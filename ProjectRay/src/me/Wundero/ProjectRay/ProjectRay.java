@@ -35,6 +35,11 @@ public class ProjectRay extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 	}
+	
+	@Override
+	public void onDisable() {
+		
+	}
 
 	private API api;
 
