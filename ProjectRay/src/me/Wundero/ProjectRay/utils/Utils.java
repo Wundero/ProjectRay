@@ -23,6 +23,7 @@ import me.Wundero.ProjectRay.fanciful.TextualComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -48,6 +49,15 @@ public class Utils {
 		}
 	}
 
+	public static boolean validateConfigSections(ConfigurationSection config, String... toValidate) {
+		for(String s : toValidate) {
+			if(!config.contains(s)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public static boolean containsOf(ArrayList<?> arr, ArrayList<?> comp) {
 		for (Object o : comp) {
 			if (arr.contains(o)) {
@@ -351,7 +361,7 @@ public class Utils {
 		return s;
 	}
 
-	public static void printError(Exception e, boolean bool) {
+	public static void printError(Exception e) {
 		ArrayList<String> toPrint = Lists.newArrayList(e.getMessage());
 		for (StackTraceElement element : e.getStackTrace()) {
 			toPrint.add("at " + element.toString());

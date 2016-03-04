@@ -1,12 +1,6 @@
 package me.Wundero.ProjectRay.framework;
 
-import java.util.List;
-
-import me.Wundero.ProjectRay.utils.Utils;
-
 import org.bukkit.OfflinePlayer;
-
-import com.google.common.collect.Lists;
 
 public class RayPlayer extends DataHolder {
 	private OfflinePlayer player;
@@ -20,27 +14,22 @@ public class RayPlayer extends DataHolder {
 		return player;
 	}
 
-	public void cacheVariableResult(String var, String[] data, Object result) {
-
-		this.putData(jvd(var, data), result);
-	}
-
-	private String jvd(String var, String[] data) {
-		List<String> list = Lists.newArrayList("variable: " + var);
-		for (String s : data) {
-			list.add(s);
-		}
-		return Utils.join("|", list);
-	}
-
-	public boolean hasVariableCache(String var, String[] data) {
-		return this.hasData(jvd(var, data));
-	}
-
-	public Object getVariableCache(String var, String[] data) {
-		if (!hasVariableCache(var, data)) {
-			return null;
-		}
-		return this.getData(jvd(var, data));
-	}
+	// Not worth it to implement yet
+	/*
+	 * public void cacheVariableResult(String var, String[] data, Object result)
+	 * {
+	 * 
+	 * this.putData(jvd(var, data), result); }
+	 * 
+	 * private String jvd(String var, String[] data) { List<String> list =
+	 * Lists.newArrayList("variable: " + var); for (String s : data) {
+	 * list.add(s); } return Utils.join("|", list); }
+	 * 
+	 * public boolean hasVariableCache(String var, String[] data) { return
+	 * this.hasData(jvd(var, data)); }
+	 * 
+	 * public Object getVariableCache(String var, String[] data) { if
+	 * (!hasVariableCache(var, data)) { return null; } return
+	 * this.getData(jvd(var, data)); }
+	 */
 }
