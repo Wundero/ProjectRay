@@ -7,7 +7,7 @@ public enum FormatType {
 	CHAT("chat", new String[] { "c" }, new Variable[] {}), MESSAGE("message",
 			new String[] { "m", "msg" }, new Variable[] {}), DEATH("death",
 			new String[] { "d" }, new Variable[] {}), JOIN(""), LEAVE(""), TAB_NAME(
-			""), CUSTOM(""), WELCOME(""), MAIL(""), MOTD("");
+			""), CUSTOM(""), WELCOME(""), MAIL(""), MOTD(""), ANNOUNCEMENT("");
 
 	// Perhaps actionbar/scoreboard/bossbar/title/tabheaderfooter
 
