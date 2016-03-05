@@ -49,6 +49,16 @@ public class Section {
 		}
 	}
 
+	public static Section createSection(ConfigurationSection section) {
+		if (section.getBoolean("selectable", false)) {
+			return new SelectableSection(section);
+		}
+		if (section.getBoolean("cacheable", false)) {
+			return new CacheableSection(section);
+		}
+		return new Section(section);
+	}
+
 	public List<String> getHover() {
 		return hover;
 	}
@@ -90,7 +100,11 @@ public class Section {
 	}
 
 	public FancyMessage getMessage(OfflinePlayer player, OfflinePlayer[] others) {
-		// TODO check player for permission
+		if (permission != null) {
+			if (!Hooks.has(player, "projectray." + permission)) {
+				return Utils.F();
+			}
+		}
 		FancyMessage fm = new FancyMessage();
 		String t = Parser.get().parse(player, others, text);
 		String c = null;

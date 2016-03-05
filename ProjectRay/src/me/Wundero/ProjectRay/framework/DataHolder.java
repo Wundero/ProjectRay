@@ -11,16 +11,18 @@ public abstract class DataHolder {
 
 	protected UUID uuid;
 
-	public synchronized Object getData(String key) {
-		return data.get(key);
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T getData(String key) {
+		return (T) data.get(key);
 	}
 
 	public synchronized boolean hasData(String key) {
 		return data.containsKey(key);
 	}
 
-	public synchronized Object removeData(String key) {
-		return data.remove(key);
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T removeData(String key) {
+		return (T) data.remove(key);
 	}
 
 	public synchronized void putData(String key, Object value) {

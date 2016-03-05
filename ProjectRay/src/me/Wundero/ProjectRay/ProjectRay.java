@@ -34,11 +34,15 @@ public class ProjectRay extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
+		// TODO load hooks
+		// TODO config
+		// TODO command architecture
+		// TODO language support
 	}
-	
+
 	@Override
 	public void onDisable() {
-		
+
 	}
 
 	private API api;
@@ -63,6 +67,8 @@ public class ProjectRay extends JavaPlugin {
 			}
 		}
 
+		// local cache of sent messages so if packet is intercepted by this
+		// plugin it can ignore it
 		public static ArrayList<String> jsons = Lists.newArrayList();
 
 		/**
@@ -74,7 +80,6 @@ public class ProjectRay extends JavaPlugin {
 
 			PacketContainer chat = new PacketContainer(
 					PacketType.Play.Server.CHAT);
-			chat.addMetadata("sentBy", "ChatR");
 			String j = (json);
 			chat.getChatComponents().write(0, WrappedChatComponent.fromJson(j));
 			jsons.add(chat.getChatComponents().read(0).getJson().toLowerCase());

@@ -6,10 +6,13 @@ public enum FormatType {
 
 	CHAT("chat", new String[] { "c" }, new Variable[] {}), MESSAGE("message",
 			new String[] { "m", "msg" }, new Variable[] {}), DEATH("death",
-			new String[] { "d" }, new Variable[] {}), JOIN(""), LEAVE(""), TAB_NAME(
-			""), CUSTOM(""), WELCOME(""), MAIL(""), MOTD(""), ANNOUNCEMENT("");
+			new String[] { "d" }, new Variable[] {}), JOIN(""), LEAVE(""), CUSTOM(
+			""), WELCOME(""), MAIL(""), MOTD(""), ANNOUNCEMENT(""), DEFAULT("");
 
-	// Perhaps actionbar/scoreboard/bossbar/title/tabheaderfooter
+	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
+	// footer)/item names/block gui names/other random text stuff
+	// all these could be animated
+	// also perhaps serverlist message (not anim)
 
 	private String[] aliases;
 	private Variable[] customVariables;
@@ -51,6 +54,23 @@ public enum FormatType {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = name.trim();
+	}
+
+	public static FormatType fromString(String s) {
+		s = s.trim();
+		for (FormatType type : values()) {
+			if (type.name.equalsIgnoreCase(s)) {
+				return type;
+			}
+		}
+		for (FormatType type : values()) {
+			for (String st : type.aliases) {
+				if (st.equalsIgnoreCase(s)) {
+					return type;
+				}
+			}
+		}
+		return DEFAULT;
 	}
 }

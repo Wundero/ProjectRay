@@ -6,6 +6,9 @@ public class RayPlayer extends DataHolder {
 	private OfflinePlayer player;
 	private String lastName;
 
+	// TODO insert map of Location > Group (location as in bungee/server/world,
+	// not bukkit loc)
+
 	public String getLastName() {
 		return lastName;
 	}

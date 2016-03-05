@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay.framework;
 import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
+import me.Wundero.ProjectRay.variables.Parser;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -41,12 +42,23 @@ public class SelectableSection extends Section {
 		}
 		FancyMessage fm = super.getMessage(player, others);
 		List<String> list = Lists.newArrayList();
+		List<String> npm = Lists.newArrayList();
+		if (super.getPermission() != null
+				&& !Hooks.has(player, "projectray." + super.getPermission())) {
+			npm = Lists.newArrayList(noPermMessage);
+		}
 		if (prependNoPerm) {
-			list.addAll(noPermMessage);
-			list.addAll(super.getHover());
+			list.addAll(Parser.get().parseList(npm, player, others));
+			if (super.getHover() != null && !super.getHover().isEmpty()) {
+				list.addAll(Parser.get().parseList(super.getHover(), player,
+						others));
+			}
 		} else {
-			list.addAll(super.getHover());
-			list.addAll(noPermMessage);
+			if (super.getHover() != null && !super.getHover().isEmpty()) {
+				list.addAll(Parser.get().parseList(super.getHover(), player,
+						others));
+			}
+			list.addAll(Parser.get().parseList(npm, player, others));
 		}
 		fm.tooltip(list);
 		return fm;
