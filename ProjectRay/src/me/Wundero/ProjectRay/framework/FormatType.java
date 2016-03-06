@@ -29,8 +29,13 @@ public enum FormatType {
 
 	CHAT("chat", new String[] { "c" }, new Variable[] {}), MESSAGE("message",
 			new String[] { "m", "msg" }, new Variable[] {}), DEATH("death",
-			new String[] { "d" }, new Variable[] {}), JOIN(""), LEAVE(""), CUSTOM(
-			""), WELCOME(""), MAIL(""), MOTD(""), ANNOUNCEMENT(""), DEFAULT("");
+			new String[] { "d" }, new Variable[] {}), JOIN("join",
+			new String[] { "j" }, new Variable[] {}), LEAVE("leave",
+			new String[] { "l" }, new Variable[] {}), CUSTOM("custom"), WELCOME(
+			"welcome", new String[] { "w" }, new Variable[] {}), MAIL("mail",
+			new String[] {}, new Variable[] {}), MOTD("motd", new String[] {},
+			new Variable[] {}), ANNOUNCEMENT("announcement",
+			new String[] { "a" }, new Variable[] {}), DEFAULT("default");
 
 	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
 	// footer)/item names/block gui names/other random text stuff
