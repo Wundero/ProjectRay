@@ -1,6 +1,8 @@
 package me.Wundero.ProjectRay.framework.iface;
 
-import java.util.Map;
+import me.Wundero.ProjectRay.framework.JSType;
+
+import org.bukkit.OfflinePlayer;
 
 /*
  The MIT License (MIT)
@@ -25,8 +27,14 @@ import java.util.Map;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public interface Configurable {
-	Map<String, Object> getDefaults();
-	
-	void load(Map<String, Object> values);
+public interface Expressable {
+	String getExpression();
+
+	String evaluate(OfflinePlayer p, Object... args);
+
+	JSType getType();
+
+	String falseResult();
+
+	String trueResult();
 }

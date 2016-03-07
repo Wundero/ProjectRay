@@ -1,6 +1,11 @@
-package me.Wundero.ProjectRay.framework.iface;
+package me.Wundero.ProjectRay.framework;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.bukkit.configuration.ConfigurationSection;
 
 /*
  The MIT License (MIT)
@@ -25,8 +30,18 @@ import java.util.Map;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public interface Configurable {
-	Map<String, Object> getDefaults();
-	
-	void load(Map<String, Object> values);
+public class Groups {
+
+	// String world is lower case
+	private final Map<String, List<Group>> groups = Collections
+			.synchronizedMap(new HashMap<String, List<Group>>());
+
+	public Groups(ConfigurationSection section) {
+
+	}
+
+	public List<Group> getGroups(String world) {
+		return groups.get(world.toLowerCase());
+	}
+
 }

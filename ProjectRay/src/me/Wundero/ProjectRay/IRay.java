@@ -1,6 +1,8 @@
-package me.Wundero.ProjectRay.framework.iface;
+package me.Wundero.ProjectRay;
 
-import java.util.Map;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  The MIT License (MIT)
@@ -25,8 +27,16 @@ import java.util.Map;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public interface Configurable {
-	Map<String, Object> getDefaults();
-	
-	void load(Map<String, Object> values);
+public interface IRay {
+	File getDirectory();
+
+	Logger getLogger();
+
+	void log(String s, Level l);
+
+	void log(String s);
+
+	String getVersion();
+
+	// TODO get + add commands
 }

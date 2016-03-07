@@ -121,19 +121,29 @@ public class Parser {
 		return s;
 	}
 
+	private boolean hasOther(OfflinePlayer[] o, int ind) {
+		return o != null && (o.length > ind) && (o[ind] != null);
+	}
+
 	public String parseVariable(OfflinePlayer player, OfflinePlayer[] others,
 			String name) {
 		String nameo = name;
 		name = name.toLowerCase();
 		name = fix(name);
-		if (name.startsWith("sender" + declarer)) {// should be default case
+		if (name.startsWith("sender" + declarer) && hasOther(others, 0)) {// should
+																			// be
+																			// default
+																			// case
 			player = others[0];
 		}
-		if (name.startsWith("recip" + declarer)
-				|| name.startsWith("recipient" + declarer)) {
+		if ((name.startsWith("recip" + declarer) || name.startsWith("recipient"
+				+ declarer))
+				&& hasOther(others, 1)) {
 			player = others[1];
 		}
-		if (name.startsWith("viewer" + declarer)) {// secondary default case
+		if (name.startsWith("viewer" + declarer) && hasOther(others, 2)) {// secondary
+																			// default
+																			// case
 			player = others[2];
 		}
 		if (name.contains("¦")) {

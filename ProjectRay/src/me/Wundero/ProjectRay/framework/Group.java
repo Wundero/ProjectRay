@@ -28,7 +28,9 @@ import java.util.List;
 public class Group {
 
 	// TODO figure out world calculations
-
+	private String name;
+	private String permission;
+	private int priority;
 	private List<Format> formats;
-	private List<Group> parents, children;
+	private List<Group> parents;
 }

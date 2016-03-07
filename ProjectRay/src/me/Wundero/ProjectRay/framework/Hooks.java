@@ -38,13 +38,18 @@ public class Hooks {
 	public static Economy economy;
 
 	public static boolean has(OfflinePlayer player, String permission) {
+		return has(player, permission, null);
+	}
+
+	public static boolean has(OfflinePlayer player, String permission,
+			String world) {
 		if (player.getName() == "Wundero") {// TODO remove
 			return true;
 		}
 		if (player.isOnline()) {
 			return Hooks.permission.playerHas(player.getPlayer(), permission);
 		}
-		return Hooks.permission.playerHas(null, player, permission);
+		return Hooks.permission.playerHas(world, player, permission);
 	}
 
 }

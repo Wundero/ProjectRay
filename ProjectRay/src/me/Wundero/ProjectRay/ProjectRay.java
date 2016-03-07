@@ -1,5 +1,6 @@
 package me.Wundero.ProjectRay;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -39,7 +40,7 @@ import com.google.common.collect.Lists;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class ProjectRay extends JavaPlugin {
+public class ProjectRay extends JavaPlugin implements IRay {
 	private static ProjectRay instance;
 
 	public static ProjectRay get() {
@@ -129,5 +130,15 @@ public class ProjectRay extends JavaPlugin {
 		public void broadcastJSONMessage(final FancyMessage message) {
 			sendJSONMessage(message);
 		}
+	}
+
+	@Override
+	public File getDirectory() {
+		return this.getDataFolder();
+	}
+
+	@Override
+	public String getVersion() {
+		return this.getDescription().getVersion();
 	}
 }

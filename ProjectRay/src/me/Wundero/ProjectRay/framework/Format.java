@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay.framework;
 import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
+import me.Wundero.ProjectRay.variables.Variable;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,10 +33,11 @@ import com.google.common.collect.Lists;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+//No world-specific formats, all specified under group
 public class Format {
 
 	// TODO default formats
-	// TODO figoure out formats on worlds/servers/bungees/whatever type of thing
 
 	private List<Section> sections;
 	private String name;

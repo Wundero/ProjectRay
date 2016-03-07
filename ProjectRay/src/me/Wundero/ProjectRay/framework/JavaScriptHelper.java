@@ -1,6 +1,9 @@
-package me.Wundero.ProjectRay.framework.iface;
+package me.Wundero.ProjectRay.framework;
 
-import java.util.Map;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import org.bukkit.Bukkit;
 
 /*
  The MIT License (MIT)
@@ -25,8 +28,23 @@ import java.util.Map;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public interface Configurable {
-	Map<String, Object> getDefaults();
-	
-	void load(Map<String, Object> values);
+public class JavaScriptHelper {
+
+	private ScriptEngine engine = null;
+
+	private JavaScriptHelper() {
+		engine = new ScriptEngineManager().getEngineByName("javascript");
+		engine.put("Server", Bukkit.getServer());
+	}
+
+	private static JavaScriptHelper helper;
+
+	public static JavaScriptHelper get() {
+		return helper == null ? (helper = new JavaScriptHelper()) : helper;
+	}
+
+	public ScriptEngine getEngine() {
+		return engine;
+	}
+
 }
