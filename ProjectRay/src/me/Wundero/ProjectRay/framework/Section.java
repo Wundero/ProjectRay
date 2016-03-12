@@ -2,6 +2,7 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
+import me.Wundero.ProjectRay.fanciful.ClickType;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.Parser;
@@ -73,11 +74,15 @@ public class Section {
 	}
 
 	public static Section createSection(ConfigurationSection section) {
+		// TODO better way of determining what type of section to use
 		if (section.getBoolean("selectable", false)) {
 			return new SelectableSection(section);
 		}
 		if (section.getBoolean("cacheable", false)) {
 			return new CacheableSection(section);
+		}
+		if (section.getBoolean("expressable", false)) {
+			return new ExpressableSection(section);
 		}
 		return new Section(section);
 	}
@@ -131,7 +136,10 @@ public class Section {
 		FancyMessage fm = new FancyMessage();
 		String t = Parser.get().parse(player, others, text);
 		String c = null;
+		ClickType ct = null;
 		if (click != null) {
+			ct = ClickType.getType(c);
+			c = ct.replace(c);
 			c = Parser.get().parse(player, others, click);// TODO get click type
 		}
 		List<String> h = null;
@@ -143,7 +151,17 @@ public class Section {
 			fm.tooltip(h);
 		}
 		if (c != null) {
-			fm.command(c);
+			switch (ct) {
+			case EXECUTE:
+				fm.command(c);
+				break;
+			case LINK:
+				fm.link(c);
+				break;
+			default:
+				fm.suggest(c);
+				break;
+			}
 		}
 		return fm;
 	}

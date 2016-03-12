@@ -56,7 +56,7 @@ public class JSVariable extends Variable implements Expressable {
 	@Override
 	public String evaluate(OfflinePlayer p, Object... args) {
 		String exp = getExpression();
-		ScriptEngine engine = JavaScriptHelper.get().getEngine();
+		ScriptEngine engine = JavaScriptHelper.getEngine();
 		engine.put("Player", p);
 		// possible infinite loop; TODO prevent?
 		exp = Parser.get().parse(p, null, exp);

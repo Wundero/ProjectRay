@@ -43,7 +43,11 @@ public class JavaScriptHelper {
 		return helper == null ? (helper = new JavaScriptHelper()) : helper;
 	}
 
-	public ScriptEngine getEngine() {
+	public static ScriptEngine getEngine() {
+		return get().getScriptEngine();
+	}
+
+	public ScriptEngine getScriptEngine() {
 		return engine;
 	}
 

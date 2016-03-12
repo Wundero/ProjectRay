@@ -27,6 +27,8 @@ import java.util.logging.Logger;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+//will be used when I add sponge/bukkit/spigot/whatever support
 public interface IRay {
 	File getDirectory();
 

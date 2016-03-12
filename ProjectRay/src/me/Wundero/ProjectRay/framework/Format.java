@@ -3,7 +3,6 @@ package me.Wundero.ProjectRay.framework;
 import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
-import me.Wundero.ProjectRay.variables.Variable;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;

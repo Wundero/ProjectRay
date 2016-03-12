@@ -28,6 +28,7 @@ import java.util.List;
 public class Group {
 
 	// TODO figure out world calculations
+	// TODO figure out how to generate parents
 	private String name;
 	private String permission;
 	private int priority;
