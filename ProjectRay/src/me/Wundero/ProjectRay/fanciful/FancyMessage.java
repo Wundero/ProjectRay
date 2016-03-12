@@ -611,10 +611,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		}
 	}
 
-	// TODO split method for messageparts
-
 	public String toJSONString() {
-		// TODO force splitting of messageparts
 		if ((!this.dirty) && (this.jsonString != null)) {
 			return this.jsonString;
 		}
