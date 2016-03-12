@@ -36,7 +36,8 @@ import com.google.common.collect.Lists;
 //No world-specific formats, all specified under group
 public class Format {
 
-	// TODO default formats
+	// TODO default formats - create default package that handles default
+	// grps/formats/everything else
 
 	private List<Section> sections;
 	private String name;

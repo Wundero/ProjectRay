@@ -60,9 +60,53 @@ public class ProjectRay extends JavaPlugin implements IRay {
 		instance = this;
 		// TODO load hooks
 		// TODO config
-		// TODO command architecture
+		// TODO command architecture - potentially use GUI's?
 		// TODO language support
 		// TODO put liscence in all files
+		// TODO multiple server type support - sponge & spigot
+		// TODO better GUI system - usefull for select sects
+		// TODO converter from other plugins
+		// TODO customizable name
+		// TODO try to minimize singletons (static = overhead)
+		// TODO try to minimize reflection (overhead)
+		// TODO performance monitor (this plugin only, don't do massivelag/top)
+		// TODO event structure and animation handler?
+		// TODO credit mkremins for fanciful lib - state that is modified???
+
+		// IDEAS:
+		/*
+		 * Custom commands like DeluxeCommands
+		 * 
+		 * Control all text not just chat - bossbar/scoreboard/tablist
+		 * name&header&footer/actionbar/title/subtitle/whatever else
+		 * 
+		 * perhaps shift to multi purpose plugin: permissions plugin w/ group &
+		 * player architecture command struct like ess/pex/others all in one
+		 * 
+		 * better scripting system - support lua, js and other script langs
+		 * 
+		 * config helper - ext program that allows you to format chat how you
+		 * want and gens a config based on the settings you choose - support
+		 * json by selecting sections and adding click/hover to them
+		 * 
+		 * in-game file browser - use GUI's and fancy-convos to edit files
+		 * nicely - support txt yaml and other files
+		 * 
+		 * animations - figure out best way to do this (threads, events, etc.)
+		 * 
+		 * figure out best way to have changing text in-game w/o resending text,
+		 * or best way of resending text - when dc2 release decomp to look for
+		 * this
+		 * 
+		 * minimize dependencies (try to remove protocollib and vault (because
+		 * can be perms plugin) and add as soft-depends)
+		 * 
+		 * mavenize (add repo, remove libs)
+		 * 
+		 * try to increase version support (1.7-1.9 at least, 1.4-1.9 best)
+		 * 
+		 * converter from fanciful to texts (spigot to sponge)
+		 */
 	}
 
 	@Override

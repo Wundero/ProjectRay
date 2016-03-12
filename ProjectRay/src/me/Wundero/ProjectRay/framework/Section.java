@@ -140,7 +140,7 @@ public class Section {
 		if (click != null) {
 			ct = ClickType.getType(c);
 			c = ct.replace(c);
-			c = Parser.get().parse(player, others, click);// TODO get click type
+			c = Parser.get().parse(player, others, click);
 		}
 		List<String> h = null;
 		if (hover != null && !hover.isEmpty()) {
