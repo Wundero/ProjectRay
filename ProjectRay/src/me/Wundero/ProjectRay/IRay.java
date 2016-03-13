@@ -40,5 +40,7 @@ public interface IRay {
 
 	String getVersion();
 
+	API getAPI();
+
 	// TODO get + add commands
 }

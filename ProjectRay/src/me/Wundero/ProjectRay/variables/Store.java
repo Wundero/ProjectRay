@@ -50,6 +50,10 @@ public class Store {
 		}
 	}
 
+	public boolean has(String id) {
+		return get(id) != null;
+	}
+
 	public static Store get() {
 		if (store == null) {
 			store = new Store();
@@ -61,18 +65,29 @@ public class Store {
 		return vars.get(Parser.get().fix(id.toLowerCase()));
 	}
 
-	public void remove(Variable v) {
-		remove(v.getName());
+	public boolean remove(Variable v) {
+		return remove(v.getName());
 	}
 
-	public void remove(String id) {
+	public boolean remove(String id) {
+		if (!has(id)) {
+			return false;
+		}
 		this.vars.remove(Parser.get().fix(id.toLowerCase())).unregister();
+		return true;
 	}
 
-	public void add(Variable v) {
+	public boolean add(Variable v) {
+		if (v == null) {
+			return false;
+		}
+		if (v.getName() == null) {
+			return false;
+		}
 		String id = v.getName();
 		id = id.toLowerCase();
 		vars.put(id, v);
 		v.register();
+		return true;
 	}
 }

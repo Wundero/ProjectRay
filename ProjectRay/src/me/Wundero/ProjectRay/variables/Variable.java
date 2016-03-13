@@ -39,12 +39,12 @@ public abstract class Variable {
 		return name;
 	}
 
-	public void register() {
-
+	public boolean register() {
+		return true;
 	}
 
-	public void unregister() {
-
+	public boolean unregister() {
+		return true;
 	}
 
 	public final void setName(String name) {
