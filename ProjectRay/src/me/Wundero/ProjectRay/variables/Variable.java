@@ -39,14 +39,6 @@ public abstract class Variable {
 		return name;
 	}
 
-	public boolean register() {
-		return true;
-	}
-
-	public boolean unregister() {
-		return true;
-	}
-
 	public final void setName(String name) {
 		this.name = name.toLowerCase();
 		fix();

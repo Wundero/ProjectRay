@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.Wundero.ProjectRay.framework.expansion.ExpansionManager;
+
 /*
  The MIT License (MIT)
 
@@ -41,6 +43,8 @@ public interface IRay {
 	String getVersion();
 
 	API getAPI();
+	
+	ExpansionManager getExpansionManager();
 
 	// TODO get + add commands
 }

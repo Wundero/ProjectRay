@@ -73,7 +73,7 @@ public class Store {
 		if (!has(id)) {
 			return false;
 		}
-		this.vars.remove(Parser.get().fix(id.toLowerCase())).unregister();
+		this.vars.remove(Parser.get().fix(id.toLowerCase()));
 		return true;
 	}
 
@@ -87,7 +87,6 @@ public class Store {
 		String id = v.getName();
 		id = id.toLowerCase();
 		vars.put(id, v);
-		v.register();
 		return true;
 	}
 }

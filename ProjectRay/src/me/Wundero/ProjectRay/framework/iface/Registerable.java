@@ -1,9 +1,4 @@
-package me.Wundero.ProjectRay.framework;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
-
-import me.Wundero.ProjectRay.framework.iface.Expressable;
+package me.Wundero.ProjectRay.framework.iface;
 
 /*
  The MIT License (MIT)
@@ -28,37 +23,8 @@ import me.Wundero.ProjectRay.framework.iface.Expressable;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class ExpressableSection extends Section implements Expressable {
+public interface Registerable {
+	boolean register();
 
-	// TODO this class
-
-	public ExpressableSection(ConfigurationSection config) {
-		super(config);
-	}
-
-	@Override
-	public String getExpression() {
-		return null;
-	}
-
-	@Override
-	public String evaluate(OfflinePlayer p, Object... args) {
-		return null;
-	}
-
-	@Override
-	public JSType getType() {
-		return null;
-	}
-
-	@Override
-	public String falseResult() {
-		return null;
-	}
-
-	@Override
-	public String trueResult() {
-		return null;
-	}
-
+	boolean unregister();
 }

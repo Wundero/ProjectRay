@@ -1,13 +1,17 @@
 package me.Wundero.ProjectRay.framework;
 
 import java.util.HashMap;
+import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.iface.Cacheable;
+import me.Wundero.ProjectRay.utils.PRTimeUnit;
+import me.Wundero.ProjectRay.utils.Utils;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /*
@@ -41,15 +45,36 @@ public class CacheableSection extends Section implements Cacheable {
 		private HashMap<String, Long> expiries = Maps.newHashMap();
 
 		@Override
-		public void putData(String key, Object value) {
+		public void putData(final String key, Object value) {
 			super.putData(key, value);
-			expiries.put(key, ((System.nanoTime() + 600000000000l)));
+			expiries.put(key, ((System.nanoTime() + (long) Utils.convert(10,
+					PRTimeUnit.MINUTES, PRTimeUnit.NANOSECONDS))));
+			Utils.sync(new Runnable() {// 10 mins later run
+						@Override
+						public void run() {
+							purge(key);
+						}
+					}, 20 * (long) (Utils.convert(10, PRTimeUnit.MINUTES,
+							PRTimeUnit.SECONDS)));
+		}
+
+		private List<String> locked = Lists.newArrayList();
+
+		public synchronized void purge(String key) {
+			locked.add(key);
+			this.removeData(key);
+			expiries.remove(key);
+			locked.remove(key);
 		}
 
 		@Override
 		public boolean hasData(String key) {
+			if (locked.contains(key)) {
+				return false;
+			}
 			if (super.hasData(key)) {
 				if (System.nanoTime() > expiries.get(key)) {
+					purge(key);
 					return false;
 				}
 				return true;

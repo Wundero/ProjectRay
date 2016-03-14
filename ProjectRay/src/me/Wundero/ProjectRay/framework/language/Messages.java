@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.ProjectRay.framework.language;
 
 /*
  The MIT License (MIT)
@@ -23,42 +23,6 @@ package me.Wundero.ProjectRay.framework;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public enum JSType {
-
-	BOOLEAN("boolean", Boolean.class), STRING("string", String.class);
-
-	private String name;
-	private Class<?> clazz;
-
-	JSType(String name, Class<?> clazz) {
-		this.setName(name);
-		this.setClazz(clazz);
-	}
-
-	public static JSType getType(String t) {
-		t = t.toLowerCase();
-		for (JSType ty : values()) {
-			if (ty.name.toLowerCase() == t) {
-				return ty;
-			}
-		}
-		return STRING;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Class<?> getClazz() {
-		return clazz;
-	}
-
-	public void setClazz(Class<?> clazz) {
-		this.clazz = clazz;
-	}
+public class Messages {
 
 }

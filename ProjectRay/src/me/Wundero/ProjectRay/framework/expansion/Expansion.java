@@ -1,8 +1,6 @@
-package me.Wundero.ProjectRay.framework.iface;
+package me.Wundero.ProjectRay.framework.expansion;
 
-import me.Wundero.ProjectRay.framework.JSType;
-
-import org.bukkit.OfflinePlayer;
+import me.Wundero.ProjectRay.framework.iface.Registerable;
 
 /*
  The MIT License (MIT)
@@ -27,14 +25,14 @@ import org.bukkit.OfflinePlayer;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public interface Expressable {
-	String getExpression();
+public interface Expansion extends Registerable {
 
-	String evaluate(OfflinePlayer p, Object... args);
+	String version();
 
-	JSType getType();
+	String author();
 
-	String falseResult();
+	String identifier();
 
-	String trueResult();
+	String plugin();
+
 }

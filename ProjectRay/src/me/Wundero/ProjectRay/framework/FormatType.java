@@ -1,7 +1,5 @@
 package me.Wundero.ProjectRay.framework;
 
-import me.Wundero.ProjectRay.variables.Variable;
-
 /*
  The MIT License (MIT)
 
@@ -27,15 +25,12 @@ import me.Wundero.ProjectRay.variables.Variable;
  */
 public enum FormatType {
 
-	CHAT("chat", new String[] { "c" }, new Variable[] {}), MESSAGE("message",
-			new String[] { "m", "msg" }, new Variable[] {}), DEATH("death",
-			new String[] { "d" }, new Variable[] {}), JOIN("join",
-			new String[] { "j" }, new Variable[] {}), LEAVE("leave",
-			new String[] { "l" }, new Variable[] {}), CUSTOM("custom"), WELCOME(
-			"welcome", new String[] { "w" }, new Variable[] {}), MAIL("mail",
-			new String[] {}, new Variable[] {}), MOTD("motd", new String[] {},
-			new Variable[] {}), ANNOUNCEMENT("announcement",
-			new String[] { "a" }, new Variable[] {}), DEFAULT("default");
+	CHAT("chat", new String[] { "c" }), MESSAGE("message", new String[] { "m",
+			"msg" }), DEATH("death", new String[] { "d" }), JOIN("join",
+			new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM(
+			"custom"), WELCOME("welcome", new String[] { "w" }), MAIL("mail",
+			new String[] {}), MOTD("motd", new String[] {}), ANNOUNCEMENT(
+			"announcement", new String[] { "a" }), DEFAULT("default");
 
 	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
 	// footer)/item names/block gui names/other random text stuff
@@ -43,7 +38,6 @@ public enum FormatType {
 	// also perhaps serverlist message (not anim)
 
 	private String[] aliases;
-	private Variable[] customVariables;
 	private String name;
 
 	FormatType(String name) {
@@ -53,20 +47,6 @@ public enum FormatType {
 	FormatType(String name, String[] aliases) {
 		this.setName(name);
 		this.setAliases(aliases);
-	}
-
-	FormatType(String name, String[] aliases, Variable[] customVariables) {
-		this.setName(name);
-		this.setAliases(aliases);
-		this.setCustomVariables(customVariables);
-	}
-
-	public Variable[] getCustomVariables() {
-		return customVariables;
-	}
-
-	public void setCustomVariables(Variable[] customVariables) {
-		this.customVariables = customVariables;
 	}
 
 	public String[] getAliases() {

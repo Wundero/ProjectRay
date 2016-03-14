@@ -32,7 +32,7 @@ import org.bukkit.OfflinePlayer;
 public class Hooks {
 
 	// TODO vault hooks, other chatplugin hooks, more stuff
-	// TODO move hooks and loading/placeholder hooks n stuff to separate package
+	// TODO move hooks and loading/placeholder hooks n stuff to separate package (or load externally?)
 
 	public static Permission permission;
 	public static Chat chat;

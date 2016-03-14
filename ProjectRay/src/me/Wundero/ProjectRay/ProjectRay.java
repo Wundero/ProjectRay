@@ -3,7 +3,14 @@ package me.Wundero.ProjectRay;
 import java.io.File;
 import java.util.logging.Level;
 
+import me.Wundero.ProjectRay.framework.Hooks;
+import me.Wundero.ProjectRay.framework.expansion.ExpansionManager;
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /*
@@ -48,6 +55,11 @@ public class ProjectRay extends JavaPlugin implements IRay {
 	public void onEnable() {
 		instance = this;
 		api = new API();
+		exp = new ExpansionManager();
+		ServicesManager sv = getServer().getServicesManager();
+		Hooks.chat = sv.getRegistration(Chat.class).getProvider();
+		Hooks.permission = sv.getRegistration(Permission.class).getProvider();
+		Hooks.economy = sv.getRegistration(Economy.class).getProvider();
 		// TODO load hooks
 		// TODO config
 		// TODO command architecture - potentially use GUI's?
@@ -106,6 +118,7 @@ public class ProjectRay extends JavaPlugin implements IRay {
 	}
 
 	private API api;
+	private ExpansionManager exp;
 
 	@Override
 	public API getAPI() {
@@ -120,6 +133,11 @@ public class ProjectRay extends JavaPlugin implements IRay {
 	@Override
 	public String getVersion() {
 		return this.getDescription().getVersion();
+	}
+
+	@Override
+	public ExpansionManager getExpansionManager() {
+		return exp;
 	}
 
 }

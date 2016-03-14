@@ -81,9 +81,6 @@ public class Section {
 		if (section.getBoolean("cacheable", false)) {
 			return new CacheableSection(section);
 		}
-		if (section.getBoolean("expressable", false)) {
-			return new ExpressableSection(section);
-		}
 		return new Section(section);
 	}
 

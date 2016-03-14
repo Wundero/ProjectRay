@@ -19,6 +19,7 @@ import me.Wundero.ProjectRay.fanciful.JsonString;
 import me.Wundero.ProjectRay.fanciful.MessagePart;
 import me.Wundero.ProjectRay.fanciful.NullMessagePart;
 import me.Wundero.ProjectRay.fanciful.TextualComponent;
+import me.Wundero.ProjectRay.framework.Hooks;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -115,6 +116,10 @@ public class Utils {
 
 	public static OfflinePlayer getPlayer(UUID uuid) {
 		return Bukkit.getOfflinePlayer(uuid);
+	}
+
+	public static boolean has(OfflinePlayer player, String permission) {
+		return Hooks.has(player, permission);
 	}
 
 	public static final UUID pregenUUID = UUID.randomUUID();
@@ -303,6 +308,23 @@ public class Utils {
 	}
 
 	public static BukkitTask async(final Runnable r, long delay, long repeat) {
+		if (repeat == 0) {
+			return Bukkit.getScheduler().runTaskLaterAsynchronously(
+					ProjectRay.get(), r, delay);
+		}
+		return Bukkit.getScheduler().runTaskTimerAsynchronously(
+				ProjectRay.get(), r, delay, repeat);
+	}
+
+	public static BukkitTask sync(final Runnable r) {
+		return sync(r, 0, 0);
+	}
+
+	public static BukkitTask sync(final Runnable r, long delay) {
+		return sync(r, delay, 0);
+	}
+
+	public static BukkitTask sync(final Runnable r, long delay, long repeat) {
 		if (repeat == 0) {
 			return Bukkit.getScheduler().runTaskLater(ProjectRay.get(), r,
 					delay);
