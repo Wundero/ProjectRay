@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
+import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.framework.iface.Cacheable;
 import me.Wundero.ProjectRay.utils.PRTimeUnit;
 import me.Wundero.ProjectRay.utils.Utils;
@@ -36,9 +37,8 @@ import com.google.common.collect.Maps;
  */
 public class CacheableSection extends Section implements Cacheable {
 
-	public CacheableSection(String n, String t, String c, String p,
-			List<String> h) {
-		super(n, t, c, p, h);
+	public CacheableSection(ConfigSection sect) {
+		super(sect);
 	}
 
 	// expirable data cache (10 mins) TODO configurable expiry

@@ -32,7 +32,7 @@ public abstract class Config extends ConfigSection {
 	protected File file;
 
 	public Config(File file) throws IOException {
-		super(file.getName(), null);
+		super("", null);
 		load();
 	}
 

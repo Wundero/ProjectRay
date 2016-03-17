@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay.framework;
 import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
+import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.variables.Parser;
 
 import com.google.common.collect.Lists;
@@ -31,24 +32,29 @@ import com.google.common.collect.Lists;
  SOFTWARE.
  */
 public class SelectableSection extends Section {
-	/*
-	 * public SelectableSection(ConfigurationSection config) { super(config); if
-	 * (!config.contains("display_no_permissions")) { setDisplay(false); } else
-	 * { setDisplay(config.getBoolean("display_no_permissions")); }
-	 * 
-	 * if (!config.contains("no_permissions_text")) {
-	 * this.setNoPermMessage(null); } else if (config.get("no_permissions_text")
-	 * instanceof String) { this.setNoPermMessage(Lists.newArrayList(config
-	 * .getString("no_permissions_text"))); } else {
-	 * this.setNoPermMessage(Lists.newArrayList(config
-	 * .getStringList("no_permissions_text"))); } if
-	 * (!config.contains("prepend_no_permissions")) { setPrependNoPerm(false); }
-	 * else { setPrependNoPerm(config.getBoolean("prepend_no_permissions")); } }
-	 */
 
-	public SelectableSection(String n, String t, String c, String p,
-			List<String> h) {
-		super(n, t, c, p, h);
+	public SelectableSection(ConfigSection config) {
+		super(config);
+		if (!config.contains("display_no_permissions")) {
+			setDisplay(false);
+		} else {
+			setDisplay(config.getBoolean("display_no_permissions"));
+		}
+
+		if (!config.contains("no_permissions_text")) {
+			this.setNoPermMessage(null);
+		} else if (config.get("no_permissions_text") instanceof String) {
+			this.setNoPermMessage(Lists.newArrayList(config
+					.getString("no_permissions_text")));
+		} else {
+			this.setNoPermMessage(Lists.newArrayList(config
+					.getStringList("no_permissions_text")));
+		}
+		if (!config.contains("prepend_no_permissions")) {
+			setPrependNoPerm(false);
+		} else {
+			setPrependNoPerm(config.getBoolean("prepend_no_permissions"));
+		}
 	}
 
 	@Override
