@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.configuration.ConfigurationSection;
+import me.Wundero.ProjectRay.framework.config.ConfigSection;
 
 /*
  The MIT License (MIT)
@@ -36,7 +36,7 @@ public class Groups {
 	private final Map<String, List<Group>> groups = Collections
 			.synchronizedMap(new HashMap<String, List<Group>>());
 
-	public Groups(ConfigurationSection section) {
+	public Groups(ConfigSection section) {
 
 	}
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bukkit.OfflinePlayer;
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 import com.google.common.collect.Lists;
 
@@ -121,12 +121,12 @@ public class Parser {
 		return s;
 	}
 
-	private boolean hasOther(OfflinePlayer[] o, int ind) {
+	private boolean hasOther(PlayerWrapper<?>[] o, int ind) {
 		return o != null && (o.length > ind) && (o[ind] != null);
 	}
 
-	public String parseVariable(OfflinePlayer player, OfflinePlayer[] others,
-			String name) {
+	public String parseVariable(PlayerWrapper<?> player,
+			PlayerWrapper<?>[] others, String name) {
 		String nameo = name;
 		name = name.toLowerCase();
 		name = fix(name);
@@ -195,8 +195,8 @@ public class Parser {
 				+ "" + normtouni.get(s.charAt(s.length() - 1));
 	}
 
-	public String parseIteration(OfflinePlayer player, OfflinePlayer[] others,
-			String s, int iterations) {
+	public String parseIteration(PlayerWrapper<?> player,
+			PlayerWrapper<?>[] others, String s, int iterations) {
 		String out = s;
 		for (int i = 0; i < iterations; i++) {
 			out = parse(player, others, out);
@@ -205,7 +205,7 @@ public class Parser {
 	}
 
 	public List<String> parseListIteration(Iterable<String> list,
-			OfflinePlayer player, OfflinePlayer[] others, int iterations) {
+			PlayerWrapper<?> player, PlayerWrapper<?>[] others, int iterations) {
 		List<String> l = Lists.newArrayList();
 		for (String s : list) {
 			l.add(parseIteration(player, others, s, iterations));
@@ -214,7 +214,7 @@ public class Parser {
 	}
 
 	public List<String> parseListUntilDone(Iterable<String> list,
-			OfflinePlayer player, OfflinePlayer[] others) {
+			PlayerWrapper<?> player, PlayerWrapper<?>[] others) {
 		List<String> l = Lists.newArrayList();
 		for (String s : list) {
 			l.add(parseUntilDone(player, others, s));
@@ -222,8 +222,8 @@ public class Parser {
 		return l;
 	}
 
-	public String parseUntilDone(OfflinePlayer player, OfflinePlayer[] others,
-			String s) {
+	public String parseUntilDone(PlayerWrapper<?> player,
+			PlayerWrapper<?>[] others, String s) {
 		String out = s;
 		String parsed = s;
 		while (out != (parsed = parse(player, others, out))) {
@@ -232,8 +232,8 @@ public class Parser {
 		return out;
 	}
 
-	public List<String> parseList(Iterable<String> list, OfflinePlayer player,
-			OfflinePlayer[] others) {
+	public List<String> parseList(Iterable<String> list,
+			PlayerWrapper<?> player, PlayerWrapper<?>[] others) {
 		List<String> l = Lists.newArrayList();
 		for (String s : list) {
 			l.add(parse(player, others, s));
@@ -241,7 +241,8 @@ public class Parser {
 		return l;
 	}
 
-	public String parse(OfflinePlayer player, OfflinePlayer[] others, String st) {
+	public String parse(PlayerWrapper<?> player, PlayerWrapper<?>[] others,
+			String st) {
 		String s = st;
 		Matcher ma = pattern.matcher(s);
 		while (ma.reset(s).find()) {

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import me.Wundero.ProjectRay.ProjectRay;
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
 import me.Wundero.ProjectRay.utils.Utils;
 
 import org.bukkit.Achievement;
@@ -22,7 +22,6 @@ import org.bukkit.Statistic;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonArray;
@@ -61,6 +60,8 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		return lc;
 	}
 
+	// TODO move this to Bukkit side
+
 	public String getLastHover() {
 		String lc = null;
 		for (MessagePart p : messageParts) {
@@ -97,12 +98,8 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		messageParts.set(ind, p);
 	}
 
-	public void send(Player... p) {
-		try {
-			ProjectRay.get().getAPI().sendjson(this.clone().toJSONString(), p);
-		} catch (CloneNotSupportedException e) {
-			ProjectRay.get().getAPI().sendjson(this.toJSONString(), p);
-		}
+	public void send(PlayerWrapper<?>... p) {
+		// TODO send
 	}
 
 	public boolean insert(MessagePart m, int index) {
@@ -114,8 +111,8 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		}
 	}
 
-	public void send(Iterable<Player> p) {
-		for (Player pl : p) {
+	public void send(Iterable<PlayerWrapper<?>> p) {
+		for (PlayerWrapper<?> pl : p) {
 			send(pl);
 		}
 	}

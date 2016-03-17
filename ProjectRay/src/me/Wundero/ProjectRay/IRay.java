@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
+import me.Wundero.ProjectRay.framework.config.Config;
+import me.Wundero.ProjectRay.framework.expansion.Expansion;
 import me.Wundero.ProjectRay.framework.expansion.ExpansionManager;
 
 /*
@@ -42,9 +45,13 @@ public interface IRay {
 
 	String getVersion();
 
-	API getAPI();
-	
-	ExpansionManager getExpansionManager();
+	ExpansionManager getExpansionManager();// TODO remove
+
+	boolean registerExpansion(Expansion e);// TODO remove
+
+	void sendJSON(final String json, final PlayerWrapper<?>... to);
+
+	Config config();
 
 	// TODO get + add commands
 }

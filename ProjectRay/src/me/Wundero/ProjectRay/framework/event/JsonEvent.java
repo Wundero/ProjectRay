@@ -35,6 +35,8 @@ import com.google.common.collect.Lists;
  */
 public abstract class JsonEvent extends Event implements Cancellable {
 
+	// BUKKIT ONLY - TODO SPONGE SUPPORT
+
 	private HandlerList handlers;
 	private boolean cancelled;
 	private List<Sendable> objects = Lists.newArrayList();

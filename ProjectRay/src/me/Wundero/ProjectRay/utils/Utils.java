@@ -19,13 +19,11 @@ import me.Wundero.ProjectRay.fanciful.JsonString;
 import me.Wundero.ProjectRay.fanciful.MessagePart;
 import me.Wundero.ProjectRay.fanciful.NullMessagePart;
 import me.Wundero.ProjectRay.fanciful.TextualComponent;
-import me.Wundero.ProjectRay.framework.Hooks;
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
+import me.Wundero.ProjectRay.framework.config.ConfigSection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -58,6 +56,7 @@ import com.google.common.collect.Maps;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+//TODO move bukkit stuff to BukkitUtils class and Sponge stuff to SpongeUtils class
 public class Utils {
 
 	private static final FancyMessage F = new FancyMessage("");
@@ -73,7 +72,7 @@ public class Utils {
 		}
 	}
 
-	public static boolean validateConfigSections(ConfigurationSection config,
+	public static boolean validateConfigSections(ConfigSection config,
 			String... toValidate) {
 		for (String s : toValidate) {
 			if (!config.contains(s)) {
@@ -105,22 +104,16 @@ public class Utils {
 		return Pattern.compile(pattern, flag);
 	}
 
-	@SuppressWarnings("deprecation")
-	public static OfflinePlayer getPlayer(String name) {
-		if (Bukkit.getOfflinePlayer(name) != null
-				&& Bukkit.getOfflinePlayer(name).getFirstPlayed() > 0) {
-			return Bukkit.getOfflinePlayer(name);
-		}
-		return null;
-	}
-
-	public static OfflinePlayer getPlayer(UUID uuid) {
-		return Bukkit.getOfflinePlayer(uuid);
-	}
-
-	public static boolean has(OfflinePlayer player, String permission) {
-		return Hooks.has(player, permission);
-	}
+	// Move this to Bukkit
+	/*
+	 * @SuppressWarnings("deprecation") public static OfflinePlayer
+	 * getPlayer(String name) { if (Bukkit.getOfflinePlayer(name) != null &&
+	 * Bukkit.getOfflinePlayer(name).getFirstPlayed() > 0) { return
+	 * Bukkit.getOfflinePlayer(name); } return null; }
+	 * 
+	 * public static OfflinePlayer getPlayer(UUID uuid) { return
+	 * Bukkit.getOfflinePlayer(uuid); }
+	 */
 
 	public static final UUID pregenUUID = UUID.randomUUID();
 
@@ -180,7 +173,8 @@ public class Utils {
 		return to.convert(val, from);
 	}
 
-	public static String strip(String s) {
+	public static String strip(String s) {// TODO figure out way to make this
+											// sponge compatible
 		return ChatColor.stripColor(s);
 	}
 
@@ -220,10 +214,11 @@ public class Utils {
 		return applyUrlsNew(m);
 	}
 
-	public synchronized static String getAnsi(ChatColor c) {
+	public synchronized static String getAnsi(ChatColor c) {// TODO spongify
 		return replacements.get(c);
 	}
 
+	// TODO Sponge stuff
 	private static final Map<ChatColor, String> replacements = Maps
 			.newHashMap();
 	static {
@@ -287,6 +282,7 @@ public class Utils {
 		}
 	}
 
+	// TODO sponge
 	public static DamageCause randomCause() {
 
 		ArrayList<DamageCause> values = Lists
@@ -299,14 +295,17 @@ public class Utils {
 		return values.get(index);
 	}
 
+	// TODO sponge
 	public static BukkitTask async(final Runnable r) {
 		return async(r, 0, 0);
 	}
 
+	// TODO sponge
 	public static BukkitTask async(final Runnable r, long delay) {
 		return async(r, delay, 0);
 	}
 
+	// TODO sponge
 	public static BukkitTask async(final Runnable r, long delay, long repeat) {
 		if (repeat == 0) {
 			return Bukkit.getScheduler().runTaskLaterAsynchronously(
@@ -316,14 +315,17 @@ public class Utils {
 				ProjectRay.get(), r, delay, repeat);
 	}
 
+	// TODO sponge
 	public static BukkitTask sync(final Runnable r) {
 		return sync(r, 0, 0);
 	}
 
+	// TODO sponge
 	public static BukkitTask sync(final Runnable r, long delay) {
 		return sync(r, delay, 0);
 	}
 
+	// TODO sponge
 	public static BukkitTask sync(final Runnable r, long delay, long repeat) {
 		if (repeat == 0) {
 			return Bukkit.getScheduler().runTaskLater(ProjectRay.get(), r,
@@ -367,6 +369,7 @@ public class Utils {
 		return out;
 	}
 
+	// TODO sponge
 	public static boolean isFormat(ChatColor paramChatColor) {
 		return paramChatColor.isFormat();
 	}
@@ -385,6 +388,7 @@ public class Utils {
 		return o;
 	}
 
+	// TODO sponge
 	public static String trans(String s) {
 		if (s == null) {
 			return "";
@@ -483,6 +487,7 @@ public class Utils {
 		return o;
 	}
 
+	// TODO sponge
 	public static boolean call(Cancellable e) {
 		Bukkit.getPluginManager().callEvent((Event) e);
 		return !e.isCancelled();
@@ -526,10 +531,6 @@ public class Utils {
 		return nanoseconds < 200000000l;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(capitalize("hello"));
-	}
-
 	public static String capitalize(String s) {
 		int i = 0;
 		for (Character c : s.toCharArray()) {
@@ -549,6 +550,7 @@ public class Utils {
 		return s;
 	}
 
+	// TODO move to BukkitUtils
 	public static FancyMessage makeFancy(String paramString) {
 		if (paramString == null) {
 			paramString = "";
@@ -643,6 +645,7 @@ public class Utils {
 		return localFancyMessage;
 	}
 
+	// TODO move to BukkitUtils
 	public static FancyMessage applyUrlsNew(final FancyMessage m) {
 		MessagePart part = new MessagePart(TextualComponent.rawText(""));
 		part.clickActionName = "open_url";
@@ -686,6 +689,7 @@ public class Utils {
 		return applyRegex(m, URL_PATTERN, part, click, hover);
 	}
 
+	// TODO move to BukkitUtils
 	/**
 	 * @param actionData
 	 *            The data to replace the parts with the matching regex with.
@@ -820,6 +824,7 @@ public class Utils {
 		return recompile(fm);
 	}
 
+	// TODO move to BukkitUtils
 	public static FancyMessage replaceRegex(final FancyMessage message,
 			final Pattern regex, final FancyMessage replaceWith) {
 		FancyMessage message1 = recompile(message);
@@ -965,6 +970,7 @@ public class Utils {
 		return list.get(list.size() - 1);
 	}
 
+	// TODO move to BukkitUtils
 	/**
 	 * Splits the message into proper color-based message parts Ex: blah&bhalb
 	 * becomes {blah},{&bblah} (crude pseudocode, but similar concept) Hover and
@@ -1037,6 +1043,7 @@ public class Utils {
 		return message;
 	}
 
+	// TODO move to BukkitUtils
 	// translates text (only difference)
 	public static FancyMessage recompile(final FancyMessage message, boolean i) {
 		if (message == null) {
@@ -1132,26 +1139,30 @@ public class Utils {
 
 	}
 
-	private static ArrayList<Player> playersAlphabetical = Lists.newArrayList();
+	private static ArrayList<PlayerWrapper<?>> playersAlphabetical = Lists
+			.newArrayList();
 
-	private static ArrayList<Player> sort(ArrayList<Player> list) {
-		list.sort(new Comparator<Player>() {
+	private static ArrayList<PlayerWrapper<?>> sort(
+			ArrayList<PlayerWrapper<?>> list) {
+		list.sort(new Comparator<PlayerWrapper<?>>() {
 			@Override
-			public int compare(Player o1, Player o2) {
-				return o1.getName().compareToIgnoreCase(o2.getName());
+			public int compare(PlayerWrapper<?> o1, PlayerWrapper<?> o2) {
+				return o1.getLastName().compareToIgnoreCase(o2.getLastName());
 			}
 		});
 		return list;
 	}
 
+	// TODO online players
 	public static void updatePlayersAplha() {
-		playersAlphabetical = sort(Lists
-				.newArrayList(Bukkit.getOnlinePlayers()));
+		/*
+		 * playersAlphabetical = sort(Lists .newArrayList(players));
+		 */
 	}
 
 	@SuppressWarnings("unchecked")
-	public static ArrayList<Player> getPlayers() {
-		return (ArrayList<Player>) playersAlphabetical.clone();
+	public static ArrayList<PlayerWrapper<?>> getPlayers() {
+		return (ArrayList<PlayerWrapper<?>>) playersAlphabetical.clone();
 	}
 
 }

@@ -41,6 +41,7 @@ import com.google.common.collect.Lists;
  *         Contains utils from @Authors Slikey and iSach
  *
  */
+//TODO move to Bukkit or replace vector math parts
 public class MathUtils {
 
 	static public final float nanoToSec = 1 / 1000000000f;

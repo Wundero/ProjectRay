@@ -8,9 +8,6 @@ import me.Wundero.ProjectRay.framework.iface.Cacheable;
 import me.Wundero.ProjectRay.utils.PRTimeUnit;
 import me.Wundero.ProjectRay.utils.Utils;
 
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -38,6 +35,11 @@ import com.google.common.collect.Maps;
  SOFTWARE.
  */
 public class CacheableSection extends Section implements Cacheable {
+
+	public CacheableSection(String n, String t, String c, String p,
+			List<String> h) {
+		super(n, t, c, p, h);
+	}
 
 	// expirable data cache (10 mins) TODO configurable expiry
 	private DataHolder cache = new DataHolder() {
@@ -84,17 +86,14 @@ public class CacheableSection extends Section implements Cacheable {
 
 	};
 
-	public CacheableSection(ConfigurationSection config) {
-		super(config);
-	}
-
 	@Override
 	public void clear() {
 		cache.clearData();
 	}
 
 	@Override
-	public FancyMessage getMessage(OfflinePlayer player, OfflinePlayer[] others) {
+	public FancyMessage getMessage(PlayerWrapper<?> player,
+			PlayerWrapper<?>[] others) {
 		String s = compileToKey(player, others);
 		if (cache.hasData(s)) {
 			return cache.getData(s);
@@ -104,23 +103,23 @@ public class CacheableSection extends Section implements Cacheable {
 		return out;
 	}
 
-	private String compileToKey(OfflinePlayer p, OfflinePlayer[] o) {
+	private String compileToKey(PlayerWrapper<?> p, PlayerWrapper<?>[] o) {
 		if (p == null) {
 			return "noplayer";
 		}
-		String out = "" + p.getUniqueId().toString();
+		String out = "" + p.getUUID().toString();
 		if (o != null && o.length > 0) {
-			for (OfflinePlayer pl : o) {
+			for (PlayerWrapper<?> pl : o) {
 				if (pl == null) {
 					continue;
 				}
-				out += "" + pl.getUniqueId().toString();
+				out += "" + pl.getUUID().toString();
 			}
 		}
 		return out;
 	}
 
-	public void cache(OfflinePlayer player, OfflinePlayer[] others,
+	public void cache(PlayerWrapper<?> player, PlayerWrapper<?>[] others,
 			FancyMessage result) {
 		String s = compileToKey(player, others);
 		if (cache.getData(s).equals(result)) {

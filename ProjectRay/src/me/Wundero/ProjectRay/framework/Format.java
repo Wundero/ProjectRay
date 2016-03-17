@@ -3,9 +3,7 @@ package me.Wundero.ProjectRay.framework;
 import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
+import me.Wundero.ProjectRay.framework.config.ConfigSection;
 
 import com.google.common.collect.Lists;
 
@@ -43,7 +41,7 @@ public class Format {
 	private String name;
 	private FormatType type;
 
-	public Format(ConfigurationSection section) throws Exception {
+	public Format(ConfigSection section) throws Exception {
 		if (section == null) {
 			throw new Exception("Configuration Section cannot be null!");
 		}
@@ -51,15 +49,16 @@ public class Format {
 		this.type = FormatType.fromString(name);
 		this.sections = Lists.newArrayList();
 		for (String s : section.getKeys(false)) {
-			if (!(section.get(s) instanceof ConfigurationSection)) {
+			if (!(section.get(s) instanceof ConfigSection)) {
 				continue;
 			}
-			ConfigurationSection sect = section.getConfigurationSection(s);
-			sections.add(Section.createSection(sect));
+			ConfigSection sect = (ConfigSection) section.get(s);
+			// TODO add new section here
 		}
 	}
 
-	public FancyMessage getMessage(OfflinePlayer player, OfflinePlayer[] others) {
+	public FancyMessage getMessage(PlayerWrapper<?> player,
+			PlayerWrapper<?>[] others) {
 		FancyMessage out = new FancyMessage();
 		out.getList().clear();
 		for (Section s : sections) {

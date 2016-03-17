@@ -37,6 +37,7 @@ import com.google.common.collect.Maps;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+//TODO remove this. Not particularly useful.
 public class ExpansionManager {
 
 	private final HashMap<String, Expansion> registeredExpansions = Maps

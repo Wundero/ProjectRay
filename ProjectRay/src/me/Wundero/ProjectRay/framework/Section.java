@@ -4,11 +4,7 @@ import java.util.List;
 
 import me.Wundero.ProjectRay.fanciful.ClickType;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
-import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.Parser;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.google.common.collect.Lists;
 
@@ -51,38 +47,25 @@ public class Section {
 		this.setHover(Lists.newArrayList(h));
 	}
 
-	public Section(ConfigurationSection config) {
-		if (config == null) {
-			Utils.printError(new Exception("Config section cannot be null!"));
-		}
-		if (!Utils.validateConfigSections(config, "text")) {
-			Utils.printError(new Exception(
-					"Missing configuation elements for section "
-							+ config.getName()));
-		}
-		this.setName(config.getName());
-		this.setPermission(config.getString("permission"));
-		this.setClick(config.getString("click"));
-		this.setText(config.getString("text"));
-		if (!config.contains("hover")) {
-			this.setHover(null);
-		} else if (config.get("hover") instanceof String) {
-			this.setHover(Lists.newArrayList(config.getString("hover")));
-		} else {
-			this.setHover(Lists.newArrayList(config.getStringList("hover")));
-		}
-	}
-
-	public static Section createSection(ConfigurationSection section) {
-		// TODO better way of determining what type of section to use
-		if (section.getBoolean("selectable", false)) {
-			return new SelectableSection(section);
-		}
-		if (section.getBoolean("cacheable", false)) {
-			return new CacheableSection(section);
-		}
-		return new Section(section);
-	}
+	/*
+	 * public Section(ConfigurationSection config) { if (config == null) {
+	 * Utils.printError(new Exception("Config section cannot be null!")); } if
+	 * (!Utils.validateConfigSections(config, "text")) { Utils.printError(new
+	 * Exception( "Missing configuation elements for section " +
+	 * config.getName())); } this.setName(config.getName());
+	 * this.setPermission(config.getString("permission"));
+	 * this.setClick(config.getString("click"));
+	 * this.setText(config.getString("text")); if (!config.contains("hover")) {
+	 * this.setHover(null); } else if (config.get("hover") instanceof String) {
+	 * this.setHover(Lists.newArrayList(config.getString("hover"))); } else {
+	 * this.setHover(Lists.newArrayList(config.getStringList("hover"))); } }
+	 * 
+	 * public static Section createSection(ConfigurationSection section) { //
+	 * TODO better way of determining what type of section to use if
+	 * (section.getBoolean("selectable", false)) { return new
+	 * SelectableSection(section); } if (section.getBoolean("cacheable", false))
+	 * { return new CacheableSection(section); } return new Section(section); }
+	 */
 
 	public List<String> getHover() {
 		return hover;
@@ -124,11 +107,10 @@ public class Section {
 		this.name = name;
 	}
 
-	public FancyMessage getMessage(OfflinePlayer player, OfflinePlayer[] others) {
+	public FancyMessage getMessage(PlayerWrapper<?> player,
+			PlayerWrapper<?>[] others) {
 		if (permission != null) {
-			if (!Hooks.has(player, "projectray." + permission)) {
-				return Utils.F();
-			}
+			// TODO permission check
 		}
 		FancyMessage fm = new FancyMessage();
 		String t = Parser.get().parse(player, others, text);

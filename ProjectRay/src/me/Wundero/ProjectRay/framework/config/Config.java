@@ -1,6 +1,7 @@
 package me.Wundero.ProjectRay.framework.config;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import java.io.File;
+import java.io.IOException;
 
 /*
  The MIT License (MIT)
@@ -26,9 +27,33 @@ import org.bukkit.configuration.file.FileConfiguration;
  SOFTWARE.
  */
 
-public class Config {
+public abstract class Config extends ConfigSection {
 
-	public Config(FileConfiguration file) {
+	protected File file;
+
+	public Config(File file) throws IOException {
+		super(file.getName(), null);
+		load();
+	}
+
+	public abstract void load() throws IOException;
+
+	public abstract void save() throws IOException;
+
+	public File getFile() {
+		return file;
+	}
+
+	public boolean setFile(File f) {
+		File f1 = file;
+		try {
+			file = f;
+			load();
+		} catch (Exception e) {
+			file = f1;
+			return false;
+		}
+		return true;
 	}
 
 }

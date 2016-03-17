@@ -1,6 +1,6 @@
 package me.Wundero.ProjectRay.variables;
 
-import org.bukkit.OfflinePlayer;
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 /*
  The MIT License (MIT)
@@ -33,7 +33,7 @@ public abstract class Variable {
 
 	private String name;
 
-	public abstract String parse(OfflinePlayer player, String[] data);
+	public abstract String parse(PlayerWrapper<?> player, String[] data);
 
 	public final String getName() {
 		return name;
