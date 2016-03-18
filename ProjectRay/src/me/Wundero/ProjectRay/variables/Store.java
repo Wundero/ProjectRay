@@ -2,6 +2,8 @@ package me.Wundero.ProjectRay.variables;
 
 import java.util.HashMap;
 
+import me.Wundero.ProjectRay.Ray;
+
 /*
  The MIT License (MIT)
 
@@ -29,9 +31,7 @@ public class Store {
 
 	private HashMap<String, Variable> vars = new HashMap<>();
 
-	private static Store store;
-
-	private Store() {
+	public Store() {
 		vars = new HashMap<>();
 	}
 
@@ -53,16 +53,8 @@ public class Store {
 	public boolean has(String id) {
 		return get(id) != null;
 	}
-
-	public static Store get() {
-		if (store == null) {
-			store = new Store();
-		}
-		return store;
-	}
-
 	public Variable get(String id) {
-		return vars.get(Parser.get().fix(id.toLowerCase()));
+		return vars.get(Ray.get().getParser().fix(id.toLowerCase()));
 	}
 
 	public boolean remove(Variable v) {
@@ -73,7 +65,7 @@ public class Store {
 		if (!has(id)) {
 			return false;
 		}
-		this.vars.remove(Parser.get().fix(id.toLowerCase()));
+		this.vars.remove(Ray.get().getParser().fix(id.toLowerCase()));
 		return true;
 	}
 

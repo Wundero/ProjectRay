@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 import com.google.common.collect.Lists;
@@ -33,11 +34,9 @@ import com.google.common.collect.Lists;
  SOFTWARE.
  */
 public class Parser {
-	private static Parser parser = new Parser();
-
 	private Pattern pattern;
 
-	private Parser() {
+	public Parser() {
 		setChars(new char[] { '%' }, new char[] { '%' }, '|', ':');
 		createPattern();
 	}
@@ -49,10 +48,6 @@ public class Parser {
 				+ ra(p1s.substring(1, p1s.length() - 1), p2s.substring(1));
 		String p = p1s + "(" + np1s + ")+" + p2s;
 		pattern = Pattern.compile(p);
-	}
-
-	public static Parser get() {
-		return parser == null ? parser = new Parser() : parser;
 	}
 
 	private char[] startchars = {}, endchars = {};
@@ -150,7 +145,7 @@ public class Parser {
 			name = name.replace("¦", "|");
 		}
 		if (!name.contains("" + data)) {
-			Variable v = Store.get().get(name);
+			Variable v = Ray.get().getStore().get(name);
 			if (v == null) {
 				return nameo;
 			}
@@ -170,7 +165,7 @@ public class Parser {
 			data[i++] = s;
 		}
 
-		Variable v = Store.get().get(name);
+		Variable v = Ray.get().getStore().get(name);
 		if (v == null) {
 			return nameo;
 		}

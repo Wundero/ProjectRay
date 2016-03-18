@@ -1,5 +1,6 @@
 package me.Wundero.ProjectRay.variables;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 /*
@@ -45,6 +46,6 @@ public abstract class Variable {
 	}
 
 	private final void fix() {
-		name = Parser.get().fix(name);
+		name = Ray.get().getParser().fix(name);
 	}
 }

@@ -2,11 +2,11 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.fanciful.ClickType;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.utils.Utils;
-import me.Wundero.ProjectRay.variables.Parser;
 
 import com.google.common.collect.Lists;
 
@@ -128,17 +128,17 @@ public class Section {
 			// TODO permission check
 		}
 		FancyMessage fm = new FancyMessage();
-		String t = Parser.get().parse(player, others, text);
+		String t = Ray.get().getParser().parse(player, others, text);
 		String c = null;
 		ClickType ct = null;
 		if (click != null) {
 			ct = ClickType.getType(c);
 			c = ct.replace(c);
-			c = Parser.get().parse(player, others, click);
+			c = Ray.get().getParser().parse(player, others, click);
 		}
 		List<String> h = null;
 		if (hover != null && !hover.isEmpty()) {
-			h = Parser.get().parseList(hover, player, others);
+			h = Ray.get().getParser().parseList(hover, player, others);
 		}
 		fm.text(t);
 		if (h != null) {

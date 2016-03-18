@@ -6,8 +6,6 @@ import java.util.logging.Logger;
 
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
 import me.Wundero.ProjectRay.framework.config.Config;
-import me.Wundero.ProjectRay.framework.expansion.Expansion;
-import me.Wundero.ProjectRay.framework.expansion.ExpansionManager;
 
 /*
  The MIT License (MIT)
@@ -44,10 +42,6 @@ public interface IRay {
 	void log(String s);
 
 	String getVersion();
-
-	ExpansionManager getExpansionManager();// TODO remove
-
-	boolean registerExpansion(Expansion e);// TODO remove
 
 	void sendJSON(final String json, final PlayerWrapper<?>... to);
 

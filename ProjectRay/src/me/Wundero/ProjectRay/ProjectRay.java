@@ -32,11 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  SOFTWARE.
  */
 public class ProjectRay extends JavaPlugin implements IRay {
-	private static ProjectRay instance;
 
-	public static ProjectRay get() {
-		return instance;
-	}
 
 	public void log(String s) {
 		log(s, Level.INFO);
@@ -48,8 +44,6 @@ public class ProjectRay extends JavaPlugin implements IRay {
 
 	@Override
 	public void onEnable() {
-		instance = this;
-		exp = new ExpansionManager();
 		// TODO setup permissions/chat
 		// TODO load hooks
 		// TODO config
@@ -108,7 +102,6 @@ public class ProjectRay extends JavaPlugin implements IRay {
 
 	}
 
-	private ExpansionManager exp;
 
 	@Override
 	public File getDirectory() {
@@ -120,9 +113,5 @@ public class ProjectRay extends JavaPlugin implements IRay {
 		return this.getDescription().getVersion();
 	}
 
-	@Override
-	public ExpansionManager getExpansionManager() {
-		return exp;
-	}
 
 }

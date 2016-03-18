@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.utils.BukkitUtils;
 
 import org.bukkit.Achievement;
 import org.bukkit.Bukkit;
@@ -612,7 +612,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		if ((!this.dirty) && (this.jsonString != null)) {
 			return this.jsonString;
 		}
-		this.setList(Utils.recompile(this).getList());
+		this.setList(BukkitUtils.recompile(this).getList());
 		StringWriter localStringWriter = new StringWriter();
 		JsonWriter localJsonWriter = new JsonWriter(localStringWriter);
 		try {

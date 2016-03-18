@@ -2,9 +2,9 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
-import me.Wundero.ProjectRay.variables.Parser;
 
 import com.google.common.collect.Lists;
 
@@ -72,17 +72,17 @@ public class SelectableSection extends Section {
 			npm = Lists.newArrayList(noPermMessage);
 		}
 		if (prependNoPerm) {
-			list.addAll(Parser.get().parseList(npm, player, others));
+			list.addAll(Ray.get().getParser().parseList(npm, player, others));
 			if (super.getHover() != null && !super.getHover().isEmpty()) {
-				list.addAll(Parser.get().parseList(super.getHover(), player,
-						others));
+				list.addAll(Ray.get().getParser()
+						.parseList(super.getHover(), player, others));
 			}
 		} else {
 			if (super.getHover() != null && !super.getHover().isEmpty()) {
-				list.addAll(Parser.get().parseList(super.getHover(), player,
-						others));
+				list.addAll(Ray.get().getParser()
+						.parseList(super.getHover(), player, others));
 			}
-			list.addAll(Parser.get().parseList(npm, player, others));
+			list.addAll(Ray.get().getParser().parseList(npm, player, others));
 		}
 		fm.tooltip(list);
 		return fm;
