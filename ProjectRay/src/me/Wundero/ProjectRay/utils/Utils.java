@@ -7,19 +7,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.Wundero.ProjectRay.ProjectRay;
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.ServerType;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.fanciful.JsonString;
 import me.Wundero.ProjectRay.fanciful.MessagePart;
-import me.Wundero.ProjectRay.fanciful.NullMessagePart;
-import me.Wundero.ProjectRay.fanciful.TextualComponent;
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
 
@@ -27,8 +24,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.scheduler.BukkitTask;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -71,6 +66,14 @@ public class Utils {
 		} catch (CloneNotSupportedException e) {
 			return F;
 		}
+	}
+
+	public static boolean isSponge() {
+		return Ray.get().getPlugin().getType() == ServerType.SPONGE;
+	}
+
+	public static boolean isBukkit() {
+		return !isSponge();// If more server types, do compare instead
 	}
 
 	public static boolean validateConfigSections(ConfigSection config,
@@ -276,48 +279,6 @@ public class Utils {
 				f.mkdirs();
 			}
 		}
-	}
-
-	
-
-	// TODO sponge
-	public static BukkitTask async(final Runnable r) {
-		return async(r, 0, 0);
-	}
-
-	// TODO sponge
-	public static BukkitTask async(final Runnable r, long delay) {
-		return async(r, delay, 0);
-	}
-
-	// TODO sponge
-	public static BukkitTask async(final Runnable r, long delay, long repeat) {
-		if (repeat == 0) {
-			return Bukkit.getScheduler().runTaskLaterAsynchronously(
-					ProjectRay.get(), r, delay);
-		}
-		return Bukkit.getScheduler().runTaskTimerAsynchronously(
-				ProjectRay.get(), r, delay, repeat);
-	}
-
-	// TODO sponge
-	public static BukkitTask sync(final Runnable r) {
-		return sync(r, 0, 0);
-	}
-
-	// TODO sponge
-	public static BukkitTask sync(final Runnable r, long delay) {
-		return sync(r, delay, 0);
-	}
-
-	// TODO sponge
-	public static BukkitTask sync(final Runnable r, long delay, long repeat) {
-		if (repeat == 0) {
-			return Bukkit.getScheduler().runTaskLater(ProjectRay.get(), r,
-					delay);
-		}
-		return Bukkit.getScheduler().runTaskTimer(ProjectRay.get(), r, delay,
-				repeat);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -531,10 +492,6 @@ public class Utils {
 		return s;
 	}
 
-	
-
-	
-
 	public static <T> T getFirst(ArrayList<T> list) {
 		if (list.isEmpty()) {
 			return null;
@@ -548,8 +505,6 @@ public class Utils {
 		}
 		return list.get(list.size() - 1);
 	}
-
-	
 
 	public static Character makeUnicode(Character c) {
 		int v = c.charValue();
@@ -577,6 +532,8 @@ public class Utils {
 
 	}
 
+	// TODO getAllOnline();
+
 	private static ArrayList<PlayerWrapper<?>> playersAlphabetical = Lists
 			.newArrayList();
 
@@ -590,6 +547,7 @@ public class Utils {
 		});
 		return list;
 	}
+
 	public static void updatePlayersAplha() {
 		/*
 		 * playersAlphabetical = sort(Lists .newArrayList(players));

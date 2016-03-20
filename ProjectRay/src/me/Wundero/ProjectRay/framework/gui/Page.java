@@ -1,12 +1,4 @@
-package me.Wundero.ProjectRay;
-
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import me.Wundero.ProjectRay.framework.PlayerWrapper;
-import me.Wundero.ProjectRay.framework.config.Config;
-
+package me.Wundero.ProjectRay.framework.gui;
 /*
  The MIT License (MIT)
 
@@ -31,23 +23,10 @@ import me.Wundero.ProjectRay.framework.config.Config;
  SOFTWARE.
  */
 
-//will be used when I add sponge/bukkit/spigot/whatever support
-public interface IRay {
-	File getDirectory();
+public class Page {
 
-	Logger getLogger();
+	public Page() {
+		// TODO Auto-generated constructor stub
+	}
 
-	void log(String s, Level l);
-
-	void log(String s);
-
-	String getVersion();
-
-	void sendJSON(final String json, final PlayerWrapper<?>... to);
-
-	Config config();
-
-	ServerType getType();
-
-	// TODO get + add commands
 }

@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.scheduler.BukkitTask;
 
+import me.Wundero.ProjectRay.ProjectRay;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.fanciful.JsonString;
 import me.Wundero.ProjectRay.fanciful.MessagePart;
@@ -595,5 +598,43 @@ public class BukkitUtils {
 			throws Exception {
 		return applyUrlsNew(m);
 	}
+	// TODO sponge
+		public static BukkitTask async(final Runnable r) {
+			return async(r, 0, 0);
+		}
 
+		// TODO sponge
+		public static BukkitTask async(final Runnable r, long delay) {
+			return async(r, delay, 0);
+		}
+
+		// TODO sponge
+		public static BukkitTask async(final Runnable r, long delay, long repeat) {
+			if (repeat == 0) {
+				return Bukkit.getScheduler().runTaskLaterAsynchronously(
+						ProjectRay.get(), r, delay);
+			}
+			return Bukkit.getScheduler().runTaskTimerAsynchronously(
+					ProjectRay.get(), r, delay, repeat);
+		}
+
+		// TODO sponge
+		public static BukkitTask sync(final Runnable r) {
+			return sync(r, 0, 0);
+		}
+
+		// TODO sponge
+		public static BukkitTask sync(final Runnable r, long delay) {
+			return sync(r, delay, 0);
+		}
+
+		// TODO sponge
+		public static BukkitTask sync(final Runnable r, long delay, long repeat) {
+			if (repeat == 0) {
+				return Bukkit.getScheduler().runTaskLater(ProjectRay.get(), r,
+						delay);
+			}
+			return Bukkit.getScheduler().runTaskTimer(ProjectRay.get(), r, delay,
+					repeat);
+		}
 }
