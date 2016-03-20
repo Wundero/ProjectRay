@@ -1,6 +1,7 @@
 package me.Wundero.ProjectRay.framework;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import com.google.common.collect.Maps;
@@ -34,6 +35,10 @@ public abstract class DataHolder {
 
 	protected UUID uuid;
 
+	public synchronized void putAll(Map<String, Object> values) {
+		data.putAll(values);
+	}
+
 	@SuppressWarnings("unchecked")
 	public synchronized <T> T getData(String key) {
 		return (T) data.get(key);
@@ -48,8 +53,8 @@ public abstract class DataHolder {
 		return (T) data.remove(key);
 	}
 
-	public synchronized void putData(String key, Object value) {
-		data.put(key, value);
+	public synchronized Object putData(String key, Object value) {
+		return data.put(key, value);
 	}
 
 	public synchronized void clearData() {

@@ -2,10 +2,12 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.framework.iface.Cacheable;
+import me.Wundero.ProjectRay.utils.BukkitUtils;
 import me.Wundero.ProjectRay.utils.PRTimeUnit;
 import me.Wundero.ProjectRay.utils.Utils;
 
@@ -35,7 +37,7 @@ import com.google.common.collect.Maps;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class CacheableSection extends Section implements Cacheable {
+public class CacheableSection extends JsonSection implements Cacheable {
 
 	public CacheableSection(ConfigSection sect) {
 		super(sect);
@@ -47,17 +49,25 @@ public class CacheableSection extends Section implements Cacheable {
 		private HashMap<String, Long> expiries = Maps.newHashMap();
 
 		@Override
-		public void putData(final String key, Object value) {
-			super.putData(key, value);
+		public Object putData(final String key, Object value) {
+			Object out = super.putData(key, value);
 			expiries.put(key, ((System.nanoTime() + (long) Utils.convert(10,
 					PRTimeUnit.MINUTES, PRTimeUnit.NANOSECONDS))));
-			Utils.sync(new Runnable() {// 10 mins later run
+			BukkitUtils.sync(new Runnable() {// 10 mins later run
 						@Override
 						public void run() {
 							purge(key);
 						}
 					}, 20 * (long) (Utils.convert(10, PRTimeUnit.MINUTES,
 							PRTimeUnit.SECONDS)));
+			return out;
+		}
+
+		@Override
+		public void putAll(final Map<String, Object> values) {
+			for (Map.Entry<String, Object> entry : values.entrySet()) {
+				putData(entry.getKey(), entry.getValue());
+			}
 		}
 
 		private List<String> locked = Lists.newArrayList();

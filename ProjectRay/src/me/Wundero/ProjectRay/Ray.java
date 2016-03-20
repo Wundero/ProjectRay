@@ -56,39 +56,51 @@ public class Ray {
 		this.setGrouplist(new Groups(getConfig()));
 		this.setMessages(new Messages());
 	}
+
 	public IRay getPlugin() {
 		return plugin;
 	}
+
 	private void setPlugin(IRay plugin) {
 		this.plugin = plugin;
 	}
+
 	public Store getStore() {
 		return varStore;
 	}
+
 	private void setVarStore(Store varStore) {
 		this.varStore = varStore;
 	}
+
 	public Parser getParser() {
 		return varParser;
 	}
+
 	private void setVarParser(Parser varParser) {
 		this.varParser = varParser;
 	}
+
 	public Messages getMessages() {
 		return messages;
 	}
+
 	private void setMessages(Messages messages) {
 		this.messages = messages;
 	}
+
 	public Groups getGrouplist() {
 		return grouplist;
 	}
+
 	private void setGrouplist(Groups grouplist) {
 		this.grouplist = grouplist;
 	}
+
 	public Config getConfig() {
 		return config;
 	}
+
 	private void setConfig(Config config) {
 		this.config = config;
 	}

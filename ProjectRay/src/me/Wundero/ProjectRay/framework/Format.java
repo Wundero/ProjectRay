@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
  */
 
 //No world-specific formats, all specified under group
-public class Format {
+public class Format extends Section {
 
 	// TODO default formats - create default package that handles default
 	// grps/formats/everything else
@@ -42,19 +42,7 @@ public class Format {
 	private FormatType type;
 
 	public Format(ConfigSection section) throws Exception {
-		if (section == null) {
-			throw new Exception("Configuration Section cannot be null!");
-		}
-		this.setName(section.getName());
-		this.type = FormatType.fromString(name);
-		this.sections = Lists.newArrayList();
-		for (String s : section.getKeys(false)) {
-			if (!(section.get(s) instanceof ConfigSection)) {
-				continue;
-			}
-			ConfigSection sect = (ConfigSection) section.get(s);
-			// TODO add new section here
-		}
+		load(section);
 	}
 
 	public FancyMessage getMessage(PlayerWrapper<?> player,
@@ -62,7 +50,11 @@ public class Format {
 		FancyMessage out = new FancyMessage();
 		out.getList().clear();
 		for (Section s : sections) {
-			out.getList().addAll(s.getMessage(player, others).getList());
+			if (!(s instanceof JsonSection)) {// TODO handle other section types
+				continue;
+			}
+			out.getList().addAll(
+					((JsonSection) s).getMessage(player, others).getList());
 		}
 		return out;
 	}
@@ -89,6 +81,24 @@ public class Format {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Override
+	public void load(ConfigSection section) {
+		if (section == null) {
+			return;
+		}
+		this.setName(section.getName());
+		this.type = FormatType.fromString(name);
+		this.sections = Lists.newArrayList();
+		for (String s : section.getKeys(false)) {
+			if (!(section.get(s) instanceof ConfigSection)) {
+				continue;
+			}
+			ConfigSection sect = (ConfigSection) section.get(s);
+			Section se = Sections.createSection(sect);
+			sections.add(se);
+		}
 	}
 
 }

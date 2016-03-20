@@ -37,6 +37,8 @@ package me.Wundero.ProjectRay.utils;
  * @since 1.5
  * @author Doug Lea
  */
+// My version of the class uses doubles instead of longs to allow decimals.
+// Useful for increased accuracy.
 public enum PRTimeUnit {
 	/**
 	 * Time unit representing one thousandth of a microsecond

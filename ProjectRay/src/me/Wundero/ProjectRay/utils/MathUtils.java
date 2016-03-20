@@ -42,6 +42,7 @@ import com.google.common.collect.Lists;
  *
  */
 //TODO move to Bukkit or replace vector math parts
+//TODO remove as this is useless to this plugin
 public class MathUtils {
 
 	static public final float nanoToSec = 1 / 1000000000f;

@@ -25,13 +25,19 @@ import java.util.List;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class Group {
+public abstract class Group extends Section {
 
 	// TODO figure out world calculations
 	// TODO figure out how to generate parents
 	private String name;
-	private String permission;
 	private int priority;
 	private List<Format> formats;
 	private List<Group> parents;
+	private List<Section> subSections;
+	
+	public abstract List<String> getPermissions();
+	
+	public abstract List<String> getAllPermissions();
+	
+	
 }

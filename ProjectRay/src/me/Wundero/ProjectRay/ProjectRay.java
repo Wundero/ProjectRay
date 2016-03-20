@@ -49,7 +49,7 @@ public class ProjectRay extends JavaPlugin implements IRay {
 		// TODO config
 		// TODO command architecture - potentially use GUI's?
 		// TODO language support
-		// TODO put liscence in all files
+		// TODO put license in all files
 		// TODO multiple server type support - sponge & spigot
 		// TODO better GUI system - usefull for select sects
 		// TODO converter from other plugins

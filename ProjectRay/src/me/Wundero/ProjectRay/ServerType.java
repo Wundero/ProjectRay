@@ -25,5 +25,5 @@ package me.Wundero.ProjectRay;
  */
 
 public enum ServerType {
-	BUKKIT, SPONGE;
+	BUKKIT, SPONGE, SPIGOT, PAPER_SPIGOT, FORGE, CAULDRON, BUNGEE, REDIS_BUNGEE;
 }

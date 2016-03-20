@@ -68,12 +68,36 @@ public class Utils {
 		}
 	}
 
+	public static boolean isBungee() {
+		return Ray.get().getPlugin().getType() == ServerType.BUNGEE;
+	}
+
+	public static boolean isRedisBungee() {
+		return Ray.get().getPlugin().getType() == ServerType.REDIS_BUNGEE;
+	}
+
 	public static boolean isSponge() {
 		return Ray.get().getPlugin().getType() == ServerType.SPONGE;
 	}
 
 	public static boolean isBukkit() {
-		return !isSponge();// If more server types, do compare instead
+		return Ray.get().getPlugin().getType() == ServerType.BUKKIT;
+	}
+
+	public static boolean isSpigot() {
+		return Ray.get().getPlugin().getType() == ServerType.SPIGOT;
+	}
+
+	public static boolean isPaperSpigot() {
+		return Ray.get().getPlugin().getType() == ServerType.PAPER_SPIGOT;
+	}
+
+	public static boolean isForge() {
+		return Ray.get().getPlugin().getType() == ServerType.FORGE;
+	}
+
+	public static boolean isCauldren() {
+		return Ray.get().getPlugin().getType() == ServerType.CAULDRON;
 	}
 
 	public static boolean validateConfigSections(ConfigSection config,

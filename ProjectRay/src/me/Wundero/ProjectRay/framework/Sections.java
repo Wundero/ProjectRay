@@ -25,12 +25,10 @@ import me.Wundero.ProjectRay.framework.config.ConfigSection;
  SOFTWARE.
  */
 
-public abstract class Section extends DataHolder{
+public class Sections {
 
-	public final void loadValues(ConfigSection section) {
-		this.putAll(section.getValues(false));
-		load(section);
+	public static Section createSection(ConfigSection sect) {
+		
 	}
-	
-	public abstract void load(ConfigSection sect);
+
 }

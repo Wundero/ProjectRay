@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
-import me.Wundero.ProjectRay.framework.expansion.Expansion;
 
 import org.bukkit.entity.Player;
 
@@ -40,10 +39,6 @@ import com.google.common.collect.Lists;
 public class API {
 
 	public API() {
-	}
-
-	public boolean registerExpansion(Expansion e) {
-		return ProjectRay.get().getExpansionManager().registerExpansion(e);
 	}
 
 	/**
