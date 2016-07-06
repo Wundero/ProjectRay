@@ -4,14 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
+import me.Wundero.ProjectRay.framework.common.Color;
 import me.Wundero.ProjectRay.utils.Utils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -19,17 +14,16 @@ import com.google.common.collect.Lists;
 import com.google.gson.stream.JsonWriter;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class MessagePart implements JsonRepresentedObject,
-		ConfigurationSerializable, Cloneable {
+public class MessagePart implements JsonRepresentedObject, Cloneable {
 
-	public ChatColor color = null;
-	public ArrayList<ChatColor> styles = Lists.newArrayList();
+	public Color color = null;
+	public ArrayList<Color> styles = Lists.newArrayList();
 	public String clickActionName = null;
 	public String clickActionData = null;
 	public String hoverActionName = null;
 	public JsonRepresentedObject hoverActionData = null;
 	public TextualComponent text = null;
-	static BiMap<ChatColor, String> stylesToNames;
+	static BiMap<Color, String> stylesToNames;
 	static boolean built = false;
 
 	@Override
@@ -38,8 +32,8 @@ public class MessagePart implements JsonRepresentedObject,
 	}
 
 	public void checkColor() {
-		if (getText().startsWith(ChatColor.COLOR_CHAR + "")) {
-			color = ChatColor.getByChar(getText().charAt(1));
+		if (getText().startsWith(Color.COLOR_CHAR + "")) {
+			color = Color.getByChar(getText().charAt(1));
 			text = TextualComponent.rawText(getText().substring(2));
 		}
 	}
@@ -67,7 +61,7 @@ public class MessagePart implements JsonRepresentedObject,
 		if (color != null) {
 			out += color + "";
 		}
-		for (ChatColor c : styles) {
+		for (Color c : styles) {
 			out += c + "";
 		}
 		return out + text.getReadableString();
@@ -133,7 +127,7 @@ public class MessagePart implements JsonRepresentedObject,
 				paramJsonWriter.name("color").value(
 						this.color.name().toLowerCase());
 			}
-			for (ChatColor localChatColor : this.styles) {
+			for (Color localChatColor : this.styles) {
 				paramJsonWriter
 						.name((String) stylesToNames.get(localChatColor))
 						.value(true);
@@ -152,10 +146,8 @@ public class MessagePart implements JsonRepresentedObject,
 				paramJsonWriter.endObject();
 			}
 			paramJsonWriter.endObject();
-		} catch (IOException localIOException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"A problem occured during writing of JSON string",
-					localIOException);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -179,7 +171,7 @@ public class MessagePart implements JsonRepresentedObject,
 		MessagePart localMessagePart = new MessagePart(
 				(TextualComponent) paramMap.get("text"));
 		localMessagePart.styles = ((ArrayList) paramMap.get("styles"));
-		localMessagePart.color = ChatColor.getByChar(paramMap.get("color")
+		localMessagePart.color = Color.getByChar(paramMap.get("color")
 				.toString());
 		localMessagePart.hoverActionName = paramMap.get("hoverActionName")
 				.toString();
@@ -194,7 +186,7 @@ public class MessagePart implements JsonRepresentedObject,
 
 	static void build() {
 		ImmutableBiMap.Builder localBuilder = ImmutableBiMap.builder();
-		for (ChatColor localChatColor : ChatColor.values()) {
+		for (Color localChatColor : Color.values()) {
 			if (localChatColor.isFormat()) {
 				String str;
 				switch (localChatColor) {
@@ -214,7 +206,6 @@ public class MessagePart implements JsonRepresentedObject,
 		}
 		stylesToNames = localBuilder.build();
 
-		ConfigurationSerialization.registerClass(MessagePart.class);
 		built = true;
 	}
 }

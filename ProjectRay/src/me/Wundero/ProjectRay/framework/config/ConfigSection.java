@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.Color;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -77,8 +75,7 @@ public class ConfigSection {
 				if (!(get(p) instanceof ConfigSection)) {
 					return false;
 				}
-				return ((ConfigSection) get(p)).set(
-						path.substring(p.length() + 1), data);
+				return ((ConfigSection) get(p)).set(path.substring(p.length() + 1), data);
 			} else {
 				ConfigSection n = new ConfigSection(p, this);
 				n.set(path.substring(p.length() + 1), data);
@@ -203,18 +200,6 @@ public class ConfigSection {
 			return (List<Character>) l;
 		}
 		return null;
-	}
-
-	public Color getColor(String path) {
-		if (!isColor(path)) {
-			return null;
-		}
-		return (Color) get(path);
-	}
-
-	public Color getColor(String path, Color def) {
-		Color c = getColor(path);
-		return c == null ? def : c;
 	}
 
 	public ConfigSection getConfigSection(String path, boolean force) {
@@ -427,13 +412,6 @@ public class ConfigSection {
 			return false;
 		}
 		return get(path) instanceof Boolean;
-	}
-
-	public boolean isColor(String path) {
-		if (!contains(path)) {
-			return false;
-		}
-		return get(path) instanceof Color;
 	}
 
 	public boolean isConfigSection(String path) {

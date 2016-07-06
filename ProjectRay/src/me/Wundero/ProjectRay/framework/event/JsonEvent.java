@@ -2,13 +2,9 @@ package me.Wundero.ProjectRay.framework.event;
 
 import java.util.List;
 
-import me.Wundero.ProjectRay.framework.iface.Sendable;
-
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-
 import com.google.common.collect.Lists;
+
+import me.Wundero.ProjectRay.framework.iface.Sendable;
 
 /*
  The MIT License (MIT)
@@ -33,22 +29,10 @@ import com.google.common.collect.Lists;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public abstract class JsonEvent extends Event implements Cancellable {
+public abstract class JsonEvent {
 
-	// BUKKIT ONLY - TODO SPONGE SUPPORT
-
-	private HandlerList handlers;
 	private boolean cancelled;
 	private List<Sendable> objects = Lists.newArrayList();
-
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public void setHandlers(HandlerList handlers) {
-		this.handlers = handlers;
-	}
 
 	public List<Sendable> getObjects() {
 		if (objects.isEmpty()) {
@@ -65,12 +49,10 @@ public abstract class JsonEvent extends Event implements Cancellable {
 		}
 	}
 
-	@Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
-	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
 	}

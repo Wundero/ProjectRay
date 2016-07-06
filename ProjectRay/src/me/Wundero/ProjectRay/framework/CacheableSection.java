@@ -4,15 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.framework.iface.Cacheable;
-import me.Wundero.ProjectRay.utils.BukkitUtils;
 import me.Wundero.ProjectRay.utils.PRTimeUnit;
 import me.Wundero.ProjectRay.utils.Utils;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /*
  The MIT License (MIT)
@@ -39,6 +38,8 @@ import com.google.common.collect.Maps;
  */
 public class CacheableSection extends JsonSection implements Cacheable {
 
+	// TODO remove this class - it's likely useless
+
 	public CacheableSection(ConfigSection sect) {
 		super(sect);
 	}
@@ -51,15 +52,14 @@ public class CacheableSection extends JsonSection implements Cacheable {
 		@Override
 		public Object putData(final String key, Object value) {
 			Object out = super.putData(key, value);
-			expiries.put(key, ((System.nanoTime() + (long) Utils.convert(10,
-					PRTimeUnit.MINUTES, PRTimeUnit.NANOSECONDS))));
-			BukkitUtils.sync(new Runnable() {// 10 mins later run
-						@Override
-						public void run() {
-							purge(key);
-						}
-					}, 20 * (long) (Utils.convert(10, PRTimeUnit.MINUTES,
-							PRTimeUnit.SECONDS)));
+			expiries.put(key,
+					((System.nanoTime() + (long) Utils.convert(10, PRTimeUnit.MINUTES, PRTimeUnit.NANOSECONDS))));
+			Utils.run(new Runnable() {// 10 mins later run
+				@Override
+				public void run() {
+					purge(key);
+				}
+			}, (int) (Utils.convert(10, PRTimeUnit.MINUTES, PRTimeUnit.MILLISECONDS)));
 			return out;
 		}
 
@@ -101,17 +101,13 @@ public class CacheableSection extends JsonSection implements Cacheable {
 		cache.clearData();
 	}
 
-	@Override
-	public FancyMessage getMessage(PlayerWrapper<?> player,
-			PlayerWrapper<?>[] others) {
-		String s = compileToKey(player, others);
-		if (cache.hasData(s)) {
-			return cache.getData(s);
-		}
-		FancyMessage out = super.getMessage(player, others);
-		cache(player, others, out);
-		return out;
-	}
+	/*
+	 * @Override public FancyMessage getMessage(PlayerWrapper<?> player,
+	 * PlayerWrapper<?>[] others) { String s = compileToKey(player, others); if
+	 * (cache.hasData(s)) { return cache.getData(s); } FancyMessage out =
+	 * super.getMessage(player, others); cache(player, others, out); return out;
+	 * }
+	 */
 
 	private String compileToKey(PlayerWrapper<?> p, PlayerWrapper<?>[] o) {
 		if (p == null) {
@@ -129,8 +125,7 @@ public class CacheableSection extends JsonSection implements Cacheable {
 		return out;
 	}
 
-	public void cache(PlayerWrapper<?> player, PlayerWrapper<?>[] others,
-			FancyMessage result) {
+	public void cache(PlayerWrapper<?> player, PlayerWrapper<?>[] others, FancyMessage result) {
 		String s = compileToKey(player, others);
 		if (cache.getData(s).equals(result)) {
 			return;

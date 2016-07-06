@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class ArrayWrapper<E> {
@@ -35,8 +35,7 @@ public final class ArrayWrapper<E> {
 		return Arrays.hashCode(this._array);
 	}
 
-	public static <T> T[] toArray(Iterable<? extends T> paramIterable,
-			Class<T> paramClass) {
+	public static <T> T[] toArray(Iterable<? extends T> paramIterable, Class<T> paramClass) {
 		int i = -1;
 		Object localObject1;
 		if ((paramIterable instanceof Collection)) {
@@ -45,8 +44,7 @@ public final class ArrayWrapper<E> {
 		}
 		if (i < 0) {
 			i = 0;
-			for (Iterator localIterator1 = paramIterable.iterator(); localIterator1
-					.hasNext();) {
+			for (Iterator localIterator1 = paramIterable.iterator(); localIterator1.hasNext();) {
 				localObject1 = (Object) localIterator1.next();
 				i++;
 			}

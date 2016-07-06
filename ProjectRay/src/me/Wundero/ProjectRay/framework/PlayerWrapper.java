@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public abstract class PlayerWrapper<T> {
 
+	private T player;
+
 	public PlayerWrapper(T player) {
 		load(player);
 	}
@@ -22,9 +24,19 @@ public abstract class PlayerWrapper<T> {
 	public abstract String getLastName();
 
 	public abstract void setLastName(String lastName);
-	
+
 	public abstract List<String> getPermissions();
-	
+
 	public abstract List<Group> getGroups();
+	
+	public abstract boolean hasPermission(String permission);
+
+	public T getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(T player) {
+		this.player = player;
+	}
 
 }

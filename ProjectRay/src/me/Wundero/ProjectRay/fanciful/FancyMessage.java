@@ -2,27 +2,16 @@ package me.Wundero.ProjectRay.fanciful;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
-import me.Wundero.ProjectRay.utils.BukkitUtils;
-
-import org.bukkit.Achievement;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Statistic;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
+import me.Wundero.ProjectRay.framework.common.Color;
+import me.Wundero.ProjectRay.utils.Utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,9 +19,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
 
+//Note - entirely abstracted from bukkit, not sure if it works
+
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class FancyMessage implements JsonRepresentedObject, Cloneable,
-		Iterable<MessagePart>, ConfigurationSerializable {
+public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<MessagePart> {
+	// TODO ditch this in favour of custom system
 	private List<MessagePart> messageParts;
 	private String jsonString;
 	private boolean dirty;
@@ -87,10 +78,6 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		this.messageParts = l;
 	}
 
-	static {
-		ConfigurationSerialization.registerClass(FancyMessage.class);
-	}
-
 	public void set(int ind, MessagePart p) {
 		if (!p.hasText()) {
 			p.text = TextualComponent.rawText("");
@@ -133,8 +120,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		FancyMessage localFancyMessage = (FancyMessage) super.clone();
 		localFancyMessage.messageParts = new ArrayList(this.messageParts.size());
 		for (int i = 0; i < this.messageParts.size(); i++) {
-			localFancyMessage.messageParts.add(i,
-					((MessagePart) this.messageParts.get(i)).clone());
+			localFancyMessage.messageParts.add(i, ((MessagePart) this.messageParts.get(i)).clone());
 		}
 		localFancyMessage.dirty = false;
 		localFancyMessage.jsonString = null;
@@ -148,14 +134,13 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		if (latest() == null || latest().text == null) {
 			return this.text(text);
 		}
-		if (latest().color != null && latest().color != ChatColor.RESET) {
+		if (latest().color != null && latest().color != Color.RESET) {
 			return this;
 		}
 		String copy = latest().text.getReadableString();
 		copy = text + copy;
 		if (latest().text instanceof TextualComponent.ArbitraryTextTypeComponent) {
-			((TextualComponent.ArbitraryTextTypeComponent) latest().text)
-					.setValue(copy);
+			((TextualComponent.ArbitraryTextTypeComponent) latest().text).setValue(copy);
 		}
 		return this;
 	}
@@ -181,8 +166,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		return this;
 	}
 
-	public FancyMessage(TextualComponent paramTextualComponent,
-			boolean... irrelevant) {
+	public FancyMessage(TextualComponent paramTextualComponent, boolean... irrelevant) {
 		this.messageParts = new ArrayList();
 		this.messageParts.add(new MessagePart(paramTextualComponent));
 		this.jsonString = null;
@@ -210,8 +194,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 	public FancyMessage text(String paramString) {
 		MessagePart localMessagePart = latest();
 		if (localMessagePart.hasText()) {
-			throw new IllegalStateException(
-					"text for this message part is already set");
+			throw new IllegalStateException("text for this message part is already set");
 		}
 		localMessagePart.text = TextualComponent.rawText(paramString);
 		this.dirty = true;
@@ -221,29 +204,26 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 	public FancyMessage text(TextualComponent paramTextualComponent) {
 		MessagePart localMessagePart = latest();
 		if (localMessagePart.hasText()) {
-			throw new IllegalStateException(
-					"text for this message part is already set");
+			throw new IllegalStateException("text for this message part is already set");
 		}
 		localMessagePart.text = paramTextualComponent;
 		this.dirty = true;
 		return this;
 	}
 
-	public FancyMessage color(ChatColor paramChatColor) {
+	public FancyMessage color(Color paramChatColor) {
 		if (!paramChatColor.isColor()) {
-			throw new IllegalArgumentException(paramChatColor.name()
-					+ " is not a color");
+			throw new IllegalArgumentException(paramChatColor.name() + " is not a color");
 		}
 		latest().color = paramChatColor;
 		this.dirty = true;
 		return this;
 	}
 
-	public FancyMessage style(ChatColor... paramVarArgs) {
-		for (ChatColor localChatColor : paramVarArgs) {
+	public FancyMessage style(Color... paramVarArgs) {
+		for (Color localChatColor : paramVarArgs) {
 			if (!localChatColor.isFormat()) {
-				throw new IllegalArgumentException(localChatColor.name()
-						+ " is not a style");
+				throw new IllegalArgumentException(localChatColor.name() + " is not a style");
 			}
 		}
 		latest().styles.addAll(Arrays.asList(paramVarArgs));
@@ -271,173 +251,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		return this;
 	}
 
-	public FancyMessage achievementTooltip(String paramString) {
-		onHover("show_achievement",
-				new JsonString("achievement." + paramString));
-		return this;
-	}
-
-	public FancyMessage achievementTooltip(Achievement paramAchievement) {
-		try {
-			Object localObject = Reflection.getMethod(
-					Reflection.getOBCClass("CraftStatistic"),
-					"getNMSAchievement", new Class[] { Achievement.class })
-					.invoke(null, new Object[] { paramAchievement });
-			return achievementTooltip((String) Reflection.getField(
-					Reflection.getNMSClass("Achievement"), "name").get(
-					localObject));
-		} catch (IllegalAccessException localIllegalAccessException) {
-			Bukkit.getLogger().log(Level.WARNING, "Could not access method.",
-					localIllegalAccessException);
-			return this;
-		} catch (IllegalArgumentException localIllegalArgumentException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"Argument could not be passed.",
-					localIllegalArgumentException);
-			return this;
-		} catch (InvocationTargetException localInvocationTargetException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"A error has occured durring invoking of method.",
-					localInvocationTargetException);
-		}
-		return this;
-	}
-
-	public FancyMessage statisticTooltip(Statistic paramStatistic) {
-		Statistic.Type localType = paramStatistic.getType();
-		if (localType != Statistic.Type.UNTYPED) {
-			throw new IllegalArgumentException(
-					"That statistic requires an additional " + localType
-							+ " parameter!");
-		}
-		try {
-			Object localObject = Reflection.getMethod(
-					Reflection.getOBCClass("CraftStatistic"),
-					"getNMSStatistic", new Class[] { Statistic.class }).invoke(
-					null, new Object[] { paramStatistic });
-			return achievementTooltip((String) Reflection.getField(
-					Reflection.getNMSClass("Statistic"), "name").get(
-					localObject));
-		} catch (IllegalAccessException localIllegalAccessException) {
-			Bukkit.getLogger().log(Level.WARNING, "Could not access method.",
-					localIllegalAccessException);
-			return this;
-		} catch (IllegalArgumentException localIllegalArgumentException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"Argument could not be passed.",
-					localIllegalArgumentException);
-			return this;
-		} catch (InvocationTargetException localInvocationTargetException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"A error has occured durring invoking of method.",
-					localInvocationTargetException);
-		}
-		return this;
-	}
-
-	public FancyMessage statisticTooltip(Statistic paramStatistic,
-			Material paramMaterial) {
-		Statistic.Type localType = paramStatistic.getType();
-		if (localType == Statistic.Type.UNTYPED) {
-			throw new IllegalArgumentException(
-					"That statistic needs no additional parameter!");
-		}
-		if (((localType == Statistic.Type.BLOCK) && (paramMaterial.isBlock()))
-				|| (localType == Statistic.Type.ENTITY)) {
-			throw new IllegalArgumentException(
-					"Wrong parameter type for that statistic - needs "
-							+ localType + "!");
-		}
-		try {
-			Object localObject = Reflection.getMethod(
-					Reflection.getOBCClass("CraftStatistic"),
-					"getMaterialStatistic",
-					new Class[] { Statistic.class, Material.class }).invoke(
-					null, new Object[] { paramStatistic, paramMaterial });
-			return achievementTooltip((String) Reflection.getField(
-					Reflection.getNMSClass("Statistic"), "name").get(
-					localObject));
-		} catch (IllegalAccessException localIllegalAccessException) {
-			Bukkit.getLogger().log(Level.WARNING, "Could not access method.",
-					localIllegalAccessException);
-			return this;
-		} catch (IllegalArgumentException localIllegalArgumentException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"Argument could not be passed.",
-					localIllegalArgumentException);
-			return this;
-		} catch (InvocationTargetException localInvocationTargetException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"A error has occured durring invoking of method.",
-					localInvocationTargetException);
-		}
-		return this;
-	}
-
-	public FancyMessage statisticTooltip(Statistic paramStatistic,
-			EntityType paramEntityType) {
-		Statistic.Type localType = paramStatistic.getType();
-		if (localType == Statistic.Type.UNTYPED) {
-			throw new IllegalArgumentException(
-					"That statistic needs no additional parameter!");
-		}
-		if (localType != Statistic.Type.ENTITY) {
-			throw new IllegalArgumentException(
-					"Wrong parameter type for that statistic - needs "
-							+ localType + "!");
-		}
-		try {
-			Object localObject = Reflection.getMethod(
-					Reflection.getOBCClass("CraftStatistic"),
-					"getEntityStatistic",
-					new Class[] { Statistic.class, EntityType.class }).invoke(
-					null, new Object[] { paramStatistic, paramEntityType });
-			return achievementTooltip((String) Reflection.getField(
-					Reflection.getNMSClass("Statistic"), "name").get(
-					localObject));
-		} catch (IllegalAccessException localIllegalAccessException) {
-			Bukkit.getLogger().log(Level.WARNING, "Could not access method.",
-					localIllegalAccessException);
-			return this;
-		} catch (IllegalArgumentException localIllegalArgumentException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"Argument could not be passed.",
-					localIllegalArgumentException);
-			return this;
-		} catch (InvocationTargetException localInvocationTargetException) {
-			Bukkit.getLogger().log(Level.WARNING,
-					"A error has occured durring invoking of method.",
-					localInvocationTargetException);
-		}
-		return this;
-	}
-
-	public FancyMessage itemTooltip(String paramString) {
-		onHover("show_item", new JsonString(paramString));
-		return this;
-	}
-
-	public FancyMessage itemTooltip(ItemStack paramItemStack) {
-		try {
-			Object localObject = Reflection.getMethod(
-					Reflection.getOBCClass("inventory.CraftItemStack"),
-					"asNMSCopy", new Class[] { ItemStack.class }).invoke(null,
-					new Object[] { paramItemStack });
-			return itemTooltip(Reflection
-					.getMethod(
-							Reflection.getNMSClass("ItemStack"),
-							"save",
-							new Class[] { Reflection
-									.getNMSClass("NBTTagCompound") })
-					.invoke(localObject,
-							new Object[] { Reflection.getNMSClass(
-									"NBTTagCompound").newInstance() })
-					.toString());
-		} catch (Exception localException) {
-			localException.printStackTrace();
-		}
-		return this;
-	}
+	// TODO items achievements and statistics as generals
 
 	public String toString() {
 		try {
@@ -471,15 +285,11 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 
 	public FancyMessage formattedTooltip(FancyMessage paramFancyMessage) {
 		for (MessagePart localMessagePart : paramFancyMessage.messageParts) {
-			if ((localMessagePart.clickActionData != null)
-					&& (localMessagePart.clickActionName != null)) {
-				throw new IllegalArgumentException(
-						"The tooltip text cannot have click data.");
+			if ((localMessagePart.clickActionData != null) && (localMessagePart.clickActionName != null)) {
+				throw new IllegalArgumentException("The tooltip text cannot have click data.");
 			}
-			if ((localMessagePart.hoverActionData != null)
-					&& (localMessagePart.hoverActionName != null)) {
-				throw new IllegalArgumentException(
-						"The tooltip text cannot have a tooltip.");
+			if ((localMessagePart.hoverActionData != null) && (localMessagePart.hoverActionName != null)) {
+				throw new IllegalArgumentException("The tooltip text cannot have a tooltip.");
 			}
 		}
 		onHover("show_text", paramFancyMessage);
@@ -496,38 +306,29 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		for (int i = 0; i < paramVarArgs.length; i++) {
 			try {
 				for (MessagePart localMessagePart : paramVarArgs[i]) {
-					if ((localMessagePart.clickActionData != null)
-							&& (localMessagePart.clickActionName != null)) {
-						throw new IllegalArgumentException(
-								"The tooltip text cannot have click data.");
+					if ((localMessagePart.clickActionData != null) && (localMessagePart.clickActionName != null)) {
+						throw new IllegalArgumentException("The tooltip text cannot have click data.");
 					}
-					if ((localMessagePart.hoverActionData != null)
-							&& (localMessagePart.hoverActionName != null)) {
-						throw new IllegalArgumentException(
-								"The tooltip text cannot have a tooltip.");
+					if ((localMessagePart.hoverActionData != null) && (localMessagePart.hoverActionName != null)) {
+						throw new IllegalArgumentException("The tooltip text cannot have a tooltip.");
 					}
 					if (localMessagePart.hasText()) {
-						localFancyMessage.messageParts.add(localMessagePart
-								.clone());
+						localFancyMessage.messageParts.add(localMessagePart.clone());
 					}
 				}
 				if (i != paramVarArgs.length - 1) {
-					localFancyMessage.messageParts.add(new MessagePart(
-							TextualComponent.rawText("\n")));
+					localFancyMessage.messageParts.add(new MessagePart(TextualComponent.rawText("\n")));
 				}
-			} catch (Exception localCloneNotSupportedException) {
-				Bukkit.getLogger().log(Level.WARNING, "Failed to clone object",
-						localCloneNotSupportedException);
+			} catch (Exception e) {
+				e.printStackTrace();
 				return this;
 			}
 		}
-		return formattedTooltip(localFancyMessage.messageParts.isEmpty() ? null
-				: localFancyMessage);
+		return formattedTooltip(localFancyMessage.messageParts.isEmpty() ? null : localFancyMessage);
 	}
 
 	public FancyMessage formattedTooltip(Iterable<FancyMessage> paramIterable) {
-		return formattedTooltip((FancyMessage[]) ArrayWrapper.toArray(
-				paramIterable, FancyMessage.class));
+		return formattedTooltip((FancyMessage[]) ArrayWrapper.toArray(paramIterable, FancyMessage.class));
 	}
 
 	public FancyMessage then(String paramString) {
@@ -594,8 +395,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 			latest().writeJson(paramJsonWriter);
 		} else {
 			try {
-				paramJsonWriter.beginObject().name("text").value("")
-						.name("extra").beginArray();
+				paramJsonWriter.beginObject().name("text").value("").name("extra").beginArray();
 			} catch (IOException e) {
 			}
 			for (MessagePart localMessagePart : this) {
@@ -612,7 +412,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		if ((!this.dirty) && (this.jsonString != null)) {
 			return this.jsonString;
 		}
-		this.setList(BukkitUtils.recompile(this).getList());
+		this.setList(Utils.recompile(this).getList());
 		StringWriter localStringWriter = new StringWriter();
 		JsonWriter localJsonWriter = new JsonWriter(localStringWriter);
 		try {
@@ -629,9 +429,8 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 	public String toOldMessageFormat() {
 		StringBuilder localStringBuilder = new StringBuilder();
 		for (MessagePart localMessagePart : this) {
-			localStringBuilder.append(localMessagePart.color == null ? ""
-					: localMessagePart.color);
-			for (ChatColor localChatColor : localMessagePart.styles) {
+			localStringBuilder.append(localMessagePart.color == null ? "" : localMessagePart.color);
+			for (Color localChatColor : localMessagePart.styles) {
 				localStringBuilder.append(localChatColor);
 			}
 			localStringBuilder.append(localMessagePart.text);
@@ -640,8 +439,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 	}
 
 	public MessagePart latest() {
-		return (MessagePart) this.messageParts
-				.get(this.messageParts.size() - 1);
+		return (MessagePart) this.messageParts.get(this.messageParts.size() - 1);
 	}
 
 	private void onClick(String paramString1, String paramString2) {
@@ -654,8 +452,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 		this.dirty = true;
 	}
 
-	private void onHover(String paramString,
-			JsonRepresentedObject paramJsonRepresentedObject) {
+	private void onHover(String paramString, JsonRepresentedObject paramJsonRepresentedObject) {
 		MessagePart localMessagePart = latest();
 		localMessagePart.hoverActionName = paramString;
 		localMessagePart.hoverActionData = paramJsonRepresentedObject;
@@ -672,8 +469,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 	public static FancyMessage deserialize(Map<String, Object> paramMap) {
 		FancyMessage localFancyMessage = new FancyMessage();
 		localFancyMessage.messageParts = ((List) paramMap.get("messageParts"));
-		localFancyMessage.jsonString = (paramMap.containsKey("JSON") ? paramMap
-				.get("JSON").toString() : null);
+		localFancyMessage.jsonString = (paramMap.containsKey("JSON") ? paramMap.get("JSON").toString() : null);
 		localFancyMessage.dirty = (!paramMap.containsKey("JSON"));
 		return localFancyMessage;
 	}
@@ -685,8 +481,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 	private static JsonParser _stringParser = new JsonParser();
 
 	public static FancyMessage deserialize(String paramString) {
-		JsonObject localJsonObject1 = _stringParser.parse(paramString)
-				.getAsJsonObject();
+		JsonObject localJsonObject1 = _stringParser.parse(paramString).getAsJsonObject();
 		JsonArray localJsonArray = localJsonObject1.getAsJsonArray("extra");
 		FancyMessage localFancyMessage = new FancyMessage();
 		localFancyMessage.messageParts.clear();
@@ -698,53 +493,37 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable,
 				if (TextualComponent.isTextKey((String) localEntry1.getKey())) {
 					localObject = new HashMap();
 					((Map) localObject).put("key", localEntry1.getKey());
-					if (((JsonElement) localEntry1.getValue())
-							.isJsonPrimitive()) {
-						((Map) localObject).put("value",
-								((JsonElement) localEntry1.getValue())
-										.getAsString());
+					if (((JsonElement) localEntry1.getValue()).isJsonPrimitive()) {
+						((Map) localObject).put("value", ((JsonElement) localEntry1.getValue()).getAsString());
 					} else {
-						for (Map.Entry localEntry2 : ((JsonElement) localEntry1
-								.getValue()).getAsJsonObject().entrySet()) {
-							((Map) localObject).put("value."
-									+ (String) localEntry2.getKey(),
-									((JsonElement) localEntry2.getValue())
-											.getAsString());
+						for (Map.Entry localEntry2 : ((JsonElement) localEntry1.getValue()).getAsJsonObject()
+								.entrySet()) {
+							((Map) localObject).put("value." + (String) localEntry2.getKey(),
+									((JsonElement) localEntry2.getValue()).getAsString());
 						}
 					}
-					localMessagePart.text = TextualComponent
-							.deserialize((Map) localObject);
-				} else if (MessagePart.stylesToNames.inverse().containsKey(
-						localEntry1.getKey())) {
+					localMessagePart.text = TextualComponent.deserialize((Map) localObject);
+				} else if (MessagePart.stylesToNames.inverse().containsKey(localEntry1.getKey())) {
 					if (((JsonElement) localEntry1.getValue()).getAsBoolean()) {
 						localMessagePart.styles
-								.add((ChatColor) MessagePart.stylesToNames
-										.inverse().get(localEntry1.getKey()));
+								.add((Color) MessagePart.stylesToNames.inverse().get(localEntry1.getKey()));
 					}
 				} else if (((String) localEntry1.getKey()).equals("color")) {
-					localMessagePart.color = ChatColor
-							.valueOf(((JsonElement) localEntry1.getValue())
-									.getAsString().toUpperCase());
+					localMessagePart.color = Color
+							.valueOf(((JsonElement) localEntry1.getValue()).getAsString().toUpperCase());
 				} else if (((String) localEntry1.getKey()).equals("clickEvent")) {
-					localObject = ((JsonElement) localEntry1.getValue())
-							.getAsJsonObject();
-					localMessagePart.clickActionName = ((JsonObject) localObject)
-							.get("action").getAsString();
-					localMessagePart.clickActionData = ((JsonObject) localObject)
-							.get("value").getAsString();
+					localObject = ((JsonElement) localEntry1.getValue()).getAsJsonObject();
+					localMessagePart.clickActionName = ((JsonObject) localObject).get("action").getAsString();
+					localMessagePart.clickActionData = ((JsonObject) localObject).get("value").getAsString();
 				} else if (((String) localEntry1.getKey()).equals("hoverEvent")) {
-					localObject = ((JsonElement) localEntry1.getValue())
-							.getAsJsonObject();
-					localMessagePart.hoverActionName = ((JsonObject) localObject)
-							.get("action").getAsString();
-					if (((JsonObject) localObject).get("value")
-							.isJsonPrimitive()) {
+					localObject = ((JsonElement) localEntry1.getValue()).getAsJsonObject();
+					localMessagePart.hoverActionName = ((JsonObject) localObject).get("action").getAsString();
+					if (((JsonObject) localObject).get("value").isJsonPrimitive()) {
 						localMessagePart.hoverActionData = new JsonString(
-								((JsonObject) localObject).get("value")
-										.getAsString());
+								((JsonObject) localObject).get("value").getAsString());
 					} else {
-						localMessagePart.hoverActionData = deserialize(((JsonObject) localObject)
-								.get("value").toString());
+						localMessagePart.hoverActionData = deserialize(
+								((JsonObject) localObject).get("value").toString());
 					}
 				}
 			}

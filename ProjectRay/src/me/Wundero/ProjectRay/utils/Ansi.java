@@ -31,7 +31,7 @@ public class Ansi {
 	private static final char FIRST_ESC_CHAR = 27;
 	private static final char SECOND_ESC_CHAR = '[';
 
-	public static enum Color {
+	public static enum AnsiColor {
 		BLACK(0, "BLACK"), RED(1, "RED"), GREEN(2, "GREEN"), YELLOW(3, "YELLOW"), BLUE(
 				4, "BLUE"), MAGENTA(5, "MAGENTA"), CYAN(6, "CYAN"), WHITE(7,
 				"WHITE"), DEFAULT(9, "DEFAULT");
@@ -39,7 +39,7 @@ public class Ansi {
 		private final int value;
 		private final String name;
 
-		Color(int index, String name) {
+		AnsiColor(int index, String name) {
 			this.value = index;
 			this.name = name;
 		}
@@ -169,22 +169,22 @@ public class Ansi {
 
 	private static class NoAnsi extends Ansi {
 		@Override
-		public Ansi fg(Color color) {
+		public Ansi fg(AnsiColor color) {
 			return this;
 		}
 
 		@Override
-		public Ansi bg(Color color) {
+		public Ansi bg(AnsiColor color) {
 			return this;
 		}
 
 		@Override
-		public Ansi fgBright(Color color) {
+		public Ansi fgBright(AnsiColor color) {
 			return this;
 		}
 
 		@Override
-		public Ansi bgBright(Color color) {
+		public Ansi bgBright(AnsiColor color) {
 			return this;
 		}
 
@@ -324,22 +324,22 @@ public class Ansi {
 		return new Ansi(size);
 	}
 
-	public Ansi fg(Color color) {
+	public Ansi fg(AnsiColor color) {
 		attributeOptions.add(color.fg());
 		return this;
 	}
 
-	public Ansi bg(Color color) {
+	public Ansi bg(AnsiColor color) {
 		attributeOptions.add(color.bg());
 		return this;
 	}
 
-	public Ansi fgBright(Color color) {
+	public Ansi fgBright(AnsiColor color) {
 		attributeOptions.add(color.fgBright());
 		return this;
 	}
 
-	public Ansi bgBright(Color color) {
+	public Ansi bgBright(AnsiColor color) {
 		attributeOptions.add(color.bgBright());
 		return this;
 	}

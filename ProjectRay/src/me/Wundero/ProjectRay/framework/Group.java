@@ -34,10 +34,5 @@ public abstract class Group extends Section {
 	private List<Format> formats;
 	private List<Group> parents;
 	private List<Section> subSections;
-	
-	public abstract List<String> getPermissions();
-	
-	public abstract List<String> getAllPermissions();
-	
-	
+
 }

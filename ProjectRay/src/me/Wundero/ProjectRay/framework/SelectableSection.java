@@ -1,6 +1,5 @@
 package me.Wundero.ProjectRay.framework;
 
-import java.util.HashMap;
 import java.util.List;
 
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
@@ -30,9 +29,10 @@ import me.Wundero.ProjectRay.framework.config.ConfigSection;
  */
 public class SelectableSection extends Section {
 
-	private List<Section> choices;
-	private HashMap<PlayerWrapper<?>, Section> chosen;
-	
+	private List<Section> choices;// players using a section are stored under
+									// section.getData("players_using") as a
+									// list
+
 	public SelectableSection(ConfigSection sect) {
 		load(sect);
 	}

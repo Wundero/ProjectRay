@@ -2,7 +2,6 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
-import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
 
 import com.google.common.collect.Lists;
@@ -39,25 +38,15 @@ public class Format extends Section {
 
 	private List<Section> sections;
 	private String name;
+	private boolean animation = false; // if true, sections must specify what
+										// frame they are part of with frame: 1
 	private FormatType type;
 
 	public Format(ConfigSection section) throws Exception {
 		load(section);
 	}
 
-	public FancyMessage getMessage(PlayerWrapper<?> player,
-			PlayerWrapper<?>[] others) {
-		FancyMessage out = new FancyMessage();
-		out.getList().clear();
-		for (Section s : sections) {
-			if (!(s instanceof JsonSection)) {// TODO handle other section types
-				continue;
-			}
-			out.getList().addAll(
-					((JsonSection) s).getMessage(player, others).getList());
-		}
-		return out;
-	}
+	// TODO getMessage
 
 	public List<Section> getSections() {
 		return sections;
@@ -99,6 +88,20 @@ public class Format extends Section {
 			Section se = Sections.createSection(sect);
 			sections.add(se);
 		}
+	}
+
+	/**
+	 * @return the animation
+	 */
+	public boolean isAnimation() {
+		return animation;
+	}
+
+	/**
+	 * @param animation the animation to set
+	 */
+	public void setAnimation(boolean animation) {
+		this.animation = animation;
 	}
 
 }

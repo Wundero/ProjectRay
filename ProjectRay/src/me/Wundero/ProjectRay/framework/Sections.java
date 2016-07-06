@@ -28,7 +28,7 @@ import me.Wundero.ProjectRay.framework.config.ConfigSection;
 public class Sections {
 
 	public static Section createSection(ConfigSection sect) {
-		
+		return null;
 	}
 
 }

@@ -2,9 +2,6 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.fanciful.ClickType;
-import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.utils.Utils;
 
@@ -90,53 +87,17 @@ public class JsonSection extends Section {
 		return this;
 	}
 
-	public FancyMessage getMessage(PlayerWrapper<?> player,
-			PlayerWrapper<?>[] others) {
-		if (permission != null) {
-			// TODO permission check
-		}
-		FancyMessage fm = new FancyMessage();
-		String t = Ray.get().getParser().parse(player, others, text);
-		String c = null;
-		ClickType ct = null;
-		if (click != null) {
-			ct = ClickType.getType(c);
-			c = ct.replace(c);
-			c = Ray.get().getParser().parse(player, others, click);
-		}
-		List<String> h = null;
-		if (hover != null && !hover.isEmpty()) {
-			h = Ray.get().getParser().parseList(hover, player, others);
-		}
-		fm.text(t);
-		if (h != null) {
-			fm.tooltip(h);
-		}
-		if (c != null) {
-			switch (ct) {
-			case EXECUTE:
-				fm.command(c);
-				break;
-			case LINK:
-				fm.link(c);
-				break;
-			default:
-				fm.suggest(c);
-				break;
-			}
-		}
-		return fm;
-	}
+	// TODO getMessage
 
 	@Override
 	public void load(ConfigSection config) {
 		if (config == null) {
 			Utils.printError(new Exception("Config section cannot be null!"));
+			return;
 		}
 		if (!Utils.validateConfigSections(config, "text")) {
-			Utils.printError(new Exception(
-					"Missing configuation elements for section "
-							+ config.getName()));
+			Utils.printError(new Exception("Missing configuation elements for section " + config.getName()));
+			return;
 		}
 		this.setName(config.getName());
 		this.setPermission(config.getString("permission"));

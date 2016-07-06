@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-
 import com.google.gson.stream.JsonWriter;
 
-public final class JsonString implements JsonRepresentedObject,
-		ConfigurationSerializable {
+public final class JsonString implements JsonRepresentedObject {
 	private String _value;
 
 	public JsonString(String paramString) {

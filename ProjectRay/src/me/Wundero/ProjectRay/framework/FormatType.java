@@ -1,5 +1,7 @@
 package me.Wundero.ProjectRay.framework;
 
+import java.util.regex.Pattern;
+
 /*
  The MIT License (MIT)
 
@@ -25,23 +27,25 @@ package me.Wundero.ProjectRay.framework;
  */
 public enum FormatType {
 
-	CHAT("chat", new String[] { "c" }), MESSAGE("message", new String[] { "m",
-			"msg" }), DEATH("death", new String[] { "d" }), JOIN("join",
-			new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM(
-			"custom"), WELCOME("welcome", new String[] { "w" }), MAIL("mail",
-			new String[] {}), MOTD("motd", new String[] {}), ANNOUNCEMENT(
-			"announcement", new String[] { "a" }), DEFAULT("default");
+	CHAT("chat", new String[] { "c" }), MESSAGE("message", new String[] { "m", "msg" }), DEATH("death",
+			new String[] { "d" }), JOIN("join", new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM(
+					"custom"), WELCOME("welcome", new String[] { "w" }), MAIL("mail", new String[] {}), MOTD("motd",
+							new String[] {}), ANNOUNCEMENT("announcement", new String[] { "a" }), DEFAULT("default");
 
 	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
 	// footer)/item names/block gui names/other random text stuff
 	// all these could be animated
 	// also perhaps serverlist message (not anim)
 
+	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
+	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
+
 	private String[] aliases;
 	private String name;
 
 	FormatType(String name) {
 		this.setName(name);
+		this.setAliases(new String[] {});
 	}
 
 	FormatType(String name, String[] aliases) {
@@ -67,6 +71,9 @@ public enum FormatType {
 
 	public static FormatType fromString(String s) {
 		s = s.trim();
+		if (namepat.matcher(s).matches()) {
+			s = altpat.matcher(s).replaceAll("");
+		}
 		for (FormatType type : values()) {
 			if (type.name.equalsIgnoreCase(s)) {
 				return type;

@@ -4,21 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.stream.JsonWriter;
 
 public abstract class TextualComponent implements Cloneable {
-	static {
-		ConfigurationSerialization
-				.registerClass(ArbitraryTextTypeComponent.class);
-		ConfigurationSerialization
-				.registerClass(ComplexTextTypeComponent.class);
-	}
-
 	public String toString() {
 		return getReadableString();
 	}
@@ -51,7 +41,7 @@ public abstract class TextualComponent implements Cloneable {
 	}
 
 	public static final class ArbitraryTextTypeComponent extends
-			TextualComponent implements ConfigurationSerializable {
+			TextualComponent {
 		private String _key;
 		private String _value;
 
@@ -115,8 +105,7 @@ public abstract class TextualComponent implements Cloneable {
 		}
 	}
 
-	public static final class ComplexTextTypeComponent extends TextualComponent
-			implements ConfigurationSerializable {
+	public static final class ComplexTextTypeComponent extends TextualComponent {
 		private String _key;
 		private Map<String, String> _value;
 
