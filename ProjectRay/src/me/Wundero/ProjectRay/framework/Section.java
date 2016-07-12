@@ -1,6 +1,10 @@
 package me.Wundero.ProjectRay.framework;
 
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
+import me.Wundero.ProjectRay.utils.Utils;
 /*
  The MIT License (MIT)
 
@@ -24,13 +28,26 @@ import me.Wundero.ProjectRay.framework.config.ConfigSection;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+import ninja.leaping.configurate.ConfigurationNode;
 
-public abstract class Section extends DataHolder{
+public abstract class Section extends DataHolder {
 
-	public final void loadValues(ConfigSection section) {
-		this.putAll(section.getValues(false));
-		load(section);
+	public final void loadValues(ConfigurationNode section) {
+		this.putAll(getMap(section.getChildrenMap()));
+		try {
+			load(section);
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
 	}
-	
-	public abstract void load(ConfigSection sect);
+
+	private static Map<String, Object> getMap(Map<Object, ? extends ConfigurationNode> map) {
+		Map<String, Object> out = Maps.newHashMap();
+		for (Object o : map.keySet()) {
+			out.put(o.toString(), map.get(o).getValue());
+		}
+		return out;
+	}
+
+	public abstract void load(ConfigurationNode sect) throws Exception;
 }

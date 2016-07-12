@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.ServerType;
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.fanciful.JsonString;
 import me.Wundero.ProjectRay.fanciful.MessagePart;
@@ -31,7 +29,7 @@ import me.Wundero.ProjectRay.fanciful.NullMessagePart;
 import me.Wundero.ProjectRay.fanciful.TextualComponent;
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
 import me.Wundero.ProjectRay.framework.common.Color;
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -93,41 +91,9 @@ public class Utils {
 		}
 	}
 
-	public static boolean isBungee() {
-		return Ray.get().getPlugin().getType() == ServerType.BUNGEE;
-	}
-
-	public static boolean isRedisBungee() {
-		return Ray.get().getPlugin().getType() == ServerType.REDIS_BUNGEE;
-	}
-
-	public static boolean isSponge() {
-		return Ray.get().getPlugin().getType() == ServerType.SPONGE;
-	}
-
-	public static boolean isBukkit() {
-		return Ray.get().getPlugin().getType() == ServerType.BUKKIT;
-	}
-
-	public static boolean isSpigot() {
-		return Ray.get().getPlugin().getType() == ServerType.SPIGOT;
-	}
-
-	public static boolean isPaperSpigot() {
-		return Ray.get().getPlugin().getType() == ServerType.PAPER_SPIGOT;
-	}
-
-	public static boolean isForge() {
-		return Ray.get().getPlugin().getType() == ServerType.FORGE;
-	}
-
-	public static boolean isCauldren() {
-		return Ray.get().getPlugin().getType() == ServerType.CAULDRON;
-	}
-
-	public static boolean validateConfigSections(ConfigSection config, String... toValidate) {
+	public static boolean hasSections(ConfigurationNode config, String... toValidate) {
 		for (String s : toValidate) {
-			if (!config.contains(s)) {
+			if (!config.getChildrenMap().containsKey(s)) {
 				return false;
 			}
 		}
@@ -387,7 +353,7 @@ public class Utils {
 			toPrint.add("at " + element.toString());
 		}
 		for (String s : toPrint) {
-			Ray.get().getPlugin().log(s, Level.SEVERE);
+			Ray.get().getPlugin().log(s);
 		}
 	}
 
@@ -480,7 +446,7 @@ public class Utils {
 
 	public static void checkTime(long n, String m) {
 		if (!isSafeTime(n)) {
-			Ray.get().getPlugin().log("Warning: unsafe time for " + m, Level.WARNING);
+			Ray.get().getPlugin().log("Warning: unsafe time for " + m);
 		}
 	}
 

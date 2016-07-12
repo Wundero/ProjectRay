@@ -2,9 +2,9 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
-
 import com.google.common.collect.Lists;
+
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -42,7 +42,7 @@ public class Format extends Section {
 										// frame they are part of with frame: 1
 	private FormatType type;
 
-	public Format(ConfigSection section) throws Exception {
+	public Format(ConfigurationNode section) throws Exception {
 		load(section);
 	}
 
@@ -73,19 +73,18 @@ public class Format extends Section {
 	}
 
 	@Override
-	public void load(ConfigSection section) {
+	public void load(ConfigurationNode section) {
 		if (section == null) {
 			return;
 		}
-		this.setName(section.getName());
+		this.setName(section.getKey().toString());
 		this.type = FormatType.fromString(name);
 		this.sections = Lists.newArrayList();
-		for (String s : section.getKeys(false)) {
-			if (!(section.get(s) instanceof ConfigSection)) {
+		for (ConfigurationNode s : section.getChildrenList()) {
+			if (!s.hasListChildren()) {
 				continue;
 			}
-			ConfigSection sect = (ConfigSection) section.get(s);
-			Section se = Sections.createSection(sect);
+			Section se = Sections.createSection(s);
 			sections.add(se);
 		}
 	}
@@ -98,7 +97,8 @@ public class Format extends Section {
 	}
 
 	/**
-	 * @param animation the animation to set
+	 * @param animation
+	 *            the animation to set
 	 */
 	public void setAnimation(boolean animation) {
 		this.animation = animation;

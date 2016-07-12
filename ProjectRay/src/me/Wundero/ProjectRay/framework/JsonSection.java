@@ -2,10 +2,11 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
-import me.Wundero.ProjectRay.utils.Utils;
-
 import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
+
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -38,8 +39,8 @@ public class JsonSection extends Section {
 	private String permission;
 	private List<String> hover;
 
-	public JsonSection(ConfigSection config) {
-		load(config);
+	public JsonSection(ConfigurationNode config) {
+		super.loadValues(config);
 	}
 
 	public List<String> getHover() {
@@ -90,25 +91,25 @@ public class JsonSection extends Section {
 	// TODO getMessage
 
 	@Override
-	public void load(ConfigSection config) {
+	public void load(ConfigurationNode config) throws Exception {
 		if (config == null) {
 			Utils.printError(new Exception("Config section cannot be null!"));
 			return;
 		}
-		if (!Utils.validateConfigSections(config, "text")) {
-			Utils.printError(new Exception("Missing configuation elements for section " + config.getName()));
+		if (!Utils.hasSections(config, "text")) {
+			Utils.printError(new Exception("Missing configuation elements for section " + config.getKey().toString()));
 			return;
 		}
-		this.setName(config.getName());
-		this.setPermission(config.getString("permission"));
-		this.setClick(config.getString("click"));
-		this.setText(config.getString("text"));
-		if (!config.contains("hover")) {
+		this.setName(config.getKey().toString());
+		this.setPermission(config.getNode("permission").getString());
+		this.setClick(config.getNode("click").getString());
+		this.setText(config.getNode("text").getString());
+		if (!Utils.hasSections(config, "hover")) {
 			this.setHover(null);
-		} else if (config.get("hover") instanceof String) {
-			this.setHover(Lists.newArrayList(config.getString("hover")));
+		} else if (config.getNode("hover").getValue() instanceof String) {
+			this.setHover(Lists.newArrayList(config.getNode("hover").getString()));
 		} else {
-			this.setHover(Lists.newArrayList(config.getStringList("hover")));
+			this.setHover(Lists.newArrayList(config.getNode("hover").getList(TypeToken.of(String.class))));
 		}
 	}
 }

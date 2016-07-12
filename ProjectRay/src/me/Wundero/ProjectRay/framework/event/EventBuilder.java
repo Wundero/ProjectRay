@@ -1,9 +1,4 @@
-package me.Wundero.ProjectRay.framework.config;
-
-import java.io.IOException;
-
-import me.Wundero.ProjectRay.framework.backend.Backend;
-
+package me.Wundero.ProjectRay.framework.event;
 /*
  The MIT License (MIT)
 
@@ -28,33 +23,58 @@ import me.Wundero.ProjectRay.framework.backend.Backend;
  SOFTWARE.
  */
 
-public abstract class Config extends ConfigSection {
+import java.util.List;
+import java.util.concurrent.Callable;
 
-	protected Backend file;
+import org.spongepowered.api.event.cause.Cause;
 
-	public Config(Backend file) throws IOException {
-		super("", null);
-		load();
-	}
+import me.Wundero.ProjectRay.framework.iface.Sendable;
 
-	public abstract void load() throws IOException;
+public class EventBuilder {
+	private Cause cause;
+	private String name;
+	private Callable<List<Sendable>> objmaker;
 
-	public abstract void save() throws IOException;
-
-	public Backend getFile() {
-		return file;
-	}
-
-	public boolean setFile(Backend f) {
-		Backend f1 = file;
-		try {
-			file = f;
-			load();
-		} catch (Exception e) {
-			file = f1;
-			return false;
+	public JsonEvent build() {
+		if (name == null || cause == null) {
+			return null;
 		}
-		return true;
+		JsonEvent event = new JsonEvent(name, cause) {
+
+			@Override
+			public void createObjects() {
+				if (objmaker == null) {
+					return;
+				}
+				try {
+					this.objects = objmaker.call();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		return event;
 	}
 
+	private EventBuilder() {
+	}
+
+	public EventBuilder withObjectCreator(Callable<List<Sendable>> creator) {
+		objmaker = creator;
+		return this;
+	}
+
+	public static EventBuilder builder() {
+		return new EventBuilder();
+	}
+
+	public EventBuilder withCause(Cause c) {
+		cause = c;
+		return this;
+	}
+
+	public EventBuilder withName(String name) {
+		this.name = name;
+		return this;
+	}
 }

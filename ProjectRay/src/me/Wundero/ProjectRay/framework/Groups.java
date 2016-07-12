@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -33,10 +33,9 @@ import me.Wundero.ProjectRay.framework.config.ConfigSection;
 public class Groups {
 
 	// String world is lower case
-	private final Map<String, List<Group>> groups = Collections
-			.synchronizedMap(new HashMap<String, List<Group>>());
+	private final Map<String, List<Group>> groups = Collections.synchronizedMap(new HashMap<String, List<Group>>());
 
-	public Groups(ConfigSection section) {
+	public Groups(ConfigurationNode section) {
 
 	}
 

@@ -2,6 +2,10 @@ package me.Wundero.ProjectRay.framework.event;
 
 import java.util.List;
 
+import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.cause.Cause;
+
 import com.google.common.collect.Lists;
 
 import me.Wundero.ProjectRay.framework.iface.Sendable;
@@ -29,10 +33,17 @@ import me.Wundero.ProjectRay.framework.iface.Sendable;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public abstract class JsonEvent {
+public abstract class JsonEvent implements Event, Cancellable {
 
-	private boolean cancelled;
-	private List<Sendable> objects = Lists.newArrayList();
+	private final Cause cause;
+	private String name = "";
+	private boolean cancelled = false;
+	protected List<Sendable> objects = Lists.newArrayList();
+
+	JsonEvent(String name, Cause cause) {
+		this.cause = cause;
+		this.name = name;
+	}
 
 	public List<Sendable> getObjects() {
 		if (objects.isEmpty()) {
@@ -49,12 +60,23 @@ public abstract class JsonEvent {
 		}
 	}
 
+	@Override
+	public Cause getCause() {
+		return this.cause;
+	}
+
+	@Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
+	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }

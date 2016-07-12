@@ -1,12 +1,15 @@
 package me.Wundero.ProjectRay;
 
 import java.io.File;
-import java.util.logging.Level;
+import java.util.Optional;
 
-import me.Wundero.ProjectRay.framework.expansion.ExpansionManager;
+import org.slf4j.Logger;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.plugin.Plugin;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
+import com.google.inject.Inject;
+
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 /*
  The MIT License (MIT)
@@ -31,85 +34,48 @@ import org.bukkit.plugin.java.JavaPlugin;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class ProjectRay extends JavaPlugin implements IRay {// TODO move this to
-															// bukkit files
 
-	public void log(String s) {
-		log(s, Level.INFO);
-	}
+@Plugin(id = "ray", name = "Ray", version = "v0.0.1")
+public class ProjectRay implements IRay {
 
-	public void log(String s, Level l) {
-		Bukkit.getLogger().log(l, "ProjectRay > " + s);
-	}
-
-	@Override
-	public void onEnable() {
-		// TODO setup permissions/chat
-		// TODO load hooks
-		// TODO config
-		// TODO command architecture - potentially use GUI's?
-		// TODO language support
-		// TODO put license in all files
-		// TODO multiple server type support - sponge & spigot
-		// TODO better GUI system - usefull for select sects
-		// TODO converter from other plugins
-		// TODO customizable name
-		// TODO try to minimize singletons (static = overhead)
-		// TODO try to minimize reflection (overhead)
-		// TODO performance monitor (this plugin only, don't do massivelag/top)
-		// TODO event structure and animation handler?
-		// TODO credit mkremins for fanciful lib - state that is modified???
-		// TODO Expansion managers and handling
-
-		// IDEAS:
-		/*
-		 * Custom commands like DeluxeCommands
-		 * 
-		 * Control all text not just chat - bossbar/scoreboard/tablist
-		 * name&header&footer/actionbar/title/subtitle/whatever else
-		 * 
-		 * perhaps shift to multi purpose plugin: permissions plugin w/ group &
-		 * player architecture command struct like ess/pex/others all in one
-		 * 
-		 * better scripting system - support lua, js and other script langs
-		 * 
-		 * config helper - ext program that allows you to format chat how you
-		 * want and gens a config based on the settings you choose - support
-		 * json by selecting sections and adding click/hover to them
-		 * 
-		 * in-game file browser - use GUI's and fancy-convos to edit files
-		 * nicely - support txt yaml and other files
-		 * 
-		 * animations - figure out best way to do this (threads, events, etc.)
-		 * 
-		 * figure out best way to have changing text in-game w/o resending text,
-		 * or best way of resending text - when dc2 release decomp to look for
-		 * this
-		 * 
-		 * minimize dependencies (try to remove protocollib and vault (because
-		 * can be perms plugin) and add as soft-depends)
-		 * 
-		 * mavenize (add repo, remove libs)
-		 * 
-		 * try to increase version support (1.7-1.9 at least, 1.4-1.9 best)
-		 * 
-		 * converter from fanciful to texts (spigot to sponge)
-		 */
-	}
-
-	@Override
-	public void onDisable() {
-
-	}
+	@Inject
+	private Logger logger;
+	@Inject
+	private Game game;
 
 	@Override
 	public File getDirectory() {
-		return this.getDataFolder();
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Logger getLogger() {
+		return logger;
+	}
+
+	@Override
+	public void log(String s) {
+		getLogger().info(s);
+	}
+
+	public Game getGame() {
+		return game;
 	}
 
 	@Override
 	public String getVersion() {
-		return this.getDescription().getVersion();
+		Optional<String> opt = game.getPluginManager().getPlugin("ray").get().getVersion();
+		if (!opt.isPresent()) {
+			return "v0.0.1";
+		}
+		return opt.get();
+	}
+
+	@Override
+	public void sendJSON(String json, PlayerWrapper<?>... to) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

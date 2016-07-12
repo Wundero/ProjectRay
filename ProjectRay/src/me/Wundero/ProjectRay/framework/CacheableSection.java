@@ -8,10 +8,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.fanciful.FancyMessage;
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
 import me.Wundero.ProjectRay.framework.iface.Cacheable;
 import me.Wundero.ProjectRay.utils.PRTimeUnit;
 import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -40,7 +40,7 @@ public class CacheableSection extends JsonSection implements Cacheable {
 
 	// TODO remove this class - it's likely useless
 
-	public CacheableSection(ConfigSection sect) {
+	public CacheableSection(ConfigurationNode sect) {
 		super(sect);
 	}
 

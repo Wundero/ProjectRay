@@ -1,11 +1,11 @@
 package me.Wundero.ProjectRay;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.spongepowered.api.Game;
 
 import me.Wundero.ProjectRay.framework.PlayerWrapper;
-import me.Wundero.ProjectRay.framework.config.Config;
 
 /*
  The MIT License (MIT)
@@ -35,19 +35,15 @@ import me.Wundero.ProjectRay.framework.config.Config;
 public interface IRay {
 	File getDirectory();
 
-	Logger getLogger();
+	Game getGame();
 
-	void log(String s, Level l);
+	Logger getLogger();
 
 	void log(String s);
 
 	String getVersion();
 
 	void sendJSON(final String json, final PlayerWrapper<?>... to);
-
-	Config config();
-
-	ServerType getType();
 
 	// TODO get + add commands
 }

@@ -1,6 +1,6 @@
 package me.Wundero.ProjectRay.framework;
 
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
+import ninja.leaping.configurate.ConfigurationNode;
 /*
  The MIT License (MIT)
 
@@ -27,7 +27,7 @@ import me.Wundero.ProjectRay.framework.config.ConfigSection;
 
 public class Sections {
 
-	public static Section createSection(ConfigSection sect) {
+	public static Section createSection(ConfigurationNode sect) {
 		return null;
 	}
 

@@ -1,8 +1,7 @@
 package me.Wundero.ProjectRay;
 
-import me.Wundero.ProjectRay.framework.Groups;
-import me.Wundero.ProjectRay.framework.command.CommandRegistrar;
-import me.Wundero.ProjectRay.framework.config.Config;
+import org.spongepowered.api.Game;
+
 import me.Wundero.ProjectRay.framework.language.Messages;
 import me.Wundero.ProjectRay.variables.Parser;
 import me.Wundero.ProjectRay.variables.Store;
@@ -45,19 +44,17 @@ public class Ray {
 	private IRay plugin;
 	private Parser varParser;
 	private Store varStore;
-	private Groups grouplist;
 	private Messages messages;
-	private Config config;
-	private CommandRegistrar commands;
 
 	public void load(IRay plugin) {
 		this.setPlugin(plugin);
 		this.setVarParser(new Parser());
 		this.setVarStore(new Store());
-		this.setConfig(plugin.config());
-		this.setGrouplist(new Groups(getConfig()));
 		this.setMessages(new Messages());
-		this.setCommands(new CommandRegistrar());
+	}
+
+	public Game getGame() {
+		return plugin.getGame();
 	}
 
 	public IRay getPlugin() {
@@ -90,36 +87,5 @@ public class Ray {
 
 	private void setMessages(Messages messages) {
 		this.messages = messages;
-	}
-
-	public Groups getGrouplist() {
-		return grouplist;
-	}
-
-	private void setGrouplist(Groups grouplist) {
-		this.grouplist = grouplist;
-	}
-
-	public Config getConfig() {
-		return config;
-	}
-
-	private void setConfig(Config config) {
-		this.config = config;
-	}
-
-	/**
-	 * @return the commands
-	 */
-	public CommandRegistrar getCommands() {
-		return commands;
-	}
-
-	/**
-	 * @param commands
-	 *            the commands to set
-	 */
-	public void setCommands(CommandRegistrar commands) {
-		this.commands = commands;
 	}
 }

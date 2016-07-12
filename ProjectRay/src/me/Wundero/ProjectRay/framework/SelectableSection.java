@@ -2,7 +2,7 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
-import me.Wundero.ProjectRay.framework.config.ConfigSection;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -33,12 +33,12 @@ public class SelectableSection extends Section {
 									// section.getData("players_using") as a
 									// list
 
-	public SelectableSection(ConfigSection sect) {
-		load(sect);
+	public SelectableSection(ConfigurationNode sect) {
+		super.loadValues(sect);
 	}
 
 	@Override
-	public void load(ConfigSection sect) {
+	public void load(ConfigurationNode sect) throws Exception {
 
 	}
 
