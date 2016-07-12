@@ -1,9 +1,4 @@
-package me.Wundero.ProjectRay.framework.config;
-
-import java.io.IOException;
-
-import me.Wundero.ProjectRay.framework.backend.Backend;
-
+package me.Wundero.ProjectRay.framework.command;
 /*
  The MIT License (MIT)
 
@@ -28,33 +23,45 @@ import me.Wundero.ProjectRay.framework.backend.Backend;
  SOFTWARE.
  */
 
-public abstract class Config extends ConfigSection {
+import java.util.HashMap;
 
-	protected Backend file;
+import com.google.common.collect.Maps;
 
-	public Config(Backend file) throws IOException {
-		super("", null);
-		load();
-	}
+public class CommandRegistrar {
+	private HashMap<String, Command> commands = Maps.newHashMap();
 
-	public abstract void load() throws IOException;
-
-	public abstract void save() throws IOException;
-
-	public Backend getFile() {
-		return file;
-	}
-
-	public boolean setFile(Backend f) {
-		Backend f1 = file;
+	public boolean register(Class<? extends Command> clazz, Command command) {
 		try {
-			file = f;
-			load();
+			commands.put(clazz.getSimpleName(), command);
+			return true;
 		} catch (Exception e) {
-			file = f1;
 			return false;
 		}
+	}
+
+	public boolean register(Command command) {
+		return register(command.getClass(), command);
+	}
+
+	public boolean register(String name, Command command) {
+		commands.put(name, command);
 		return true;
 	}
 
+	public boolean deregister(String name) {
+		commands.remove(name);
+		return true;
+	}
+
+	public boolean deregister(Class<? extends Command> clazz) {
+		try {
+			return deregister(clazz.getName());
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean deregister(Command c) {
+		return deregister(c.getClass());
+	}
 }

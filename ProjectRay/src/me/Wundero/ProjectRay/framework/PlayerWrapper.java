@@ -17,6 +17,10 @@ public abstract class PlayerWrapper<T> {
 		return getUUID();
 	}
 
+	public abstract void chat(String text);
+
+	public abstract void command(String command);
+
 	public abstract void setUUID(UUID uuid);
 
 	public abstract void load(T player);
@@ -28,7 +32,7 @@ public abstract class PlayerWrapper<T> {
 	public abstract List<String> getPermissions();
 
 	public abstract List<Group> getGroups();
-	
+
 	public abstract boolean hasPermission(String permission);
 
 	public T getPlayer() {

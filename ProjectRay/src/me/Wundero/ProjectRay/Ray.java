@@ -1,6 +1,7 @@
 package me.Wundero.ProjectRay;
 
 import me.Wundero.ProjectRay.framework.Groups;
+import me.Wundero.ProjectRay.framework.command.CommandRegistrar;
 import me.Wundero.ProjectRay.framework.config.Config;
 import me.Wundero.ProjectRay.framework.language.Messages;
 import me.Wundero.ProjectRay.variables.Parser;
@@ -47,6 +48,7 @@ public class Ray {
 	private Groups grouplist;
 	private Messages messages;
 	private Config config;
+	private CommandRegistrar commands;
 
 	public void load(IRay plugin) {
 		this.setPlugin(plugin);
@@ -55,6 +57,7 @@ public class Ray {
 		this.setConfig(plugin.config());
 		this.setGrouplist(new Groups(getConfig()));
 		this.setMessages(new Messages());
+		this.setCommands(new CommandRegistrar());
 	}
 
 	public IRay getPlugin() {
@@ -103,5 +106,20 @@ public class Ray {
 
 	private void setConfig(Config config) {
 		this.config = config;
+	}
+
+	/**
+	 * @return the commands
+	 */
+	public CommandRegistrar getCommands() {
+		return commands;
+	}
+
+	/**
+	 * @param commands
+	 *            the commands to set
+	 */
+	public void setCommands(CommandRegistrar commands) {
+		this.commands = commands;
 	}
 }

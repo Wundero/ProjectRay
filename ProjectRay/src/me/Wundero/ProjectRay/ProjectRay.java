@@ -31,8 +31,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class ProjectRay extends JavaPlugin implements IRay {
-
+public class ProjectRay extends JavaPlugin implements IRay {// TODO move this to
+															// bukkit files
 
 	public void log(String s) {
 		log(s, Level.INFO);
@@ -102,7 +102,6 @@ public class ProjectRay extends JavaPlugin implements IRay {
 
 	}
 
-
 	@Override
 	public File getDirectory() {
 		return this.getDataFolder();
@@ -112,6 +111,5 @@ public class ProjectRay extends JavaPlugin implements IRay {
 	public String getVersion() {
 		return this.getDescription().getVersion();
 	}
-
 
 }

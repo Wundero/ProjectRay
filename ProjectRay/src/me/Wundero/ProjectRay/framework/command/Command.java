@@ -1,9 +1,4 @@
-package me.Wundero.ProjectRay.framework.config;
-
-import java.io.IOException;
-
-import me.Wundero.ProjectRay.framework.backend.Backend;
-
+package me.Wundero.ProjectRay.framework.command;
 /*
  The MIT License (MIT)
 
@@ -28,33 +23,22 @@ import me.Wundero.ProjectRay.framework.backend.Backend;
  SOFTWARE.
  */
 
-public abstract class Config extends ConfigSection {
+import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.PlayerWrapper;
+import me.Wundero.ProjectRay.framework.iface.Registerable;
 
-	protected Backend file;
+public abstract class Command implements Registerable {
+	public abstract boolean parse(String command, PlayerWrapper<?> sender);
 
-	public Config(Backend file) throws IOException {
-		super("", null);
-		load();
-	}
-
-	public abstract void load() throws IOException;
-
-	public abstract void save() throws IOException;
-
-	public Backend getFile() {
-		return file;
-	}
-
-	public boolean setFile(Backend f) {
-		Backend f1 = file;
+	public boolean register() {
 		try {
-			file = f;
-			load();
+			return Ray.get().getCommands().register(this);
 		} catch (Exception e) {
-			file = f1;
 			return false;
 		}
-		return true;
 	}
 
+	public boolean unregister() {
+		return Ray.get().getCommands().deregister(this);
+	}
 }

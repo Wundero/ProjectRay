@@ -1,9 +1,4 @@
-package me.Wundero.ProjectRay.framework.config;
-
-import java.io.IOException;
-
-import me.Wundero.ProjectRay.framework.backend.Backend;
-
+package me.Wundero.ProjectRay.framework.backend;
 /*
  The MIT License (MIT)
 
@@ -28,33 +23,8 @@ import me.Wundero.ProjectRay.framework.backend.Backend;
  SOFTWARE.
  */
 
-public abstract class Config extends ConfigSection {
-
-	protected Backend file;
-
-	public Config(Backend file) throws IOException {
-		super("", null);
-		load();
-	}
-
-	public abstract void load() throws IOException;
-
-	public abstract void save() throws IOException;
-
-	public Backend getFile() {
-		return file;
-	}
-
-	public boolean setFile(Backend f) {
-		Backend f1 = file;
-		try {
-			file = f;
-			load();
-		} catch (Exception e) {
-			file = f1;
-			return false;
-		}
-		return true;
-	}
-
+public class Backend {
+	private BackendType type;
+	private Object storage;// TODO this + backend implementations - use internal
+							// db's of servers if possible
 }
