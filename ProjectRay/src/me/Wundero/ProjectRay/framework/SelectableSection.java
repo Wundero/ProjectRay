@@ -34,7 +34,7 @@ public class SelectableSection extends Section {
 									// list
 
 	public SelectableSection(ConfigurationNode sect) {
-		super.loadValues(sect);
+		super(sect);
 	}
 
 	@Override

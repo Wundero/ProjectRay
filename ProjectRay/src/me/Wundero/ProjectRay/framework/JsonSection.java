@@ -40,7 +40,7 @@ public class JsonSection extends Section {
 	private List<String> hover;
 
 	public JsonSection(ConfigurationNode config) {
-		super.loadValues(config);
+		super(config);
 	}
 
 	public List<String> getHover() {

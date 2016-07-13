@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
+import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 /*
@@ -35,8 +38,32 @@ public class Groups {
 	// String world is lower case
 	private final Map<String, List<Group>> groups = Collections.synchronizedMap(new HashMap<String, List<Group>>());
 
+	// passed section: worlds
+	// section config: worlds.<worldname>.groups.<groupname>
 	public Groups(ConfigurationNode section) {
+		for (ConfigurationNode node : section.getChildrenList()) {
+			String world = node.getKey().toString();
+			ConfigurationNode node2 = node.getNode("groups");
+			List<Group> groups = Lists.newArrayList();
+			for (ConfigurationNode child : node2.getChildrenList()) {
+				groups.add(createGroup(child));
+			}
+			this.groups.put(world, groups);
+		}
+		for (String w : groups.keySet()) {
+			for (Group g : groups.get(w)) {
+				try {
+					g.loadParents();
+				} catch (Exception e) {
+					Utils.printError(e);
+				}
+			}
+		}
+	}
 
+	public Group createGroup(ConfigurationNode node) {
+		return new Group(node) {
+		};
 	}
 
 	public List<Group> getGroups(String world) {

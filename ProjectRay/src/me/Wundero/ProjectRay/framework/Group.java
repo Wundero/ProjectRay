@@ -2,6 +2,13 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
+
+import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+
 /*
  The MIT License (MIT)
 
@@ -27,12 +34,94 @@ import java.util.List;
  */
 public abstract class Group extends Section {
 
-	// TODO figure out world calculations
-	// TODO figure out how to generate parents
+	public Group(ConfigurationNode node) {
+		super(node);
+	}
+
+	private static int nextPriority = 0;
+
 	private String name;
 	private int priority;
 	private List<Format> formats;
 	private List<Group> parents;
 	private List<Section> subSections;
+
+	@Override
+	public void load(ConfigurationNode config) {
+		setName(config.getKey().toString());
+		setPriority(config.getNode("priority").getInt(nextPriority));
+		nextPriority++;
+		this.formats = Lists.newArrayList();
+		this.parents = Lists.newArrayList();
+		this.subSections = Lists.newArrayList();
+		try {
+			loadFormats(config.getNode("formats"));
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
+		loadSubSections(config);
+	}
+
+	public void loadParents() throws Exception {
+		String world = this.section.getParent().getParent().getKey().toString();
+		List<String> parentNames = this.section.getNode("parents").getList(TypeToken.of(String.class));
+		List<Group> allGroupsInWorld = Ray.get().getGroups().getGroups(world);
+		for (Group g : allGroupsInWorld) {
+			if (g == this || g.getName().equals(this.name)) {
+				continue;
+			}
+			if (parentNames.contains(g.getName())) {
+				parents.add(g);
+			}
+		}
+	}
+
+	private void loadSubSections(ConfigurationNode node) {
+		for (ConfigurationNode n : node.getChildrenList()) {
+			switc: switch (n.getKey().toString().toLowerCase().trim()) {
+			case "formats":
+			case "priority":
+			case "parents":
+				continue;
+			default:
+				break switc;
+			}
+			subSections.add(Sections.createSection(n));
+		}
+	}
+
+	private void loadFormats(ConfigurationNode formats) throws Exception {
+		for (ConfigurationNode node : formats.getChildrenList()) {
+			this.formats.add(new Format(node));
+		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	private void setName(String name) {
+		this.name = name;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	private void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	public List<Format> getFormats() {
+		return formats;
+	}
+
+	public List<Group> getParents() {
+		return parents;
+	}
+
+	public List<Section> getSubSections() {
+		return subSections;
+	}
 
 }

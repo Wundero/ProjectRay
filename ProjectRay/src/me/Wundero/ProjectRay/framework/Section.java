@@ -32,8 +32,15 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 public abstract class Section extends DataHolder {
 
+	protected ConfigurationNode section = null;
+
+	public Section(ConfigurationNode node) {
+		loadValues(node);
+	}
+
 	public final void loadValues(ConfigurationNode section) {
 		this.putAll(getMap(section.getChildrenMap()));
+		this.setSection(section);
 		try {
 			load(section);
 		} catch (Exception e) {
@@ -50,4 +57,12 @@ public abstract class Section extends DataHolder {
 	}
 
 	public abstract void load(ConfigurationNode sect) throws Exception;
+
+	public ConfigurationNode getSection() {
+		return section;
+	}
+
+	private void setSection(ConfigurationNode section) {
+		this.section = section;
+	}
 }

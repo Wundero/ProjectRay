@@ -2,6 +2,7 @@ package me.Wundero.ProjectRay;
 
 import org.spongepowered.api.Game;
 
+import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.framework.language.Messages;
 import me.Wundero.ProjectRay.variables.Parser;
 import me.Wundero.ProjectRay.variables.Store;
@@ -45,12 +46,14 @@ public class Ray {
 	private Parser varParser;
 	private Store varStore;
 	private Messages messages;
+	private Groups groups;
 
 	public void load(IRay plugin) {
 		this.setPlugin(plugin);
 		this.setVarParser(new Parser());
 		this.setVarStore(new Store());
 		this.setMessages(new Messages());
+		this.setGroups(new Groups(null));// TODO config load
 	}
 
 	public Game getGame() {
@@ -87,5 +90,20 @@ public class Ray {
 
 	private void setMessages(Messages messages) {
 		this.messages = messages;
+	}
+
+	/**
+	 * @return the groups
+	 */
+	public Groups getGroups() {
+		return groups;
+	}
+
+	/**
+	 * @param groups
+	 *            the groups to set
+	 */
+	public void setGroups(Groups groups) {
+		this.groups = groups;
 	}
 }

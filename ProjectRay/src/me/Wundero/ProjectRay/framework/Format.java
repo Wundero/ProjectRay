@@ -36,15 +36,15 @@ public class Format extends Section {
 	// TODO default formats - create default package that handles default
 	// grps/formats/everything else
 
+	public Format(ConfigurationNode node) {
+		super(node);
+	}
+
 	private List<Section> sections;
 	private String name;
 	private boolean animation = false; // if true, sections must specify what
 										// frame they are part of with frame: 1
 	private FormatType type;
-
-	public Format(ConfigurationNode section) throws Exception {
-		load(section);
-	}
 
 	// TODO getMessage
 
