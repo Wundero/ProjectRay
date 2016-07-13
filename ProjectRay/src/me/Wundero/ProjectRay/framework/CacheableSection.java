@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import me.Wundero.ProjectRay.fanciful.FancyMessage;
 import me.Wundero.ProjectRay.framework.iface.Cacheable;
 import me.Wundero.ProjectRay.utils.PRTimeUnit;
 import me.Wundero.ProjectRay.utils.Utils;
@@ -102,30 +104,29 @@ public class CacheableSection extends JsonSection implements Cacheable {
 	}
 
 	/*
-	 * @Override public FancyMessage getMessage(PlayerWrapper<?> player,
-	 * PlayerWrapper<?>[] others) { String s = compileToKey(player, others); if
-	 * (cache.hasData(s)) { return cache.getData(s); } FancyMessage out =
-	 * super.getMessage(player, others); cache(player, others, out); return out;
-	 * }
+	 * @Override public FancyMessage getMessage(Player player, Player[] others)
+	 * { String s = compileToKey(player, others); if (cache.hasData(s)) { return
+	 * cache.getData(s); } FancyMessage out = super.getMessage(player, others);
+	 * cache(player, others, out); return out; }
 	 */
 
-	private String compileToKey(PlayerWrapper<?> p, PlayerWrapper<?>[] o) {
+	private String compileToKey(Player p, Player[] o) {
 		if (p == null) {
 			return "noplayer";
 		}
-		String out = "" + p.getUUID().toString();
+		String out = "" + p.getUniqueId().toString();
 		if (o != null && o.length > 0) {
-			for (PlayerWrapper<?> pl : o) {
+			for (Player pl : o) {
 				if (pl == null) {
 					continue;
 				}
-				out += "" + pl.getUUID().toString();
+				out += "" + pl.getUniqueId().toString();
 			}
 		}
 		return out;
 	}
 
-	public void cache(PlayerWrapper<?> player, PlayerWrapper<?>[] others, FancyMessage result) {
+	public void cache(Player player, Player[] others, Text result) {
 		String s = compileToKey(player, others);
 		if (cache.getData(s).equals(result)) {
 			return;

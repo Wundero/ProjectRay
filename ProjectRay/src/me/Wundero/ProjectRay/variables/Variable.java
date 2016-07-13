@@ -1,7 +1,8 @@
 package me.Wundero.ProjectRay.variables;
 
+import org.spongepowered.api.entity.living.player.Player;
+
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 /*
  The MIT License (MIT)
@@ -34,7 +35,7 @@ public abstract class Variable {
 
 	private String name;
 
-	public abstract String parse(PlayerWrapper<?> player, String[] data);
+	public abstract String parse(Player player, String[] data);
 
 	public final String getName() {
 		return name;

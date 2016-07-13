@@ -4,8 +4,7 @@ import java.io.File;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-
-import me.Wundero.ProjectRay.framework.PlayerWrapper;
+import org.spongepowered.api.entity.living.player.Player;
 
 /*
  The MIT License (MIT)
@@ -43,7 +42,7 @@ public interface IRay {
 
 	String getVersion();
 
-	void sendJSON(final String json, final PlayerWrapper<?>... to);
+	void sendJSON(final String json, final Player... to);
 
 	// TODO get + add commands
 }

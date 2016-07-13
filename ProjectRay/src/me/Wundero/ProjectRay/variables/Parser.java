@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.PlayerWrapper;
+import org.spongepowered.api.entity.living.player.Player;
 
 import com.google.common.collect.Lists;
+
+import me.Wundero.ProjectRay.Ray;
 
 /*
  The MIT License (MIT)
@@ -116,12 +117,11 @@ public class Parser {
 		return s;
 	}
 
-	private boolean hasOther(PlayerWrapper<?>[] o, int ind) {
+	private boolean hasOther(Player[] o, int ind) {
 		return o != null && (o.length > ind) && (o[ind] != null);
 	}
 
-	public String parseVariable(PlayerWrapper<?> player,
-			PlayerWrapper<?>[] others, String name) {
+	public String parseVariable(Player player, Player[] others, String name) {
 		String nameo = name;
 		name = name.toLowerCase();
 		name = fix(name);
@@ -131,9 +131,7 @@ public class Parser {
 																			// case
 			player = others[0];
 		}
-		if ((name.startsWith("recip" + declarer) || name.startsWith("recipient"
-				+ declarer))
-				&& hasOther(others, 1)) {
+		if ((name.startsWith("recip" + declarer) || name.startsWith("recipient" + declarer)) && hasOther(others, 1)) {
 			player = others[1];
 		}
 		if (name.startsWith("viewer" + declarer) && hasOther(others, 2)) {// secondary
@@ -186,12 +184,11 @@ public class Parser {
 		if (fix(s) == s) {
 			return s;
 		}
-		return normtouni.get(s.charAt(0)) + "" + s.substring(1, s.length() - 1)
-				+ "" + normtouni.get(s.charAt(s.length() - 1));
+		return normtouni.get(s.charAt(0)) + "" + s.substring(1, s.length() - 1) + ""
+				+ normtouni.get(s.charAt(s.length() - 1));
 	}
 
-	public String parseIteration(PlayerWrapper<?> player,
-			PlayerWrapper<?>[] others, String s, int iterations) {
+	public String parseIteration(Player player, Player[] others, String s, int iterations) {
 		String out = s;
 		for (int i = 0; i < iterations; i++) {
 			out = parse(player, others, out);
@@ -199,8 +196,7 @@ public class Parser {
 		return out;
 	}
 
-	public List<String> parseListIteration(Iterable<String> list,
-			PlayerWrapper<?> player, PlayerWrapper<?>[] others, int iterations) {
+	public List<String> parseListIteration(Iterable<String> list, Player player, Player[] others, int iterations) {
 		List<String> l = Lists.newArrayList();
 		for (String s : list) {
 			l.add(parseIteration(player, others, s, iterations));
@@ -208,8 +204,7 @@ public class Parser {
 		return l;
 	}
 
-	public List<String> parseListUntilDone(Iterable<String> list,
-			PlayerWrapper<?> player, PlayerWrapper<?>[] others) {
+	public List<String> parseListUntilDone(Iterable<String> list, Player player, Player[] others) {
 		List<String> l = Lists.newArrayList();
 		for (String s : list) {
 			l.add(parseUntilDone(player, others, s));
@@ -217,8 +212,7 @@ public class Parser {
 		return l;
 	}
 
-	public String parseUntilDone(PlayerWrapper<?> player,
-			PlayerWrapper<?>[] others, String s) {
+	public String parseUntilDone(Player player, Player[] others, String s) {
 		String out = s;
 		String parsed = s;
 		while (out != (parsed = parse(player, others, out))) {
@@ -227,8 +221,7 @@ public class Parser {
 		return out;
 	}
 
-	public List<String> parseList(Iterable<String> list,
-			PlayerWrapper<?> player, PlayerWrapper<?>[] others) {
+	public List<String> parseList(Iterable<String> list, Player player, Player[] others) {
 		List<String> l = Lists.newArrayList();
 		for (String s : list) {
 			l.add(parse(player, others, s));
@@ -236,13 +229,11 @@ public class Parser {
 		return l;
 	}
 
-	public String parse(PlayerWrapper<?> player, PlayerWrapper<?>[] others,
-			String st) {
+	public String parse(Player player, Player[] others, String st) {
 		String s = st;
 		Matcher ma = pattern.matcher(s);
 		while (ma.reset(s).find()) {
-			s = s.replace("" + ma.group(0),
-					f(parseVariable(player, others, ma.group(0))));
+			s = s.replace("" + ma.group(0), f(parseVariable(player, others, ma.group(0))));
 		}
 		return x(s);
 	}

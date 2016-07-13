@@ -5,11 +5,10 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.Plugin;
 
 import com.google.inject.Inject;
-
-import me.Wundero.ProjectRay.framework.PlayerWrapper;
 
 /*
  The MIT License (MIT)
@@ -73,7 +72,7 @@ public class ProjectRay implements IRay {
 	}
 
 	@Override
-	public void sendJSON(String json, PlayerWrapper<?>... to) {
+	public void sendJSON(String json, Player... to) {
 		// TODO Auto-generated method stub
 
 	}
