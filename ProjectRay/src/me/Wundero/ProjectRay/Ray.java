@@ -2,10 +2,7 @@ package me.Wundero.ProjectRay;
 
 import org.spongepowered.api.Game;
 
-import me.Wundero.ProjectRay.framework.Groups;
-import me.Wundero.ProjectRay.framework.language.Messages;
-import me.Wundero.ProjectRay.variables.Parser;
-import me.Wundero.ProjectRay.variables.Store;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -42,68 +39,35 @@ public class Ray {
 		return singleton;
 	}
 
-	private IRay plugin;
-	private Parser varParser;
-	private Store varStore;
-	private Messages messages;
-	private Groups groups;
+	private ProjectRay plugin;
+	private ConfigurationNode config;
 
-	public void load(IRay plugin) {
+	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
-		this.setVarParser(new Parser());
-		this.setVarStore(new Store());
-		this.setMessages(new Messages());
-		this.setGroups(new Groups(null));// TODO config load
+		this.setConfig(plugin.getConfig());
+	}
+
+	public void terminate() {
+		// TODO more
 	}
 
 	public Game getGame() {
 		return plugin.getGame();
 	}
 
-	public IRay getPlugin() {
+	public ProjectRay getPlugin() {
 		return plugin;
 	}
 
-	private void setPlugin(IRay plugin) {
+	private void setPlugin(ProjectRay plugin) {
 		this.plugin = plugin;
 	}
 
-	public Store getStore() {
-		return varStore;
+	public ConfigurationNode getConfig() {
+		return config;
 	}
 
-	private void setVarStore(Store varStore) {
-		this.varStore = varStore;
-	}
-
-	public Parser getParser() {
-		return varParser;
-	}
-
-	private void setVarParser(Parser varParser) {
-		this.varParser = varParser;
-	}
-
-	public Messages getMessages() {
-		return messages;
-	}
-
-	private void setMessages(Messages messages) {
-		this.messages = messages;
-	}
-
-	/**
-	 * @return the groups
-	 */
-	public Groups getGroups() {
-		return groups;
-	}
-
-	/**
-	 * @param groups
-	 *            the groups to set
-	 */
-	public void setGroups(Groups groups) {
-		this.groups = groups;
+	public void setConfig(ConfigurationNode config) {
+		this.config = config;
 	}
 }

@@ -1,15 +1,4 @@
 package me.Wundero.ProjectRay.framework;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.Lists;
-
-import me.Wundero.ProjectRay.utils.Utils;
-import ninja.leaping.configurate.ConfigurationNode;
-
 /*
  The MIT License (MIT)
 
@@ -33,41 +22,44 @@ import ninja.leaping.configurate.ConfigurationNode;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
+import ninja.leaping.configurate.ConfigurationNode;
+
 public class Groups {
+	private Map<String, Map<String, Group>> groups = Maps.newHashMap();
 
-	// String world is lower case
-	private final Map<String, List<Group>> groups = Collections.synchronizedMap(new HashMap<String, List<Group>>());
-
-	// passed section: worlds
-	// section config: worlds.<worldname>.groups.<groupname>
-	public Groups(ConfigurationNode section) {
-		for (ConfigurationNode node : section.getChildrenList()) {
-			String world = node.getKey().toString();
-			ConfigurationNode node2 = node.getNode("groups");
-			List<Group> groups = Lists.newArrayList();
-			for (ConfigurationNode child : node2.getChildrenList()) {
-				groups.add(createGroup(child));
-			}
-			this.groups.put(world, groups);
-		}
-		for (String w : groups.keySet()) {
-			for (Group g : groups.get(w)) {
-				try {
-					g.loadParents();
-				} catch (Exception e) {
-					Utils.printError(e);
+	// pass "worlds" node
+	public Groups(ConfigurationNode node) {
+		for (ConfigurationNode child : node.getChildrenList()) {
+			String world = child.getKey().toString();
+			ConfigurationNode groups = child.getNode("groups");
+			for (ConfigurationNode group : groups.getChildrenList()) {
+				String name = group.getKey().toString();
+				if (!this.groups.containsKey(world)) {
+					Map<String, Group> map = Maps.newHashMap();
+					map.put(name, new Group(world, group));
+					this.groups.put(world, map);
+				} else {
+					Map<String, Group> map = this.groups.get(world);
+					map.put(name, new Group(world, group));
+					this.groups.put(world, map);
 				}
 			}
 		}
 	}
 
-	public Group createGroup(ConfigurationNode node) {
-		return new Group(node) {
-		};
+	public Group getGroup(String name, String world) {
+		if (!groups.containsKey(world)) {
+			return null;
+		}
+		return getGroups(world).get(name);
 	}
 
-	public List<Group> getGroups(String world) {
-		return groups.get(world.toLowerCase());
+	public Map<String, Group> getGroups(String world) {
+		return groups.get(world);
 	}
-
 }

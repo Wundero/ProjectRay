@@ -1,11 +1,4 @@
 package me.Wundero.ProjectRay.framework;
-
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import ninja.leaping.configurate.ConfigurationNode;
-
 /*
  The MIT License (MIT)
 
@@ -30,30 +23,35 @@ import ninja.leaping.configurate.ConfigurationNode;
  SOFTWARE.
  */
 
-//No world-specific formats, all specified under group
-public class Format extends Section {
+import org.spongepowered.api.text.TextTemplate;
 
-	// TODO default formats - create default package that handles default
-	// grps/formats/everything else
+import com.google.common.reflect.TypeToken;
+
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
+public class Format {
+	private TextTemplate template;
+	private FormatType type;
+	private String name;
 
 	public Format(ConfigurationNode node) {
-		super(node);
+		name = node.getKey().toString();
+		setType(FormatType.fromString(name));
+		try {
+			setTemplate(node.getNode("format").getValue(TypeToken.of(TextTemplate.class)));
+		} catch (ObjectMappingException e) {
+			Utils.printError(e);
+		}
 	}
 
-	private List<Section> sections;
-	private String name;
-	private boolean animation = false; // if true, sections must specify what
-										// frame they are part of with frame: 1
-	private FormatType type;
-
-	// TODO getMessage
-
-	public List<Section> getSections() {
-		return sections;
+	public TextTemplate getTemplate() {
+		return template;
 	}
 
-	public void setSections(List<Section> sections) {
-		this.sections = sections;
+	public void setTemplate(TextTemplate template) {
+		this.template = template;
 	}
 
 	public FormatType getType() {
@@ -63,45 +61,4 @@ public class Format extends Section {
 	public void setType(FormatType type) {
 		this.type = type;
 	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public void load(ConfigurationNode section) {
-		if (section == null) {
-			return;
-		}
-		this.setName(section.getKey().toString());
-		this.type = FormatType.fromString(name);
-		this.sections = Lists.newArrayList();
-		for (ConfigurationNode s : section.getChildrenList()) {
-			if (!s.hasListChildren()) {
-				continue;
-			}
-			Section se = Sections.createSection(s);
-			sections.add(se);
-		}
-	}
-
-	/**
-	 * @return the animation
-	 */
-	public boolean isAnimation() {
-		return animation;
-	}
-
-	/**
-	 * @param animation
-	 *            the animation to set
-	 */
-	public void setAnimation(boolean animation) {
-		this.animation = animation;
-	}
-
 }

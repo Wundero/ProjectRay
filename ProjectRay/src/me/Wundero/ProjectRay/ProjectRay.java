@@ -1,14 +1,23 @@
 package me.Wundero.ProjectRay;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import com.google.inject.Inject;
+
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 /*
  The MIT License (MIT)
@@ -35,25 +44,22 @@ import com.google.inject.Inject;
  */
 
 @Plugin(id = "ray", name = "Ray", version = "v0.0.1")
-public class ProjectRay implements IRay {
+public class ProjectRay {
 
 	@Inject
 	private Logger logger;
 	@Inject
 	private Game game;
+	@Inject
+	@ConfigDir(sharedRoot = false)
+	private Path configDir;
 
-	@Override
-	public File getDirectory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private ConfigurationNode config;
 
-	@Override
 	public Logger getLogger() {
 		return logger;
 	}
 
-	@Override
 	public void log(String s) {
 		getLogger().info(s);
 	}
@@ -62,7 +68,6 @@ public class ProjectRay implements IRay {
 		return game;
 	}
 
-	@Override
 	public String getVersion() {
 		Optional<String> opt = game.getPluginManager().getPlugin("ray").get().getVersion();
 		if (!opt.isPresent()) {
@@ -71,10 +76,50 @@ public class ProjectRay implements IRay {
 		return opt.get();
 	}
 
-	@Override
-	public void sendJSON(String json, Player... to) {
-		// TODO Auto-generated method stub
+	private void loadConfig() {
+		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(configDir)
+				.build();
+		try {
+			setConfig(loader.load());
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
+	}
 
+	private void saveConfig() {
+		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(configDir)
+				.build();
+		try {
+			loader.save(config);
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
+	}
+
+	@Listener
+	public void onStart(GameStartedServerEvent event) {
+		loadConfig();
+		Ray.get().load(this);
+	}
+	
+	@Listener
+	public void onStop(GameStoppingServerEvent event) {
+		saveConfig();
+	}
+
+	/**
+	 * @return the config
+	 */
+	public ConfigurationNode getConfig() {
+		return config;
+	}
+
+	/**
+	 * @param config
+	 *            the config to set
+	 */
+	public void setConfig(ConfigurationNode config) {
+		this.config = config;
 	}
 
 }

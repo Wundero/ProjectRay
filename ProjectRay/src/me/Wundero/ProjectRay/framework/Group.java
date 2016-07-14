@@ -1,13 +1,16 @@
 package me.Wundero.ProjectRay.framework;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /*
  The MIT License (MIT)
@@ -32,96 +35,114 @@ import ninja.leaping.configurate.ConfigurationNode;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public abstract class Group extends Section {
 
-	public Group(ConfigurationNode node) {
-		super(node);
+public class Group {
+	private Map<FormatType, List<Format>> formats = Maps.newHashMap();
+	private List<String> parents = Lists.newArrayList();
+	private String world;
+	private int priority;
+	private String permission;
+	private ConfigurationNode config;
+	private String name;
+
+	public Group(String world, ConfigurationNode config) {
+		this.setWorld(world);
+		this.setConfig(config);
+		load();
 	}
 
-	private static int nextPriority = 0;
-
-	private String name;
-	private int priority;
-	private List<Format> formats;
-	private List<Group> parents;
-	private List<Section> subSections;
-
-	@Override
-	public void load(ConfigurationNode config) {
-		setName(config.getKey().toString());
-		setPriority(config.getNode("priority").getInt(nextPriority));
-		nextPriority++;
-		this.formats = Lists.newArrayList();
-		this.parents = Lists.newArrayList();
-		this.subSections = Lists.newArrayList();
+	public void load() {
+		this.setName(config.getKey().toString());
+		this.setPermission(config.getNode("permission").getString("ray." + ""));
+		this.setPriority(config.getNode("priority").getInt(0));
 		try {
-			loadFormats(config.getNode("formats"));
-		} catch (Exception e) {
+			this.setParents(config.getNode("parents").getList(TypeToken.of(String.class)));
+		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
-		loadSubSections(config);
-	}
-
-	public void loadParents() throws Exception {
-		String world = this.section.getParent().getParent().getKey().toString();
-		List<String> parentNames = this.section.getNode("parents").getList(TypeToken.of(String.class));
-		List<Group> allGroupsInWorld = Ray.get().getGroups().getGroups(world);
-		for (Group g : allGroupsInWorld) {
-			if (g == this || g.getName().equals(this.name)) {
-				continue;
-			}
-			if (parentNames.contains(g.getName())) {
-				parents.add(g);
+		for (ConfigurationNode node : config.getNode("formats").getChildrenList()) {
+			Format f = new Format(node);
+			FormatType type = f.getType();
+			if (!formats.containsKey(type)) {
+				formats.put(type, Lists.newArrayList(f));
+			} else {
+				List<Format> list = formats.get(type);
+				list.add(f);
+				formats.put(type, list);
 			}
 		}
 	}
 
-	private void loadSubSections(ConfigurationNode node) {
-		for (ConfigurationNode n : node.getChildrenList()) {
-			switc: switch (n.getKey().toString().toLowerCase().trim()) {
-			case "formats":
-			case "priority":
-			case "parents":
-				continue;
-			default:
-				break switc;
-			}
-			subSections.add(Sections.createSection(n));
+	public Format getFormat(FormatType type, int index) {
+		return getFormats(type).get(index);
+	}
+
+	public Format getFormat(FormatType type) {
+		return getFormat(type, 0);
+	}
+
+	public Format getRandomFormat(FormatType type) {
+		List<Format> fmats = getFormats(type);
+		return fmats.get(new Random().nextInt(fmats.size()));
+	}
+
+	public List<Format> getAllFormats() {
+		List<Format> out = Lists.newArrayList();
+		for (List<Format> f : formats.values()) {
+			out.addAll(f);
 		}
+		return out;
 	}
 
-	private void loadFormats(ConfigurationNode formats) throws Exception {
-		for (ConfigurationNode node : formats.getChildrenList()) {
-			this.formats.add(new Format(node));
-		}
+	public List<Format> getFormats(FormatType type) {
+		return formats.get(type);
 	}
 
-	public String getName() {
-		return name;
+	public ConfigurationNode getConfig() {
+		return config;
 	}
 
-	private void setName(String name) {
-		this.name = name;
+	public void setConfig(ConfigurationNode config) {
+		this.config = config;
+	}
+
+	public List<String> getParents() {
+		return parents;
+	}
+
+	public void setParents(List<String> parents) {
+		this.parents = parents;
+	}
+
+	public String getWorld() {
+		return world;
+	}
+
+	public void setWorld(String world) {
+		this.world = world;
 	}
 
 	public int getPriority() {
 		return priority;
 	}
 
-	private void setPriority(int priority) {
+	public void setPriority(int priority) {
 		this.priority = priority;
 	}
 
-	public List<Format> getFormats() {
-		return formats;
+	public String getPermission() {
+		return permission;
 	}
 
-	public List<Group> getParents() {
-		return parents;
+	public void setPermission(String permission) {
+		this.permission = permission;
 	}
 
-	public List<Section> getSubSections() {
-		return subSections;
+	public String getName() {
+		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
 }

@@ -1,8 +1,10 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.ProjectRay;
 
-import org.spongepowered.api.entity.living.player.Player;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-import me.Wundero.ProjectRay.Ray;
+import com.google.common.collect.Maps;
 
 /*
  The MIT License (MIT)
@@ -27,26 +29,44 @@ import me.Wundero.ProjectRay.Ray;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public abstract class Variable {
+public abstract class DataHolder {
 
-	public Variable(String s) {
-		setName(s);
+	protected HashMap<String, Object> data = Maps.newHashMap();
+
+	protected UUID uuid;
+
+	public synchronized void putAll(Map<String, Object> values) {
+		data.putAll(values);
 	}
 
-	private String name;
-
-	public abstract String parse(Player player, String[] data);
-
-	public final String getName() {
-		return name;
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T getData(String key) {
+		return (T) data.get(key);
 	}
 
-	public final void setName(String name) {
-		this.name = name.toLowerCase();
-		fix();
+	public synchronized boolean hasData(String key) {
+		return data.containsKey(key);
 	}
 
-	private final void fix() {
-		name = Ray.get().getParser().fix(name);
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T removeData(String key) {
+		return (T) data.remove(key);
 	}
+
+	public synchronized Object putData(String key, Object value) {
+		return data.put(key, value);
+	}
+
+	public synchronized void clearData() {
+		data.clear();
+	}
+
+	public synchronized UUID getUUID() {
+		return uuid;
+	}
+
+	public synchronized void setUUID(UUID u) {
+		this.uuid = u;
+	}
+
 }
