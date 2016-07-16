@@ -34,6 +34,7 @@ public class RayPlayer extends DataHolder {
 	// TODO conversations
 
 	private User user;
+	private Group group;
 
 	public RayPlayer(User u) {
 		this.setUser(u);

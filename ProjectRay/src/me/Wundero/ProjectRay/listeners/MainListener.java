@@ -23,17 +23,22 @@ package me.Wundero.ProjectRay.listeners;
  SOFTWARE.
  */
 
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import java.util.Optional;
 
-import me.Wundero.ProjectRay.Ray;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.message.MessageEvent;
 
 public class MainListener {
 	@Listener
 	public void onChat(MessageEvent event) {
-		Text original = event.getOriginalMessage();
-		Ray.get().getPlugin().getLogger().info("original message: " + TextSerializers.JSON.serialize(original));
+		Cause c = event.getCause();
+		Optional<Player> sender = c.first(Player.class);
+		if(!sender.isPresent()) {
+			return;
+		}
+		Player s = sender.get();
+		
 	}
 }
