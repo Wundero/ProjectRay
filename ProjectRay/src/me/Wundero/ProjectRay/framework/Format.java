@@ -35,6 +35,48 @@ public class Format {
 	private TextTemplate template;
 	private FormatType type;
 	private String name;
+	private boolean usable = false;
+
+	private Format() {
+
+	}
+
+	public static Format builder() {
+		return new Format();
+	}
+
+	public Format withSection(Object... text) {
+		if (template == null) {
+			template = TextTemplate.of(text);
+		} else {
+			template.concat(TextTemplate.of(text));
+		}
+		return this;
+	}
+
+	public Format build() {
+		if (type == null && (name != null && !name.isEmpty())) {
+			type = FormatType.fromString(name);
+		}
+		if (template == null || type == null || name == null || name.isEmpty()) {
+			return null;
+		}
+		usable = true;
+		return this;
+	}
+
+	public Format withType(FormatType type) {
+		return setType(type);
+	}
+
+	public Format withName(String name) {
+		return setName(name);
+	}
+
+	public Format setName(String name) {
+		this.name = name;
+		return this;
+	}
 
 	public Format(ConfigurationNode node) {
 		name = node.getKey().toString();
@@ -44,21 +86,28 @@ public class Format {
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
+		usable = true;
+	}
+
+	public boolean usable() {
+		return usable;
 	}
 
 	public TextTemplate getTemplate() {
 		return template;
 	}
 
-	public void setTemplate(TextTemplate template) {
+	public Format setTemplate(TextTemplate template) {
 		this.template = template;
+		return this;
 	}
 
 	public FormatType getType() {
 		return type;
 	}
 
-	public void setType(FormatType type) {
+	public Format setType(FormatType type) {
 		this.type = type;
+		return this;
 	}
 }

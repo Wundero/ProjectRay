@@ -23,43 +23,32 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
-import java.util.Map;
+import java.util.UUID;
 
-import com.google.common.collect.Maps;
+import org.spongepowered.api.entity.living.player.User;
 
-import ninja.leaping.configurate.ConfigurationNode;
+import me.Wundero.ProjectRay.DataHolder;
 
-public class Groups {
-	private Map<String, Map<String, Group>> groups = Maps.newHashMap();
+public class RayPlayer extends DataHolder {
 
-	// pass "worlds" node or "worlds" folder TODO folder support
-	public Groups(ConfigurationNode node) {
-		for (ConfigurationNode child : node.getChildrenList()) {
-			String world = child.getKey().toString();
-			ConfigurationNode groups = child.getNode("groups");
-			for (ConfigurationNode group : groups.getChildrenList()) {
-				String name = group.getKey().toString();
-				if (!this.groups.containsKey(world)) {
-					Map<String, Group> map = Maps.newHashMap();
-					map.put(name, new Group(world, group));
-					this.groups.put(world, map);
-				} else {
-					Map<String, Group> map = this.groups.get(world);
-					map.put(name, new Group(world, group));
-					this.groups.put(world, map);
-				}
-			}
-		}
+	// TODO conversations
+
+	private User user;
+
+	public RayPlayer(User u) {
+		this.setUser(u);
+		this.uuid = u.getUniqueId();
 	}
 
-	public Group getGroup(String name, String world) {
-		if (!groups.containsKey(world)) {
-			return null;
-		}
-		return getGroups(world).get(name);
+	public UUID getUniqueId() {
+		return getUUID();
 	}
 
-	public Map<String, Group> getGroups(String world) {
-		return groups.get(world);
+	public User getUser() {
+		return user;
+	}
+
+	private void setUser(User user) {
+		this.user = user;
 	}
 }

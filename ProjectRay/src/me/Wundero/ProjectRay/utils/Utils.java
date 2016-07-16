@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
@@ -59,27 +55,6 @@ import ninja.leaping.configurate.ConfigurationNode;
  */
 
 public class Utils {
-
-	private static ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
-	private static List<ScheduledFuture<?>> threads = Lists.newArrayList();
-
-	public static synchronized int run(Runnable r, int delay, int repeat) {
-		threads.add(executor.scheduleAtFixedRate(r, delay * 50, repeat * 50, TimeUnit.MILLISECONDS));
-		return threads.size() - 1;
-	}
-
-	public static synchronized int run(Runnable r, int delay) {
-		threads.add(executor.schedule(r, delay * 50, TimeUnit.MILLISECONDS));
-		return threads.size() - 1;
-	}
-
-	public static synchronized int run(Runnable r) {
-		return run(r, 0);
-	}
-
-	public static boolean cancel(int task) {
-		return threads.get(task).cancel(false);
-	}
 
 	public static final String S = "";
 	public static final Pattern URL_PATTERN = Pattern

@@ -44,6 +44,9 @@ public class Group {
 	private String permission;
 	private ConfigurationNode config;
 	private String name;
+	private boolean isDir = false;// TODO support groups being both single file
+									// represenatations and file folders with
+									// config files
 
 	public Group(String world, ConfigurationNode config) {
 		this.setWorld(world);
