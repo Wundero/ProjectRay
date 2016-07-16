@@ -1,7 +1,9 @@
 package me.Wundero.ProjectRay;
 
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 
+import me.Wundero.ProjectRay.listeners.MainListener;
 import ninja.leaping.configurate.ConfigurationNode;
 
 /*
@@ -45,6 +47,7 @@ public class Ray {
 	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
+		Sponge.getEventManager().registerListeners(plugin, new MainListener());
 	}
 
 	public void terminate() {

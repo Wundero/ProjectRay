@@ -105,16 +105,6 @@ public class Utils {
 
 	private static HashMap<UUID, Long> times = Maps.newHashMap();
 
-	public static <T> ArrayList<T> modifiedList(ArrayList<T> in, Modifier<T, ?> mod) {
-		ArrayList<T> out = Lists.newArrayList();
-		for (T t : in) {
-			@SuppressWarnings("unchecked")
-			T t2 = mod.modify(t);
-			out.add(t2);
-		}
-		return out;
-	}
-
 	@SafeVarargs
 	public static <T> ArrayList<T> of(T... t) {
 		return Lists.newArrayList(t);
