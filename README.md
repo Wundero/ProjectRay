@@ -5,6 +5,7 @@ This plugin is meant to be an all in one controller for servers looking to unify
 This is under heavy development and is NOT FUNCTIONAL AT THE MOMENT.
 
 Things to do:
+
 -Full permissions support (groups, global groups, mirroring, inheritance, the likes)
 
 -Full chat support
@@ -36,5 +37,3 @@ Things to do:
 -Potentially make a GUI system for commands built into the architecture, and disable by default (interface?)
 
 -Changeable name (final name for this plugin is probably not going to be ProjectRay but whatever)
-
-Credit for the Fanciful library used in this plugin goes to mkremins. License here: https://github.com/mkremins/fanciful/blob/master/LICENSE
