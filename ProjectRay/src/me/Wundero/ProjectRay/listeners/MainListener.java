@@ -23,22 +23,22 @@ package me.Wundero.ProjectRay.listeners;
  SOFTWARE.
  */
 
-import java.util.Optional;
-
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.message.MessageEvent;
+
+import me.Wundero.ProjectRay.Ray;
 
 public class MainListener {
 	@Listener
-	public void onChat(MessageEvent event) {
-		Cause c = event.getCause();
-		Optional<Player> sender = c.first(Player.class);
-		if(!sender.isPresent()) {
-			return;
+	public void onChat(MessageEvent event, @First Player s) {
+		Ray.get().getPlugin().getLogger().info(event.getClass().getSimpleName());
+		String type = event.getClass().getSimpleName();
+		if (type.contains("$")) {
+			type = type.split("$")[1];
+			Ray.get().getPlugin().getLogger().info(type);
 		}
-		Player s = sender.get();
-		
 	}
+
 }

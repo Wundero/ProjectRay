@@ -23,15 +23,37 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
+import java.util.HashMap;
 import java.util.UUID;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 
+import com.google.common.collect.Maps;
+
 import me.Wundero.ProjectRay.DataHolder;
+import me.Wundero.ProjectRay.Ray;
 
 public class RayPlayer extends DataHolder {
 
 	// TODO conversations
+
+	private static HashMap<UUID, RayPlayer> cache = Maps.newHashMap();
+
+	public static RayPlayer getRay(UUID u) {
+		if (!cache.containsKey(u)) {
+			User u2 = (User) Sponge.getServer().getPlayer(u).orElse(null);
+			if (u2 == null) {
+				return null;
+			}
+			return new RayPlayer(u2);
+		} else
+			return cache.get(u);
+	}
+
+	public void updateGroup() {
+		this.setGroup(Ray.get().getGroups().getMainGroup(user));
+	}
 
 	private User user;
 	private Group group;
@@ -39,6 +61,8 @@ public class RayPlayer extends DataHolder {
 	public RayPlayer(User u) {
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
+		cache.put(uuid, this);
+		this.setGroup(Ray.get().getGroups().getMainGroup(u));
 	}
 
 	public UUID getUniqueId() {
@@ -51,5 +75,20 @@ public class RayPlayer extends DataHolder {
 
 	private void setUser(User user) {
 		this.user = user;
+	}
+
+	/**
+	 * @return the group
+	 */
+	public Group getGroup() {
+		return group;
+	}
+
+	/**
+	 * @param group
+	 *            the group to set
+	 */
+	public void setGroup(Group group) {
+		this.group = group;
 	}
 }

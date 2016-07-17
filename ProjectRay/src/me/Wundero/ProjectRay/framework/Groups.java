@@ -25,6 +25,9 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.Map;
 
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.world.World;
+
 import com.google.common.collect.Maps;
 
 import ninja.leaping.configurate.ConfigurationNode;
@@ -49,6 +52,38 @@ public class Groups {
 					this.groups.put(world, map);
 				}
 			}
+		}
+	}
+
+	public Group getMainGroup(User p) {
+		if (!p.isOnline()) {
+			Group cg = null;
+			for (Map<String, Group> m : groups.values()) {
+				for (Group g : m.values()) {
+					if (p.hasPermission(g.getPermission())) {
+						if (cg == null) {
+							cg = g;
+						} else if (cg.getPriority() < g.getPriority()) {
+							cg = g;
+						}
+					}
+				}
+			}
+			return cg;
+		} else {
+			World w = p.getPlayer().get().getWorld();
+			String wname = w.getName().toLowerCase();
+			Group cg = null;
+			for (Group g : getGroups(wname).values()) {
+				if (p.hasPermission(g.getPermission())) {
+					if (cg == null) {
+						cg = g;
+					} else if (cg.getPriority() < g.getPriority()) {
+						cg = g;
+					}
+				}
+			}
+			return cg;
 		}
 	}
 

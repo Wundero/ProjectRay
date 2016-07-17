@@ -1,8 +1,14 @@
 package me.Wundero.ProjectRay;
 
+import java.util.List;
+
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 
+import com.google.common.collect.Lists;
+
+import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -34,6 +40,14 @@ public class Ray {
 
 	private static Ray singleton = new Ray();
 
+	private List<Task> asyncTasks = Lists.newArrayList();
+
+	public void registerTask(Task t) {
+		if (t.isAsynchronous()) {
+			asyncTasks.add(t);
+		}
+	}
+
 	private Ray() {
 	}
 
@@ -43,15 +57,18 @@ public class Ray {
 
 	private ProjectRay plugin;
 	private ConfigurationNode config;
+	private Groups groups;
 
 	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
-		Sponge.getEventManager().registerListeners(plugin, new MainListener());
+		this.setGroups(new Groups(config.getNode("worlds")));
 	}
 
 	public void terminate() {
-		// TODO more
+		for (Task t : asyncTasks) {
+			t.cancel();
+		}
 	}
 
 	public Game getGame() {
@@ -72,5 +89,13 @@ public class Ray {
 
 	public void setConfig(ConfigurationNode config) {
 		this.config = config;
+	}
+
+	public Groups getGroups() {
+		return groups;
+	}
+
+	public void setGroups(Groups groups) {
+		this.groups = groups;
 	}
 }

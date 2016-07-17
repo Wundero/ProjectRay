@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -13,6 +14,7 @@ import org.spongepowered.api.plugin.Plugin;
 
 import com.google.inject.Inject;
 
+import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -100,6 +102,7 @@ public class ProjectRay {
 	@Listener
 	public void onStart(GameStartedServerEvent event) {
 		loadConfig();
+		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
 	}
 
