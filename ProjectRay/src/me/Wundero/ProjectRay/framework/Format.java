@@ -68,6 +68,10 @@ public class Format {
 	public Format withType(FormatType type) {
 		return setType(type);
 	}
+	
+	public Format withTypeFromString(String type) {
+		return withType(FormatType.fromString(type));
+	}
 
 	public Format withName(String name) {
 		return setName(name);
