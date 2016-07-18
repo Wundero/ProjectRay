@@ -3,13 +3,11 @@ package me.Wundero.ProjectRay;
 import java.util.List;
 
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.collect.Lists;
 
 import me.Wundero.ProjectRay.framework.Groups;
-import me.Wundero.ProjectRay.listeners.MainListener;
 import ninja.leaping.configurate.ConfigurationNode;
 
 /*

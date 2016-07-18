@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay.utils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,6 +30,9 @@ import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.Ray;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 /*
  The MIT License (MIT)
@@ -59,6 +63,36 @@ public class Utils {
 	public static final String S = "";
 	public static final Pattern URL_PATTERN = Pattern
 			.compile("((?:(?:https?)://)?[\\w-_\\.]{2,})\\.([a-zA-Z]{2,}(?:/\\S+)?)");
+
+	public static ConfigurationNode load(File config) {
+		return load(config.toPath());
+
+	}
+
+	public static ConfigurationNode load(Path config) {
+		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(config)
+				.build();
+		try {
+			return loader.load();
+		} catch (Exception e) {
+			Utils.printError(e);
+			return null;
+		}
+	}
+
+	public static void save(File file, ConfigurationNode root) {
+		save(file.toPath(), root);
+	}
+
+	public static void save(Path file, ConfigurationNode root) {
+		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(file)
+				.build();
+		try {
+			loader.save(root);
+		} catch (IOException e) {
+			Utils.printError(e);
+		}
+	}
 
 	public static boolean hasSections(ConfigurationNode config, String... toValidate) {
 		for (String s : toValidate) {

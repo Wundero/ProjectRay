@@ -47,8 +47,10 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Usable;
 import me.Wundero.ProjectRay.utils.Utils;
 
+@SuppressWarnings("unused")
 public abstract class ObjectBuilder {
 	private BiMap<String, Method> invokable = HashBiMap.create();
 	private Method build;
@@ -97,7 +99,7 @@ public abstract class ObjectBuilder {
 
 	public abstract void displayOptions(Text[] options);
 
-	public abstract String getInput(String key);
+	public abstract void getInput(Usable<String> cmd, String key);
 
 	public abstract Text getSuccessfullClick();
 
@@ -117,8 +119,7 @@ public abstract class ObjectBuilder {
 			}
 			final Method method = selected.get();
 			final String key = invokable.inverse().get(method);
-			inputTask = Task.builder().execute(() -> {
-				String value = getInput(key);
+			Usable<String> c = (value) -> {
 				try {
 					boolean a = method.isAccessible();
 					method.setAccessible(true);
@@ -127,7 +128,8 @@ public abstract class ObjectBuilder {
 				} catch (Exception e) {
 					Utils.printError(e);
 				}
-			}).submit(Ray.get());
+			};
+			getInput(c, key);
 			src.sendMessage(getSuccessfullClick());
 			return CommandResult.success();
 		}

@@ -24,6 +24,7 @@ package me.Wundero.ProjectRay.framework;
  */
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
@@ -31,12 +32,12 @@ import org.spongepowered.api.entity.living.player.User;
 
 import com.google.common.collect.Maps;
 
-import me.Wundero.ProjectRay.DataHolder;
 import me.Wundero.ProjectRay.Ray;
 
-public class RayPlayer extends DataHolder {
+public class RayPlayer {
 
 	// TODO conversations
+	// TODO file saving - save to individual files with world - group map
 
 	private static HashMap<UUID, RayPlayer> cache = Maps.newHashMap();
 
@@ -51,22 +52,23 @@ public class RayPlayer extends DataHolder {
 			return cache.get(u);
 	}
 
-	public void updateGroup() {
-		this.setGroup(Ray.get().getGroups().getMainGroup(user));
-	}
-
 	private User user;
-	private Group group;
+	private UUID uuid;
+	private Map<String, Group> groups;
 
 	public RayPlayer(User u) {
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
 		cache.put(uuid, this);
-		this.setGroup(Ray.get().getGroups().getMainGroup(u));
+		this.setGroups(Ray.get().getGroups().getGroups(u));
 	}
 
 	public UUID getUniqueId() {
 		return getUUID();
+	}
+
+	private UUID getUUID() {
+		return uuid;
 	}
 
 	public User getUser() {
@@ -80,15 +82,22 @@ public class RayPlayer extends DataHolder {
 	/**
 	 * @return the group
 	 */
-	public Group getGroup() {
-		return group;
+	public Map<String, Group> getGroups() {
+		return groups;
+	}
+
+	public Group getActiveGroup() {
+		if (!user.isOnline()) {
+			return null;
+		}
+		return getGroups().get(user.getPlayer().get().getWorld().getName());
 	}
 
 	/**
 	 * @param group
 	 *            the group to set
 	 */
-	public void setGroup(Group group) {
-		this.group = group;
+	public void setGroups(Map<String, Group> groups) {
+		this.groups = groups;
 	}
 }

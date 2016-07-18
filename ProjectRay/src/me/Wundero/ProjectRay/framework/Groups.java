@@ -23,6 +23,7 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
+import java.io.File;
 import java.util.Map;
 
 import org.spongepowered.api.entity.living.player.User;
@@ -30,6 +31,7 @@ import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Maps;
 
+import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class Groups {
@@ -44,12 +46,73 @@ public class Groups {
 				String name = group.getKey().toString();
 				if (!this.groups.containsKey(world)) {
 					Map<String, Group> map = Maps.newHashMap();
-					map.put(name, new Group(world, group));
+					map.put(name, new Group(world, group, null));
 					this.groups.put(world, map);
 				} else {
 					Map<String, Group> map = this.groups.get(world);
-					map.put(name, new Group(world, group));
+					map.put(name, new Group(world, group, null));
 					this.groups.put(world, map);
+				}
+			}
+		}
+	}
+
+	public Groups(File path) {
+		if (path.exists() && path.isFile()) {
+			throw new IllegalArgumentException("Path is single file, use other constructor");
+		}
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+		for (File f : path.listFiles()) {
+			if (!f.exists()) {
+				continue;
+			}
+			String world = f.getName();
+			if (f.isFile()) {
+				ConfigurationNode groups = Utils.load(f).getNode("groups");
+				for (ConfigurationNode group : groups.getChildrenList()) {
+					String name = group.getKey().toString();
+					if (!this.groups.containsKey(world)) {
+						Map<String, Group> map = Maps.newHashMap();
+						map.put(name, new Group(world, group, null));
+						this.groups.put(world, map);
+					} else {
+						Map<String, Group> map = this.groups.get(world);
+						map.put(name, new Group(world, group, null));
+						this.groups.put(world, map);
+					}
+				}
+			} else {
+				File f1 = new File(f, "groups");
+				if (f1.exists() && f1.isFile()) {
+					ConfigurationNode groups = Utils.load(f1).getNode("groups");
+					for (ConfigurationNode group : groups.getChildrenList()) {
+						String name = group.getKey().toString();
+						if (!this.groups.containsKey(world)) {
+							Map<String, Group> map = Maps.newHashMap();
+							map.put(name, new Group(world, group, null));
+							this.groups.put(world, map);
+						} else {
+							Map<String, Group> map = this.groups.get(world);
+							map.put(name, new Group(world, group, null));
+							this.groups.put(world, map);
+						}
+					}
+				} else {
+					for (File g : f.listFiles()) {
+						String name = g.getName();
+						ConfigurationNode group = Utils.load(g);
+						if (!this.groups.containsKey(world)) {
+							Map<String, Group> map = Maps.newHashMap();
+							map.put(name, new Group(world, group, null));
+							this.groups.put(world, map);
+						} else {
+							Map<String, Group> map = this.groups.get(world);
+							map.put(name, new Group(world, group, null));
+							this.groups.put(world, map);
+						}
+					}
 				}
 			}
 		}
@@ -87,11 +150,33 @@ public class Groups {
 		}
 	}
 
+	public Group getMainGroup(User p, String world) {
+		Group cg = null;
+		for (Group g : getGroups(world).values()) {
+			if (p.hasPermission(g.getPermission())) {
+				if (cg == null) {
+					cg = g;
+				} else if (cg.getPriority() < g.getPriority()) {
+					cg = g;
+				}
+			}
+		}
+		return cg;
+	}
+
 	public Group getGroup(String name, String world) {
 		if (!groups.containsKey(world)) {
 			return null;
 		}
 		return getGroups(world).get(name);
+	}
+
+	public Map<String, Group> getGroups(User user) {
+		Map<String, Group> out = Maps.newHashMap();
+		for (String world : groups.keySet()) {
+			out.put(world, getMainGroup(user, world));
+		}
+		return out;
 	}
 
 	public Map<String, Group> getGroups(String world) {
