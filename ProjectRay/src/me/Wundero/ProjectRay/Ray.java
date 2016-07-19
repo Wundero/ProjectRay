@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
@@ -66,6 +67,7 @@ public class Ray {
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
 		this.setGroups(new Groups(config.getNode("worlds")));
+		this.setVariables(new Variables());
 	}
 
 	public void terminate() {
@@ -80,6 +82,10 @@ public class Ray {
 
 	public ProjectRay getPlugin() {
 		return plugin;
+	}
+
+	public Logger getLogger() {
+		return getPlugin().getLogger();
 	}
 
 	private void setPlugin(ProjectRay plugin) {

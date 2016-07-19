@@ -186,7 +186,7 @@ public class Group {
 	}
 
 	public String getPermission() {
-		return permission;
+		return permission == null ? "" : permission;
 	}
 
 	public void setPermission(String permission) {

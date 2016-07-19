@@ -23,13 +23,14 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class Format {
 	private TextTemplate template;
@@ -82,15 +83,25 @@ public class Format {
 		return this;
 	}
 
-	public Format(ConfigurationNode node) {
+	public Format(final ConfigurationNode node) {
 		name = node.getKey().toString();
 		setType(FormatType.fromString(name));
-		try {
-			setTemplate(node.getNode("format").getValue(TypeToken.of(TextTemplate.class)));
-		} catch (ObjectMappingException e) {
-			Utils.printError(e);
-		}
-		usable = true;
+		Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
+			try {
+				TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
+				if (template == null) {
+					Ray.get().getLogger().info("nooooo");
+					return;
+				}
+				Ray.get().getLogger().info("yay");
+				setTemplate(template);
+			} catch (Exception e) {
+				Utils.printError(e);
+			}
+			usable = true;
+			task.cancel();
+		}).submit(Ray.get().getPlugin());
+		Ray.get().registerTask(t);
 	}
 
 	public boolean usable() {

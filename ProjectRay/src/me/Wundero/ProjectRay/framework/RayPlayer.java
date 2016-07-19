@@ -102,7 +102,12 @@ public class RayPlayer {
 		if (!user.isOnline()) {
 			return null;
 		}
-		return getGroups().get(user.getPlayer().get().getWorld().getName());
+		return gg((user.getPlayer().get()).getWorld().getName()) == null ? gg("all")
+				: gg((user.getPlayer().get()).getWorld().getName());
+	}
+
+	private Group gg(String world) {
+		return getGroups().get(world);
 	}
 
 	/**

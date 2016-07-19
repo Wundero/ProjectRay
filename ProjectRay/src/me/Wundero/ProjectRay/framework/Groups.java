@@ -170,6 +170,7 @@ public class Groups {
 	}
 
 	public Group getMainGroup(User p, String world) {
+		Ray.get().getLogger().info("getting group for player " + p.getName() + " in world " + world);
 		Group cg = null;
 		for (Group g : getGroups(world).values()) {
 			if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
@@ -180,6 +181,8 @@ public class Groups {
 				}
 			}
 		}
+		Ray.get().getLogger()
+				.info("group chosen for player " + p.getName() + " in world " + world + ": " + cg.getName());
 		return cg;
 	}
 
@@ -189,6 +192,7 @@ public class Groups {
 
 	public Map<String, Group> getGroups(User user) {
 		Map<String, Group> out = Maps.newHashMap();
+		Ray.get().getLogger().info("getting all main groups for user " + user.getName());
 		for (String world : groups.keySet()) {
 			out.put(world, getMainGroup(user, world));
 		}
