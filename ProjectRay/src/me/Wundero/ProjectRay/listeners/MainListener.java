@@ -23,22 +23,97 @@ package me.Wundero.ProjectRay.listeners;
  SOFTWARE.
  */
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.event.achievement.GrantAchievementEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.chat.ChatType;
+
+import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.Format;
+import me.Wundero.ProjectRay.framework.FormatType;
+import me.Wundero.ProjectRay.framework.RayPlayer;
 
 public class MainListener {
-	@Listener
-	public void onChat(MessageEvent event, @First Player s) {
-		Ray.get().getPlugin().getLogger().info(event.getClass().getSimpleName());
-		String type = event.getClass().getSimpleName();
-		if (type.contains("$")) {
-			type = type.split("$")[1];
-			Ray.get().getPlugin().getLogger().info(type);
+
+	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
+			MessageChannel channel) {
+		if (p == null) {
+			return false;
 		}
+		Format f = RayPlayer.getRay(p.getUniqueId()).getActiveGroup().getFormat(t);
+		v = Ray.get().setVars(v, f.getTemplate(), p, false);
+		final TextTemplate template = f.getTemplate();
+		final Map<String, Object> args = Maps.newHashMap(v);
+		MessageChannel newchan = MessageChannel.combined(channel, new MessageChannel() {
+
+			@Override
+			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
+					ChatType type) {
+				// TODO checks to see if recip can see player msgs, etc.
+				if (recipient instanceof Player) {
+					args.putAll(Ray.get().setVars(args, template, (Player) recipient, true));
+				} else {
+					args.putAll(Ray.get().setVars(args, template, null, true));
+				}
+				Text t = template.apply(args).build();
+				return Optional.of(t);
+			}
+
+			@Override
+			public Collection<MessageReceiver> getMembers() {
+				return Collections.emptyList();
+			}
+
+		});
+		e.setChannel(newchan);
+		return false;
+	}
+
+	@Listener
+	public void onChat(MessageChannelEvent.Chat event) {
+		Map<String, Object> vars = Maps.newHashMap();
+		vars.put("message", event.getRawMessage());
+		if (event.getCause().first(Player.class).isPresent()) {
+			vars.put("player", Ray.get().getVariables().get("player", event.getCause().first(Player.class).get()));
+		}
+		event.setCancelled(handle(FormatType.CHAT, event, vars, (Player) vars.get("player"), event.getChannel().get()));
+	}
+
+	@Listener
+	public void onJoin(ClientConnectionEvent.Join event) {
+
+	}
+
+	@Listener
+	public void onQuit(ClientConnectionEvent.Disconnect event) {
+	}
+
+	@Listener
+	public void onDeath(DestructEntityEvent.Death event) {
+	}
+
+	@Listener
+	public void onKick(KickPlayerEvent event) {
+	}
+
+	@Listener
+	public void onAch(GrantAchievementEvent.TargetPlayer event) {
+
 	}
 
 }

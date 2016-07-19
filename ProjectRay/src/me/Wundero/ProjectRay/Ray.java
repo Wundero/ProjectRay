@@ -1,11 +1,15 @@
 package me.Wundero.ProjectRay;
 
 import java.util.List;
+import java.util.Map;
 
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.framework.Groups;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -56,6 +60,7 @@ public class Ray {
 	private ProjectRay plugin;
 	private ConfigurationNode config;
 	private Groups groups;
+	private Variables vars;
 
 	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
@@ -95,5 +100,33 @@ public class Ray {
 
 	public void setGroups(Groups groups) {
 		this.groups = groups;
+	}
+
+	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender,
+			boolean isRecip) {
+		Map<String, Object> out = Maps.newHashMap();
+		for (String key : known.keySet()) {
+			if (template.getArguments().containsKey(key)) {
+				out.put(key, known.get(key));
+			}
+		}
+		for (String key : template.getArguments().keySet()) {
+			String k = key;
+			if (isRecip) {
+				k = "recip_" + key;
+			}
+			if (!out.containsKey(k)) {
+				out.put(k, getVariables().get(key, sender));
+			}
+		}
+		return out;// stub
+	}
+
+	public Variables getVariables() {
+		return vars;
+	}
+
+	public void setVariables(Variables vars) {
+		this.vars = vars;
 	}
 }

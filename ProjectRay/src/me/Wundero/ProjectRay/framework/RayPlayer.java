@@ -25,10 +25,13 @@ package me.Wundero.ProjectRay.framework;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.collect.Maps;
 
@@ -39,14 +42,16 @@ public class RayPlayer {
 	// TODO conversations
 	// TODO file saving - save to individual files with world - group map
 
+	private boolean conversing = false;
 	private static HashMap<UUID, RayPlayer> cache = Maps.newHashMap();
 
 	public static RayPlayer getRay(UUID u) {
 		if (!cache.containsKey(u)) {
-			User u2 = (User) Sponge.getServer().getPlayer(u).orElse(null);
-			if (u2 == null) {
+			Optional<Player> p = Sponge.getServer().getPlayer(u);
+			if(!p.isPresent()) {
 				return null;
 			}
+			Player u2 = p.get();
 			return new RayPlayer(u2);
 		} else
 			return cache.get(u);
@@ -99,5 +104,27 @@ public class RayPlayer {
 	 */
 	public void setGroups(Map<String, Group> groups) {
 		this.groups = groups;
+	}
+
+	/**
+	 * @return the conversing
+	 */
+	public boolean isConversing() {
+		return conversing;
+	}
+
+	/**
+	 * @param conversing
+	 *            the conversing to set
+	 */
+	public void setConversing(boolean conversing) {
+		if (!user.isOnline()) {
+			conversing = false;
+			return;
+		}
+		this.conversing = conversing;
+		if (conversing) {
+			user.getPlayer().get().setMessageChannel(MessageChannel.TO_NONE);
+		}
 	}
 }

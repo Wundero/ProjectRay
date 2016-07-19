@@ -28,10 +28,11 @@ import java.util.regex.Pattern;
 public enum FormatType {
 
 	CHAT("chat", new String[] { "c" }), MESSAGE("message", new String[] { "m", "msg" }), DEATH("death",
-			new String[] { "d" }), JOIN("join", new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM(
-					"custom"), WELCOME("welcome", new String[] { "w" }), MAIL("mail", new String[] {}, true), MOTD(
-							"motd", new String[] {}), ANNOUNCEMENT("announcement", new String[] { "a" }), TABLIST(
-									"tablist", new String[] { "list", "t", "tab" }, true), DEFAULT("default");
+			new String[] { "d" }), JOIN("join", new String[] { "j" }), LEAVE("leave",
+					new String[] { "l" }), CUSTOM("custom"), WELCOME("welcome", new String[] { "w" }), MOTD("motd",
+							new String[] {}), ANNOUNCEMENT("announcement", new String[] { "a" }), TABLIST("tablist",
+									new String[] { "list", "t", "tab" },
+									true), DEFAULT("default"), ACHIEVEMENT("achievement"), KICK("kick");
 
 	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
 	// footer)/item names/block gui names/other random text stuff

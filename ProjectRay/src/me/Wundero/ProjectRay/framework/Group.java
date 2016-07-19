@@ -126,6 +126,10 @@ public class Group {
 		return getFormat(type, 0);
 	}
 
+	public Format getFormat(FormatType type, boolean random) {
+		return getFormat(type, random ? new Random().nextInt(getFormats(type).size()) : 0);
+	}
+
 	public Format getRandomFormat(FormatType type) {
 		List<Format> fmats = getFormats(type);
 		return fmats.get(new Random().nextInt(fmats.size()));

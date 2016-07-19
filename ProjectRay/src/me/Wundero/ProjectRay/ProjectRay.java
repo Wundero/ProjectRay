@@ -45,7 +45,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
  SOFTWARE.
  */
 
-@Plugin(id = "ray", name = "Ray", version = "v0.0.1", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = "Ray", name = "Ray", version = "v0.0.1", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 

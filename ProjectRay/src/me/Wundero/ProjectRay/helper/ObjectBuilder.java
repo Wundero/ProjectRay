@@ -52,6 +52,7 @@ import me.Wundero.ProjectRay.utils.Utils;
 
 @SuppressWarnings("unused")
 public abstract class ObjectBuilder {
+	//This is probably useless but ill keep it for now
 	private BiMap<String, Method> invokable = HashBiMap.create();
 	private Method build;
 	private Class<?> clazz;
