@@ -35,8 +35,10 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
@@ -88,31 +90,49 @@ public class MainListener {
 	public void onChat(MessageChannelEvent.Chat event) {
 		Map<String, Object> vars = Maps.newHashMap();
 		vars.put("message", event.getRawMessage());
-		if (event.getCause().first(Player.class).isPresent()) {
-			vars.put("player", Ray.get().getVariables().get("player", event.getCause().first(Player.class).get()));
-		}
 		event.setCancelled(handle(FormatType.CHAT, event, vars, (Player) vars.get("player"), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onJoin(ClientConnectionEvent.Join event) {
-
+		Map<String, Object> vars = Maps.newHashMap();
+		event.setMessageCancelled(
+				handle(FormatType.JOIN, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
+		Map<String, Object> vars = Maps.newHashMap();
+		event.setMessageCancelled(
+				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onDeath(DestructEntityEvent.Death event) {
+		if (!(event.getTargetEntity() instanceof Player)) {
+			return;
+		}
+		Map<String, Object> vars = Maps.newHashMap();
+		Ray.get().getPlugin().getLogger().info("Cause: " + event.getCause().all());
+		event.setMessageCancelled(
+				handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onKick(KickPlayerEvent event) {
+		Map<String, Object> vars = Maps.newHashMap();
+		event.setMessageCancelled(
+				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onAch(GrantAchievementEvent.TargetPlayer event) {
+		Map<String, Object> vars = Maps.newHashMap();
+		Achievement ach = event.getAchievement();
+		vars.put("achievement",
+				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());
+		event.setMessageCancelled(
+				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 
 	}
 
