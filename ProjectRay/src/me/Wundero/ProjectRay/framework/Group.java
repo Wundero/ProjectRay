@@ -46,12 +46,14 @@ public class Group {
 	private String permission;
 	private ConfigurationNode config;
 	private String name;
-	private boolean isDir = false;// TODO support groups being both single file
-									// represenatations and file folders with
-									// config files
+	private boolean isDir = false;
+	private boolean global = false;
 	private Path dir;
 
-	public Group(String world, ConfigurationNode config, Path directory) {
+	// TODO default group
+
+	public Group(String world, ConfigurationNode config, Path directory, boolean global) {
+		this.setGlobal(global);
 		this.setWorld(world);
 		this.setConfig(config);
 		isDir = !(directory == null);
@@ -61,7 +63,7 @@ public class Group {
 
 	public synchronized void load() {
 		this.setName(config.getKey().toString());
-		this.setPermission(config.getNode("permission").getString("ray." + ""));
+		this.setPermission(config.getNode("permission").getString("ray." + getName()));
 		this.setPriority(config.getNode("priority").getInt(0));
 		try {
 			this.setParents(config.getNode("parents").getList(TypeToken.of(String.class)));
@@ -119,6 +121,9 @@ public class Group {
 	}
 
 	public Format getFormat(FormatType type, int index) {
+		if (getFormats(type) == null || getFormats(type).isEmpty()) {
+			return null;
+		}
 		return getFormats(type).get(index);
 	}
 
@@ -127,7 +132,10 @@ public class Group {
 	}
 
 	public Format getFormat(FormatType type, boolean random) {
-		return getFormat(type, random ? new Random().nextInt(getFormats(type).size()) : 0);
+		if (random) {
+			return getRandomFormat(type);
+		}
+		return getFormat(type, 0);
 	}
 
 	public Format getRandomFormat(FormatType type) {
@@ -195,18 +203,19 @@ public class Group {
 		this.name = name;
 	}
 
-	/**
-	 * @return the dir
-	 */
 	public Path getDir() {
 		return dir;
 	}
 
-	/**
-	 * @param dir
-	 *            the dir to set
-	 */
 	public void setDir(Path dir) {
 		this.dir = dir;
+	}
+
+	public boolean isGlobal() {
+		return global;
+	}
+
+	public void setGlobal(boolean global) {
+		this.global = global;
 	}
 }

@@ -40,17 +40,21 @@ public class Groups {
 	// pass "worlds" node or "worlds" folder TODO folder support
 	public Groups(ConfigurationNode node) {
 		for (ConfigurationNode child : node.getChildrenList()) {
+			boolean global = false;
 			String world = child.getKey().toString();
+			if (world.equalsIgnoreCase("all")) {
+				global = true;
+			}
 			ConfigurationNode groups = child.getNode("groups");
 			for (ConfigurationNode group : groups.getChildrenList()) {
 				String name = group.getKey().toString();
 				if (!this.groups.containsKey(world)) {
 					Map<String, Group> map = Maps.newHashMap();
-					map.put(name, new Group(world, group, null));
+					map.put(name, new Group(world, group, null, global));
 					this.groups.put(world, map);
 				} else {
 					Map<String, Group> map = this.groups.get(world);
-					map.put(name, new Group(world, group, null));
+					map.put(name, new Group(world, group, null, global));
 					this.groups.put(world, map);
 				}
 			}
@@ -69,17 +73,18 @@ public class Groups {
 				continue;
 			}
 			String world = f.getName();
+			boolean global = world.equalsIgnoreCase("all");
 			if (f.isFile()) {
 				ConfigurationNode groups = Utils.load(f).getNode("groups");
 				for (ConfigurationNode group : groups.getChildrenList()) {
 					String name = group.getKey().toString();
 					if (!this.groups.containsKey(world)) {
 						Map<String, Group> map = Maps.newHashMap();
-						map.put(name, new Group(world, group, null));
+						map.put(name, new Group(world, group, null, global));
 						this.groups.put(world, map);
 					} else {
 						Map<String, Group> map = this.groups.get(world);
-						map.put(name, new Group(world, group, null));
+						map.put(name, new Group(world, group, null, global));
 						this.groups.put(world, map);
 					}
 				}
@@ -91,11 +96,11 @@ public class Groups {
 						String name = group.getKey().toString();
 						if (!this.groups.containsKey(world)) {
 							Map<String, Group> map = Maps.newHashMap();
-							map.put(name, new Group(world, group, null));
+							map.put(name, new Group(world, group, null, global));
 							this.groups.put(world, map);
 						} else {
 							Map<String, Group> map = this.groups.get(world);
-							map.put(name, new Group(world, group, null));
+							map.put(name, new Group(world, group, null, global));
 							this.groups.put(world, map);
 						}
 					}
@@ -105,11 +110,11 @@ public class Groups {
 						ConfigurationNode group = Utils.load(g);
 						if (!this.groups.containsKey(world)) {
 							Map<String, Group> map = Maps.newHashMap();
-							map.put(name, new Group(world, group, null));
+							map.put(name, new Group(world, group, null, global));
 							this.groups.put(world, map);
 						} else {
 							Map<String, Group> map = this.groups.get(world);
-							map.put(name, new Group(world, group, null));
+							map.put(name, new Group(world, group, null, global));
 							this.groups.put(world, map);
 						}
 					}
@@ -121,16 +126,15 @@ public class Groups {
 	public Group getMainGroup(User p) {
 		if (!p.isOnline()) {
 			Group cg = null;
-			for (Map<String, Group> m : groups.values()) {
-				for (Group g : m.values()) {
-					if (p.hasPermission(g.getPermission())) {
-						if (cg == null) {
-							cg = g;
-						} else if (cg.getPriority() < g.getPriority()) {
-							cg = g;
-						}
+			for (Group g : getGroups("all").values()) {
+				if (p.hasPermission(g.getPermission())) {
+					if (cg == null) {
+						cg = g;
+					} else if (cg.getPriority() < g.getPriority()) {
+						cg = g;
 					}
 				}
+
 			}
 			return cg;
 		} else {
@@ -165,9 +169,6 @@ public class Groups {
 	}
 
 	public Group getGroup(String name, String world) {
-		if (!groups.containsKey(world)) {
-			return null;
-		}
 		return getGroups(world).get(name);
 	}
 
@@ -180,6 +181,10 @@ public class Groups {
 	}
 
 	public Map<String, Group> getGroups(String world) {
-		return groups.get(world);
+		Map<String, Group> out = groups.get(world) == null ? Maps.newHashMap() : groups.get(world);
+		if (groups.containsKey("all")) {
+			out.putAll(groups.get("all"));
+		}
+		return out;
 	}
 }

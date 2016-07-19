@@ -1,5 +1,7 @@
 package me.Wundero.ProjectRay;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -11,9 +13,11 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
 
 import com.google.inject.Inject;
 
+import me.Wundero.ProjectRay.config.Template;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -45,7 +49,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
  SOFTWARE.
  */
 
-@Plugin(id = "Ray", name = "Ray", version = "v0.0.1", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = "ray", name = "Ray", version = "v0.0.1", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 
@@ -79,19 +83,43 @@ public class ProjectRay {
 		return opt.get();
 	}
 
+	public Path getConfigPath() {
+		File f = new File(configDir.toFile(), "ray.conf");
+		if (!configDir.toFile().exists()) {
+			configDir.toFile().mkdirs();
+		}
+		if (!f.exists()) {
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				Utils.printError(e);
+			}
+		}
+		return f.toPath();
+	}
+
 	private void loadConfig() {
-		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(configDir)
-				.build();
+		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
+				.setPath(getConfigPath()).build();
 		try {
 			setConfig(loader.load());
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
+		tryLoadDefaults();
+	}
+
+	private void tryLoadDefaults() {
+		if (config.isVirtual() || !config.hasListChildren()) {
+			Template.builder(config).withGroup("default").withPriority(0).withFormat("chat").withArg("player")
+					.withText(Text.of(" ")).withArg("message").build().build().build();
+			saveConfig();
+		}
 	}
 
 	private void saveConfig() {
-		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(configDir)
-				.build();
+		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
+				.setPath(getConfigPath()).build();
 		try {
 			loader.save(config);
 		} catch (Exception e) {
@@ -101,6 +129,7 @@ public class ProjectRay {
 
 	@Listener
 	public void onStart(GameStartedServerEvent event) {
+		getLogger().info(configDir.toString());
 		loadConfig();
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);

@@ -48,6 +48,7 @@ import com.google.common.collect.Maps;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatType;
+import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 
 public class MainListener {
@@ -57,7 +58,12 @@ public class MainListener {
 		if (p == null) {
 			return false;
 		}
-		Format f = RayPlayer.getRay(p.getUniqueId()).getActiveGroup().getFormat(t);
+		RayPlayer r = RayPlayer.getRay(p);
+		Group g = r.getActiveGroup();
+		Format f = g.getFormat(t);
+		if (f == null) {
+			return false;
+		}
 		v = Ray.get().setVars(v, f.getTemplate(), p, false);
 		final TextTemplate template = f.getTemplate();
 		final Map<String, Object> args = Maps.newHashMap(v);
@@ -132,7 +138,7 @@ public class MainListener {
 		vars.put("achievement",
 				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());
 		event.setMessageCancelled(
-				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
+				handle(FormatType.ACHIEVEMENT, event, vars, event.getTargetEntity(), event.getChannel().get()));
 
 	}
 

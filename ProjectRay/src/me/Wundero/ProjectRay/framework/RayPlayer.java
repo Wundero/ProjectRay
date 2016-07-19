@@ -48,13 +48,20 @@ public class RayPlayer {
 	public static RayPlayer getRay(UUID u) {
 		if (!cache.containsKey(u)) {
 			Optional<Player> p = Sponge.getServer().getPlayer(u);
-			if(!p.isPresent()) {
+			if (!p.isPresent()) {
 				return null;
 			}
 			Player u2 = p.get();
 			return new RayPlayer(u2);
 		} else
 			return cache.get(u);
+	}
+
+	public static RayPlayer getRay(User u) {
+		if (!cache.containsKey(u.getUniqueId())) {
+			return new RayPlayer(u);
+		}
+		return cache.get(u.getUniqueId());
 	}
 
 	private User user;
