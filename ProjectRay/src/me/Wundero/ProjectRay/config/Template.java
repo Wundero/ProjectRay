@@ -29,8 +29,11 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 
+import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class Template {
 
@@ -124,7 +127,11 @@ public class Template {
 				}
 
 				public GroupBuilder build() {
-					node.getNode("format").setValue(template);
+					try {
+						node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
+					} catch (ObjectMappingException e) {
+						Utils.printError(e);
+					}
 					return parent;
 				}
 

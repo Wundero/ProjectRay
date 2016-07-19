@@ -50,8 +50,6 @@ public class Group {
 	private boolean global = false;
 	private Path dir;
 
-	// TODO default group
-
 	public Group(String world, ConfigurationNode config, Path directory, boolean global) {
 		this.setGlobal(global);
 		this.setWorld(world);
