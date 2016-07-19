@@ -24,13 +24,16 @@ package me.Wundero.ProjectRay.framework;
  */
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.World;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -39,14 +42,16 @@ public class Groups {
 
 	// pass "worlds" node or "worlds" folder TODO folder support
 	public Groups(ConfigurationNode node) {
-		for (ConfigurationNode child : node.getChildrenList()) {
+		Ray.get().getPlugin().getLogger().info("1" + node.getKey().toString());
+		for (ConfigurationNode child : node.getChildrenMap().values()) {
+			Ray.get().getPlugin().getLogger().info("2" + child.getKey().toString());
 			boolean global = false;
 			String world = child.getKey().toString();
 			if (world.equalsIgnoreCase("all")) {
 				global = true;
 			}
 			ConfigurationNode groups = child.getNode("groups");
-			for (ConfigurationNode group : groups.getChildrenList()) {
+			for (ConfigurationNode group : groups.getChildrenMap().values()) {
 				String name = group.getKey().toString();
 				if (!this.groups.containsKey(world)) {
 					Map<String, Group> map = Maps.newHashMap();
@@ -76,7 +81,7 @@ public class Groups {
 			boolean global = world.equalsIgnoreCase("all");
 			if (f.isFile()) {
 				ConfigurationNode groups = Utils.load(f).getNode("groups");
-				for (ConfigurationNode group : groups.getChildrenList()) {
+				for (ConfigurationNode group : groups.getChildrenMap().values()) {
 					String name = group.getKey().toString();
 					if (!this.groups.containsKey(world)) {
 						Map<String, Group> map = Maps.newHashMap();
@@ -92,7 +97,7 @@ public class Groups {
 				File f1 = new File(f, "groups");
 				if (f1.exists() && f1.isFile()) {
 					ConfigurationNode groups = Utils.load(f1).getNode("groups");
-					for (ConfigurationNode group : groups.getChildrenList()) {
+					for (ConfigurationNode group : groups.getChildrenMap().values()) {
 						String name = group.getKey().toString();
 						if (!this.groups.containsKey(world)) {
 							Map<String, Group> map = Maps.newHashMap();
@@ -123,11 +128,21 @@ public class Groups {
 		}
 	}
 
+	public List<Group> getAllGroups() {
+		List<Group> groups = Lists.newArrayList();
+		for (Map<String, Group> g1 : this.groups.values()) {
+			for (Group g : g1.values()) {
+				groups.add(g);
+			}
+		}
+		return groups;
+	}
+
 	public Group getMainGroup(User p) {
 		if (!p.isOnline()) {
 			Group cg = null;
 			for (Group g : getGroups("all").values()) {
-				if (p.hasPermission(g.getPermission())) {
+				if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
 					if (cg == null) {
 						cg = g;
 					} else if (cg.getPriority() < g.getPriority()) {
@@ -142,7 +157,7 @@ public class Groups {
 			String wname = w.getName().toLowerCase();
 			Group cg = null;
 			for (Group g : getGroups(wname).values()) {
-				if (p.hasPermission(g.getPermission())) {
+				if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
 					if (cg == null) {
 						cg = g;
 					} else if (cg.getPriority() < g.getPriority()) {
@@ -157,7 +172,7 @@ public class Groups {
 	public Group getMainGroup(User p, String world) {
 		Group cg = null;
 		for (Group g : getGroups(world).values()) {
-			if (p.hasPermission(g.getPermission())) {
+			if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
 				if (cg == null) {
 					cg = g;
 				} else if (cg.getPriority() < g.getPriority()) {

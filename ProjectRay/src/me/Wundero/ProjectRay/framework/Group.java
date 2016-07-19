@@ -61,7 +61,7 @@ public class Group {
 
 	public synchronized void load() {
 		this.setName(config.getKey().toString());
-		this.setPermission(config.getNode("permission").getString("ray." + getName()));
+		this.setPermission(config.getNode("permission").getString());
 		this.setPriority(config.getNode("priority").getInt(0));
 		try {
 			this.setParents(config.getNode("parents").getList(TypeToken.of(String.class)));
@@ -78,7 +78,7 @@ public class Group {
 		} else {
 			nod2 = nod.getNode("formats");
 		}
-		for (ConfigurationNode node : nod2.getChildrenList()) {
+		for (ConfigurationNode node : nod2.getChildrenMap().values()) {
 			Format f = new Format(node);
 			FormatType type = f.getType();
 			if (!formats.containsKey(type)) {

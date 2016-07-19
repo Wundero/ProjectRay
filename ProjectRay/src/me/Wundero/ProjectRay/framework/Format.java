@@ -49,7 +49,7 @@ public class Format {
 		if (template == null) {
 			template = TextTemplate.of(text);
 		} else {
-			template.concat(TextTemplate.of(text));
+			template = template.concat(TextTemplate.of(text));
 		}
 		return this;
 	}
@@ -68,7 +68,7 @@ public class Format {
 	public Format withType(FormatType type) {
 		return setType(type);
 	}
-	
+
 	public Format withTypeFromString(String type) {
 		return withType(FormatType.fromString(type));
 	}

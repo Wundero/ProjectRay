@@ -86,7 +86,9 @@ public class Template {
 				}
 				node.getNode("priority").setValue(priority);
 				node.getNode("permission").setValue(permission);
-				node.getNode("parents").setValue(parents);
+				if (!parents.isEmpty()) {
+					node.getNode("parents").setValue(parents);
+				}
 				return parent;
 			}
 
@@ -136,13 +138,14 @@ public class Template {
 				}
 
 				public FormatBuilder withArg(String key) {
-					template.concat(TextTemplate.of(TextTemplate.arg(key)));
+					template = template.concat(TextTemplate.of(TextTemplate.arg(key)));
 					return this;
 				}
 
 				public FormatBuilder withText(Text... texts) {
-					List<Text> texts2 = Lists.newArrayList(texts);
-					template.concat(TextTemplate.of(texts2));
+					for (Text t : texts) {
+						template = template.concat(TextTemplate.of(t));
+					}
 					return this;
 				}
 			}

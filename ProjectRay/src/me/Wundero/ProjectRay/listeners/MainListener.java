@@ -61,12 +61,15 @@ public class MainListener {
 		RayPlayer r = RayPlayer.getRay(p);
 		Group g = r.getActiveGroup();
 		if (g == null) {
+			Ray.get().getPlugin().getLogger().info("gn");
 			return false;
 		}
 		Format f = g.getFormat(t);
 		if (f == null) {
+			Ray.get().getPlugin().getLogger().info("fn");
 			return false;
 		}
+		Ray.get().getPlugin().getLogger().info("passed");
 		v = Ray.get().setVars(v, f.getTemplate(), p, false);
 		final TextTemplate template = f.getTemplate();
 		final Map<String, Object> args = Maps.newHashMap(v);
@@ -99,7 +102,11 @@ public class MainListener {
 	public void onChat(MessageChannelEvent.Chat event) {
 		Map<String, Object> vars = Maps.newHashMap();
 		vars.put("message", event.getRawMessage());
-		event.setCancelled(handle(FormatType.CHAT, event, vars, (Player) vars.get("player"), event.getChannel().get()));
+		Player p = null;
+		if (event.getCause().containsType(Player.class)) {
+			p = (Player) event.getCause().first(Player.class).get();
+		}
+		event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
 	}
 
 	@Listener

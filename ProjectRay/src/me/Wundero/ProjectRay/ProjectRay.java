@@ -18,6 +18,7 @@ import org.spongepowered.api.text.Text;
 import com.google.inject.Inject;
 
 import me.Wundero.ProjectRay.config.Template;
+import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -110,8 +111,8 @@ public class ProjectRay {
 	}
 
 	private void tryLoadDefaults() {
-		if (config.isVirtual() || !config.hasListChildren()) {
-			Template.builder(config).withGroup("default").withPriority(0).withFormat("chat").withArg("player")
+		if (config.getNode("worlds").isVirtual()) {
+			Template.builder(config).withGroup("default").withPriority(0).withFormat("chat").withArg("displayname")
 					.withText(Text.of(" ")).withArg("message").build().build().build();
 			saveConfig();
 		}
@@ -129,10 +130,15 @@ public class ProjectRay {
 
 	@Listener
 	public void onStart(GameStartedServerEvent event) {
-		getLogger().info(configDir.toString());
 		loadConfig();
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
+		File f = new File(configDir.toFile(), "worlds");
+		if (!f.exists() || !f.isDirectory()) {
+			Ray.get().setGroups(new Groups(config.getNode("worlds")));
+		} else {
+			Ray.get().setGroups(new Groups(f));
+		}
 	}
 
 	@Listener
