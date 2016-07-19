@@ -60,6 +60,9 @@ public class MainListener {
 		}
 		RayPlayer r = RayPlayer.getRay(p);
 		Group g = r.getActiveGroup();
+		if (g == null) {
+			return false;
+		}
 		Format f = g.getFormat(t);
 		if (f == null) {
 			return false;
