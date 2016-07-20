@@ -66,7 +66,6 @@ public class Ray {
 	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
-		this.setGroups(new Groups(config.getNode("worlds")));
 		this.setVariables(new Variables());
 	}
 

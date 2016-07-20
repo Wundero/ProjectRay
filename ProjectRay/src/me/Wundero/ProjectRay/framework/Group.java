@@ -2,6 +2,7 @@ package me.Wundero.ProjectRay.framework;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -10,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -150,6 +152,31 @@ public class Group {
 	}
 
 	public List<Format> getFormats(FormatType type) {
+		if (formats.get(type) == null || formats.get(type).isEmpty()) {
+			List<Group> groups = Lists.newArrayList(Ray.get().getGroups().getGroups(world).values());
+			List<Group> torem = Lists.newArrayList();
+			for (Group g : groups) {
+				if (!parents.contains(g.name)) {
+					torem.add(g);
+				}
+			}
+			for (Group g : torem) {
+				groups.remove(g);
+			}
+			groups.sort(new Comparator<Group>() {
+				@Override
+				public int compare(Group o1, Group o2) {
+					return o1.priority - o2.priority;
+				}
+			});
+			List<Format> formats;
+			for (Group g : groups) {
+				formats = g.getFormats(type);
+				if (!(formats == null || formats.isEmpty())) {
+					return formats;
+				}
+			}
+		}
 		return formats.get(type);
 	}
 

@@ -40,7 +40,6 @@ import ninja.leaping.configurate.ConfigurationNode;
 public class Groups {
 	private Map<String, Map<String, Group>> groups = Maps.newHashMap();
 
-	// pass "worlds" node or "worlds" folder TODO folder support
 	public Groups(ConfigurationNode node) {
 		Ray.get().getPlugin().getLogger().info("1" + node.getKey().toString());
 		for (ConfigurationNode child : node.getChildrenMap().values()) {

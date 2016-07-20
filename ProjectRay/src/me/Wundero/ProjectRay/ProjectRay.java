@@ -13,11 +13,11 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
 
 import com.google.inject.Inject;
 
 import me.Wundero.ProjectRay.config.Template;
+import me.Wundero.ProjectRay.config.Templates;
 import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
@@ -112,8 +112,7 @@ public class ProjectRay {
 
 	private void tryLoadDefaults() {
 		if (config.getNode("worlds").isVirtual()) {
-			Template.builder(config).withGroup("default").withPriority(0).withFormat("chat").withArg("displayname")
-					.withText(Text.of(" ")).withArg("message").build().build().build();
+			Templates.DEFAULT(Template.builder(config));
 			saveConfig();
 		}
 	}

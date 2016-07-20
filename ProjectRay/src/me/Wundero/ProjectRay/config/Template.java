@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.TextTemplate.Arg;
 
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
@@ -138,7 +139,11 @@ public class Template {
 				}
 
 				public FormatBuilder withArg(String key) {
-					template = template.concat(TextTemplate.of(TextTemplate.arg(key)));
+					return withArg(TextTemplate.arg(key));
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder) {
+					template = template.concat(TextTemplate.of(builder.build()));
 					return this;
 				}
 
