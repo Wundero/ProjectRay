@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.text.Text;
@@ -67,6 +68,14 @@ public class Utils {
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
 
+	}
+
+	public static Text transIf(String s, User u) {
+		if (u.hasPermission("ray.color")) {
+			return TextSerializers.FORMATTING_CODE.deserialize(s);
+		} else {
+			return Text.of(s);
+		}
 	}
 
 	public static ConfigurationNode load(Path config) {

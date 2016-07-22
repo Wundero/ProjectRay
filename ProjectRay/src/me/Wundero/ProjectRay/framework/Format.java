@@ -23,23 +23,26 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
+import java.util.Optional;
+
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.config.InternalTextTemplate;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class Format {
-	private TextTemplate template;
+	private InternalTextTemplate template;
 	private FormatType type;
 	private String name;
 	private boolean usable = false;
+	private Optional<ConfigurationNode> node;
 
 	private Format() {
-
+		setNode(Optional.empty());
 	}
 
 	public static Format builder() {
@@ -48,9 +51,9 @@ public class Format {
 
 	public Format withSection(Object... text) {
 		if (template == null) {
-			template = TextTemplate.of(text);
+			template = InternalTextTemplate.of(text);
 		} else {
-			template = template.concat(TextTemplate.of(text));
+			template = template.concat(InternalTextTemplate.of(text));
 		}
 		return this;
 	}
@@ -84,11 +87,13 @@ public class Format {
 	}
 
 	public Format(final ConfigurationNode node) {
+		this.setNode(Optional.of(node));
 		name = node.getKey().toString();
 		setType(FormatType.fromString(name));
 		Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
 			try {
-				TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
+				InternalTextTemplate template = node.getNode("format")
+						.getValue(TypeToken.of(InternalTextTemplate.class));
 				if (template == null) {
 					Ray.get().getLogger().info("nooooo");
 					return;
@@ -108,11 +113,11 @@ public class Format {
 		return usable;
 	}
 
-	public TextTemplate getTemplate() {
+	public InternalTextTemplate getTemplate() {
 		return template;
 	}
 
-	public Format setTemplate(TextTemplate template) {
+	public Format setTemplate(InternalTextTemplate template) {
 		this.template = template;
 		return this;
 	}
@@ -124,5 +129,13 @@ public class Format {
 	public Format setType(FormatType type) {
 		this.type = type;
 		return this;
+	}
+
+	public Optional<ConfigurationNode> getNode() {
+		return node;
+	}
+
+	public void setNode(Optional<ConfigurationNode> node) {
+		this.node = node;
 	}
 }

@@ -32,7 +32,7 @@ public class Variables {
 	public Object get(String key, Object... objects) {
 		switch (key) {
 		case "online":
-			return Sponge.getServer().getOnlinePlayers().size();
+			return Sponge.getServer().getOnlinePlayers().size()+"";
 		case "displayname":
 			if (objects[0] == null) {
 				return "";

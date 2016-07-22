@@ -37,7 +37,6 @@ import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -46,6 +45,7 @@ import org.spongepowered.api.text.chat.ChatType;
 import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.config.InternalTextTemplate;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
@@ -64,25 +64,24 @@ public class MainListener {
 			Ray.get().getPlugin().getLogger().info("gn");
 			return false;
 		}
-		Format f = g.getFormat(t);
+		final Format f = g.getFormat(t);
 		if (f == null) {
 			Ray.get().getPlugin().getLogger().info("fn");
 			return false;
 		}
 		Ray.get().getPlugin().getLogger().info("passed");
-		v = Ray.get().setVars(v, f.getTemplate(), p, false);
-		final TextTemplate template = f.getTemplate();
+		v = Ray.get().setVars(v, f.getTemplate(), p, false, Optional.of(f));
+		final InternalTextTemplate template = f.getTemplate();
 		final Map<String, Object> args = Maps.newHashMap(v);
 		MessageChannel newchan = MessageChannel.combined(channel, new MessageChannel() {
 
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
-				// TODO checks to see if recip can see player msgs, etc.
 				if (recipient instanceof Player) {
-					args.putAll(Ray.get().setVars(args, template, (Player) recipient, true));
+					args.putAll(Ray.get().setVars(args, template, (Player) recipient, true, Optional.of(f)));
 				} else {
-					args.putAll(Ray.get().setVars(args, template, null, true));
+					args.putAll(Ray.get().setVars(args, template, null, true, Optional.of(f)));
 				}
 				Text t = template.apply(args).build();
 				return Optional.of(t);

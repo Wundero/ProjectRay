@@ -24,12 +24,16 @@ package me.Wundero.ProjectRay.config;
  */
 
 import java.util.List;
+import java.util.Map;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
+import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.HoverAction;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.utils.Utils;
@@ -120,18 +124,27 @@ public class Template {
 				@SuppressWarnings("unused")
 				private String name;
 				private GroupBuilder parent;
-				private TextTemplate template;
+				private InternalTextTemplate template;
+				private Map<Arg, ClickAction<?>> clicks = Maps.newHashMap();
+				private Map<Arg, HoverAction<?>> hovers = Maps.newHashMap();
 
 				FormatBuilder(ConfigurationNode node, String name, GroupBuilder parent) {
 					this.node = node;
 					this.name = name;
 					this.parent = parent;
-					template = TextTemplate.of();
+					template = InternalTextTemplate.of();
 				}
 
 				public GroupBuilder build() {
 					try {
-						node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
+						node.getNode("format").setValue(TypeToken.of(InternalTextTemplate.class), template);
+						ConfigurationNode args = node.getNode("format", "arguments");
+						for (Arg a : clicks.keySet()) {
+							args.getNode(a.getName(), "click").setValue(TypeToken.of(ClickAction.class), clicks.get(a));
+						}
+						for (Arg a : hovers.keySet()) {
+							args.getNode(a.getName(), "hover").setValue(TypeToken.of(HoverAction.class), hovers.get(a));
+						}
 					} catch (ObjectMappingException e) {
 						Utils.printError(e);
 					}
@@ -139,17 +152,48 @@ public class Template {
 				}
 
 				public FormatBuilder withArg(String key) {
-					return withArg(TextTemplate.arg(key));
+					return withArg(key, null, null);
+				}
+
+				public FormatBuilder withArg(String key, HoverAction<?> hover) {
+					return withArg(key, null, hover);
+				}
+
+				public FormatBuilder withArg(String key, ClickAction<?> click) {
+					return withArg(key, click, null);
+				}
+
+				public FormatBuilder withArg(String key, ClickAction<?> click, HoverAction<?> hover) {
+					return withArg(TextTemplate.arg(key), click, hover);
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder, HoverAction<?> hover) {
+					return withArg(builder, null, hover);
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder, ClickAction<?> click) {
+					return withArg(builder, click, null);
 				}
 
 				public FormatBuilder withArg(Arg.Builder builder) {
-					template = template.concat(TextTemplate.of(builder.build()));
+					return withArg(builder, null, null);
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder, ClickAction<?> click, HoverAction<?> hover) {
+					Arg built = builder.build();
+					if (click != null) {
+						clicks.put(built, click);
+					}
+					if (hover != null) {
+						hovers.put(built, hover);
+					}
+					template = template.concat(InternalTextTemplate.of(builder.build()));
 					return this;
 				}
 
 				public FormatBuilder withText(Text... texts) {
 					for (Text t : texts) {
-						template = template.concat(TextTemplate.of(t));
+						template = template.concat(InternalTextTemplate.of(t));
 					}
 					return this;
 				}
