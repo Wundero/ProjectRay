@@ -36,6 +36,14 @@ import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 
+import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
+
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+
 /**
  * Represents a {@link TextAction} that responds to clicks.
  *
@@ -54,6 +62,56 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		super(result);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public static TypeSerializer<InternalClickAction> serializer() {
+		return new ts();
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static class ts implements TypeSerializer<InternalClickAction> {
+
+		@Override
+		public InternalClickAction deserialize(TypeToken<?> arg0, ConfigurationNode arg1)
+				throws ObjectMappingException {
+			System.out.println(arg1.getNode("type").getString());
+			final String icc = "";
+			final ConfigurationNode result = arg1.getNode("result");
+			switch (arg1.getNode("type").getString()) {
+			case icc + "RunCommand":
+				return Utils.runCommand(result.getString());
+			case icc + "SuggestCommand":
+				return Utils.suggestCommand(result.getString());
+			case icc + "ChangePage":
+				return Utils.changePage(result.getInt());
+			case icc + "OpenUrl":
+				return Utils.openUrl(result.getValue(TypeToken.of(URL.class)));
+			case icc + "RunTemplate":
+				return Utils.runTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+			case icc + "SuggestTemplate":
+				return Utils.suggestTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+			case icc + "UrlTemplate":
+				return Utils.urlTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+			}
+			return null;
+		}
+
+		@Override
+		public void serialize(TypeToken<?> arg0, InternalClickAction arg1, ConfigurationNode arg2)
+				throws ObjectMappingException {
+			if (arg1 instanceof ATemplate) {
+				arg2.getNode("result").setValue(TypeToken.of(TextTemplate.class),
+						(TextTemplate) ((ATemplate) arg1).getTemplate());
+			} else if (arg1 instanceof ExecuteCallback) {
+				throw new ObjectMappingException("Cannot save a callback!");
+			} else {
+				arg2.getNode("result").setValue(arg1.getResult());
+			}
+			ConfigurationNode typ = arg2.getNode("type");
+			typ.setValue(arg1.getClass().getSimpleName());
+		}
+
+	};
+
 	@SuppressWarnings("unchecked")
 	private ClickAction<?> toClick() {
 		if (this instanceof OpenUrl) {
@@ -71,7 +129,12 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		if (this instanceof ExecuteCallback) {
 			return TextActions.executeCallback((Consumer<CommandSource>) this.getResult());
 		}
-		String plain = ((TextTemplate) this.getResult()).apply().build().toPlain();
+		TextTemplate t = ((ATemplate) this).getTemplate();
+		Map<String, Object> p = Maps.newHashMap();
+		for (String k : t.getArguments().keySet()) {
+			p.put(k, "");
+		}
+		String plain = t.apply(p).build().toPlain();
 		if (this instanceof RunTemplate) {
 			return TextActions.runCommand(plain);
 		}

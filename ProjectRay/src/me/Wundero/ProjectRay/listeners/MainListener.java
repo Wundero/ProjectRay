@@ -28,13 +28,17 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -42,6 +46,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
 
 import com.google.common.collect.Maps;
 
@@ -81,6 +86,9 @@ public class MainListener {
 				} else {
 					args.putAll(Ray.get().setVars(args, template, null, true, Optional.of(f), true));
 				}
+				if (template == null) {
+					return Optional.of(original);
+				}
 				Text t = template.apply(args).build();
 				return Optional.of(t);
 			}
@@ -103,14 +111,29 @@ public class MainListener {
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
 		}
-		event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
+		if (event.getCause().containsNamed("formattype")) {
+			event.setCancelled(handle(event.getCause().get("formattype", FormatType.class).get(), event, vars, p,
+					event.getChannel().get()));
+		} else {
+			event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
+		}
 	}
 
 	@Listener
 	public void onJoin(ClientConnectionEvent.Join event) {
-		Map<String, Object> vars = Maps.newHashMap();
-		event.setMessageCancelled(
-				handle(FormatType.JOIN, event, vars, event.getTargetEntity(), event.getChannel().get()));
+		Ray.get().setLoadable(event.getTargetEntity());
+		if (event.getChannel().isPresent()) {
+			event.setMessageCancelled(true);
+			Task.builder().delayTicks(10).execute(() -> {
+				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
+						Cause.builder().from(event.getCause()).named("formattype", FormatType.JOIN).build(),
+						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
+				Sponge.getEventManager().post(ev2);
+				if (!ev2.isCancelled()) {
+					ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
+				}
+			}).submit(Ray.get().getPlugin());
+		}
 	}
 
 	@Listener

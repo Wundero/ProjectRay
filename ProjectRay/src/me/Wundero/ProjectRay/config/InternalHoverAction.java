@@ -43,8 +43,14 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.Identifiable;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.config.InternalHoverAction.ShowEntity.Ref;
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 /**
  * Represents a {@link TextAction} that responds to hovers.
@@ -64,6 +70,65 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		super(result);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public static TypeSerializer<InternalHoverAction> serializer() {
+		return new TypeSerializer<InternalHoverAction>() {
+
+			@Override
+			public InternalHoverAction deserialize(TypeToken<?> arg0, ConfigurationNode arg1)
+					throws ObjectMappingException {
+				System.out.println(arg1.getNode("type").getString());
+				final String icc = "";
+				final ConfigurationNode result = arg1.getNode("result");
+				switch (arg1.getNode("type").getString()) {
+				case icc + "ShowTemplate":
+					return Utils.showTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+				case icc + "ShowText":
+					return Utils.showText(result.getValue(TypeToken.of(Text.class)));
+				case icc + "ShowItem":
+					return Utils.showItem(result.getValue(TypeToken.of(ItemStack.class)));
+				case icc + "ShowAchievement":
+					return Utils.showAchievement(result.getValue(TypeToken.of(Achievement.class)));
+				case icc + "ShowEntity":
+					UUID uuid = result.getNode("uuid").getValue(TypeToken.of(UUID.class));
+					String name = result.getNode("name").getString();
+					EntityType t = result.getNode("entity").getValue(TypeToken.of(EntityType.class));
+					if (t != null) {
+						return Utils.showEntity(uuid, name, t);
+					}
+					return Utils.showEntity(uuid, name);
+				}
+				return null;
+			}
+
+			@Override
+			public void serialize(TypeToken<?> arg0, InternalHoverAction arg1, ConfigurationNode arg2)
+					throws ObjectMappingException {
+				if (arg1 instanceof ShowTemplate) {
+					arg2.getNode("result").setValue(TypeToken.of(TextTemplate.class),
+							(TextTemplate) ((ShowTemplate) arg1).getTemplate());
+				} else if (arg1 instanceof ShowText) {
+					arg2.getNode("result").setValue(TypeToken.of(Text.class), (Text) arg1.getResult());
+				} else if (arg1 instanceof ShowItem) {
+					arg2.getNode("result").setValue(TypeToken.of(ItemStack.class), (ItemStack) arg1.getResult());
+				} else if (arg1 instanceof ShowAchievement) {
+					arg2.getNode("result").setValue(TypeToken.of(Achievement.class), (Achievement) arg1.getResult());
+				} else if (arg1 instanceof ShowEntity) {
+					Ref r = ((ShowEntity) arg1).getResult();
+					ConfigurationNode n = arg2.getNode("result");
+					n.getNode("uuid").setValue(TypeToken.of(UUID.class), r.uuid);
+					n.getNode("name").setValue(r.name);
+					if (r.getType().isPresent()) {
+						n.getNode("entity").setValue(TypeToken.of(EntityType.class), r.getType().get());
+					}
+				}
+				ConfigurationNode typ = arg2.getNode("type");
+				typ.setValue(arg1.getClass().getSimpleName());
+			}
+
+		};
+	}
+
 	private HoverAction<?> toHover() {
 		if (this instanceof ShowText) {
 			return TextActions.showText((Text) this.getResult());
@@ -78,7 +143,12 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			return TextActions.showEntity(
 					new HoverAction.ShowEntity.Ref(((Ref) this.getResult()).uuid, ((Ref) this.getResult()).name));
 		}
-		return TextActions.showText(((ShowTemplate) this).template.apply().build());
+		TextTemplate t = ((ShowTemplate) this).template;
+		Map<String, Object> p = Maps.newHashMap();
+		for (String k : t.getArguments().keySet()) {
+			p.put(k, "");
+		}
+		return TextActions.showText(t.apply(p).build());
 	}
 
 	@Override

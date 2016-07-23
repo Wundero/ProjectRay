@@ -3,10 +3,12 @@ package me.Wundero.ProjectRay;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -21,6 +23,7 @@ import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /*
  The MIT License (MIT)
@@ -51,11 +54,25 @@ public class Ray {
 	private static Ray singleton = new Ray();
 
 	private List<Task> asyncTasks = Lists.newArrayList();
+	private List<Task> formatTasks = Lists.newArrayList();
 
 	public void registerTask(Task t) {
 		if (t.isAsynchronous()) {
 			asyncTasks.add(t);
 		}
+	}
+
+	public boolean hasFormatTask() {
+		return !formatTasks.isEmpty();
+	}
+
+	public void registerFormatTask(Task t) {
+		registerTask(t);
+		formatTasks.add(t);
+	}
+
+	public void finishFormatTask(Task t) {
+		formatTasks.remove(t);
 	}
 
 	private Ray() {
@@ -69,11 +86,27 @@ public class Ray {
 	private ConfigurationNode config;
 	private Groups groups;
 	private Variables vars;
+	private boolean loadableSet = false;
 
 	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
+		loadableSet = config.getNode("loadable").getValue() != null;
 		this.setVariables(new Variables());
+	}
+
+	public void setLoadable(UUID u) {
+		if (!loadableSet) {
+			try {
+				config.getNode("loadable").setValue(TypeToken.of(UUID.class), u);
+			} catch (ObjectMappingException e) {
+				config.getNode("loadable").setValue(u);
+			}
+		}
+	}
+
+	public void setLoadable(User u) {
+		setLoadable(u.getUniqueId());
 	}
 
 	public void terminate() {
@@ -124,46 +157,48 @@ public class Ray {
 		}
 		ConfigurationNode args = null;
 		if (formatUsed.isPresent() && formatUsed.get().getNode().isPresent()) {
-			args = formatUsed.get().getNode().get().getNode("format", "arguments");
+			args = formatUsed.get().getNode().get().getNode("format_args", "arguments");
 		}
-		for (String key : template.getArguments().keySet()) {
-			String k = key;
-			if (k.toLowerCase().startsWith("recip_") != isRecip) {
-				continue;
-			}
-			if (!out.containsKey(key)) {
-				Object var = getVariables().get(k, sender);
-				Object var2 = var;
-				if (args != null) {
-					Text t = var instanceof Text ? (Text) var : Text.of(var.toString());
-					Text.Builder newVar = t.toBuilder();
-					if (useClickHover) {
-						try {
-							InternalClickAction<?> click = args.getNode(key, "click")
-									.getValue(TypeToken.of(InternalClickAction.class));
-							InternalHoverAction<?> hover = args.getNode(key, "hover")
-									.getValue(TypeToken.of(InternalHoverAction.class));
-							if (click != null) {
-								if (click instanceof InternalClickAction.ATemplate) {
-									((InternalClickAction.ATemplate) click).apply(setVars(out,
-											(TextTemplate) hover.getResult(), sender, isRecip, formatUsed, false));
-								}
-								click.applyTo(newVar);
-							}
-							if (hover != null) {
-								if (hover instanceof InternalHoverAction.ShowTemplate) {
-									((InternalHoverAction.ShowTemplate) hover).apply(setVars(out,
-											(TextTemplate) hover.getResult(), sender, isRecip, formatUsed, false));
-								}
-								hover.applyTo(newVar);
-							}
-						} catch (Exception e) {
-							Utils.printError(e);
-						}
-					}
-					var2 = newVar.build();
+		if (template != null && template.getArguments() != null) {
+			for (String key : template.getArguments().keySet()) {
+				String k = key;
+				if (k.toLowerCase().startsWith("recip_") != isRecip) {
+					continue;
 				}
-				out.put(key, var2);
+				if (!out.containsKey(key)) {
+					Object var = getVariables().get(k, sender);
+					Object var2 = var;
+					if (args != null) {
+						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());
+						Text.Builder newVar = t.toBuilder();
+						if (useClickHover) {
+							try {
+								InternalClickAction<?> click = args.getNode(key, "click")
+										.getValue(TypeToken.of(InternalClickAction.class));
+								InternalHoverAction<?> hover = args.getNode(key, "hover")
+										.getValue(TypeToken.of(InternalHoverAction.class));
+								if (click != null) {
+									if (click instanceof InternalClickAction.ATemplate) {
+										((InternalClickAction.ATemplate) click).apply(setVars(out,
+												(TextTemplate) click.getResult(), sender, isRecip, formatUsed, false));
+									}
+									click.applyTo(newVar);
+								}
+								if (hover != null) {
+									if (hover instanceof InternalHoverAction.ShowTemplate) {
+										((InternalHoverAction.ShowTemplate) hover).apply(setVars(out,
+												(TextTemplate) hover.getResult(), sender, isRecip, formatUsed, false));
+									}
+									hover.applyTo(newVar);
+								}
+							} catch (Exception e) {
+								Utils.printError(e);
+							}
+						}
+						var2 = newVar.build();
+					}
+					out.put(key, var2);
+				}
 			}
 		}
 		return out;

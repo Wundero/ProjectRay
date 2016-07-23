@@ -14,17 +14,22 @@ import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
+import me.Wundero.ProjectRay.config.InternalClickAction;
+import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.config.Template;
 import me.Wundero.ProjectRay.config.Templates;
 import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 
 /*
  The MIT License (MIT)
@@ -99,11 +104,18 @@ public class ProjectRay {
 		return f.toPath();
 	}
 
+	private ConfigurationOptions updateSerializers(ConfigurationOptions opts) {
+		TypeSerializerCollection t = opts.getSerializers();
+		t.registerType(TypeToken.of(InternalClickAction.class), InternalClickAction.serializer());
+		t.registerType(TypeToken.of(InternalHoverAction.class), InternalHoverAction.serializer());
+		return opts.setSerializers(t);
+	}
+
 	private void loadConfig() {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
 				.setPath(getConfigPath()).build();
 		try {
-			setConfig(loader.load());
+			setConfig(loader.load(updateSerializers(loader.getDefaultOptions())));
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
@@ -112,7 +124,7 @@ public class ProjectRay {
 
 	private void tryLoadDefaults() {
 		if (config.getNode("worlds").isVirtual()) {
-			Templates.DEFAULT(Template.builder(config));
+			Templates.ADVANCED(Template.builder(config));
 			saveConfig();
 		}
 	}
@@ -143,6 +155,7 @@ public class ProjectRay {
 	@Listener
 	public void onStop(GameStoppingServerEvent event) {
 		saveConfig();
+		Ray.get().terminate();
 	}
 
 	/**

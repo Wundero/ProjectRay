@@ -136,7 +136,7 @@ public class Template {
 				public GroupBuilder build() {
 					try {
 						node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
-						ConfigurationNode args = node.getNode("format", "arguments");
+						ConfigurationNode args = node.getNode("format_args", "arguments");
 						for (Arg a : clicks.keySet()) {
 							args.getNode(a.getName(), "click").setValue(TypeToken.of(InternalClickAction.class),
 									clicks.get(a));

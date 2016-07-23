@@ -386,7 +386,11 @@ public class Utils {
 			toPrint.add("at " + element.toString());
 		}
 		for (String s : toPrint) {
-			Ray.get().getPlugin().getLogger().error(s);
+			if (Ray.get() != null && Ray.get().getPlugin() != null && Ray.get().getPlugin().getLogger() != null) {
+				Ray.get().getPlugin().getLogger().error(s);
+			} else {
+				e.printStackTrace();
+			}
 		}
 	}
 

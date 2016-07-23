@@ -31,6 +31,7 @@ import java.util.UUID;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.collect.Maps;
@@ -49,6 +50,12 @@ public class RayPlayer {
 		if (!cache.containsKey(u)) {
 			Optional<Player> p = Sponge.getServer().getPlayer(u);
 			if (!p.isPresent()) {
+				UserStorageService storage = Ray.get().getPlugin().getGame().getServiceManager()
+						.provide(UserStorageService.class).get();
+				Optional<User> opt = storage.get(u);
+				if (opt.isPresent()) {
+					return new RayPlayer(opt.get());
+				}
 				return null;
 			}
 			Player u2 = p.get();
@@ -123,6 +130,10 @@ public class RayPlayer {
 	 */
 	public boolean isConversing() {
 		return conversing;
+	}
+
+	public void reloadGroups() {
+		this.setGroups(Ray.get().getGroups().getGroups(this.getUser()));
 	}
 
 	/**

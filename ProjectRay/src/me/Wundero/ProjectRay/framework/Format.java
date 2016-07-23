@@ -94,18 +94,17 @@ public class Format {
 			try {
 				TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
 				if (template == null) {
-					Ray.get().getLogger().info("nooooo");
 					return;
 				}
-				Ray.get().getLogger().info("yay");
 				setTemplate(template);
 			} catch (Exception e) {
 				Utils.printError(e);
 			}
 			usable = true;
 			task.cancel();
+			Ray.get().finishFormatTask(task);
 		}).submit(Ray.get().getPlugin());
-		Ray.get().registerTask(t);
+		Ray.get().registerFormatTask(t);
 	}
 
 	public boolean usable() {

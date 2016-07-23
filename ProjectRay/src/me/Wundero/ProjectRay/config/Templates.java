@@ -36,7 +36,7 @@ public class Templates {
 
 	public static Template ADVANCED(Template.Builder t) {
 		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" ")).withArg("message").build().withFormat("join").withArg("displayname")
+				.withText(Text.of(" ")).withArg("message").build().withFormat("join").withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
 				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
