@@ -49,6 +49,10 @@ public class Format {
 		return new Format();
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	public Format withSection(Object... text) {
 		if (template == null) {
 			template = TextTemplate.of(text);

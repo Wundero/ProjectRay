@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.collect.Lists;
@@ -39,6 +40,7 @@ public abstract class Conversation {
 	private ConversationContext context;
 	private boolean suppressMessages, echoInputs, started = false;
 	private List<ConversationCanceller> cancellers = Lists.newArrayList();
+	private Text prefix = Text.of();
 
 	public boolean start() {
 		if (Sponge.getEventManager().post(new ConversationEvent.Start(
@@ -47,8 +49,13 @@ public abstract class Conversation {
 		}
 		started = true;
 		context.setOriginal(context.getHolder().getMessageChannel());
-		context.getHolder().setMessageChannel(MessageChannel.TO_NONE);
-		context.getHolder().sendMessage(currentPrompt.getQuestion(context));
+		MessageChannel channelNew = context.getOriginal();
+		if (suppressMessages) {
+			channelNew = MessageChannel.TO_NONE;
+		}
+		context.getHolder().setMessageChannel(channelNew);
+		context.getHolder().sendMessage(prefix.concat(currentPrompt.getQuestion(context)));
+		context.putData("conversation", this);
 		return true;
 	}
 
@@ -63,7 +70,7 @@ public abstract class Conversation {
 			return false;
 		}
 		currentPrompt = next;
-		context.getHolder().sendMessage(currentPrompt.getQuestion(context));
+		context.getHolder().sendMessage(prefix.concat(currentPrompt.getQuestion(context)));
 		return true;
 	}
 
@@ -192,5 +199,20 @@ public abstract class Conversation {
 	 */
 	public boolean isStarted() {
 		return started;
+	}
+
+	/**
+	 * @return the prefix
+	 */
+	public Text getPrefix() {
+		return prefix;
+	}
+
+	/**
+	 * @param prefix
+	 *            the prefix to set
+	 */
+	public void setPrefix(Text prefix) {
+		this.prefix = prefix;
 	}
 }

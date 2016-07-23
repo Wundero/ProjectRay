@@ -26,35 +26,55 @@ package me.Wundero.ProjectRay.conversation;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class ConversationFactory {
 
 	private Prompt firstPrompt;
-	private ConversationListener listener;
+	private ConversationListener listener = null;
 	private ConversationContext context;
-	private boolean suppressMessages, echoInputs;
+	private boolean suppressMessages = true, echoInputs = false;
 	private List<ConversationCanceller> cancellers = Lists.newArrayList();
 	private Object plugin;
-	private Map<String, Object> initialContextdata;
+	private Map<String, Object> initialContextdata = Maps.newHashMap();
+	private Text prefix = Text.of();
 
 	private ConversationFactory() {
 	}
 
 	public Conversation build(Player player) {
+		Validate.notNull(firstPrompt);
+		Validate.notNull(plugin);
+		Validate.notNull(player);
 		context = new ConversationContext(plugin, player);
 		context.putAll(initialContextdata);
 		Conversation convo = new Conversation() {
 		};
+		if (listener == null) {
+			listener = new ConversationListener(convo) {
+			};
+		}
 		convo.setCancellers(cancellers);
 		convo.setContext(context);
 		convo.setCurrentPrompt(firstPrompt);
 		convo.setEchoInputs(echoInputs);
 		convo.setListener(listener);
 		convo.setSuppressMessages(suppressMessages);
+		convo.setPrefix(prefix);
 		return convo;
+	}
+
+	public ConversationFactory withPrefix(Text prefix) {
+		if (!prefix.toPlain().endsWith(" ")) {
+			prefix = prefix.concat(Text.of(" "));
+		}
+		this.prefix = prefix;
+		return this;
 	}
 
 	public ConversationFactory withEcho(boolean echoInputs) {

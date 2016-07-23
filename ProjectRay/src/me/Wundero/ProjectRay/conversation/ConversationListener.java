@@ -29,6 +29,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.text.Text;
 
 public abstract class ConversationListener {
 	private final Conversation conversation;
@@ -81,6 +82,9 @@ public abstract class ConversationListener {
 					Cause.source(context.getPlugin()).named(NamedCause.of("conversation", this)).build(), context,
 					input);
 			if (!Sponge.getEventManager().post(event1)) {
+				if (conversation.isEchoInputs()) {
+					p.sendMessage(conversation.getPrefix().concat(Text.of(input)));
+				}
 				for (ConversationCanceller c : conversation.getCancellers()) {
 					if (c.checkCancel(conversation, input)) {
 						return;

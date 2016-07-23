@@ -52,7 +52,8 @@ public abstract class Prompt {
 	public abstract Prompt onInput(Optional<Option> selected, String text, ConversationContext context);
 
 	public boolean isInputValid(ConversationContext context, String input) {
-		if (options(context).isPresent()) {
+		Optional<List<Option>> o = options(context);
+		if (o != null && o.isPresent()) {
 			List<Option> opts = options(context).get();
 			for (Option opt : opts) {
 				if (opt.works(input)) {
@@ -65,7 +66,8 @@ public abstract class Prompt {
 	}
 
 	public Optional<Option> getSelected(ConversationContext context, String input) {
-		if (options(context).isPresent()) {
+		Optional<List<Option>> o = options(context);
+		if (o != null && o.isPresent()) {
 			List<Option> opts = options(context).get();
 			for (Option opt : opts) {
 				if (opt.works(input)) {
@@ -80,7 +82,8 @@ public abstract class Prompt {
 		if (isInputValid(context, input)) {
 			return onInput(getSelected(context, input), input, context);
 		} else {
-			context.getHolder().sendMessage(getFailedText(context, input));
+			context.getHolder().sendMessage(
+					((Conversation) context.getData("conversation")).getPrefix().concat(getFailedText(context, input)));
 			return this;
 		}
 	}

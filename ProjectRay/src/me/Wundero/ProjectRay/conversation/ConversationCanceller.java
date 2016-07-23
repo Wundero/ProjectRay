@@ -35,4 +35,13 @@ public abstract class ConversationCanceller {
 		}
 		return false;
 	}
+
+	public static final ConversationCanceller DEFAULT = new ConversationCanceller() {
+
+		@Override
+		public boolean shouldCancel(ConversationContext context, String input) {
+			return input.toLowerCase().trim().equals("exit");
+		}
+
+	};
 }
