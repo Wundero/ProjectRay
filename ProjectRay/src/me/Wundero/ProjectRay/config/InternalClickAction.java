@@ -62,6 +62,42 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		super(result);
 	}
 
+	public static <T> ActionBuilder<T> builder() {
+		return new ActionBuilder<T>();
+	}
+
+	protected static class ActionBuilder<R> {
+		@SuppressWarnings("unchecked")
+		public InternalClickAction<R> build(Class<?> type) {
+			switch (type.getSimpleName()) {
+			case "RunTemplate":
+				return (InternalClickAction<R>) Utils.runTemplate((TextTemplate) result);
+			case "UrlTemplate":
+				return (InternalClickAction<R>) Utils.urlTemplate((TextTemplate) result);
+			case "SuggestTemplate":
+				return (InternalClickAction<R>) Utils.suggestTemplate((TextTemplate) result);
+			case "ExecuteCallback":
+				return (InternalClickAction<R>) Utils.executeCallback((Consumer<CommandSource>) result);
+			case "ChangePage":
+				return (InternalClickAction<R>) Utils.changePage((Integer) result);
+			case "RunCommand":
+				return (InternalClickAction<R>) Utils.runCommand((String) result);
+			case "OpenUrl":
+				return (InternalClickAction<R>) Utils.openUrl((URL) result);
+			default:
+				return (InternalClickAction<R>) Utils.suggestCommand((String) result);
+			}
+
+		}
+
+		private R result = null;
+
+		public ActionBuilder<R> withResult(R result) {
+			this.result = result;
+			return this;
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
 	public static TypeSerializer<InternalClickAction> serializer() {
 		return new ts();
@@ -186,6 +222,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		public void apply(Map<String, ?> args) {
 			template = TextTemplate.of(template.apply(args).build());
 		}
+
 	}
 
 	/**

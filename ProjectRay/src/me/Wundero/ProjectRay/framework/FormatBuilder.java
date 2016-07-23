@@ -41,8 +41,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class FormatBuilder {
 
-	// TODO make template builder and use that in this
-
 	private ConfigurationNode node;
 	@SuppressWarnings("unused")
 	private String name;
@@ -70,6 +68,10 @@ public class FormatBuilder {
 			Utils.printError(e);
 		}
 		return new Format(node);
+	}
+
+	public static FormatBuilder builder(Group group, String name) {
+		return new FormatBuilder(group.getConfig().getNode("format", name), name);
 	}
 
 	public FormatBuilder withArg(String key) {

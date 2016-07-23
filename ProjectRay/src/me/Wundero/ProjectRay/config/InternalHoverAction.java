@@ -70,6 +70,38 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		super(result);
 	}
 
+	public static <T> ActionBuilder<T> builder() {
+		return new ActionBuilder<T>();
+	}
+
+	protected static class ActionBuilder<R> {
+		@SuppressWarnings("unchecked")
+		public InternalHoverAction<R> build(Class<?> type) {
+			switch (type.getSimpleName()) {
+			case "ShowTemplate":
+				return (InternalHoverAction<R>) Utils.showTemplate((TextTemplate) result);
+			case "ShowText":
+				return (InternalHoverAction<R>) Utils.showText((Text) result);
+			case "ShowItem":
+				return (InternalHoverAction<R>) Utils.showItem((ItemStack) result);
+			case "ShowEntity":
+				return (InternalHoverAction<R>) Utils.showEntity((Ref) result);
+			case "ShowAchievement":
+				return (InternalHoverAction<R>) Utils.showAchievement((Achievement) result);
+			default:
+				return (InternalHoverAction<R>) Utils.showText(Text.of(((Object) result).toString()));
+			}
+
+		}
+
+		private R result = null;
+
+		public ActionBuilder<R> withResult(R result) {
+			this.result = result;
+			return this;
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
 	public static TypeSerializer<InternalHoverAction> serializer() {
 		return new TypeSerializer<InternalHoverAction>() {
