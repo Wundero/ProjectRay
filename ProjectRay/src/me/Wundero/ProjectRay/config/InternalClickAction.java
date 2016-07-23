@@ -66,7 +66,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 			return TextActions.suggestCommand((String) this.getResult());
 		}
 		if (this instanceof ChangePage) {
-			return TextActions.changePage((int) this.getResult());
+			return TextActions.changePage((Integer) this.getResult());
 		}
 		if (this instanceof ExecuteCallback) {
 			return TextActions.executeCallback((Consumer<CommandSource>) this.getResult());
@@ -174,7 +174,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		 *            The book page to switch to
 		 */
 		public ChangePage(int page) {
-			super(page);
+			super(Integer.valueOf(page));
 		}
 
 	}
