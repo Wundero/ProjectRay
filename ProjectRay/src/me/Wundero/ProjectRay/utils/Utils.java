@@ -13,13 +13,20 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
@@ -30,6 +37,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.config.InternalHoverAction;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -67,7 +75,38 @@ public class Utils {
 
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
+	}
 
+	public static InternalHoverAction.ShowEntity showEntity(InternalHoverAction.ShowEntity.Ref entity) {
+		return new InternalHoverAction.ShowEntity(entity);
+	}
+
+	public static InternalHoverAction.ShowEntity showEntity(UUID uuid, String name, @Nullable EntityType type) {
+		return showEntity(new InternalHoverAction.ShowEntity.Ref(uuid, name, type));
+	}
+
+	public static InternalHoverAction.ShowEntity showEntity(UUID uuid, String name) {
+		return showEntity(new InternalHoverAction.ShowEntity.Ref(uuid, name));
+	}
+
+	public static InternalHoverAction.ShowEntity showEntity(Entity entity, String name) {
+		return showEntity(new InternalHoverAction.ShowEntity.Ref(entity, name));
+	}
+
+	public static InternalHoverAction<?> showItem(ItemStack i) {
+		return new InternalHoverAction.ShowItem(i);
+	}
+
+	public static InternalHoverAction<?> showAchievement(Achievement a) {
+		return new InternalHoverAction.ShowAchievement(a);
+	}
+
+	public static InternalHoverAction<?> showText(Text t) {
+		return new InternalHoverAction.ShowText(t);
+	}
+
+	public static InternalHoverAction<?> showTemplate(TextTemplate t) {
+		return new InternalHoverAction.ShowTemplate(t);
 	}
 
 	public static Text transIf(String s, User u) {

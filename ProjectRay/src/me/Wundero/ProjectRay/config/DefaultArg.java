@@ -23,23 +23,47 @@ package me.Wundero.ProjectRay.config;
  SOFTWARE.
  */
 
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.TextTemplate.Arg;
+import org.spongepowered.api.text.action.ClickAction;
 
-public class Templates {
-	public static Template DEFAULT(Template.Builder t) {
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg("player").withText(Text.of(" "))
-				.withArg("message").build().build().build();
+public class DefaultArg {
+	private Arg.Builder builder;
+	private ClickAction<?> click;
+	private InternalHoverAction<?> hover;
+
+	public DefaultArg(Arg.Builder b, ClickAction<?> c, InternalHoverAction<?> h) {
+		this.setBuilder(b);
+		this.setClick(c);
+		this.setHover(h);
 	}
 
-	// TODO argument clicks
-
-	public static Template ADVANCED(Template.Builder t) {
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" ")).withArg("message").build().withFormat("join").withArg("displayname")
-				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
-				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
-				.build();
+	public DefaultArg(String s, ClickAction<?> c, InternalHoverAction<?> h) {
+		this(TextTemplate.arg(s), c, h);
 	}
+
+	public Arg.Builder getBuilder() {
+		return builder;
+	}
+
+	public void setBuilder(Arg.Builder builder) {
+		this.builder = builder;
+	}
+
+	public ClickAction<?> getClick() {
+		return click;
+	}
+
+	public void setClick(ClickAction<?> click) {
+		this.click = click;
+	}
+
+	public InternalHoverAction<?> getHover() {
+		return hover;
+	}
+
+	public void setHover(InternalHoverAction<?> hover) {
+		this.hover = hover;
+	}
+
 }

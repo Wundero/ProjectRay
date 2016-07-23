@@ -26,16 +26,16 @@ package me.Wundero.ProjectRay.framework;
 import java.util.Optional;
 
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.config.InternalTextTemplate;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class Format {
-	private InternalTextTemplate template;
+	private TextTemplate template;
 	private FormatType type;
 	private String name;
 	private boolean usable = false;
@@ -51,9 +51,9 @@ public class Format {
 
 	public Format withSection(Object... text) {
 		if (template == null) {
-			template = InternalTextTemplate.of(text);
+			template = TextTemplate.of(text);
 		} else {
-			template = template.concat(InternalTextTemplate.of(text));
+			template = template.concat(TextTemplate.of(text));
 		}
 		return this;
 	}
@@ -92,8 +92,7 @@ public class Format {
 		setType(FormatType.fromString(name));
 		Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
 			try {
-				InternalTextTemplate template = node.getNode("format")
-						.getValue(TypeToken.of(InternalTextTemplate.class));
+				TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
 				if (template == null) {
 					Ray.get().getLogger().info("nooooo");
 					return;
@@ -113,11 +112,11 @@ public class Format {
 		return usable;
 	}
 
-	public InternalTextTemplate getTemplate() {
+	public TextTemplate getTemplate() {
 		return template;
 	}
 
-	public Format setTemplate(InternalTextTemplate template) {
+	public Format setTemplate(TextTemplate template) {
 		this.template = template;
 		return this;
 	}

@@ -24,22 +24,11 @@ package me.Wundero.ProjectRay.config;
  */
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.action.TextActions;
 
-public class Templates {
-	public static Template DEFAULT(Template.Builder t) {
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg("player").withText(Text.of(" "))
-				.withArg("message").build().build().build();
-	}
+import me.Wundero.ProjectRay.utils.Utils;
 
-	// TODO argument clicks
-
-	public static Template ADVANCED(Template.Builder t) {
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" ")).withArg("message").build().withFormat("join").withArg("displayname")
-				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
-				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
-				.build();
-	}
+public class DefaultArgs {
+	public static final DefaultArg DISPLAYNAME = new DefaultArg("displayname",
+			TextActions.suggestCommand("/msg {displayname}"), Utils.showText(Text.of("Name: {displayname}")));
 }

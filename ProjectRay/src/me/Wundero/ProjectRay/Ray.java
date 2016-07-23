@@ -9,14 +9,14 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.ClickAction;
-import org.spongepowered.api.text.action.HoverAction;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.config.InternalTextTemplate;
+import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.utils.Utils;
@@ -114,8 +114,8 @@ public class Ray {
 		this.groups = groups;
 	}
 
-	public Map<String, Object> setVars(Map<String, Object> known, InternalTextTemplate template, Player sender,
-			boolean isRecip, Optional<Format> formatUsed) {
+	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender, boolean isRecip,
+			Optional<Format> formatUsed, boolean useClickHover) {
 		Map<String, Object> out = Maps.newHashMap();
 		for (String key : known.keySet()) {
 			if (template.getArguments().containsKey(key)) {
@@ -137,36 +137,49 @@ public class Ray {
 				if (args != null) {
 					if (var instanceof Text) {
 						Text.Builder newVar = Text.builder(((Text) var).toPlain()).format(((Text) var).getFormat());
-						try {
-							ClickAction<?> click = args.getNode(key, "click").getValue(TypeToken.of(ClickAction.class));
-							HoverAction<?> hover = args.getNode(key, "hover").getValue(TypeToken.of(HoverAction.class));
-							if (click != null) {
-								newVar.onClick(click);
-							}
-							if (hover != null) {
-								if (hover.getResult() instanceof Text) {
-
+						if (useClickHover) {
+							try {
+								ClickAction<?> click = args.getNode(key, "click")
+										.getValue(TypeToken.of(ClickAction.class));
+								InternalHoverAction<?> hover = args.getNode(key, "hover")
+										.getValue(TypeToken.of(InternalHoverAction.class));
+								if (click != null) {
+									newVar.onClick(click);
 								}
-								newVar.onHover(hover);
+								if (hover != null) {
+									if (hover instanceof InternalHoverAction.ShowTemplate) {
+										((InternalHoverAction.ShowTemplate) hover).apply(setVars(out,
+												(TextTemplate) hover.getResult(), sender, isRecip, formatUsed, false));
+									}
+									hover.applyTo(newVar);
+								}
+							} catch (Exception e) {
+								Utils.printError(e);
 							}
-						} catch (Exception e) {
-							Utils.printError(e);
 						}
 						var2 = newVar.build();
 					} else {
 						Text t = Utils.transIf(var.toString(), sender);
 						Text.Builder newVar = t.toBuilder();
-						try {
-							ClickAction<?> click = args.getNode(key, "click").getValue(TypeToken.of(ClickAction.class));
-							HoverAction<?> hover = args.getNode(key, "hover").getValue(TypeToken.of(HoverAction.class));
-							if (click != null) {
-								newVar.onClick(click);
+						if (useClickHover) {
+							try {
+								ClickAction<?> click = args.getNode(key, "click")
+										.getValue(TypeToken.of(ClickAction.class));
+								InternalHoverAction<?> hover = args.getNode(key, "hover")
+										.getValue(TypeToken.of(InternalHoverAction.class));
+								if (click != null) {
+									newVar.onClick(click);
+								}
+								if (hover != null) {
+									if (hover instanceof InternalHoverAction.ShowTemplate) {
+										((InternalHoverAction.ShowTemplate) hover).apply(setVars(out,
+												(TextTemplate) hover.getResult(), sender, isRecip, formatUsed, false));
+									}
+									hover.applyTo(newVar);
+								}
+							} catch (Exception e) {
+								Utils.printError(e);
 							}
-							if (hover != null) {
-								newVar.onHover(hover);
-							}
-						} catch (Exception e) {
-							Utils.printError(e);
 						}
 						var2 = newVar.build();
 					}
