@@ -25,20 +25,19 @@ package me.Wundero.ProjectRay.config;
 
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
-import org.spongepowered.api.text.action.ClickAction;
 
 public class DefaultArg {
 	private Arg.Builder builder;
-	private ClickAction<?> click;
+	private InternalClickAction<?> click;
 	private InternalHoverAction<?> hover;
 
-	public DefaultArg(Arg.Builder b, ClickAction<?> c, InternalHoverAction<?> h) {
+	public DefaultArg(Arg.Builder b, InternalClickAction<?> c, InternalHoverAction<?> h) {
 		this.setBuilder(b);
 		this.setClick(c);
 		this.setHover(h);
 	}
 
-	public DefaultArg(String s, ClickAction<?> c, InternalHoverAction<?> h) {
+	public DefaultArg(String s, InternalClickAction<?> c, InternalHoverAction<?> h) {
 		this(TextTemplate.arg(s), c, h);
 	}
 
@@ -50,11 +49,11 @@ public class DefaultArg {
 		this.builder = builder;
 	}
 
-	public ClickAction<?> getClick() {
+	public InternalClickAction<?> getClick() {
 		return click;
 	}
 
-	public void setClick(ClickAction<?> click) {
+	public void setClick(InternalClickAction<?> click) {
 		this.click = click;
 	}
 

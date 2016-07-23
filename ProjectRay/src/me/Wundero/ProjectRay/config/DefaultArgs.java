@@ -24,11 +24,15 @@ package me.Wundero.ProjectRay.config;
  */
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class DefaultArgs {
 	public static final DefaultArg DISPLAYNAME = new DefaultArg("displayname",
-			TextActions.suggestCommand("/msg {displayname}"), Utils.showText(Text.of("Name: {displayname}")));
+			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
+			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.DARK_GRAY).build(),
+					TextTemplate.arg("displayname").build(), "\n",
+					Text.builder("Say hello!").color(TextColors.AQUA).build())));
 }

@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay.utils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -37,6 +40,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -75,6 +79,38 @@ public class Utils {
 
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
+	}
+
+	public static InternalClickAction<?> urlTemplate(TextTemplate t) {
+		return new InternalClickAction.UrlTemplate(t);
+	}
+
+	public static InternalClickAction<?> suggestTemplate(TextTemplate t) {
+		return new InternalClickAction.SuggestTemplate(t);
+	}
+
+	public static InternalClickAction<?> runTemplate(TextTemplate t) {
+		return new InternalClickAction.RunTemplate(t);
+	}
+
+	public static InternalClickAction<?> executeCallback(Consumer<CommandSource> c) {
+		return new InternalClickAction.ExecuteCallback(c);
+	}
+
+	public static InternalClickAction<?> changePage(int i) {
+		return new InternalClickAction.ChangePage(i);
+	}
+
+	public static InternalClickAction<?> openUrl(URL u) {
+		return new InternalClickAction.OpenUrl(u);
+	}
+
+	public static InternalClickAction<?> suggestCommand(String s) {
+		return new InternalClickAction.SuggestCommand(s);
+	}
+
+	public static InternalClickAction<?> runCommand(String s) {
+		return new InternalClickAction.RunCommand(s);
 	}
 
 	public static InternalHoverAction.ShowEntity showEntity(InternalHoverAction.ShowEntity.Ref entity) {

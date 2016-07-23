@@ -29,7 +29,6 @@ import java.util.Map;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
-import org.spongepowered.api.text.action.ClickAction;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -124,7 +123,7 @@ public class Template {
 				private String name;
 				private GroupBuilder parent;
 				private TextTemplate template;
-				private Map<Arg, ClickAction<?>> clicks = Maps.newHashMap();
+				private Map<Arg, InternalClickAction<?>> clicks = Maps.newHashMap();
 				private Map<Arg, InternalHoverAction<?>> hovers = Maps.newHashMap();
 
 				FormatBuilder(ConfigurationNode node, String name, GroupBuilder parent) {
@@ -139,7 +138,8 @@ public class Template {
 						node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
 						ConfigurationNode args = node.getNode("format", "arguments");
 						for (Arg a : clicks.keySet()) {
-							args.getNode(a.getName(), "click").setValue(TypeToken.of(ClickAction.class), clicks.get(a));
+							args.getNode(a.getName(), "click").setValue(TypeToken.of(InternalClickAction.class),
+									clicks.get(a));
 						}
 						for (Arg a : hovers.keySet()) {
 							args.getNode(a.getName(), "hover").setValue(TypeToken.of(InternalHoverAction.class),
@@ -159,11 +159,11 @@ public class Template {
 					return withArg(key, null, hover);
 				}
 
-				public FormatBuilder withArg(String key, ClickAction<?> click) {
+				public FormatBuilder withArg(String key, InternalClickAction<?> click) {
 					return withArg(key, click, null);
 				}
 
-				public FormatBuilder withArg(String key, ClickAction<?> click, InternalHoverAction<?> hover) {
+				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover) {
 					return withArg(TextTemplate.arg(key), click, hover);
 				}
 
@@ -175,7 +175,7 @@ public class Template {
 					return withArg(builder, null, hover);
 				}
 
-				public FormatBuilder withArg(Arg.Builder builder, ClickAction<?> click) {
+				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click) {
 					return withArg(builder, click, null);
 				}
 
@@ -183,7 +183,8 @@ public class Template {
 					return withArg(builder, null, null);
 				}
 
-				public FormatBuilder withArg(Arg.Builder builder, ClickAction<?> click, InternalHoverAction<?> hover) {
+				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
+						InternalHoverAction<?> hover) {
 					Arg built = builder.build();
 					if (click != null) {
 						clicks.put(built, click);
