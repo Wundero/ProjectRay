@@ -24,6 +24,7 @@ package me.Wundero.ProjectRay.config;
  */
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
 public class Templates {
@@ -32,11 +33,10 @@ public class Templates {
 				.withArg("message").build().build().build();
 	}
 
-	// TODO argument clicks
-
 	public static Template ADVANCED(Template.Builder t) {
 		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" ")).withArg("message").build().withFormat("join").withArg(DefaultArgs.DISPLAYNAME)
+				.withText(Text.of(" ")).withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build()
+				.withFormat("join").withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
 				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
