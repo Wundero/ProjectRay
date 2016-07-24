@@ -30,9 +30,10 @@ public enum FormatType {
 	CHAT("chat", new String[] { "c" }), MESSAGE("message", new String[] { "m", "msg" }), DEATH("death",
 			new String[] { "d" }), JOIN("join", new String[] { "j" }), LEAVE("leave",
 					new String[] { "l" }), CUSTOM("custom"), WELCOME("welcome", new String[] { "w" }), MOTD("motd",
-							new String[] {}), ANNOUNCEMENT("announcement", new String[] { "a" }), TABLIST("tablist",
-									new String[] { "list", "t", "tab" },
-									true), DEFAULT("default"), ACHIEVEMENT("achievement"), KICK("kick");
+							new String[] {}), ANNOUNCEMENT("announcement", new String[] { "a" }), TABLIST_ENTRY(
+									"tablist", new String[] { "list", "t", "tab" }), TABLIST_HEADER("header",
+											new String[] {}), TABLIST_FOOTER("footer", new String[] {}), DEFAULT(
+													"default"), ACHIEVEMENT("achievement"), KICK("kick");
 
 	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
 	// footer)/item names/block gui names/other random text stuff
@@ -44,7 +45,6 @@ public enum FormatType {
 
 	private String[] aliases;
 	private String name;
-	private boolean multiPart = false;
 
 	FormatType(String name) {
 		this.setName(name);
@@ -54,11 +54,6 @@ public enum FormatType {
 	FormatType(String name, String[] aliases) {
 		this.setName(name);
 		this.setAliases(aliases);
-	}
-
-	FormatType(String name, String[] aliases, boolean multipart) {
-		this(name, aliases);
-		this.setMultiPart(multipart);
 	}
 
 	public String[] getAliases() {
@@ -95,20 +90,5 @@ public enum FormatType {
 			}
 		}
 		return DEFAULT;
-	}
-
-	/**
-	 * @return the multiPart
-	 */
-	public boolean isMultiPart() {
-		return multiPart;
-	}
-
-	/**
-	 * @param multiPart
-	 *            the multiPart to set
-	 */
-	public void setMultiPart(boolean multiPart) {
-		this.multiPart = multiPart;
 	}
 }

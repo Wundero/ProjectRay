@@ -61,6 +61,13 @@ public class Group {
 		load();
 	}
 
+	public void addFormat(Format format) {
+		FormatType type = format.getType();
+		List<Format> f = formats.get(type);
+		f.add(format);
+		formats.put(type, f);
+	}
+
 	public synchronized void load() {
 		this.setName(config.getKey().toString());
 		this.setPermission(config.getNode("permission").getString());

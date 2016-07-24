@@ -48,7 +48,7 @@ public class FormatBuilder {
 	private Map<Arg, InternalClickAction<?>> clicks = Maps.newHashMap();
 	private Map<Arg, InternalHoverAction<?>> hovers = Maps.newHashMap();
 
-	FormatBuilder(ConfigurationNode node, String name) {
+	public FormatBuilder(ConfigurationNode node, String name) {
 		this.node = node;
 		this.name = name;
 		template = TextTemplate.of();

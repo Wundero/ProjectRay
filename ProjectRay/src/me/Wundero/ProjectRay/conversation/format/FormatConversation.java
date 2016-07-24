@@ -32,11 +32,14 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Lists;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.config.InternalClickAction;
+import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.conversation.Conversation;
 import me.Wundero.ProjectRay.conversation.ConversationCanceller;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
@@ -44,7 +47,10 @@ import me.Wundero.ProjectRay.conversation.ConversationFactory;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.framework.Format;
+import me.Wundero.ProjectRay.framework.FormatBuilder;
+import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
+import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class FormatConversation {
@@ -197,7 +203,9 @@ public class FormatConversation {
 	private static class ShouldDoTypePrompt extends Prompt {
 
 		public ShouldDoTypePrompt() {
-			this(TextTemplate.of("Would you like to specify a type?", TextColors.GRAY));
+			this(TextTemplate.of(Text.of("Would you like to specify a type? ", TextColors.GRAY, "[✓]", TextColors.GREEN,
+					TextActions.runCommand("y"), " | ", TextColors.GRAY, "[✕]", TextColors.RED,
+					TextActions.runCommand("n"))));
 		}
 
 		public ShouldDoTypePrompt(TextTemplate template) {
@@ -256,7 +264,8 @@ public class FormatConversation {
 			if (parseInput(text)) {
 				return new TypePrompt();
 			} else {
-
+				context.putData("formattype", FormatType.fromString(context.getData("name")));
+				return new TemplateBuilderTypePrompt();
 			}
 		}
 
@@ -264,35 +273,417 @@ public class FormatConversation {
 
 	private static class TypePrompt extends Prompt {
 
+		public TypePrompt() {
+			this(TextTemplate.of(Text.of("Please select a type: ", TextColors.GRAY), TextTemplate.arg("options")));
+		}
+
 		public TypePrompt(TextTemplate template) {
 			super(template);
 		}
 
 		@Override
 		public Text getQuestion(ConversationContext context) {
-			// TODO Auto-generated method stub
-			return null;
+			return formatTemplate(context);
 		}
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			// TODO Auto-generated method stub
-			return null;
+			List<Option> options = Lists.newArrayList();
+			for (FormatType type : FormatType.values()) {
+				if (type == FormatType.DEFAULT) {
+					continue;
+				}
+				options.add(new Option(type.getName(),
+						Text.of(type.getName().toLowerCase().replace("_", " "), TextColors.GOLD,
+								TextActions.runCommand(type.getName().toLowerCase().replace("_", " ")),
+								TextActions.showText(Text.of(
+										"Click here to select " + type.getName().toLowerCase().replace("_", " ") + "!",
+										TextColors.AQUA))),
+						type));
+			}
+			return Optional.of(options);
 		}
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			// TODO Auto-generated method stub
-			return null;
+			return Text.of(failedInput + " is not a valid format type!", TextColors.RED);
 		}
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			// TODO Auto-generated method stub
-			return null;
+			context.putData("formattype", selected.get().getValue());
+			FormatBuilder fb = new FormatBuilder(context.getData("node"), context.getData("name"));
+			context.putData("builder", fb);
+			return new TemplateBuilderTypePrompt();
 		}
 
 	}
 
-	// TODO template prompt
+	private static class TemplateBuilderTypePrompt extends Prompt {
+
+		public TemplateBuilderTypePrompt() {
+			this(TextTemplate.of(Text.of("Choose an element to add: ", TextColors.GRAY),
+					TextTemplate.arg("options").build()));
+		}
+
+		public TemplateBuilderTypePrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			return super.isInputValid(context, input) || input.toLowerCase().trim().equals("done");
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			List<Option> options = Lists.newArrayList();
+			options.add(
+					new Option("arg",
+							Text.of("argument", TextColors.GOLD, TextActions.runCommand("arg"),
+									TextActions.showText(Text.of("Click this to select argument!", TextColors.AQUA))),
+							"arg"));
+			options.add(
+					new Option("text",
+							Text.of("text", TextColors.GOLD, TextActions.runCommand("text"),
+									TextActions.showText(Text.of("Click this to select text!", TextColors.AQUA))),
+							"text"));
+			return Optional.of(options);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of("You must choose one of the options!", TextColors.RED);
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			if (text.equals("arg")) {
+				return new ArgTypePrompt();
+			}
+			if (text.equals("text")) {
+				return new TextTypePrompt();
+			}
+			Format format = ((FormatBuilder) context.getData("builder")).build();
+			Group group = context.getData("group");
+			group.addFormat(format);
+			context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
+					.concat(Text.of("Format " + context.getData("name") + " successfully created!", TextColors.GREEN)));
+			return null;
+		}
+	}
+
+	private static class ArgTypePrompt extends Prompt {
+
+		private ArgBuilderPrompt p = null;
+
+		private ArgTypePrompt(ArgBuilderPrompt p) {
+			this();
+			this.p = p;
+		}
+
+		public ArgTypePrompt() {
+			this(TextTemplate.of(Text.of("Choose an element to add: ", TextColors.GRAY),
+					TextTemplate.arg("options").build()));
+		}
+
+		public ArgTypePrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			return super.isInputValid(context, input) || input.toLowerCase().trim().equals("done");
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			List<Option> options = Lists.newArrayList();
+			options.add(new Option("key",
+					Text.of("argument", TextColors.GOLD, TextActions.runCommand("key"),
+							TextActions.showText(
+									Text.of("Click this to select key (creates a new argument)!", TextColors.AQUA))),
+					"key"));
+			options.add(
+					new Option("click",
+							Text.of("click", TextColors.GOLD, TextActions.runCommand("click"),
+									TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))),
+							"click"));
+			options.add(
+					new Option("hover",
+							Text.of("click", TextColors.GOLD, TextActions.runCommand("hover"),
+									TextActions.showText(Text.of("Click this to select hover!", TextColors.AQUA))),
+							"hover"));
+			return Optional.of(options);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of("You must choose one of the options!", TextColors.RED);
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			switch (text.toLowerCase().trim()) {
+			case "key":
+				if (p != null) {
+					p.apply(context);
+				}
+				return new ArgBuilderPrompt(null, null, null, "key");
+			case "click":
+			case "hover":
+				if (p == null) {
+					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
+							.concat(Text.of("You must choose a key first!", TextColors.RED)));
+					return this;
+				}
+				p.value = text.toLowerCase().trim();
+				return p;
+			case "done":
+				if (p != null) {
+					p.apply(context);
+				}
+				return new TemplateBuilderTypePrompt();
+			}
+			return null;
+		}
+	}
+
+	private static class ArgBuilderPrompt extends Prompt {
+
+		private String key;
+		private InternalClickAction<?> click;
+		private InternalHoverAction<?> hover;
+		private String value;
+
+		public ArgBuilderPrompt(String key, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
+			this(TextTemplate.of(Text.of("Please input a " + value + ":", TextColors.GRAY)));
+			this.key = key;
+			this.hover = hover;
+			this.click = click;
+			this.value = value;
+		}
+
+		public ArgBuilderPrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of("ERROR: This should not have triggered!", TextColors.DARK_RED);
+		}
+
+		public void apply(ConversationContext context) {
+			FormatBuilder builder = context.getData("builder");
+			builder = builder.withArg(key, click, hover);
+			context.putData("builder", builder);
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			switch (value) {
+			case "key":
+				key = text;
+				return new ArgTypePrompt(this);
+			case "click":
+				Class<?> clickType = InternalClickAction.SuggestTemplate.class;
+				if (text.toLowerCase().startsWith("run:")) {
+					clickType = InternalClickAction.RunTemplate.class;
+					text = text.substring(4);
+				}
+				if (text.toLowerCase().startsWith("suggest:")) {
+					text = text.substring(8);
+				}
+				if (text.toLowerCase().startsWith("url:")) {
+					clickType = InternalClickAction.UrlTemplate.class;
+					text = text.substring(4);
+				}
+				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
+				return new ArgTypePrompt(this);
+			case "hover":
+				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))
+						.build(InternalHoverAction.ShowTemplate.class);
+				return new ArgTypePrompt(this);
+			}
+			return this;
+		}
+
+	}
+
+	private static class TextTypePrompt extends Prompt {
+
+		private TextBuilderPrompt p = null;
+
+		private TextTypePrompt(TextBuilderPrompt p) {
+			this();
+			this.p = p;
+		}
+
+		public TextTypePrompt() {
+			this(TextTemplate.of(Text.of("Choose an element to add: ", TextColors.GRAY),
+					TextTemplate.arg("options").build()));
+		}
+
+		public TextTypePrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			return super.isInputValid(context, input) || input.toLowerCase().trim().equals("done");
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			List<Option> options = Lists.newArrayList();
+			options.add(
+					new Option("text",
+							Text.of("text", TextColors.GOLD,
+									TextActions.runCommand("text"), TextActions.showText(Text
+											.of("Click this to select text (creates a new text)!", TextColors.AQUA))),
+							"text"));
+			options.add(
+					new Option("click",
+							Text.of("click", TextColors.GOLD, TextActions.runCommand("click"),
+									TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))),
+							"click"));
+			options.add(
+					new Option("hover",
+							Text.of("click", TextColors.GOLD, TextActions.runCommand("hover"),
+									TextActions.showText(Text.of("Click this to select hover!", TextColors.AQUA))),
+							"hover"));
+			return Optional.of(options);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of("You must choose one of the options!", TextColors.RED);
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			switch (text.toLowerCase().trim()) {
+			case "text":
+				if (p != null) {
+					p.apply(context);
+				}
+				return new TextBuilderPrompt(null, null, null, "text");
+			case "click":
+			case "hover":
+				if (p == null) {
+					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
+							.concat(Text.of("You must input some text first!", TextColors.RED)));
+					return this;
+				}
+				p.value = text.toLowerCase().trim();
+				return p;
+			case "done":
+				if (p != null) {
+					p.apply(context);
+				}
+				return new TemplateBuilderTypePrompt();
+			}
+			return null;
+		}
+	}
+
+	private static class TextBuilderPrompt extends Prompt {
+
+		private Text text;
+		private InternalClickAction<?> click;
+		private InternalHoverAction<?> hover;
+		private String value;
+
+		public TextBuilderPrompt(Text text, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
+			this(TextTemplate.of(Text.of("Please input a " + value + ":", TextColors.GRAY)));
+			this.text = text;
+			this.hover = hover;
+			this.click = click;
+			this.value = value;
+		}
+
+		public TextBuilderPrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of("ERROR: This should not have triggered!", TextColors.DARK_RED);
+		}
+
+		public void apply(ConversationContext context) {
+			FormatBuilder builder = context.getData("builder");
+			Text.Builder t = text.toBuilder();
+			click.applyTo(t);
+			hover.applyTo(t);
+			builder = builder.withText(t.build());
+			context.putData("builder", builder);
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			switch (value) {
+			case "text":
+				this.text = TextSerializers.FORMATTING_CODE.deserialize(text);
+				return new TextTypePrompt(this);
+			case "click":
+				Class<?> clickType = InternalClickAction.SuggestTemplate.class;
+				if (text.toLowerCase().startsWith("run:")) {
+					clickType = InternalClickAction.RunTemplate.class;
+					text = text.substring(4);
+				}
+				if (text.toLowerCase().startsWith("suggest:")) {
+					text = text.substring(8);
+				}
+				if (text.toLowerCase().startsWith("url:")) {
+					clickType = InternalClickAction.UrlTemplate.class;
+					text = text.substring(4);
+				}
+				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
+				return new TextTypePrompt(this);
+			case "hover":
+				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))
+						.build(InternalHoverAction.ShowTemplate.class);
+				return new TextTypePrompt(this);
+			}
+			return this;
+		}
+
+	}
+
 }

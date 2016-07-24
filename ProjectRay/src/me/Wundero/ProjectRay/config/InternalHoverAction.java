@@ -74,7 +74,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		return new ActionBuilder<T>();
 	}
 
-	protected static class ActionBuilder<R> {
+	public static class ActionBuilder<R> {
 		@SuppressWarnings("unchecked")
 		public InternalHoverAction<R> build(Class<?> type) {
 			switch (type.getSimpleName()) {

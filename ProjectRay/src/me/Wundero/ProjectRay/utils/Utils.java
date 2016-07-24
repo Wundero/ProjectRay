@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -76,9 +77,28 @@ public class Utils {
 	public static final String S = "";
 	public static final Pattern URL_PATTERN = Pattern
 			.compile("((?:(?:https?)://)?[\\w-_\\.]{2,})\\.([a-zA-Z]{2,}(?:/\\S+)?)");
+	public static final Pattern VAR_PATTERN = Pattern.compile("[{][^{}]+[}]");
 
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
+	}
+
+	public static TextTemplate parse(String in, boolean allowColors) {
+		if (!allowColors) {
+			in = strip(in);
+		}
+		if (!VAR_PATTERN.matcher(in).find()) {
+			return TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(in));
+		}
+		String[] textParts = in.split(VAR_PATTERN.pattern());
+		Matcher matcher = VAR_PATTERN.matcher(in);
+		matcher.find();
+		TextTemplate out = TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[0]));
+		for (int i = 0; i < matcher.groupCount(); i++) {
+			out = out.concat(TextTemplate.of(TextTemplate.arg(matcher.group(i))));
+			out = out.concat(TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[i + 1])));
+		}
+		return out;
 	}
 
 	public static InternalClickAction<?> urlTemplate(TextTemplate t) {

@@ -66,7 +66,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		return new ActionBuilder<T>();
 	}
 
-	protected static class ActionBuilder<R> {
+	public static class ActionBuilder<R> {
 		@SuppressWarnings("unchecked")
 		public InternalClickAction<R> build(Class<?> type) {
 			switch (type.getSimpleName()) {
