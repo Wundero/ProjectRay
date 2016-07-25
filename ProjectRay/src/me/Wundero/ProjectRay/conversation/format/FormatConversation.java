@@ -57,19 +57,34 @@ public class FormatConversation {
 
 	public static void start(Player player) {
 		if (!player.hasPermission("ray.formatbuilder")) {
-			player.sendMessage(Text.of("You do not have permission to do this!", TextColors.RED));
+			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));
 			return;
 		}
+		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ", TextColors.GREEN,
+				"You can cancel at any time by typing \"exit\"."));
 		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(false)
-				.withPrefix(Text.of("[Formats]", TextColors.AQUA)).withCanceller(ConversationCanceller.DEFAULT)
-				.withFirstPrompt(new WorldPrompt()).build(player);
+				.withPrefix(Text.of(TextColors.AQUA, "[Formats]")).withCanceller(new ConversationCanceller() {
+
+					@Override
+					public boolean shouldCancel(ConversationContext context, String input) {
+						return input.toLowerCase().trim().equals("exit");
+					}
+
+					@Override
+					public void onCancel(ConversationContext context) {
+						ConfigurationNode node = context.getData("wipable node");
+						node.getParent().removeChild(node.getKey());
+					}
+
+				}).withFirstPrompt(new WorldPrompt()).build(player);
 		convo.start();
 	}
 
 	private static class WorldPrompt extends Prompt {
 
 		public WorldPrompt() {
-			this(TextTemplate.of(Text.of("Choose a world: ", TextColors.GRAY), TextTemplate.arg("options").build()));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose a world: "),
+					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
 		public WorldPrompt(TextTemplate template) {
@@ -84,13 +99,17 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Lists.newArrayList();
-			options.add(new Option("all", Text.of("all", TextColors.GOLD, TextActions.runCommand("all"),
-					TextActions.showText(Text.of("Click to choose all!", TextColors.AQUA))), "all"));
+			options.add(new Option("all",
+					Text.builder("all").color(TextColors.GOLD).onClick(TextActions.runCommand("all"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to choose all!"))).build(),
+					"all"));
 			for (World world : Sponge.getServer().getWorlds()) {
 				options.add(new Option(world.getName(),
-						Text.of(world.getName(), TextColors.GOLD, TextActions.runCommand(world.getName()),
-								TextActions.showText(
-										Text.of("Click to choose " + world.getName() + "!", TextColors.AQUA))),
+						Text.builder(world.getName()).color(TextColors.GOLD)
+								.onClick(TextActions.runCommand(world.getName()))
+								.onHover(TextActions
+										.showText(Text.of(TextColors.AQUA, "Click to choose " + world.getName() + "!")))
+								.build(),
 						world.getName()));
 			}
 			return Optional.of(options);
@@ -98,7 +117,7 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(failedInput + " is not a valid world!", TextColors.RED);
+			return Text.of(TextColors.RED, failedInput + " is not a valid world!");
 		}
 
 		@Override
@@ -114,7 +133,8 @@ public class FormatConversation {
 	private static class GroupPrompt extends Prompt {
 
 		public GroupPrompt() {
-			this(TextTemplate.of(Text.of("Choose a group: ", TextColors.GRAY), TextTemplate.arg("options").build()));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose a group: "),
+					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
 		public GroupPrompt(TextTemplate template) {
@@ -131,8 +151,9 @@ public class FormatConversation {
 			List<Option> options = Lists.newArrayList();
 			for (String g : Ray.get().getGroups().getGroups(context.getData("world").toString()).keySet()) {
 				options.add(new Option(g,
-						Text.of(g, TextColors.GOLD, TextActions.runCommand(g),
-								TextActions.showText(Text.of("Click to select " + g + "!", TextColors.AQUA))),
+						Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
+								.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!")))
+								.build(),
 						Ray.get().getGroups().getGroup(g, context.getData("world").toString())));
 			}
 			return Optional.of(options);
@@ -140,7 +161,7 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(failedInput + " is not a valid group!", TextColors.RED);
+			return Text.of(TextColors.RED, failedInput + " is not a valid group!");
 		}
 
 		@Override
@@ -156,7 +177,7 @@ public class FormatConversation {
 	private static class NamePrompt extends Prompt {
 
 		public NamePrompt() {
-			this(TextTemplate.of(Text.of("Choose a name for your format:", TextColors.GRAY)));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose a name for your format:")));
 		}
 
 		public NamePrompt(TextTemplate template) {
@@ -186,14 +207,16 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(failedInput + " already exists!", TextColors.RED);
+			return Text.of(TextColors.RED, failedInput + " already exists!");
 		}
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node2 = node;
 			node = node.getNode(text.toLowerCase().trim());
 			context.putData("node", node);
+			context.putData("wipable node", node2);
 			context.putData("name", text);
 			return new ShouldDoTypePrompt();
 		}
@@ -203,9 +226,10 @@ public class FormatConversation {
 	private static class ShouldDoTypePrompt extends Prompt {
 
 		public ShouldDoTypePrompt() {
-			this(TextTemplate.of(Text.of("Would you like to specify a type? ", TextColors.GRAY, "[✓]", TextColors.GREEN,
-					TextActions.runCommand("y"), " | ", TextColors.GRAY, "[✕]", TextColors.RED,
-					TextActions.runCommand("n"))));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Would you like to specify a type? "),
+					Text.builder("[✓]").color(TextColors.GREEN).onClick(TextActions.runCommand("y")),
+					Text.of(TextColors.GRAY, " | "),
+					Text.builder("[✕]").color(TextColors.RED).onClick(TextActions.runCommand("n"))));
 		}
 
 		public ShouldDoTypePrompt(TextTemplate template) {
@@ -256,7 +280,7 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of("That is not a valid input! Try yes or no.", TextColors.RED);
+			return Text.of(TextColors.RED, "That is not a valid input! Try yes or no.");
 		}
 
 		@Override
@@ -274,7 +298,8 @@ public class FormatConversation {
 	private static class TypePrompt extends Prompt {
 
 		public TypePrompt() {
-			this(TextTemplate.of(Text.of("Please select a type: ", TextColors.GRAY), TextTemplate.arg("options")));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please select a type: "),
+					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
 		public TypePrompt(TextTemplate template) {
@@ -293,20 +318,21 @@ public class FormatConversation {
 				if (type == FormatType.DEFAULT) {
 					continue;
 				}
-				options.add(new Option(type.getName(),
-						Text.of(type.getName().toLowerCase().replace("_", " "), TextColors.GOLD,
-								TextActions.runCommand(type.getName().toLowerCase().replace("_", " ")),
-								TextActions.showText(Text.of(
-										"Click here to select " + type.getName().toLowerCase().replace("_", " ") + "!",
-										TextColors.AQUA))),
-						type));
+				options.add(
+						new Option(type.getName(),
+								Text.builder(type.getName().toLowerCase().replace("_", " ")).color(TextColors.GOLD)
+										.onClick(TextActions.runCommand(type.getName().toLowerCase().replace("_", " ")))
+										.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select "
+												+ type.getName().toLowerCase().replace("_", " ") + "!")))
+										.build(),
+								type));
 			}
 			return Optional.of(options);
 		}
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(failedInput + " is not a valid format type!", TextColors.RED);
+			return Text.of(TextColors.RED, failedInput + " is not a valid format type!");
 		}
 
 		@Override
@@ -322,8 +348,8 @@ public class FormatConversation {
 	private static class TemplateBuilderTypePrompt extends Prompt {
 
 		public TemplateBuilderTypePrompt() {
-			this(TextTemplate.of(Text.of("Choose an element to add: ", TextColors.GRAY),
-					TextTemplate.arg("options").build()));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add, or type \"done\" to finish: "),
+					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
 		public TemplateBuilderTypePrompt(TextTemplate template) {
@@ -343,22 +369,18 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Lists.newArrayList();
-			options.add(
-					new Option("arg",
-							Text.of("argument", TextColors.GOLD, TextActions.runCommand("arg"),
-									TextActions.showText(Text.of("Click this to select argument!", TextColors.AQUA))),
-							"arg"));
-			options.add(
-					new Option("text",
-							Text.of("text", TextColors.GOLD, TextActions.runCommand("text"),
-									TextActions.showText(Text.of("Click this to select text!", TextColors.AQUA))),
-							"text"));
+			Text t1 = Text.builder("argument").color(TextColors.GOLD).onClick(TextActions.runCommand("arg"))
+					.onHover(TextActions.showText(Text.of("Click this to select argument!", TextColors.AQUA))).build();
+			Text t2 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
+					.onHover(TextActions.showText(Text.of("Click this to select text!", TextColors.AQUA))).build();
+			options.add(new Option("arg", t1, "arg"));
+			options.add(new Option("text", t2, "text"));
 			return Optional.of(options);
 		}
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of("You must choose one of the options!", TextColors.RED);
+			return Text.of(TextColors.RED, "You must choose one of the options, or type \"done\" to finish!");
 		}
 
 		@Override
@@ -373,7 +395,8 @@ public class FormatConversation {
 			Group group = context.getData("group");
 			group.addFormat(format);
 			context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
-					.concat(Text.of("Format " + context.getData("name") + " successfully created!", TextColors.GREEN)));
+					.concat(Text.of(TextColors.GREEN, "Format " + context.getData("name") + " successfully created!")));
+			Ray.get().getPlugin().save();
 			return null;
 		}
 	}
@@ -388,8 +411,8 @@ public class FormatConversation {
 		}
 
 		public ArgTypePrompt() {
-			this(TextTemplate.of(Text.of("Choose an element to add: ", TextColors.GRAY),
-					TextTemplate.arg("options").build()));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add: "),
+					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
 		public ArgTypePrompt(TextTemplate template) {
@@ -409,27 +432,25 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Lists.newArrayList();
-			options.add(new Option("key",
-					Text.of("argument", TextColors.GOLD, TextActions.runCommand("key"),
-							TextActions.showText(
-									Text.of("Click this to select key (creates a new argument)!", TextColors.AQUA))),
-					"key"));
 			options.add(
-					new Option("click",
-							Text.of("click", TextColors.GOLD, TextActions.runCommand("click"),
-									TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))),
-							"click"));
-			options.add(
-					new Option("hover",
-							Text.of("click", TextColors.GOLD, TextActions.runCommand("hover"),
-									TextActions.showText(Text.of("Click this to select hover!", TextColors.AQUA))),
-							"hover"));
+					new Option("key",
+							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
+									.onHover(TextActions.showText(Text
+											.of("Click this to select key (creates a new argument)!", TextColors.AQUA)))
+									.build(),
+							"key"));
+			Text t2 = Text.builder("click").color(TextColors.GOLD).onClick(TextActions.runCommand("click"))
+					.onHover(TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))).build();
+			Text t3 = Text.builder("hover").color(TextColors.GOLD).onClick(TextActions.runCommand("hover"))
+					.onHover(TextActions.showText(Text.of("Click this to select hover!", TextColors.AQUA))).build();
+			options.add(new Option("click", t2, "click"));
+			options.add(new Option("hover", t3, "hover"));
 			return Optional.of(options);
 		}
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of("You must choose one of the options!", TextColors.RED);
+			return Text.of(TextColors.RED, "You must choose one of the options!");
 		}
 
 		@Override
@@ -444,7 +465,7 @@ public class FormatConversation {
 			case "hover":
 				if (p == null) {
 					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
-							.concat(Text.of("You must choose a key first!", TextColors.RED)));
+							.concat(Text.of(TextColors.RED, "You must choose a key first!")));
 					return this;
 				}
 				p.value = text.toLowerCase().trim();
@@ -467,7 +488,7 @@ public class FormatConversation {
 		private String value;
 
 		public ArgBuilderPrompt(String key, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
-			this(TextTemplate.of(Text.of("Please input a " + value + ":", TextColors.GRAY)));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please input a " + value + ":")));
 			this.key = key;
 			this.hover = hover;
 			this.click = click;
@@ -490,7 +511,8 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of("ERROR: This should not have triggered!", TextColors.DARK_RED);
+			return Text.of(TextColors.DARK_RED,
+					"ERROR: This should not have triggered! Please report this, including the input: " + failedInput);
 		}
 
 		public void apply(ConversationContext context) {
@@ -540,8 +562,8 @@ public class FormatConversation {
 		}
 
 		public TextTypePrompt() {
-			this(TextTemplate.of(Text.of("Choose an element to add: ", TextColors.GRAY),
-					TextTemplate.arg("options").build()));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add: "),
+					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
 		public TextTypePrompt(TextTemplate template) {
@@ -561,28 +583,23 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Lists.newArrayList();
-			options.add(
-					new Option("text",
-							Text.of("text", TextColors.GOLD,
-									TextActions.runCommand("text"), TextActions.showText(Text
-											.of("Click this to select text (creates a new text)!", TextColors.AQUA))),
-							"text"));
-			options.add(
-					new Option("click",
-							Text.of("click", TextColors.GOLD, TextActions.runCommand("click"),
-									TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))),
-							"click"));
-			options.add(
-					new Option("hover",
-							Text.of("click", TextColors.GOLD, TextActions.runCommand("hover"),
-									TextActions.showText(Text.of("Click this to select hover!", TextColors.AQUA))),
-							"hover"));
+			Text t1 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
+					.onHover(TextActions
+							.showText(Text.of("Click this to select text (creates a new text)!", TextColors.AQUA)))
+					.build();
+			Text t2 = Text.builder("click").color(TextColors.GOLD).onClick(TextActions.runCommand("click"))
+					.onHover(TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))).build();
+			Text t3 = Text.builder("hover").color(TextColors.GOLD).onClick(TextActions.runCommand("hover"))
+					.onHover(TextActions.showText(Text.of("Click this to select hover!", TextColors.AQUA))).build();
+			options.add(new Option("text", t1, "text"));
+			options.add(new Option("click", t2, "click"));
+			options.add(new Option("hover", t3, "hover"));
 			return Optional.of(options);
 		}
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of("You must choose one of the options!", TextColors.RED);
+			return Text.of(TextColors.RED, "You must choose one of the options!");
 		}
 
 		@Override
@@ -597,7 +614,7 @@ public class FormatConversation {
 			case "hover":
 				if (p == null) {
 					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
-							.concat(Text.of("You must input some text first!", TextColors.RED)));
+							.concat(Text.of(TextColors.RED, "You must input some text first!")));
 					return this;
 				}
 				p.value = text.toLowerCase().trim();
@@ -620,7 +637,7 @@ public class FormatConversation {
 		private String value;
 
 		public TextBuilderPrompt(Text text, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
-			this(TextTemplate.of(Text.of("Please input a " + value + ":", TextColors.GRAY)));
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please input a " + value + ":")));
 			this.text = text;
 			this.hover = hover;
 			this.click = click;
@@ -643,7 +660,8 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of("ERROR: This should not have triggered!", TextColors.DARK_RED);
+			return Text.of(TextColors.DARK_RED,
+					"ERROR: This should not have triggered! Please report this, including the input: " + failedInput);
 		}
 
 		public void apply(ConversationContext context) {

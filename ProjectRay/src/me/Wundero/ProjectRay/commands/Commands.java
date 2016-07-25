@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.ProjectRay.commands;
 /*
  The MIT License (MIT)
 
@@ -23,32 +23,31 @@ package me.Wundero.ProjectRay.conversation;
  SOFTWARE.
  */
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 
-public abstract class ConversationCanceller {
-	public abstract boolean shouldCancel(ConversationContext context, String input);
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.text.Text;
 
-	public abstract void onCancel(ConversationContext context);
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-	public final boolean checkCancel(Conversation convo, String input) {
-		if (shouldCancel(convo.getContext(), input)) {
-			onCancel(convo.getContext());
-			convo.cancel(Optional.of(this));
-			return true;
-		}
-		return false;
+public class Commands {
+
+	private static Map<List<String>, CommandCallable> children = Maps.newHashMap();
+	static {
+		children.put(Lists.newArrayList("format", "formatbuilder"),
+				CommandSpec.builder().permission("ray.formatbuilder").description(Text.of("Create a new format."))
+						.executor(new FormatConversationCommand()).build());
 	}
 
-	public static final ConversationCanceller DEFAULT = new ConversationCanceller() {
+	public static Map<List<String>, ? extends CommandCallable> getChildren() {
+		return children;
+	}
 
-		@Override
-		public boolean shouldCancel(ConversationContext context, String input) {
-			return input.toLowerCase().trim().equals("exit");
-		}
-
-		@Override
-		public void onCancel(ConversationContext context) {
-		}
-
-	};
+	public static CommandExecutor getExecutor() {
+		return new RayCommand();
+	}
 }

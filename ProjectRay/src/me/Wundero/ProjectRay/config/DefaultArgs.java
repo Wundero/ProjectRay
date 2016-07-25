@@ -31,8 +31,7 @@ import me.Wundero.ProjectRay.utils.Utils;
 
 public class DefaultArgs {
 	public static final DefaultArg DISPLAYNAME = new DefaultArg("displayname",
-			Utils.suggestTemplate(
-					TextTemplate.of("/msg ", TextTemplate.arg("displayname").color(TextColors.GRAY).build(), " ")),
+			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
 			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
 					TextTemplate.arg("displayname").color(TextColors.GRAY).build(), "\n",
 					Text.builder("Say hello!").color(TextColors.AQUA).build())));

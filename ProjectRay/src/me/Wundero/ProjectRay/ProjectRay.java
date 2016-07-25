@@ -8,15 +8,19 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
+import me.Wundero.ProjectRay.commands.Commands;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.config.Template;
@@ -139,8 +143,12 @@ public class ProjectRay {
 		}
 	}
 
+	public synchronized void save() {
+		saveConfig();
+	}
+
 	@Listener
-	public void onStart(GameStartedServerEvent event) {
+	public void onStart(GameInitializationEvent event) {
 		loadConfig();
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
@@ -150,6 +158,13 @@ public class ProjectRay {
 		} else {
 			Ray.get().setGroups(new Groups(f));
 		}
+	}
+
+	@Listener
+	public void registerCommandEvent(GameStartingServerEvent event) {
+		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
+				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();
+		Sponge.getCommandManager().register(this, myCommandSpec, "ray", "projectray");
 	}
 
 	@Listener

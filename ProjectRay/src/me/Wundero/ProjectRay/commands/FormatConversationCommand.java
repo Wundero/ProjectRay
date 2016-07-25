@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.ProjectRay.commands;
 /*
  The MIT License (MIT)
 
@@ -23,32 +23,27 @@ package me.Wundero.ProjectRay.conversation;
  SOFTWARE.
  */
 
-import java.util.Optional;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
-public abstract class ConversationCanceller {
-	public abstract boolean shouldCancel(ConversationContext context, String input);
+import me.Wundero.ProjectRay.conversation.format.FormatConversation;
 
-	public abstract void onCancel(ConversationContext context);
+public class FormatConversationCommand implements CommandExecutor {
 
-	public final boolean checkCancel(Conversation convo, String input) {
-		if (shouldCancel(convo.getContext(), input)) {
-			onCancel(convo.getContext());
-			convo.cancel(Optional.of(this));
-			return true;
+	@Override
+	public CommandResult execute(CommandSource source, CommandContext arguments) throws CommandException {
+		if (!(source instanceof Player)) {
+			source.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
 		}
-		return false;
+		Player player = (Player) source;
+		FormatConversation.start(player);
+		return CommandResult.success();
 	}
 
-	public static final ConversationCanceller DEFAULT = new ConversationCanceller() {
-
-		@Override
-		public boolean shouldCancel(ConversationContext context, String input) {
-			return input.toLowerCase().trim().equals("exit");
-		}
-
-		@Override
-		public void onCancel(ConversationContext context) {
-		}
-
-	};
 }
