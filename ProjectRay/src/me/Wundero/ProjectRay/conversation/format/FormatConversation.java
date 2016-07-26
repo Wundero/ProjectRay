@@ -62,7 +62,7 @@ public class FormatConversation {
 		}
 		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ", TextColors.GREEN,
 				"You can cancel at any time by typing \"exit\"."));
-		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(false)
+		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(true)
 				.withPrefix(Text.of(TextColors.AQUA, "[Formats]")).withCanceller(new ConversationCanceller() {
 
 					@Override
@@ -72,8 +72,14 @@ public class FormatConversation {
 
 					@Override
 					public void onCancel(ConversationContext context) {
+						if (!context.hasData("wipable node")) {
+							return;
+						}
 						ConfigurationNode node = context.getData("wipable node");
-						node.getParent().removeChild(node.getKey());
+						if (node != null) {
+							Ray.get().getLogger().info("node wiping name: " + node.getKey().toString());
+							node.getParent().removeChild(node.getKey());
+						}
 					}
 
 				}).withFirstPrompt(new WorldPrompt()).build(player);
@@ -213,10 +219,9 @@ public class FormatConversation {
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			ConfigurationNode node = context.getData("node");
-			ConfigurationNode node2 = node;
 			node = node.getNode(text.toLowerCase().trim());
 			context.putData("node", node);
-			context.putData("wipable node", node2);
+			context.putData("wipable node", node.getParent().getNode(node.getKey()));
 			context.putData("name", text);
 			return new ShouldDoTypePrompt();
 		}
@@ -227,9 +232,9 @@ public class FormatConversation {
 
 		public ShouldDoTypePrompt() {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Would you like to specify a type? "),
-					Text.builder("[✓]").color(TextColors.GREEN).onClick(TextActions.runCommand("y")),
+					Text.builder("[" + '\u2713' + "]").color(TextColors.GREEN).onClick(TextActions.runCommand("y")),
 					Text.of(TextColors.GRAY, " | "),
-					Text.builder("[✕]").color(TextColors.RED).onClick(TextActions.runCommand("n"))));
+					Text.builder("[" + '\u2715' + "]").color(TextColors.RED).onClick(TextActions.runCommand("n"))));
 		}
 
 		public ShouldDoTypePrompt(TextTemplate template) {
@@ -369,11 +374,11 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Lists.newArrayList();
-			Text t1 = Text.builder("argument").color(TextColors.GOLD).onClick(TextActions.runCommand("arg"))
-					.onHover(TextActions.showText(Text.of("Click this to select argument!", TextColors.AQUA))).build();
+			Text t1 = Text.builder("variable").color(TextColors.GOLD).onClick(TextActions.runCommand("variable"))
+					.onHover(TextActions.showText(Text.of("Click this to select variable!", TextColors.AQUA))).build();
 			Text t2 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
 					.onHover(TextActions.showText(Text.of("Click this to select text!", TextColors.AQUA))).build();
-			options.add(new Option("arg", t1, "arg"));
+			options.add(new Option("variable", t1, "variable"));
 			options.add(new Option("text", t2, "text"));
 			return Optional.of(options);
 		}
@@ -385,7 +390,7 @@ public class FormatConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			if (text.equals("arg")) {
+			if (text.equals("variable")) {
 				return new ArgTypePrompt();
 			}
 			if (text.equals("text")) {
@@ -436,7 +441,7 @@ public class FormatConversation {
 					new Option("key",
 							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
 									.onHover(TextActions.showText(Text
-											.of("Click this to select key (creates a new argument)!", TextColors.AQUA)))
+											.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
 									.build(),
 							"key"));
 			Text t2 = Text.builder("click").color(TextColors.GOLD).onClick(TextActions.runCommand("click"))
@@ -462,6 +467,8 @@ public class FormatConversation {
 				}
 				return new ArgBuilderPrompt(null, null, null, "key");
 			case "click":
+				text = text
+						+ " (put url:, run:, or suggest: in front of the click to change it's type (default is suggest))";
 			case "hover":
 				if (p == null) {
 					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
@@ -488,7 +495,7 @@ public class FormatConversation {
 		private String value;
 
 		public ArgBuilderPrompt(String key, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
-			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please input a " + value + ":")));
+			this(null);
 			this.key = key;
 			this.hover = hover;
 			this.click = click;
@@ -501,7 +508,7 @@ public class FormatConversation {
 
 		@Override
 		public Text getQuestion(ConversationContext context) {
-			return formatTemplate(context);
+			return Text.of(TextColors.GRAY, "Please input a " + value + ":");
 		}
 
 		@Override
@@ -611,6 +618,8 @@ public class FormatConversation {
 				}
 				return new TextBuilderPrompt(null, null, null, "text");
 			case "click":
+				text = text
+						+ " (put url:, run:, or suggest: in front of the click to change it's type (default is suggest))";
 			case "hover":
 				if (p == null) {
 					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
@@ -667,8 +676,12 @@ public class FormatConversation {
 		public void apply(ConversationContext context) {
 			FormatBuilder builder = context.getData("builder");
 			Text.Builder t = text.toBuilder();
-			click.applyTo(t);
-			hover.applyTo(t);
+			if (click != null) {
+				click.applyTo(t);
+			}
+			if (hover != null) {
+				hover.applyTo(t);
+			}
 			builder = builder.withText(t.build());
 			context.putData("builder", builder);
 		}

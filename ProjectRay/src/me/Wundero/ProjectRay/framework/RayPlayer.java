@@ -74,6 +74,7 @@ public class RayPlayer {
 	private User user;
 	private UUID uuid;
 	private Map<String, Group> groups;
+	private Optional<RayPlayer> lastMessaged = Optional.empty();
 
 	public RayPlayer(User u) {
 		this.setUser(u);
@@ -149,5 +150,26 @@ public class RayPlayer {
 		if (conversing) {
 			user.getPlayer().get().setMessageChannel(MessageChannel.TO_NONE);
 		}
+	}
+
+	/**
+	 * @return the lastMessaged
+	 */
+	public Optional<RayPlayer> getLastMessaged() {
+		return lastMessaged;
+	}
+
+	/**
+	 * @param lastMessaged
+	 *            the lastMessaged to set
+	 */
+	public void setLastMessaged(Optional<RayPlayer> lastMessaged, boolean recurse) {
+		if (!lastMessaged.isPresent()) {
+			return;
+		}
+		if (recurse) {
+			lastMessaged.get().setLastMessaged(Optional.of(this), false);
+		}
+		this.lastMessaged = lastMessaged;
 	}
 }

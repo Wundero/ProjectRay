@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -21,6 +22,8 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
 import me.Wundero.ProjectRay.commands.Commands;
+import me.Wundero.ProjectRay.commands.MessageCommand;
+import me.Wundero.ProjectRay.commands.ReplyCommand;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.config.Template;
@@ -165,6 +168,17 @@ public class ProjectRay {
 		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
 				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();
 		Sponge.getCommandManager().register(this, myCommandSpec, "ray", "projectray");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().permission("ray.message").description(Text.of("Message a player."))
+						.arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of("player"))),
+								GenericArguments.remainingJoinedStrings(Text.of("message")))
+						.executor(new MessageCommand()).build(),
+				"m", "msg", "message", "w", "whisper", "t", "tell");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().permission("ray.message").description(Text.of("Reply to a player."))
+						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
+						.executor(new ReplyCommand()).build(),
+				"r", "reply");
 	}
 
 	@Listener

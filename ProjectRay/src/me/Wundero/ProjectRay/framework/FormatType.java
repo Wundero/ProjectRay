@@ -27,18 +27,29 @@ import java.util.regex.Pattern;
  */
 public enum FormatType {
 
-	CHAT("chat", new String[] { "c" }), MESSAGE("message", new String[] { "m", "msg" }), DEATH("death",
-			new String[] { "d" }), JOIN("join", new String[] { "j" }), LEAVE("leave",
-					new String[] { "l" }), CUSTOM("custom"), WELCOME("welcome", new String[] { "w" }), MOTD("motd",
-							new String[] {}), ANNOUNCEMENT("announcement", new String[] { "a" }), TABLIST_ENTRY(
-									"tablist", new String[] { "list", "t", "tab" }), TABLIST_HEADER("header",
-											new String[] {}), TABLIST_FOOTER("footer", new String[] {}), DEFAULT(
-													"default"), ACHIEVEMENT("achievement"), KICK("kick");
+	CHAT("chat", new String[] { "c" }), MESSAGE_SEND("send_message",
+			new String[] { "sm", "smsg", "sendmsg" }), MESSAGE_RECEIVE("receive_message",
+					new String[] { "rm", "rmsg", "receivemsg" }), DEATH("death", new String[] { "d" }), JOIN("join",
+							new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM("custom"), WELCOME(
+									"welcome", new String[] { "w" }), MOTD("motd", new String[] {}), ANNOUNCEMENT(
+											"announcement", new String[] { "a" }), TABLIST_ENTRY("tablist",
+													new String[] { "list", "t", "tab" }), TABLIST_HEADER("header",
+															new String[] {}), TABLIST_FOOTER("footer",
+																	new String[] {}), DEFAULT("default"), ACHIEVEMENT(
+																			"achievement"), KICK("kick");
 
-	// Perhaps actionbar/scoreboard/bossbar/title/tab (name header and
-	// footer)/item names/block gui names/other random text stuff
-	// all these could be animated
-	// also perhaps serverlist message (not anim)
+	// Done format types:
+	/*
+	 * chat-------------------------------------------------------------------
+	 * message_send-----------------------------------------------------------
+	 * message_receive--------------------------------------------------------
+	 * join-------------------------------------------------------------------
+	 * leave------------------------------------------------------------------
+	 * achievement------------------------------------------------------------
+	 * kick-------------------------------------------------------------------
+	 */
+
+	// TODO add more formats as seen fit
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);

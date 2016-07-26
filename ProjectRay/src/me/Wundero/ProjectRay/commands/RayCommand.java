@@ -54,7 +54,7 @@ public class RayCommand implements CommandExecutor {
 	}
 
 	private Text buildTextForCmd(CommandSource src, CommandCallable cmd, List<String> aliases) {
-		Text out = Text.of(TextColors.DARK_GREEN, "  /" + aliases.get(0), " ");
+		Text out = Text.of(TextColors.DARK_GREEN, "  /ray " + aliases.get(0), " ");
 		@SuppressWarnings("unchecked")
 		Optional<Text> opt = (Optional<Text>) cmd.getShortDescription(src);
 		out = out.concat(opt.orElse(Text.of(TextColors.GRAY, "Default command description")));

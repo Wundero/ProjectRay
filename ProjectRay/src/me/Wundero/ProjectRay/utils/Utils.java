@@ -166,7 +166,8 @@ public class Utils {
 	}
 
 	public static Text transIf(String s, User u) {
-		if (u.hasPermission("ray.color")) {
+
+		if (u == null || u.hasPermission("ray.color")) {
 			return TextSerializers.FORMATTING_CODE.deserialize(s);
 		} else {
 			return Text.of(s);

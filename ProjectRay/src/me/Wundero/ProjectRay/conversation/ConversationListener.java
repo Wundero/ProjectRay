@@ -23,13 +23,18 @@ package me.Wundero.ProjectRay.conversation;
  SOFTWARE.
  */
 
+import java.util.Optional;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
+
+import me.Wundero.ProjectRay.Ray;
 
 public abstract class ConversationListener {
 	private final Conversation conversation;
@@ -65,16 +70,21 @@ public abstract class ConversationListener {
 
 	@Listener
 	public final void internalchat(MessageChannelEvent.Chat event) {
+		Ray.get().getLogger().info("event in convo listener");
 		if (!conversation.isStarted()) {
 			return;
 		}
+		Ray.get().getLogger().info("convo is started");
 		Player p = null;
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
 		} else {
 			return;
 		}
+		Ray.get().getLogger().info("player not null");
 		if (conversation.getContext().getHolder().getUniqueId().equals(p.getUniqueId())) {
+			Ray.get().getLogger().info("cancelling msg event for conversation for player " + p.getName()
+					+ " with raw content: " + event.getRawMessage().toPlain());
 			event.setCancelled(true);
 			ConversationContext context = conversation.getContext();
 			String input = event.getRawMessage().toPlain();
@@ -93,6 +103,22 @@ public abstract class ConversationListener {
 				Prompt pr = conversation.getCurrentPrompt().input(context, input);
 				conversation.next(pr);
 			}
+		}
+	}
+
+	@Listener
+	public final void internalquit(ClientConnectionEvent.Disconnect event) {
+		if (!conversation.isStarted()) {
+			return;
+		}
+		Player p = null;
+		if (event.getCause().containsType(Player.class)) {
+			p = (Player) event.getCause().first(Player.class).get();
+		} else {
+			return;
+		}
+		if ((conversation.getContext().getHolder().getUniqueId().equals(p.getUniqueId()))) {
+			conversation.cancel(Optional.empty());
 		}
 	}
 

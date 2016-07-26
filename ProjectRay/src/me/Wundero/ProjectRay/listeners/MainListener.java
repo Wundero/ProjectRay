@@ -27,13 +27,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
@@ -55,6 +59,7 @@ import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayPlayer;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class MainListener {
 
@@ -106,11 +111,11 @@ public class MainListener {
 	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
 		Map<String, Object> vars = Maps.newHashMap();
-		vars.put("message", event.getRawMessage());
 		Player p = null;
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
 		}
+		vars.put("message", Utils.transIf(event.getRawMessage().toPlain(), p));
 		if (event.getCause().containsNamed("formattype")) {
 			event.setCancelled(handle(event.getCause().get("formattype", FormatType.class).get(), event, vars, p,
 					event.getChannel().get()));
@@ -137,6 +142,15 @@ public class MainListener {
 	}
 
 	@Listener
+	public void onCommand(SendCommandEvent event) {
+		String player = "";
+		if (event.getCause().containsType(CommandSource.class)) {
+			player = event.getCause().first(CommandSource.class).get().getName() + ": ";
+		}
+		Ray.get().getLogger().info(player + "/" + event.getCommand() + " " + event.getArguments());
+	}
+
+	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
 		Map<String, Object> vars = Maps.newHashMap();
 		event.setMessageCancelled(
@@ -150,6 +164,16 @@ public class MainListener {
 		}
 		Map<String, Object> vars = Maps.newHashMap();
 		Ray.get().getPlugin().getLogger().info("Cause: " + event.getCause().all());
+		Ray.get().getPlugin().getLogger().info("Plain message: " + event.getMessage().toPlain());
+		Ray.get().getPlugin().getLogger().info("Message json: " + event.getMessage().toString());
+		String parsefrom = event.getMessage().toString();
+		Pattern typepat = Pattern.compile("SpongeTranslation\\{id=death\\.[a-zA-Z0-9\\.]+\\}");
+		Matcher m = typepat.matcher(parsefrom);
+		m.find();
+		String deathtype = m.group(0);
+		deathtype = deathtype.substring("SpongeTranslation{id=death.".length());
+		deathtype = deathtype.substring(0, deathtype.length() - 1);
+		Ray.get().getLogger().info("death type: " + deathtype);
 		event.setMessageCancelled(
 				handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(), event.getChannel().get()));
 	}

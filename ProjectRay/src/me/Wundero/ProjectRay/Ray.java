@@ -149,6 +149,26 @@ public class Ray {
 
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender, boolean isRecip,
 			Optional<Format> formatUsed, boolean useClickHover) {
+		if (sender == null) {
+			getLogger().warn("var call sender null.");
+			return known;
+		}
+		if (template == null) {
+			String s = formatUsed.isPresent() ? " with format " + formatUsed.get().getName() : "";
+			getLogger().warn("Template for call on " + sender.getName() + s + " failed as template was null.");
+			if (formatUsed.isPresent()) {
+				TextTemplate t2 = formatUsed.get().getTemplate();
+				getLogger()
+						.warn("Template for format: " + (t2 == null ? "null" : "not null: " + t2.toText().toPlain()));
+				if (t2 != null) {
+					template = t2;
+				} else {
+					return known;
+				}
+			} else {
+				return known;
+			}
+		}
 		Map<String, Object> out = Maps.newHashMap();
 		for (String key : known.keySet()) {
 			if (template.getArguments().containsKey(key)) {

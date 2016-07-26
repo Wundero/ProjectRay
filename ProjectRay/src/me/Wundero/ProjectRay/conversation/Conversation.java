@@ -34,6 +34,8 @@ import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.collect.Lists;
 
+import me.Wundero.ProjectRay.Ray;
+
 public abstract class Conversation {
 	private Prompt currentPrompt;
 	private ConversationListener listener;
@@ -55,6 +57,7 @@ public abstract class Conversation {
 		}
 		context.getHolder().setMessageChannel(channelNew);
 		context.getHolder().sendMessage(prefix.concat(currentPrompt.getQuestion(context)));
+		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), listener);
 		context.putData("conversation", this);
 		return true;
 	}
@@ -81,6 +84,7 @@ public abstract class Conversation {
 						canceller))) {
 			return false;
 		}
+		Sponge.getEventManager().unregisterListeners(listener);
 		context.getHolder().setMessageChannel(context.getOriginal());
 		started = false;
 		return true;
@@ -91,6 +95,7 @@ public abstract class Conversation {
 				Cause.source(context.getPlugin()).named(NamedCause.of("conversation", this)).build(), context))) {
 			return false;
 		}
+		Sponge.getEventManager().unregisterListeners(listener);
 		context.getHolder().setMessageChannel(context.getOriginal());
 		started = false;
 		return true;

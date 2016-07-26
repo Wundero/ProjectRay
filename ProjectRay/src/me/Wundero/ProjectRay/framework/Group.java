@@ -64,6 +64,9 @@ public class Group {
 	public void addFormat(Format format) {
 		FormatType type = format.getType();
 		List<Format> f = formats.get(type);
+		if (f == null) {
+			f = Lists.newArrayList();
+		}
 		f.add(format);
 		formats.put(type, f);
 	}
