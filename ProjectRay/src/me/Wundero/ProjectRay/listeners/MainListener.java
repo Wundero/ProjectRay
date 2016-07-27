@@ -27,8 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -85,7 +83,6 @@ public class MainListener {
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
-				Ray.get().getLogger().info("Original message: " + original.toPlain());
 				if (recipient instanceof Player) {
 					args.putAll(Ray.get().setVars(args, template, (Player) recipient, true, Optional.of(f), true));
 				} else {
@@ -141,6 +138,7 @@ public class MainListener {
 		}
 	}
 
+	// Logs ALL commands that are handled by the server
 	@Listener
 	public void onCommand(SendCommandEvent event) {
 		String player = "";
@@ -157,23 +155,14 @@ public class MainListener {
 				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
 
+	// TODO figure out way to customize messages - locale is retrivable so use
+	// translations?
 	@Listener
 	public void onDeath(DestructEntityEvent.Death event) {
 		if (!(event.getTargetEntity() instanceof Player)) {
 			return;
 		}
 		Map<String, Object> vars = Maps.newHashMap();
-		Ray.get().getPlugin().getLogger().info("Cause: " + event.getCause().all());
-		Ray.get().getPlugin().getLogger().info("Plain message: " + event.getMessage().toPlain());
-		Ray.get().getPlugin().getLogger().info("Message json: " + event.getMessage().toString());
-		String parsefrom = event.getMessage().toString();
-		Pattern typepat = Pattern.compile("SpongeTranslation\\{id=death\\.[a-zA-Z0-9\\.]+\\}");
-		Matcher m = typepat.matcher(parsefrom);
-		m.find();
-		String deathtype = m.group(0);
-		deathtype = deathtype.substring("SpongeTranslation{id=death.".length());
-		deathtype = deathtype.substring(0, deathtype.length() - 1);
-		Ray.get().getLogger().info("death type: " + deathtype);
 		event.setMessageCancelled(
 				handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(), event.getChannel().get()));
 	}
@@ -182,7 +171,7 @@ public class MainListener {
 	public void onKick(KickPlayerEvent event) {
 		Map<String, Object> vars = Maps.newHashMap();
 		event.setMessageCancelled(
-				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
+				handle(FormatType.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener

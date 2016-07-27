@@ -1,7 +1,5 @@
 package me.Wundero.ProjectRay.framework;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +46,12 @@ public class Group {
 	private String permission;
 	private ConfigurationNode config;
 	private String name;
-	private boolean isDir = false;
 	private boolean global = false;
-	private Path dir;
 
-	public Group(String world, ConfigurationNode config, Path directory, boolean global) {
+	public Group(String world, ConfigurationNode config, boolean global) {
 		this.setGlobal(global);
 		this.setWorld(world);
 		this.setConfig(config);
-		isDir = !(directory == null);
-		this.setDir(directory);
 		load();
 	}
 
@@ -104,30 +98,7 @@ public class Group {
 	}
 
 	private synchronized void loadFormats() {
-		if (!isDir) {
-			lf(config);
-		} else {
-			File fdir = new File(dir.toFile(), "formats");
-			if (!fdir.exists()) {
-				fdir.mkdirs();
-			}
-			if (fdir.isFile()) {
-				ConfigurationNode conf = Utils.load(fdir);
-				lf(conf);
-			} else {
-				for (File fil : fdir.listFiles()) {
-					Format f = new Format(Utils.load(fil));
-					FormatType type = f.getType();
-					if (!formats.containsKey(type)) {
-						formats.put(type, Lists.newArrayList(f));
-					} else {
-						List<Format> list = formats.get(type);
-						list.add(f);
-						formats.put(type, list);
-					}
-				}
-			}
-		}
+		lf(config);
 	}
 
 	public Format getFormat(FormatType type, int index) {
@@ -236,14 +207,6 @@ public class Group {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Path getDir() {
-		return dir;
-	}
-
-	public void setDir(Path dir) {
-		this.dir = dir;
 	}
 
 	public boolean isGlobal() {

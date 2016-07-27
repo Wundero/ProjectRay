@@ -140,7 +140,11 @@ public class ProjectRay {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
 				.setPath(getConfigPath()).build();
 		try {
-			loader.save(config);
+			// This will allow safe editing out of game while still saving in
+			// game changes (in game has priority)
+			ConfigurationNode toMerge = loader.load();
+			ConfigurationNode node2 = config.mergeValuesFrom(toMerge);
+			loader.save(node2);
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
@@ -155,12 +159,7 @@ public class ProjectRay {
 		loadConfig();
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
-		File f = new File(configDir.toFile(), "worlds");
-		if (!f.exists() || !f.isDirectory()) {
-			Ray.get().setGroups(new Groups(config.getNode("worlds")));
-		} else {
-			Ray.get().setGroups(new Groups(f));
-		}
+		Ray.get().setGroups(new Groups(config.getNode("worlds")));
 	}
 
 	@Listener

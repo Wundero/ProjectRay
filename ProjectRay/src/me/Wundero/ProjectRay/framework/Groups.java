@@ -23,7 +23,6 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -33,17 +32,13 @@ import org.spongepowered.api.world.World;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class Groups {
 	private Map<String, Map<String, Group>> groups = Maps.newHashMap();
 
 	public Groups(ConfigurationNode node) {
-		Ray.get().getPlugin().getLogger().info("1" + node.getKey().toString());
 		for (ConfigurationNode child : node.getChildrenMap().values()) {
-			Ray.get().getPlugin().getLogger().info("2" + child.getKey().toString());
 			boolean global = false;
 			String world = child.getKey().toString();
 			if (world.equalsIgnoreCase("all")) {
@@ -54,78 +49,58 @@ public class Groups {
 				String name = group.getKey().toString();
 				if (!this.groups.containsKey(world)) {
 					Map<String, Group> map = Maps.newHashMap();
-					map.put(name, new Group(world, group, null, global));
+					map.put(name, new Group(world, group, global));
 					this.groups.put(world, map);
 				} else {
 					Map<String, Group> map = this.groups.get(world);
-					map.put(name, new Group(world, group, null, global));
+					map.put(name, new Group(world, group, global));
 					this.groups.put(world, map);
 				}
 			}
 		}
 	}
 
-	public Groups(File path) {
-		if (path.exists() && path.isFile()) {
-			throw new IllegalArgumentException("Path is single file, use other constructor");
-		}
-		if (!path.exists()) {
-			path.mkdirs();
-		}
-		for (File f : path.listFiles()) {
-			if (!f.exists()) {
-				continue;
-			}
-			String world = f.getName();
-			boolean global = world.equalsIgnoreCase("all");
-			if (f.isFile()) {
-				ConfigurationNode groups = Utils.load(f).getNode("groups");
-				for (ConfigurationNode group : groups.getChildrenMap().values()) {
-					String name = group.getKey().toString();
-					if (!this.groups.containsKey(world)) {
-						Map<String, Group> map = Maps.newHashMap();
-						map.put(name, new Group(world, group, null, global));
-						this.groups.put(world, map);
-					} else {
-						Map<String, Group> map = this.groups.get(world);
-						map.put(name, new Group(world, group, null, global));
-						this.groups.put(world, map);
-					}
-				}
-			} else {
-				File f1 = new File(f, "groups");
-				if (f1.exists() && f1.isFile()) {
-					ConfigurationNode groups = Utils.load(f1).getNode("groups");
-					for (ConfigurationNode group : groups.getChildrenMap().values()) {
-						String name = group.getKey().toString();
-						if (!this.groups.containsKey(world)) {
-							Map<String, Group> map = Maps.newHashMap();
-							map.put(name, new Group(world, group, null, global));
-							this.groups.put(world, map);
-						} else {
-							Map<String, Group> map = this.groups.get(world);
-							map.put(name, new Group(world, group, null, global));
-							this.groups.put(world, map);
-						}
-					}
-				} else {
-					for (File g : f.listFiles()) {
-						String name = g.getName();
-						ConfigurationNode group = Utils.load(g);
-						if (!this.groups.containsKey(world)) {
-							Map<String, Group> map = Maps.newHashMap();
-							map.put(name, new Group(world, group, null, global));
-							this.groups.put(world, map);
-						} else {
-							Map<String, Group> map = this.groups.get(world);
-							map.put(name, new Group(world, group, null, global));
-							this.groups.put(world, map);
-						}
-					}
-				}
-			}
-		}
+	public Group load(ConfigurationNode groupNode) {
+		String worldname = groupNode.getParent().getParent().getKey().toString();
+		Group group = new Group(worldname, groupNode, worldname.equalsIgnoreCase("all"));
+		Map<String, Group> map = groups.getOrDefault(worldname, Maps.newHashMap());
+		map.put(group.getName(), group);
+		groups.put(worldname, map);
+		return group;
 	}
+
+	// gonna remove this, don't feel that it's necessary with format builders
+
+	/*
+	 * public Groups(File path) { if (path.exists() && path.isFile()) { throw
+	 * new IllegalArgumentException("Path is single file, use other constructor"
+	 * ); } if (!path.exists()) { path.mkdirs(); } for (File f :
+	 * path.listFiles()) { if (!f.exists()) { continue; } String world =
+	 * f.getName(); boolean global = world.equalsIgnoreCase("all"); if
+	 * (f.isFile()) { ConfigurationNode groups =
+	 * Utils.load(f).getNode("groups"); for (ConfigurationNode group :
+	 * groups.getChildrenMap().values()) { String name =
+	 * group.getKey().toString(); if (!this.groups.containsKey(world)) {
+	 * Map<String, Group> map = Maps.newHashMap(); map.put(name, new
+	 * Group(world, group, null, global)); this.groups.put(world, map); } else {
+	 * Map<String, Group> map = this.groups.get(world); map.put(name, new
+	 * Group(world, group, null, global)); this.groups.put(world, map); } } }
+	 * else { File f1 = new File(f, "groups"); if (f1.exists() && f1.isFile()) {
+	 * ConfigurationNode groups = Utils.load(f1).getNode("groups"); for
+	 * (ConfigurationNode group : groups.getChildrenMap().values()) { String
+	 * name = group.getKey().toString(); if (!this.groups.containsKey(world)) {
+	 * Map<String, Group> map = Maps.newHashMap(); map.put(name, new
+	 * Group(world, group, null, global)); this.groups.put(world, map); } else {
+	 * Map<String, Group> map = this.groups.get(world); map.put(name, new
+	 * Group(world, group, null, global)); this.groups.put(world, map); } } }
+	 * else { for (File g : f.listFiles()) { String name = g.getName();
+	 * ConfigurationNode group = Utils.load(g); if
+	 * (!this.groups.containsKey(world)) { Map<String, Group> map =
+	 * Maps.newHashMap(); map.put(name, new Group(world, group, null, global));
+	 * this.groups.put(world, map); } else { Map<String, Group> map =
+	 * this.groups.get(world); map.put(name, new Group(world, group, null,
+	 * global)); this.groups.put(world, map); } } } } } }
+	 */
 
 	public List<Group> getAllGroups() {
 		List<Group> groups = Lists.newArrayList();
@@ -169,7 +144,6 @@ public class Groups {
 	}
 
 	public Group getMainGroup(User p, String world) {
-		Ray.get().getLogger().info("getting group for player " + p.getName() + " in world " + world);
 		Group cg = null;
 		for (Group g : getGroups(world).values()) {
 			if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
@@ -180,8 +154,6 @@ public class Groups {
 				}
 			}
 		}
-		Ray.get().getLogger()
-				.info("group chosen for player " + p.getName() + " in world " + world + ": " + cg.getName());
 		return cg;
 	}
 
@@ -191,7 +163,6 @@ public class Groups {
 
 	public Map<String, Group> getGroups(User user) {
 		Map<String, Group> out = Maps.newHashMap();
-		Ray.get().getLogger().info("getting all main groups for user " + user.getName());
 		for (String world : groups.keySet()) {
 			out.put(world, getMainGroup(user, world));
 		}

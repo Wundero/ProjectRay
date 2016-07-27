@@ -77,7 +77,6 @@ public class FormatConversation {
 						}
 						ConfigurationNode node = context.getData("wipable node");
 						if (node != null) {
-							Ray.get().getLogger().info("node wiping name: " + node.getKey().toString());
 							node.getParent().removeChild(node.getKey());
 						}
 					}
@@ -139,7 +138,8 @@ public class FormatConversation {
 	private static class GroupPrompt extends Prompt {
 
 		public GroupPrompt() {
-			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose a group: "),
+			this(TextTemplate.of(
+					Text.of(TextColors.GRAY, "Choose a group, or type in a different name to create one: "),
 					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
@@ -150,6 +150,11 @@ public class FormatConversation {
 		@Override
 		public Text getQuestion(ConversationContext context) {
 			return formatTemplate(context);
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			return true;
 		}
 
 		@Override
@@ -167,14 +172,19 @@ public class FormatConversation {
 
 		@Override
 		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(TextColors.RED, failedInput + " is not a valid group!");
+			return Text.of();
 		}
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			ConfigurationNode node = context.getData("node");
-			context.putData("node", node.getNode(selected.get().getKey(), "formats"));
-			context.putData("group", selected.get().getValue());
+			context.putData("node", node.getNode(selected.isPresent() ? selected.get().getKey() : text, "formats"));
+			if (selected.isPresent()) {
+				context.putData("group", selected.get().getValue());
+			} else {
+				Group g = Ray.get().getGroups().load(node.getNode(text));
+				context.putData("group", g);
+			}
 			return new NamePrompt();
 		}
 
