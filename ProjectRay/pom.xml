@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.Wundero</groupId>
-	<artifactId>ray</artifactId>
-	<version>1.0</version>
+	<artifactId>Ray</artifactId>
+	<version>1.0.0</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -24,6 +24,9 @@
 						<phase>install</phase>
 						<configuration>
 							<target>
+								<delete>
+									<fileset dir="D:/Sponge Test Server/mods" />
+								</delete>
 								<copy
 									file="${project.build.directory}/${project.build.finalName}.jar"
 									todir="D:/Sponge Test Server/mods" />

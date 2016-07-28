@@ -62,7 +62,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
  SOFTWARE.
  */
 
-@Plugin(id = "ray", name = "Ray", version = "v0.0.1", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = "ray", name = "Ray", version = "1.0.0", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 
@@ -91,7 +91,7 @@ public class ProjectRay {
 	public String getVersion() {
 		Optional<String> opt = game.getPluginManager().getPlugin("ray").get().getVersion();
 		if (!opt.isPresent()) {
-			return "v0.0.1";
+			return "1.0.0";
 		}
 		return opt.get();
 	}
