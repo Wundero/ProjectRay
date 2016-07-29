@@ -164,9 +164,8 @@ public class MainListener {
 		Task.builder().delayTicks(15).execute(() -> {
 			MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 					Cause.builder().from(event.getCause()).named("formattype", FormatType.MOTD).build(),
-					MessageChannel.TO_NONE,
-					Optional.of(MessageChannel.combined(MessageChannel.TO_CONSOLE,
-							MessageChannel.fixed(event.getTargetEntity()))),
+					MessageChannel.fixed(event.getTargetEntity()),
+					Optional.of(MessageChannel.fixed(event.getTargetEntity())),
 					new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE, "Welcome to the server!")),
 					event.getMessage(), false);
 			Sponge.getEventManager().post(ev2);
