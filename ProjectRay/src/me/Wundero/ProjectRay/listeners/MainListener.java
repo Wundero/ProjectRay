@@ -39,6 +39,7 @@ import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
@@ -49,14 +50,14 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
-
-import com.google.common.collect.Maps;
+import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayPlayer;
+import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class MainListener {
@@ -75,9 +76,19 @@ public class MainListener {
 		if (f == null) {
 			return false;
 		}
+		if (f.getTemplate() == null) {
+			// possibly not loaded, but i don't care to figure out why formats
+			// don't always properly load templates
+			return true;
+		}
+		if (channel instanceof ChatChannel) {
+			ChatChannel c = (ChatChannel) channel;
+			v.put("channel", c.getTag());
+			v.put("channelname", c.getName());
+		}
 		v = Ray.get().setVars(v, f.getTemplate(), p, false, Optional.of(f), true);
 		final TextTemplate template = f.getTemplate();
-		final Map<String, Object> args = Maps.newHashMap(v);
+		final Map<String, Object> args = Utils.sm(v);
 		MessageChannel newchan = MessageChannel.combined(channel, new MessageChannel() {
 
 			@Override
@@ -90,6 +101,9 @@ public class MainListener {
 				}
 				if (template == null) {
 					return Optional.of(original);
+				}
+				if (sender instanceof CancelEvent) {
+					return Optional.empty();
 				}
 				Text t = template.apply(args).build();
 				return Optional.of(t);
@@ -105,9 +119,12 @@ public class MainListener {
 		return false;
 	}
 
+	private static class CancelEvent {
+	}
+
 	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
-		Map<String, Object> vars = Maps.newHashMap();
+		Map<String, Object> vars = Utils.sm();
 		Player p = null;
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
@@ -132,10 +149,31 @@ public class MainListener {
 						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
+				}
+			}).submit(Ray.get().getPlugin());
+			Task.builder().delayTicks(20).execute(() -> {
+				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
+						Cause.builder().from(event.getCause()).named("formattype", FormatType.JOIN).build(),
+						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
+				Sponge.getEventManager().post(ev2);
+				if (!ev2.isCancelled()) {
 					ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
 				}
 			}).submit(Ray.get().getPlugin());
 		}
+		Task.builder().delayTicks(15).execute(() -> {
+			MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
+					Cause.builder().from(event.getCause()).named("formattype", FormatType.MOTD).build(),
+					MessageChannel.TO_NONE,
+					Optional.of(MessageChannel.combined(MessageChannel.TO_CONSOLE,
+							MessageChannel.fixed(event.getTargetEntity()))),
+					new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE, "Welcome to the server!")),
+					event.getMessage(), false);
+			Sponge.getEventManager().post(ev2);
+			if (!ev2.isCancelled()) {
+				ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
+			}
+		}).submit(Ray.get().getPlugin());
 	}
 
 	// Logs ALL commands that are handled by the server
@@ -150,7 +188,7 @@ public class MainListener {
 
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
-		Map<String, Object> vars = Maps.newHashMap();
+		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
 				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
@@ -162,21 +200,21 @@ public class MainListener {
 		if (!(event.getTargetEntity() instanceof Player)) {
 			return;
 		}
-		Map<String, Object> vars = Maps.newHashMap();
+		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
 				handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onKick(KickPlayerEvent event) {
-		Map<String, Object> vars = Maps.newHashMap();
+		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
 				handle(FormatType.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
 	}
 
 	@Listener
 	public void onAch(GrantAchievementEvent.TargetPlayer event) {
-		Map<String, Object> vars = Maps.newHashMap();
+		Map<String, Object> vars = Utils.sm();
 		Achievement ach = event.getAchievement();
 		vars.put("achievement",
 				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());

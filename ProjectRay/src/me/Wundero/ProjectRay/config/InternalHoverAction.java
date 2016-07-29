@@ -43,7 +43,6 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.Identifiable;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.config.InternalHoverAction.ShowEntity.Ref;
@@ -109,7 +108,6 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			@Override
 			public InternalHoverAction deserialize(TypeToken<?> arg0, ConfigurationNode arg1)
 					throws ObjectMappingException {
-				System.out.println(arg1.getNode("type").getString());
 				final String icc = "";
 				final ConfigurationNode result = arg1.getNode("result");
 				switch (arg1.getNode("type").getString()) {
@@ -176,7 +174,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 					new HoverAction.ShowEntity.Ref(((Ref) this.getResult()).uuid, ((Ref) this.getResult()).name));
 		}
 		TextTemplate t = ((ShowTemplate) this).template;
-		Map<String, Object> p = Maps.newHashMap();
+		Map<String, Object> p = Utils.sm();
 		for (String k : t.getArguments().keySet()) {
 			p.put(k, "");
 		}

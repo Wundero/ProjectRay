@@ -32,16 +32,15 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
-import com.google.common.collect.Lists;
-
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public abstract class Conversation {
 	private Prompt currentPrompt;
 	private ConversationListener listener;
 	private ConversationContext context;
 	private boolean suppressMessages, echoInputs, started = false;
-	private List<ConversationCanceller> cancellers = Lists.newArrayList();
+	private List<ConversationCanceller> cancellers = Utils.sl();
 	private Text prefix = Text.of();
 
 	public boolean start() {

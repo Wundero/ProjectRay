@@ -36,7 +36,6 @@ import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.utils.Utils;
@@ -109,7 +108,6 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		@Override
 		public InternalClickAction deserialize(TypeToken<?> arg0, ConfigurationNode arg1)
 				throws ObjectMappingException {
-			System.out.println(arg1.getNode("type").getString());
 			final String icc = "";
 			final ConfigurationNode result = arg1.getNode("result");
 			switch (arg1.getNode("type").getString()) {
@@ -166,7 +164,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 			return TextActions.executeCallback((Consumer<CommandSource>) this.getResult());
 		}
 		TextTemplate t = ((ATemplate) this).getTemplate();
-		Map<String, Object> p = Maps.newHashMap();
+		Map<String, Object> p = Utils.sm();
 		for (String k : t.getArguments().keySet()) {
 			p.put(k, "");
 		}

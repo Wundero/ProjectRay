@@ -30,8 +30,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.utils.Utils;
@@ -74,7 +72,7 @@ public class Template {
 			private String name;
 			private int priority = 0;
 			private String permission = "";
-			private List<String> parents = Lists.newArrayList();
+			private List<String> parents = Utils.sl();
 			private Builder parent;
 
 			GroupBuilder(ConfigurationNode node, String name, Builder parent) {
@@ -123,8 +121,8 @@ public class Template {
 				private String name;
 				private GroupBuilder parent;
 				private TextTemplate template;
-				private Map<Arg, InternalClickAction<?>> clicks = Maps.newHashMap();
-				private Map<Arg, InternalHoverAction<?>> hovers = Maps.newHashMap();
+				private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
+				private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
 
 				FormatBuilder(ConfigurationNode node, String name, GroupBuilder parent) {
 					this.node = node;

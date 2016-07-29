@@ -35,8 +35,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.World;
 
-import com.google.common.collect.Lists;
-
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
@@ -103,7 +101,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Lists.newArrayList();
+			List<Option> options = Utils.sl();
 			options.add(new Option("all",
 					Text.builder("all").color(TextColors.GOLD).onClick(TextActions.runCommand("all"))
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to choose all!"))).build(),
@@ -159,7 +157,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Lists.newArrayList();
+			List<Option> options = Utils.sl();
 			for (String g : Ray.get().getGroups().getGroups(context.getData("world").toString()).keySet()) {
 				options.add(new Option(g,
 						Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
@@ -328,7 +326,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Lists.newArrayList();
+			List<Option> options = Utils.sl();
 			for (FormatType type : FormatType.values()) {
 				if (type == FormatType.DEFAULT) {
 					continue;
@@ -383,7 +381,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Lists.newArrayList();
+			List<Option> options = Utils.sl();
 			Text t1 = Text.builder("variable").color(TextColors.GOLD).onClick(TextActions.runCommand("variable"))
 					.onHover(TextActions.showText(Text.of("Click this to select variable!", TextColors.AQUA))).build();
 			Text t2 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
@@ -446,7 +444,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Lists.newArrayList();
+			List<Option> options = Utils.sl();
 			options.add(
 					new Option("key",
 							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
@@ -599,7 +597,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Lists.newArrayList();
+			List<Option> options = Utils.sl();
 			Text t1 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
 					.onHover(TextActions
 							.showText(Text.of("Click this to select text (creates a new text)!", TextColors.AQUA)))

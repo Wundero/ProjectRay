@@ -23,7 +23,7 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,9 +34,8 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
-import com.google.common.collect.Maps;
-
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class RayPlayer {
 
@@ -44,7 +43,7 @@ public class RayPlayer {
 	// TODO file saving - save to individual files with world - group map
 
 	private boolean conversing = false;
-	private static HashMap<UUID, RayPlayer> cache = Maps.newHashMap();
+	private static Map<UUID, RayPlayer> cache = Utils.sm();
 
 	public static RayPlayer getRay(UUID u) {
 		if (!cache.containsKey(u)) {
@@ -75,6 +74,7 @@ public class RayPlayer {
 	private UUID uuid;
 	private Map<String, Group> groups;
 	private Optional<RayPlayer> lastMessaged = Optional.empty();
+	private List<RayPlayer> ignore = Utils.sl();
 
 	public RayPlayer(User u) {
 		this.setUser(u);

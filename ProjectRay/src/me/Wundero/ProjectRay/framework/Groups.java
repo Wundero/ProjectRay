@@ -29,13 +29,11 @@ import java.util.Map;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.World;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class Groups {
-	private Map<String, Map<String, Group>> groups = Maps.newHashMap();
+	private Map<String, Map<String, Group>> groups = Utils.sm();
 
 	public Groups(ConfigurationNode node) {
 		for (ConfigurationNode child : node.getChildrenMap().values()) {
@@ -48,7 +46,7 @@ public class Groups {
 			for (ConfigurationNode group : groups.getChildrenMap().values()) {
 				String name = group.getKey().toString();
 				if (!this.groups.containsKey(world)) {
-					Map<String, Group> map = Maps.newHashMap();
+					Map<String, Group> map = Utils.sm();
 					map.put(name, new Group(world, group, global));
 					this.groups.put(world, map);
 				} else {
@@ -63,7 +61,7 @@ public class Groups {
 	public Group load(ConfigurationNode groupNode) {
 		String worldname = groupNode.getParent().getParent().getKey().toString();
 		Group group = new Group(worldname, groupNode, worldname.equalsIgnoreCase("all"));
-		Map<String, Group> map = groups.getOrDefault(worldname, Maps.newHashMap());
+		Map<String, Group> map = groups.getOrDefault(worldname, Utils.sm());
 		map.put(group.getName(), group);
 		groups.put(worldname, map);
 		return group;
@@ -103,7 +101,7 @@ public class Groups {
 	 */
 
 	public List<Group> getAllGroups() {
-		List<Group> groups = Lists.newArrayList();
+		List<Group> groups = Utils.sl();
 		for (Map<String, Group> g1 : this.groups.values()) {
 			for (Group g : g1.values()) {
 				groups.add(g);
@@ -162,7 +160,7 @@ public class Groups {
 	}
 
 	public Map<String, Group> getGroups(User user) {
-		Map<String, Group> out = Maps.newHashMap();
+		Map<String, Group> out = Utils.sm();
 		for (String world : groups.keySet()) {
 			out.put(world, getMainGroup(user, world));
 		}
@@ -170,7 +168,7 @@ public class Groups {
 	}
 
 	public Map<String, Group> getGroups(String world) {
-		Map<String, Group> out = groups.get(world) == null ? Maps.newHashMap() : groups.get(world);
+		Map<String, Group> out = groups.get(world) == null ? Utils.sm() : groups.get(world);
 		if (groups.containsKey("all")) {
 			out.putAll(groups.get("all"));
 		}

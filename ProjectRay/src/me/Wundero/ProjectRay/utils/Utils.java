@@ -6,12 +6,14 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +26,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.statistic.achievement.Achievement;
@@ -35,8 +36,11 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -81,6 +85,64 @@ public class Utils {
 
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
+	}
+
+	public static <T> List<T> sl(Iterable<T> objs) {
+		List<T> l = sl();
+		for (T t : objs) {
+			l.add(t);
+		}
+		return l;
+	}
+
+	@SafeVarargs
+	public static <T> List<T> sl(T... objs) {
+		List<T> l = sl();
+		for (T t : objs) {
+			l.add(t);
+		}
+		return l;
+	}
+
+	public static <T> List<T> sl() {
+		// returns a new arraylist that copies itself for iteration (makes
+		// unsynchronized iter blocks safe)
+		return Collections.synchronizedList(new ArrayList<T>() {
+
+			private static final long serialVersionUID = -9083645937669914699L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public Iterator<T> iterator() {
+				return (Iterator<T>) ImmutableList.builder().addAll(this).build().iterator();
+			}
+
+		});
+	}
+
+	public static <K, V> Map<K, V> sm(Map<? extends K, ? extends V> m) {
+		Map<K, V> m1 = sm();
+		m1.putAll(m);
+		return m1;
+	}
+
+	public static <K, V> Map<K, V> sm() {
+		return new ConcurrentHashMap<K, V>();
+	}
+
+	public static boolean inRange(Location<World> loc1, Location<World> loc2, double range) {
+		// pythagorean range calc
+		if (range < 0) {
+			return true;
+		}
+		if (range == 0) {
+			return false;
+		}
+		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
+				z2 = loc2.getZ();
+		double l1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2) + Math.pow(z1, 2)),
+				l2 = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2) + Math.pow(z2, 2));
+		return Math.abs(l1 - l2) <= range;
 	}
 
 	public static TextTemplate parse(String in, boolean allowColors) {
@@ -209,8 +271,8 @@ public class Utils {
 	}
 
 	public static <T> ArrayList<T> scramble(ArrayList<T> list) {
-		List<T> out = Lists.newArrayList();
-		List<T> in = Lists.newArrayList(list);
+		List<T> out = sl();
+		List<T> in = sl(list);
 		Random r = new Random();
 		while (!in.isEmpty()) {
 			out.add(in.remove(r.nextInt(in.size())));
@@ -242,12 +304,7 @@ public class Utils {
 
 	public static final UUID pregenUUID = UUID.randomUUID();
 
-	private static HashMap<UUID, Long> times = Maps.newHashMap();
-
-	@SafeVarargs
-	public static <T> ArrayList<T> of(T... t) {
-		return Lists.newArrayList(t);
-	}
+	private static Map<UUID, Long> times = sm();
 
 	public static boolean isURL(String input) {
 		String s = input;
@@ -278,7 +335,7 @@ public class Utils {
 	}
 
 	public static String join(String sep, String... k) {
-		return join(sep, Lists.newArrayList(k));
+		return join(sep, sl(k));
 	}
 
 	public static String join(String sep, Iterable<String> k) {
@@ -349,8 +406,8 @@ public class Utils {
 		return (T[]) wrappedCollection.toArray(new Object[wrappedCollection.size()]);
 	}
 
-	public static <T> ArrayList<String> toStringList(ArrayList<T> o, Optional<Method> toCall) {
-		ArrayList<String> out = Lists.newArrayList();
+	public static <T> List<String> toStringList(ArrayList<T> o, Optional<Method> toCall) {
+		List<String> out = sl();
 		if (!toCall.isPresent() || toCall.get().getReturnType() != String.class
 				|| toCall.get().getParameters().length > 0) {
 			for (Object o1 : o) {
@@ -360,7 +417,7 @@ public class Utils {
 		}
 		Method m = toCall.get();
 		for (Object o1 : o) {
-			ArrayList<Method> objMethods = Lists.newArrayList(o1.getClass().getMethods());
+			List<Method> objMethods = sl(o1.getClass().getMethods());
 			if (!objMethods.contains(m)) {
 				out.add(o1.toString());
 			} else {
@@ -402,7 +459,7 @@ public class Utils {
 	}
 
 	public static void printError(Exception e) {
-		ArrayList<String> toPrint = Lists.newArrayList(e.getMessage());
+		List<String> toPrint = sl(e.getMessage());
 		for (StackTraceElement element : e.getStackTrace()) {
 			toPrint.add("at " + element.toString());
 		}
@@ -416,8 +473,8 @@ public class Utils {
 	}
 
 	// before index i
-	public static <T> ArrayList<T> sub(int i, Iterable<T> j) {
-		ArrayList<T> o = Lists.newArrayList();
+	public static <T> List<T> sub(int i, Iterable<T> j) {
+		List<T> o = sl();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -430,8 +487,8 @@ public class Utils {
 	}
 
 	@SafeVarargs
-	public static <T> ArrayList<T> sub(int i, T... j) {
-		ArrayList<T> o = Lists.newArrayList();
+	public static <T> List<T> sub(int i, T... j) {
+		List<T> o = sl();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -444,8 +501,8 @@ public class Utils {
 	}
 
 	// after and including index i
-	public static <T> ArrayList<T> post(int i, Iterable<T> j) {
-		ArrayList<T> o = Lists.newArrayList();
+	public static <T> List<T> post(int i, Iterable<T> j) {
+		List<T> o = sl();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -458,8 +515,8 @@ public class Utils {
 	}
 
 	@SafeVarargs
-	public static <T> ArrayList<T> post(int i, T... j) {
-		ArrayList<T> o = Lists.newArrayList();
+	public static <T> List<T> post(int i, T... j) {
+		List<T> o = sl();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -481,9 +538,8 @@ public class Utils {
 		return o;
 	}
 
-	public static boolean call(Cancellable e) {
-		Sponge.getEventManager().post((Event) e);
-		return !e.isCancelled();
+	public static boolean call(Event e) {
+		return !Sponge.getEventManager().post(e);
 	}
 
 	public static UUID time() {
@@ -557,7 +613,7 @@ public class Utils {
 		if (v < 33 || v > 126) {
 			return c;
 		}
-		return Character.valueOf((char) (v + 65248));
+		return Character.valueOf((char) (v + 65248));// magic number lol
 	}
 
 	public static String makeUnicode(String n) {
@@ -578,9 +634,9 @@ public class Utils {
 
 	}
 
-	private static ArrayList<Player> playersAlphabetical = Lists.newArrayList();
+	private static List<Player> playersAlphabetical = sl();
 
-	private static ArrayList<Player> sort(ArrayList<Player> list) {
+	private static List<Player> sort(List<Player> list) {
 		list.sort(new Comparator<Player>() {
 			@Override
 			public int compare(Player o1, Player o2) {
@@ -591,13 +647,12 @@ public class Utils {
 	}
 
 	public static void updatePlayersAplha() {
-		playersAlphabetical = sort(Lists.newArrayList(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers()));
+		playersAlphabetical = sort(sl(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers()));
 
 	}
 
-	@SuppressWarnings("unchecked")
-	public static ArrayList<Player> getPlayers() {
-		return (ArrayList<Player>) playersAlphabetical.clone();
+	public static List<Player> getPlayers() {
+		return sl(playersAlphabetical);
 	}
 
 }

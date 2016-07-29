@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
@@ -39,8 +37,8 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  */
 
 public class Group {
-	private Map<FormatType, List<Format>> formats = Maps.newHashMap();
-	private List<String> parents = Lists.newArrayList();
+	private Map<FormatType, List<Format>> formats = Utils.sm();
+	private List<String> parents = Utils.sl();
 	private String world;
 	private int priority;
 	private String permission;
@@ -59,7 +57,7 @@ public class Group {
 		FormatType type = format.getType();
 		List<Format> f = formats.get(type);
 		if (f == null) {
-			f = Lists.newArrayList();
+			f = Utils.sl();
 		}
 		f.add(format);
 		formats.put(type, f);
@@ -88,7 +86,7 @@ public class Group {
 			Format f = new Format(node);
 			FormatType type = f.getType();
 			if (!formats.containsKey(type)) {
-				formats.put(type, Lists.newArrayList(f));
+				formats.put(type, Utils.sl(f));
 			} else {
 				List<Format> list = formats.get(type);
 				list.add(f);
@@ -125,7 +123,7 @@ public class Group {
 	}
 
 	public List<Format> getAllFormats() {
-		List<Format> out = Lists.newArrayList();
+		List<Format> out = Utils.sl();
 		for (List<Format> f : formats.values()) {
 			out.addAll(f);
 		}
@@ -134,8 +132,8 @@ public class Group {
 
 	public List<Format> getFormats(FormatType type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
-			List<Group> groups = Lists.newArrayList(Ray.get().getGroups().getGroups(world).values());
-			List<Group> torem = Lists.newArrayList();
+			List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
+			List<Group> torem = Utils.sl();
 			for (Group g : groups) {
 				if (!parents.contains(g.name)) {
 					torem.add(g);

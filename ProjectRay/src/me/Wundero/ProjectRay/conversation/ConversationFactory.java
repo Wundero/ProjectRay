@@ -30,8 +30,7 @@ import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class ConversationFactory {
 
@@ -39,9 +38,9 @@ public class ConversationFactory {
 	private ConversationListener listener = null;
 	private ConversationContext context;
 	private boolean suppressMessages = true, echoInputs = false;
-	private List<ConversationCanceller> cancellers = Lists.newArrayList();
+	private List<ConversationCanceller> cancellers = Utils.sl();
 	private Object plugin;
-	private Map<String, Object> initialContextdata = Maps.newHashMap();
+	private Map<String, Object> initialContextdata = Utils.sm();
 	private Text prefix = Text.of();
 
 	private ConversationFactory() {

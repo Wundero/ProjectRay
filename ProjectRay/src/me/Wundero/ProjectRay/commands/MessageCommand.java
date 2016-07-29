@@ -54,6 +54,10 @@ public class MessageCommand implements CommandExecutor {
 		}
 		Player sendto = (Player) args.getOne("player").get();
 		Player sendfrom = (Player) sender;
+		if (sendto.getUniqueId().equals(sendfrom.getUniqueId())) {
+			sender.sendMessage(Text.of(TextColors.RED, "You cannot message yourself!"));
+			return CommandResult.success();
+		}
 		String message = (String) args.getOne("message").get();
 		MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(
 				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SEND).build(),

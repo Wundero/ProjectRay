@@ -13,8 +13,6 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.config.InternalClickAction;
@@ -53,8 +51,8 @@ public class Ray {
 
 	private static Ray singleton = new Ray();
 
-	private List<Task> asyncTasks = Lists.newArrayList();
-	private List<Task> formatTasks = Lists.newArrayList();
+	private List<Task> asyncTasks = Utils.sl();
+	private List<Task> formatTasks = Utils.sl();
 
 	public void registerTask(Task t) {
 		if (t.isAsynchronous()) {
@@ -164,7 +162,7 @@ public class Ray {
 				return known;
 			}
 		}
-		Map<String, Object> out = Maps.newHashMap();
+		Map<String, Object> out = Utils.sm();
 		for (String key : known.keySet()) {
 			if (template.getArguments().containsKey(key)) {
 				out.put(key, known.get(key));

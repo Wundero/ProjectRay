@@ -25,13 +25,13 @@ package me.Wundero.ProjectRay.animation;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class FrameSequence {
-	private List<Frame> frames = Lists.newArrayList();
+	private List<Frame> frames = Utils.sl();
 
 	public FrameSequence(Frame... frames) {
-		this(Lists.newArrayList(frames));
+		this(Utils.sl(frames));
 	}
 
 	public FrameSequence(List<Frame> frames) {

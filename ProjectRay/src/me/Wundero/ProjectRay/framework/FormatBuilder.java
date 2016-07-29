@@ -29,7 +29,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.config.DefaultArg;
@@ -45,8 +44,8 @@ public class FormatBuilder {
 	@SuppressWarnings("unused")
 	private String name;
 	private TextTemplate template;
-	private Map<Arg, InternalClickAction<?>> clicks = Maps.newHashMap();
-	private Map<Arg, InternalHoverAction<?>> hovers = Maps.newHashMap();
+	private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
+	private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
 
 	public FormatBuilder(ConfigurationNode node, String name) {
 		this.node = node;

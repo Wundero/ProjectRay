@@ -31,9 +31,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.google.common.collect.Maps;
-
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public abstract class Prompt {
 
@@ -106,7 +105,7 @@ public abstract class Prompt {
 	}
 
 	public Text formatTemplate(ConversationContext context) {
-		Map<String, Object> args = Maps.newHashMap();
+		Map<String, Object> args = Utils.sm();
 		args.put("options", buildList(options(context)));
 		args = Ray.get().setVars(args, template, context.getHolder(), false, Optional.empty(), false);
 		return template.apply(args).build();

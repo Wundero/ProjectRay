@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.ProjectRay.framework.channel;
 /*
  The MIT License (MIT)
 
@@ -23,38 +23,41 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.TextTemplate.Arg;
+import java.util.List;
+import java.util.Map;
 
-public class TemplateBuilder {
-	private TextTemplate template;
+import org.spongepowered.api.entity.living.player.Player;
 
-	public static TemplateBuilder builder() {
-		return new TemplateBuilder();
+import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+
+public class ChatChannels {
+	private Map<String, ChatChannel> channels = Utils.sm();
+
+	public void load(ConfigurationNode node) {
+		// not implemented yet as i need to decide on how to structure config,
+		// and also how to deal with channels as a whole
 	}
 
-	TemplateBuilder() {
-		template = TextTemplate.of();
+	public ChatChannel getChannel(String name) {
+		return channels.get(name);
 	}
 
-	public TextTemplate build() {
-		return template;
-	}
-
-	public TemplateBuilder withArg(String key) {
-		return withArg(TextTemplate.arg(key));
-	}
-
-	public TemplateBuilder withArg(Arg.Builder builder) {
-		template = template.concat(TextTemplate.of(builder.build()));
-		return this;
-	}
-
-	public TemplateBuilder withText(Text... texts) {
-		for (Text t : texts) {
-			template = template.concat(TextTemplate.of(t));
+	public List<ChatChannel> getJoinableChannels(Player player) {
+		List<ChatChannel> l = getAllChannels();
+		List<ChatChannel> o = Utils.sl();
+		synchronized (l) {
+			for (ChatChannel c : l) {
+				if (player.hasPermission(c.getPermission())) {
+					o.add(c);
+				}
+			}
 		}
-		return this;
+		return o;
+	}
+
+	public List<ChatChannel> getAllChannels() {// due to clone synchronized
+												// blocks probably not necessary
+		return Utils.sl(channels.values());
 	}
 }

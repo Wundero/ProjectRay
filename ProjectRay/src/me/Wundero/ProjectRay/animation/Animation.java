@@ -28,16 +28,15 @@ import java.util.List;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 
-import com.google.common.collect.Lists;
-
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class Animation {
 	private final FrameSequence animation;
 	private final Player player;
 
-	private List<Task.Builder> tasks = Lists.newArrayList();
-	private List<String> taskids = Lists.newArrayList();
+	private List<Task.Builder> tasks = Utils.sl();
+	private List<String> taskids = Utils.sl();
 	private Task cancellableTask;
 
 	private boolean running;

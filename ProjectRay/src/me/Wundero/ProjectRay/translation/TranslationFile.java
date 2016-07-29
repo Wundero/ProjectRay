@@ -30,17 +30,17 @@ import java.util.Scanner;
 
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.translation.Translation;
-
-import com.google.common.collect.Maps;
+import org.spongepowered.api.text.translation.locale.Locales;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class TranslationFile {
 	private File file;
-	private Map<String, String> lines = Maps.newHashMap();
+	private Map<String, String> lines = Utils.sm();
 	private boolean usable = false;
 	private Locale locale;
-	private static Map<Locale, TranslationFile> files = Maps.newHashMap();
+	private static Map<Locale, TranslationFile> files = Utils.sm();
 
 	public TranslationFile(File file) {
 		this.setFile(file);
@@ -58,17 +58,27 @@ public class TranslationFile {
 
 			@Override
 			public String get(Locale locale) {
-				return files.get(locale).lines.get(key);
+				String e = "";
+				if (!files.containsKey(locale)) {
+					if (!files.containsKey(Locales.DEFAULT)) {
+						return e;
+					}
+					String g = files.get(Locales.DEFAULT).lines.get(key);
+					return g == null ? e : g;
+				}
+				String g = files.get(locale).lines.get(key);
+				return g == null ? e : g;
 			}
 
 			@Override
 			public String get(Locale locale, Object... args) {
-				return String.format(files.get(locale).lines.get(key), args);
+				return String.format(get(locale), args);
 			}
 
 		};
 	}
 
+	// TODO ditch scanner?
 	private Task parse(final File f, final TranslationFile tf) {
 		Task t = Task.builder().async().execute((task) -> {
 			try {
@@ -83,7 +93,6 @@ public class TranslationFile {
 				task.cancel();
 				return;
 			}
-			setUsable(true);
 		}).submit(Ray.get().getPlugin());
 		return t;
 	}
