@@ -302,6 +302,9 @@ public class FormatConversation {
 				return new TypePrompt();
 			} else {
 				context.putData("formattype", FormatType.fromString(context.getData("name")));
+				ConfigurationNode node = context.getData("node");
+				String type = ((FormatType) context.getData("formattype")).getName();
+				node.getNode("type").setValue(type);
 				return new TemplateBuilderTypePrompt();
 			}
 		}
@@ -353,6 +356,9 @@ public class FormatConversation {
 			context.putData("formattype", selected.get().getValue());
 			FormatBuilder fb = new FormatBuilder(context.getData("node"), context.getData("name"));
 			context.putData("builder", fb);
+			ConfigurationNode node = context.getData("node");
+			String type = ((FormatType) context.getData("formattype")).getName();
+			node.getNode("type").setValue(type);
 			return new TemplateBuilderTypePrompt();
 		}
 

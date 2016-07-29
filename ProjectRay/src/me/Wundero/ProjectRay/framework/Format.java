@@ -93,7 +93,10 @@ public class Format {
 	public Format(final ConfigurationNode node) {
 		this.setNode(Optional.of(node));
 		name = node.getKey().toString();
-		setType(FormatType.fromString(name));
+		setType(node.getNode("type").isVirtual() ? FormatType.fromString(name)
+				: FormatType.fromString(node.getNode("type").getString()));
+		node.getNode("type").setValue(type.getName());// forces type to be
+														// present
 		Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
 			try {
 				TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
