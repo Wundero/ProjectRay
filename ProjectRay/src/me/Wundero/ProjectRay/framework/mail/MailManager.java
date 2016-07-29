@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.channel;
+package me.Wundero.ProjectRay.framework.mail;
 /*
  The MIT License (MIT)
 
@@ -23,45 +23,6 @@ package me.Wundero.ProjectRay.framework.channel;
  SOFTWARE.
  */
 
-import java.util.List;
-import java.util.Map;
+public class MailManager {
 
-import org.spongepowered.api.entity.living.player.Player;
-
-import me.Wundero.ProjectRay.utils.Utils;
-import ninja.leaping.configurate.ConfigurationNode;
-
-public class ChatChannels {
-	private Map<String, ChatChannel> channels = Utils.sm();
-
-	public void load(ConfigurationNode node) {
-		// not implemented yet as i need to decide on how to structure config,
-		// and also how to deal with channels as a whole
-	}
-
-	public ChatChannel getChannel(String name) {
-		if (name == null || name.isEmpty()) {
-			return null;
-		}
-		return channels.get(name);
-	}
-
-	public List<ChatChannel> getJoinableChannels(Player player) {
-		List<ChatChannel> l = getAllChannels();
-		List<ChatChannel> o = Utils.sl();
-		for (ChatChannel c : l) {
-			if (c.isHidden()) {
-				continue;
-			}
-			if (player.hasPermission(c.getPermission())) {
-				o.add(c);
-			}
-
-		}
-		return o;
-	}
-
-	public List<ChatChannel> getAllChannels() {
-		return Utils.sl(channels.values());
-	}
 }

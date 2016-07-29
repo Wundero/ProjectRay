@@ -23,6 +23,8 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,8 +36,14 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
+import com.google.common.reflect.TypeToken;
+
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.mail.Mail;
 import me.Wundero.ProjectRay.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class RayPlayer {
 
@@ -70,13 +78,112 @@ public class RayPlayer {
 		return cache.get(u.getUniqueId());
 	}
 
+	public static void saveAll() throws ObjectMappingException {
+		for (RayPlayer p : cache.values()) {
+			p.save();
+		}
+	}
+
+	public static RayPlayer get(UUID u) {
+		return getRay(u);
+	}
+
+	public static RayPlayer get(User u) {
+		return getRay(u);
+	}
+
 	private User user;
 	private UUID uuid;
 	private Map<String, Group> groups;
 	private Optional<RayPlayer> lastMessaged = Optional.empty();
-	private List<RayPlayer> ignore = Utils.sl();
+	private List<UUID> ignore = Utils.sl();
+	private List<Mail> mails = Utils.sl();
+	private ConfigurationNode config;
+	private ChatChannel activeChannel = null;
+
+	public boolean isIgnoring(RayPlayer player) {
+		return ignore.contains(player.uuid);
+	}
+
+	public boolean unignore(RayPlayer player) {
+		return ignore.remove(player.uuid);
+	}
+
+	public boolean ignore(RayPlayer player) {
+		if (ignore.contains(player.uuid)) {
+			return false;
+		}
+		return ignore.add(player.uuid);
+	}
+
+	public ChatChannel getActiveChannel() {
+		return activeChannel;
+	}
+
+	public void setActiveChannel(ChatChannel channel) {
+		if (channel == null) {
+			return;
+		}
+		activeChannel = channel;
+		if (user.isOnline() && user.getPlayer().isPresent()) {
+			user.getPlayer().get().setMessageChannel(activeChannel);
+		}
+	}
+
+	public void load() throws ObjectMappingException {
+		if (config == null) {
+			return;
+		}
+		ConfigurationNode i = config.getNode("ignoring");
+		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)));
+		ConfigurationNode m = config.getNode("mail");
+		mails = Utils.sl(m.getList(TypeToken.of(Mail.class)));
+		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
+	}
+
+	public void save() throws ObjectMappingException {
+		if (config == null) {
+			return;
+		}
+		config.getNode("ignoring").setValue(ignore);
+		saveMails(config.getNode("mail"), mails);
+		config.getNode("channel").setValue(activeChannel == null ? null : activeChannel.getName());
+		config.getNode("lastname").setValue(user.getName());
+		// TODO save displayname
+	}
+
+	private static void saveMails(ConfigurationNode node, List<Mail> mails) throws ObjectMappingException {
+		if (mails.isEmpty()) {
+			return;
+		}
+		for (int i = 0; i < mails.size(); i++) {
+			node.getNode(String.valueOf(i)).setValue(TypeToken.of(Mail.class), mails.get(i));
+		}
+	}
 
 	public RayPlayer(User u) {
+		// TODO pass config node that's loaded already if single file for all
+		// players is desired
+		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
+		File f = new File(p, u.getUniqueId() + ".conf");
+		if (!p.exists()) {
+			p.mkdirs();
+		}
+		if (f.exists()) {
+			config = Utils.load(f);
+			try {
+				load();
+			} catch (Exception e) {
+				Utils.printError(e);
+			}
+		} else {
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				Utils.printError(e);
+			}
+			config = Utils.load(f);
+		}
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
 		cache.put(uuid, this);
@@ -171,5 +278,35 @@ public class RayPlayer {
 			lastMessaged.get().setLastMessaged(Optional.of(this), false);
 		}
 		this.lastMessaged = lastMessaged;
+	}
+
+	/**
+	 * @return the config
+	 */
+	public ConfigurationNode getConfig() {
+		return config;
+	}
+
+	/**
+	 * @param config
+	 *            the config to set
+	 */
+	public void setConfig(ConfigurationNode config) {
+		this.config = config;
+	}
+
+	/**
+	 * @return the mails
+	 */
+	public List<Mail> getMails() {
+		return mails;
+	}
+
+	/**
+	 * @param mails
+	 *            the mails to set
+	 */
+	public void setMails(List<Mail> mails) {
+		this.mails = mails;
 	}
 }

@@ -32,9 +32,12 @@ import java.util.concurrent.TimeUnit;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
+
+import com.google.common.base.Preconditions;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
@@ -48,29 +51,23 @@ public class ChatChannel implements MutableMessageChannel {
 	private Text tag;
 	private double range;
 	private List<MessageReceiver> mutes = Utils.sl();
+	private boolean hidden = false;
+	private ConfigurationNode node;
 	// TODO
 	/*
-	 * mutes join/leave msgs hidden forced autojoin quickmessage multiworld
-	 * enable/disable moderators bans whitelist etc.
+	 * autojoin quickmessage multiworld enable/disable moderators bans whitelist
+	 * etc.
 	 */
 
 	public ChatChannel(ConfigurationNode node) {
-
+		this();
+		this.setNode(Preconditions.checkNotNull(node));
+		this.name = "";// TODO set this
+		this.permission = "ray.channel." + name;
 	}
 
-	public ChatChannel(String name, Text tag, String permission) {
-		this.name = name;
-		this.tag = tag;
-		this.permission = permission;
-		this.range = -1.0D;
-	}
-
-	public ChatChannel(String name, Text tag) {
-		this(name, tag, "ray.channel." + name);
-	}
-
-	public ChatChannel(String name) {
-		this(name, Text.of(name));
+	private ChatChannel() {
+		members.addAll(MessageChannel.TO_CONSOLE.getMembers());
 	}
 
 	@Override
@@ -147,5 +144,21 @@ public class ChatChannel implements MutableMessageChannel {
 
 	public String getPermission() {
 		return permission;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	public ConfigurationNode getNode() {
+		return node;
+	}
+
+	private void setNode(ConfigurationNode node) {
+		this.node = node;
 	}
 }

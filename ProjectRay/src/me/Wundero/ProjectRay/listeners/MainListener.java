@@ -94,6 +94,15 @@ public class MainListener {
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
+
+				if (recipient instanceof Player && sender instanceof Player) {
+					Player s = (Player) sender;
+					Player r = (Player) recipient;
+					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
+						return Optional.empty();
+					}
+				}
+
 				if (recipient instanceof Player) {
 					args.putAll(Ray.get().setVars(args, template, (Player) recipient, true, Optional.of(f), true));
 				} else {
@@ -101,9 +110,6 @@ public class MainListener {
 				}
 				if (template == null) {
 					return Optional.of(original);
-				}
-				if (sender instanceof CancelEvent) {
-					return Optional.empty();
 				}
 				Text t = template.apply(args).build();
 				return Optional.of(t);
@@ -117,9 +123,6 @@ public class MainListener {
 		});
 		e.setChannel(newchan);
 		return false;
-	}
-
-	private static class CancelEvent {
 	}
 
 	@Listener

@@ -44,6 +44,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import me.Wundero.ProjectRay.ProjectRay;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
@@ -240,7 +241,7 @@ public class Utils {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(config)
 				.build();
 		try {
-			return loader.load();
+			return loader.load(ProjectRay.updateSerializers(loader.getDefaultOptions()));
 		} catch (Exception e) {
 			Utils.printError(e);
 			return null;

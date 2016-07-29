@@ -19,6 +19,7 @@ import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.Groups;
+import me.Wundero.ProjectRay.framework.channel.ChatChannels;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -84,6 +85,7 @@ public class Ray {
 	private ConfigurationNode config;
 	private Groups groups;
 	private Variables vars;
+	private ChatChannels channels;
 	private boolean loadableSet = false;
 
 	public void load(ProjectRay plugin) {
@@ -91,6 +93,8 @@ public class Ray {
 		this.setConfig(plugin.getConfig());
 		loadableSet = config.getNode("loadable").getValue() != null;
 		this.setVariables(new Variables());
+		this.setChannels(new ChatChannels());
+		channels.load(null);// TODO this
 	}
 
 	public void setLoadable(UUID u) {
@@ -223,5 +227,20 @@ public class Ray {
 
 	public void setVariables(Variables vars) {
 		this.vars = vars;
+	}
+
+	/**
+	 * @return the channels
+	 */
+	public ChatChannels getChannels() {
+		return channels;
+	}
+
+	/**
+	 * @param channels
+	 *            the channels to set
+	 */
+	public void setChannels(ChatChannels channels) {
+		this.channels = channels;
 	}
 }

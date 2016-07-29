@@ -25,7 +25,9 @@
 						<configuration>
 							<target>
 								<delete>
-									<fileset dir="D:/Sponge Test Server/mods" />
+									<fileset dir="D:/Sponge Test Server/mods">
+										<include name="**/*Ray*.jar" />
+									</fileset>
 								</delete>
 								<copy
 									file="${project.build.directory}/${project.build.finalName}.jar"
