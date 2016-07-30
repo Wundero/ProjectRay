@@ -163,12 +163,16 @@ public class MainListener {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		Ray.get().setLoadable(event.getTargetEntity());
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
-		p.setTabTask(Task.builder().execute(() -> {
-			Player player = p.getUser().getPlayer().get();
+		p.setTabTask(() -> {
+			Player player = event.getTargetEntity();
 			TabList list = player.getTabList();
 			List<TabListEntry> lx = Utils.sl(list.getEntries());
 			for (TabListEntry e : lx) {
-				Player pla = Sponge.getServer().getPlayer(e.getProfile().getUniqueId()).get();
+				Optional<Player> h = Sponge.getServer().getPlayer(e.getProfile().getUniqueId());
+				if (!h.isPresent()) {
+					continue;
+				}
+				Player pla = h.get();
 				RayPlayer plx = RayPlayer.get(pla);
 				Group g = plx.getActiveGroup();
 				if (g == null) {
@@ -189,7 +193,7 @@ public class MainListener {
 						t.apply(Ray.get().setVars(Utils.sm(), t, pla, Optional.of(player), Optional.of(f), false))
 								.build());
 			}
-		}));
+		});
 
 		// TODO tablist header/footer
 
@@ -239,6 +243,10 @@ public class MainListener {
 				ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
 			}
 		}).submit(Ray.get().getPlugin());
+		Task.builder().delayTicks(30).execute(() -> {
+			RayPlayer.updateTabs();
+			p.updateTab();
+		}).submit(Ray.get().getPlugin());
 	}
 
 	// Logs ALL commands that are handled by the server
@@ -256,6 +264,7 @@ public class MainListener {
 		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
 				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
+		RayPlayer.updateTabs();
 	}
 
 	// TODO figure out way to customize messages - locale is retrivable so use
@@ -275,6 +284,7 @@ public class MainListener {
 		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
 				handle(FormatType.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
+		RayPlayer.updateTabs();
 	}
 
 	@Listener

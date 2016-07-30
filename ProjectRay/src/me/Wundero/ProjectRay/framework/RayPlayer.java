@@ -78,13 +78,17 @@ public class RayPlayer {
 		}
 		return cache.get(u.getUniqueId());
 	}
-	
+
 	public static void updateTabs() {
-		for(RayPlayer p : cache.values()) {
-			if(p.user.isOnline() && p.user.getPlayer().isPresent()) {
-				
+		for (RayPlayer p : cache.values()) {
+			if (p.user.isOnline() && p.user.getPlayer().isPresent()) {
+				p.updateTab();
 			}
 		}
+	}
+
+	public void updateTab() {
+		Task.builder().execute(tabTask).submit(Ray.get().getPlugin());
 	}
 
 	public static void saveAll() throws ObjectMappingException {
@@ -108,7 +112,7 @@ public class RayPlayer {
 	private List<UUID> ignore = Utils.sl();
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
-	private Task.Builder tabTask;
+	private Runnable tabTask;
 	private Animation tabhfAnimation;
 
 	public boolean isIgnoring(RayPlayer player) {
@@ -296,7 +300,7 @@ public class RayPlayer {
 	/**
 	 * @return the tabTask
 	 */
-	public Task.Builder getTabTask() {
+	public Runnable getTabTask() {
 		return tabTask;
 	}
 
@@ -304,7 +308,7 @@ public class RayPlayer {
 	 * @param tabTask
 	 *            the tabTask to set
 	 */
-	public void setTabTask(Task.Builder tabTask) {
+	public void setTabTask(Runnable tabTask) {
 		this.tabTask = tabTask;
 	}
 

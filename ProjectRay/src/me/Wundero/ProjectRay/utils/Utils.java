@@ -163,7 +163,9 @@ public class Utils {
 			String mg = matcher.group().substring(1);
 			mg = mg.substring(0, mg.length() - 1);
 			out = out.concat(TextTemplate.of(TextTemplate.arg(mg)));
-			out = out.concat(TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[x])));
+			if (x < textParts.length) {
+				out = out.concat(TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[x])));
+			}
 			in = matcher.replaceFirst("");
 			x++;
 		}
