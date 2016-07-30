@@ -29,7 +29,6 @@ import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.config.Template;
 import me.Wundero.ProjectRay.config.Templates;
 import me.Wundero.ProjectRay.framework.Groups;
-import me.Wundero.ProjectRay.framework.mail.Mail;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -96,7 +95,7 @@ public class ProjectRay {
 		}
 		return opt.get();
 	}
-	
+
 	public Path getConfigDir() {
 		return configDir;
 	}
@@ -120,7 +119,6 @@ public class ProjectRay {
 		TypeSerializerCollection t = opts.getSerializers();
 		t.registerType(TypeToken.of(InternalClickAction.class), InternalClickAction.serializer());
 		t.registerType(TypeToken.of(InternalHoverAction.class), InternalHoverAction.serializer());
-		t.registerType(TypeToken.of(Mail.class), Mail.serializer());
 		return opts.setSerializers(t);
 	}
 

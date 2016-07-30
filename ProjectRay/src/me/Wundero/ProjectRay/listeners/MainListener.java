@@ -25,12 +25,15 @@ package me.Wundero.ProjectRay.listeners;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
@@ -64,6 +67,11 @@ public class MainListener {
 
 	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel) {
+		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty());
+	}
+
+	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
+			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip) {
 		if (p == null) {
 			return false;
 		}
@@ -86,7 +94,6 @@ public class MainListener {
 			v.put("channel", c.getTag());
 			v.put("channelname", c.getName());
 		}
-		v = Ray.get().setVars(v, f.getTemplate(), p, false, Optional.of(f), true);
 		final TextTemplate template = f.getTemplate();
 		final Map<String, Object> args = Utils.sm(v);
 		MessageChannel newchan = MessageChannel.combined(channel, new MessageChannel() {
@@ -104,9 +111,11 @@ public class MainListener {
 				}
 
 				if (recipient instanceof Player) {
-					args.putAll(Ray.get().setVars(args, template, (Player) recipient, true, Optional.of(f), true));
+					args.putAll(Ray.get().setVars(args, template, msgsender.isPresent() ? msgsender.get() : p,
+							msgrecip.isPresent() ? msgrecip : Optional.of((Player) recipient), Optional.of(f), true));
 				} else {
-					args.putAll(Ray.get().setVars(args, template, null, true, Optional.of(f), true));
+					args.putAll(Ray.get().setVars(args, template, msgsender.isPresent() ? msgsender.get() : p,
+							msgrecip.isPresent() ? msgrecip : Optional.empty(), Optional.of(f), true));
 				}
 				if (template == null) {
 					return Optional.of(original);
@@ -134,8 +143,16 @@ public class MainListener {
 		}
 		vars.put("message", Utils.transIf(event.getRawMessage().toPlain(), p));
 		if (event.getCause().containsNamed("formattype")) {
+			Optional<Player> sf = Optional.empty();
+			Optional<Player> st = Optional.empty();
+			if (event.getCause().containsNamed("sendfrom")) {
+				sf = event.getCause().get("sendfrom", Player.class);
+			}
+			if (event.getCause().containsNamed("sendto")) {
+				st = event.getCause().get("sendto", Player.class);
+			}
 			event.setCancelled(handle(event.getCause().get("formattype", FormatType.class).get(), event, vars, p,
-					event.getChannel().get()));
+					event.getChannel().get(), sf, st));
 		} else {
 			event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
 		}
@@ -143,7 +160,39 @@ public class MainListener {
 
 	@Listener
 	public void onJoin(ClientConnectionEvent.Join event) {
+		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		Ray.get().setLoadable(event.getTargetEntity());
+		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
+		p.setTabTask(Task.builder().execute(() -> {
+			Player player = p.getUser().getPlayer().get();
+			TabList list = player.getTabList();
+			List<TabListEntry> lx = Utils.sl(list.getEntries());
+			for (TabListEntry e : lx) {
+				Player pla = Sponge.getServer().getPlayer(e.getProfile().getUniqueId()).get();
+				RayPlayer plx = RayPlayer.get(pla);
+				Group g = plx.getActiveGroup();
+				if (g == null) {
+					Object o = Ray.get().getVariables().get("displayname", pla);
+					e.setDisplayName(o instanceof Text ? (Text) o : Text.of(o.toString()));
+				}
+				Format f = g.getFormat(FormatType.TABLIST_ENTRY);
+				if (f == null) {
+					Object o = Ray.get().getVariables().get("displayname", pla);
+					e.setDisplayName(o instanceof Text ? (Text) o : Text.of(o.toString()));
+				}
+				TextTemplate t = f.getTemplate();
+				if (t == null) {
+					Object o = Ray.get().getVariables().get("displayname", pla);
+					e.setDisplayName(o instanceof Text ? (Text) o : Text.of(o.toString()));
+				}
+				e.setDisplayName(
+						t.apply(Ray.get().setVars(Utils.sm(), t, pla, Optional.of(player), Optional.of(f), false))
+								.build());
+			}
+		}));
+
+		// TODO tablist header/footer
+
 		if (event.getChannel().isPresent()) {
 			event.setMessageCancelled(true);
 			Task.builder().delayTicks(10).execute(() -> {
@@ -158,6 +207,20 @@ public class MainListener {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 						Cause.builder().from(event.getCause()).named("formattype", FormatType.JOIN).build(),
 						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
+				Sponge.getEventManager().post(ev2);
+				if (!ev2.isCancelled()) {
+					ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
+				}
+			}).submit(Ray.get().getPlugin());
+		}
+		if (welcome) {
+			Task.builder().delayTicks(15).execute(() -> {
+				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
+						Cause.builder().from(event.getCause()).named("formattype", FormatType.WELCOME).build(),
+						MessageChannel.TO_ALL, Optional.of(MessageChannel.TO_ALL),
+						new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE,
+								"Welcome " + event.getTargetEntity().getName() + " to the server!")),
+						event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
 					ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);

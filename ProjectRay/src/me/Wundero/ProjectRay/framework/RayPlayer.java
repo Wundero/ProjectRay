@@ -33,14 +33,15 @@ import java.util.UUID;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
-import me.Wundero.ProjectRay.framework.mail.Mail;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -77,6 +78,14 @@ public class RayPlayer {
 		}
 		return cache.get(u.getUniqueId());
 	}
+	
+	public static void updateTabs() {
+		for(RayPlayer p : cache.values()) {
+			if(p.user.isOnline() && p.user.getPlayer().isPresent()) {
+				
+			}
+		}
+	}
 
 	public static void saveAll() throws ObjectMappingException {
 		for (RayPlayer p : cache.values()) {
@@ -97,9 +106,10 @@ public class RayPlayer {
 	private Map<String, Group> groups;
 	private Optional<RayPlayer> lastMessaged = Optional.empty();
 	private List<UUID> ignore = Utils.sl();
-	private List<Mail> mails = Utils.sl();
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
+	private Task.Builder tabTask;
+	private Animation tabhfAnimation;
 
 	public boolean isIgnoring(RayPlayer player) {
 		return ignore.contains(player.uuid);
@@ -136,8 +146,6 @@ public class RayPlayer {
 		}
 		ConfigurationNode i = config.getNode("ignoring");
 		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)));
-		ConfigurationNode m = config.getNode("mail");
-		mails = Utils.sl(m.getList(TypeToken.of(Mail.class)));
 		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
 	}
 
@@ -146,19 +154,9 @@ public class RayPlayer {
 			return;
 		}
 		config.getNode("ignoring").setValue(ignore);
-		saveMails(config.getNode("mail"), mails);
 		config.getNode("channel").setValue(activeChannel == null ? null : activeChannel.getName());
 		config.getNode("lastname").setValue(user.getName());
 		// TODO save displayname
-	}
-
-	private static void saveMails(ConfigurationNode node, List<Mail> mails) throws ObjectMappingException {
-		if (mails.isEmpty()) {
-			return;
-		}
-		for (int i = 0; i < mails.size(); i++) {
-			node.getNode(String.valueOf(i)).setValue(TypeToken.of(Mail.class), mails.get(i));
-		}
 	}
 
 	public RayPlayer(User u) {
@@ -296,17 +294,32 @@ public class RayPlayer {
 	}
 
 	/**
-	 * @return the mails
+	 * @return the tabTask
 	 */
-	public List<Mail> getMails() {
-		return mails;
+	public Task.Builder getTabTask() {
+		return tabTask;
 	}
 
 	/**
-	 * @param mails
-	 *            the mails to set
+	 * @param tabTask
+	 *            the tabTask to set
 	 */
-	public void setMails(List<Mail> mails) {
-		this.mails = mails;
+	public void setTabTask(Task.Builder tabTask) {
+		this.tabTask = tabTask;
+	}
+
+	/**
+	 * @return the tabhfAnimation
+	 */
+	public Animation getTabAnimation() {
+		return tabhfAnimation;
+	}
+
+	/**
+	 * @param tabhfAnimation
+	 *            the tabhfAnimation to set
+	 */
+	public void setTabAnimation(Animation tabhfAnimation) {
+		this.tabhfAnimation = tabhfAnimation;
 	}
 }

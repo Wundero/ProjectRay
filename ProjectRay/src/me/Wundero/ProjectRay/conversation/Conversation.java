@@ -63,7 +63,7 @@ public abstract class Conversation {
 
 	public boolean next(Prompt next) {
 		if (next == null) {
-			finish();
+			return finish();
 		}
 		if (Sponge.getEventManager()
 				.post(new ConversationEvent.Next(

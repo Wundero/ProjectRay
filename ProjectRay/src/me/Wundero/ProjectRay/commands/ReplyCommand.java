@@ -63,20 +63,22 @@ public class ReplyCommand implements CommandExecutor {
 		String message = (String) args.getOne("message").get();
 		Player sendto = sender.getLastMessaged().get().getUser().getPlayer().get();
 		MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SEND).build(),
+				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SEND).named("sendfrom", sendfrom)
+						.named("sendto", sendto).build(),
 				sendfrom.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(sendfrom), MessageChannel.TO_CONSOLE)),
 				new MessageEvent.MessageFormatter(Text.of("You to ", sendto.getName()), Text.of(message)),
 				Text.of(message), false);
 		MessageChannelEvent.Chat event2 = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_RECEIVE).build(),
+				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_RECEIVE).named("sendfrom", sendfrom)
+						.named("sendto", sendto).build(),
 				sendto.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto), MessageChannel.TO_CONSOLE)),
 				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"), Text.of(message)),
 				Text.of(message), false);
 		if (!Sponge.getEventManager().post(event) && !Sponge.getEventManager().post(event2)) {
-			event.getChannel().get().send(event.getMessage());
-			event2.getChannel().get().send(event2.getMessage());
+			event.getChannel().get().send(sendfrom, event.getMessage());
+			event2.getChannel().get().send(sendfrom, event2.getMessage());
 			RayPlayer.getRay(sendto).setLastMessaged(Optional.of(RayPlayer.getRay(sendfrom)), true);
 		}
 		return CommandResult.success();

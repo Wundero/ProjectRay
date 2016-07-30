@@ -334,14 +334,15 @@ public class FormatConversation {
 				if (type == FormatType.DEFAULT) {
 					continue;
 				}
-				options.add(
-						new Option(type.getName(),
-								Text.builder(type.getName().toLowerCase().replace("_", " ")).color(TextColors.GOLD)
-										.onClick(TextActions.runCommand(type.getName().toLowerCase().replace("_", " ")))
-										.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select "
-												+ type.getName().toLowerCase().replace("_", " ") + "!")))
-										.build(),
-								type));
+				options.add(new Option(
+						type.getName().toLowerCase().replace("_",
+								" "),
+						Text.builder(type.getName().toLowerCase().replace("_", " ")).color(TextColors.GOLD)
+								.onClick(TextActions.runCommand(type.getName().toLowerCase().replace("_", " ")))
+								.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select "
+										+ type.getName().toLowerCase().replace("_", " ") + "!")))
+								.build(),
+						type));
 			}
 			return Optional.of(options);
 		}
@@ -544,6 +545,10 @@ public class FormatConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			System.out.println(value);
+			if (value.contains(" ")) {
+				value = value.split(" ")[0];
+			}
 			switch (value) {
 			case "key":
 				key = text;
@@ -562,6 +567,7 @@ public class FormatConversation {
 					text = text.substring(4);
 				}
 				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
+				System.out.println(text);
 				return new ArgTypePrompt(this);
 			case "hover":
 				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))

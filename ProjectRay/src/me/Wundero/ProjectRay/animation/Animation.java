@@ -23,58 +23,55 @@ package me.Wundero.ProjectRay.animation;
  SOFTWARE.
  */
 
-import java.util.List;
-
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.utils.Utils;
 
 public class Animation {
 	private final FrameSequence animation;
 	private final Player player;
 
-	private List<Task.Builder> tasks = Utils.sl();
-	private List<String> taskids = Utils.sl();
-	private Task cancellableTask;
+	private Task task;
 
 	private boolean running;
 	private boolean repeat;
 
+	private int index = 0;
+	private int ticksTillNext = 0;
+
 	public Animation(FrameSequence animation, Player to) {
 		this.animation = animation;
 		this.player = to;
-		for (Frame f : animation.getFrames()) {
-			Task.Builder tb = Task.builder().delayTicks(f.getDelayTicks())
-					.name("RayFrameTo" + to.getName() + "-S-" + animation.getFrames().indexOf(f)).execute((task) -> {
-						if (!f.send(player)) {
-							stop();
-							return;
-						}
-						int index = taskids.indexOf(task.getName()) + 1;
-						if (tasks.size() == index) {
-							if (!repeat) {
-								return;
-							}
-							index = 0;
-						}
-						Task.Builder t2 = tasks.get(index);
-						cancellableTask = t2.submit(Ray.get().getPlugin());
-					});
-			tasks.add(tb);
-			taskids.add("RayFrameTo" + to.getName() + "-S-" + animation.getFrames().indexOf(f));
-		}
+		ttn();
+	}
+
+	private void ttn() {
+		ticksTillNext = animation.getFrames().get(index).getDelayTicks();
 	}
 
 	public void stop() {
 		setRunning(false);
-		cancellableTask.cancel();
+		task.cancel();
 	}
 
 	public void start() {
 		setRunning(true);
-		cancellableTask = tasks.get(0).submit(Ray.get().getPlugin());
+		task = Task.builder().delayTicks(1).execute(() -> {
+			if (ticksTillNext <= 0) {
+				if (repeat && index >= animation.getFrames().size()) {
+					index = 0;
+				} else {
+					stop();
+					return;
+				}
+				animation.getFrames().get(index).send(player);
+				index++;
+				ttn();
+			} else {
+				ticksTillNext--;
+			}
+		}).submit(Ray.get().getPlugin());
 	}
 
 	public FrameSequence getAnimation() {

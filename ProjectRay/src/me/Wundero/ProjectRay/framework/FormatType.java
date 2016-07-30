@@ -27,22 +27,16 @@ import java.util.regex.Pattern;
  */
 public enum FormatType {
 
-	CHAT("chat", new String[] { "c" }), 
-	MESSAGE_SEND("send_message",new String[] { "sm", "smsg", "sendmsg" }), 
-	MESSAGE_RECEIVE("receive_message",	new String[] { "rm", "rmsg", "receivemsg" }), 
-	DEATH("death", new String[] { "d" }), 
-	JOIN("join",new String[] { "j" }), 
-	LEAVE("leave", new String[] { "l" }), 
-	CUSTOM("custom"), 
-	WELCOME("welcome", new String[] { "w" }),
-	MOTD("motd", new String[] {}), 
-	ANNOUNCEMENT("announcement", new String[] { "a" }), 
-	TABLIST_ENTRY("tablist",new String[] { "list", "t", "tab" }), 
-	TABLIST_HEADER("header",new String[] {}), 
-	TABLIST_FOOTER("footer",new String[] {}), 
-	DEFAULT("default"), 
-	ACHIEVEMENT("achievement"), 
-	KICK("kick");
+	CHAT("chat", new String[] { "c" }), MESSAGE_SEND("send_message",
+			new String[] { "sm", "smsg", "sendmsg" }), MESSAGE_RECEIVE("receive_message",
+					new String[] { "rm", "rmsg", "receivemsg" }), DEATH("death", new String[] { "d" }), JOIN("join",
+							new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM("custom"), WELCOME(
+									"welcome", new String[] { "w" }), MOTD("motd", new String[] {}), ANNOUNCEMENT(
+											"announcement", new String[] { "a" }), TABLIST_ENTRY("tablist",
+													new String[] { "list", "t", "tab" }), TABLIST_HEADER("header",
+															new String[] {}), TABLIST_FOOTER("footer",
+																	new String[] {}), DEFAULT("default"), ACHIEVEMENT(
+																			"achievement"), KICK("kick");
 
 	// format types:
 	/*
@@ -55,7 +49,7 @@ public enum FormatType {
 	 * kick------------------------------------------------------------------Y
 	 * death----------------------------------------------------------------/N
 	 * custom---------------------------------------------------------------/N
-	 * welcome---------------------------------------------------------------N
+	 * welcome---------------------------------------------------------------Y
 	 * modt------------------------------------------------------------------Y
 	 * announcement----------------------------------------------------------N
 	 * tablist_entry---------------------------------------------------------N
@@ -99,12 +93,12 @@ public enum FormatType {
 	}
 
 	public static FormatType fromString(String s) {
-		s = s.trim();
+		s = s.trim().toUpperCase().replace(" ", "_");
 		if (namepat.matcher(s).matches()) {
 			s = altpat.matcher(s).replaceAll("");
 		}
 		for (FormatType type : values()) {
-			if (type.name.equalsIgnoreCase(s)) {
+			if (type.name.equalsIgnoreCase(s) || type.getName().equalsIgnoreCase(s)) {
 				return type;
 			}
 		}

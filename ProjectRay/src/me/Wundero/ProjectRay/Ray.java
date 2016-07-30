@@ -19,6 +19,7 @@ import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.Groups;
+import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannels;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -123,6 +124,11 @@ public class Ray {
 		for (Task t : asyncTasks) {
 			t.cancel();
 		}
+		try {
+			RayPlayer.saveAll();
+		} catch (ObjectMappingException e) {
+			Utils.printError(e);
+		}
 	}
 
 	public Game getGame() {
@@ -149,8 +155,8 @@ public class Ray {
 		this.groups = groups;
 	}
 
-	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender, boolean isRecip,
-			Optional<Format> formatUsed, boolean useClickHover) {
+	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender,
+			Optional<Player> recip, Optional<Format> formatUsed, boolean useClickHover) {
 		if (sender == null) {
 			return known;
 		}
@@ -179,11 +185,16 @@ public class Ray {
 		if (template != null && template.getArguments() != null) {
 			for (String key : template.getArguments().keySet()) {
 				String k = key;
-				if (k.toLowerCase().startsWith("recip_") != isRecip) {
+				if (k.toLowerCase().startsWith("recip_") && !recip.isPresent()) {
 					continue;
 				}
+				boolean irecip = false;
+				if (k.toLowerCase().startsWith("recip_")) {
+					k = k.substring("recip_".length());
+					irecip = true;
+				}
 				if (!out.containsKey(key)) {
-					Object var = getVariables().get(k, sender);
+					Object var = getVariables().get(k, irecip ? recip.get() : sender);
 					Object var2 = var;
 					if (args != null) {
 						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());
@@ -196,15 +207,15 @@ public class Ray {
 										.getValue(TypeToken.of(InternalHoverAction.class));
 								if (click != null) {
 									if (click instanceof InternalClickAction.ATemplate) {
-										((InternalClickAction.ATemplate) click).apply(setVars(out,
-												(TextTemplate) click.getResult(), sender, isRecip, formatUsed, false));
+										((InternalClickAction.ATemplate) click).apply(setVars(known,
+												(TextTemplate) click.getResult(), sender, recip, formatUsed, false));
 									}
 									click.applyTo(newVar);
 								}
 								if (hover != null) {
 									if (hover instanceof InternalHoverAction.ShowTemplate) {
-										((InternalHoverAction.ShowTemplate) hover).apply(setVars(out,
-												(TextTemplate) hover.getResult(), sender, isRecip, formatUsed, false));
+										((InternalHoverAction.ShowTemplate) hover).apply(setVars(known,
+												(TextTemplate) hover.getResult(), sender, recip, formatUsed, false));
 									}
 									hover.applyTo(newVar);
 								}

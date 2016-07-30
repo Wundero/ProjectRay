@@ -65,7 +65,7 @@ public class RayCommand implements CommandExecutor {
 		Text out = Text.builder("/ray " + aliases.get(0) + " ").color(TextColors.DARK_GREEN)
 				.onClick(TextActions.suggestCommand("/ray " + aliases.get(0)))
 				.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to use the command!"))).build();
-		Optional<Text> opt = (Optional<Text>) cmd.getShortDescription(src);
+		Optional<Text> opt = cmd.getShortDescription(src);
 		out = out.concat(Text.of(TextColors.GRAY, "- "));
 		out = out.concat(opt.orElse(Text.of(TextColors.GRAY, "Default command description")));
 		if (aliases.size() > 1) {

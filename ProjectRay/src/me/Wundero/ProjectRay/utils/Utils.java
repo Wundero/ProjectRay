@@ -115,7 +115,7 @@ public class Utils {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) ImmutableList.builder().addAll(this).build().iterator();
+				return (Iterator<T>) ImmutableList.builder().add(this.toArray()).build().iterator();
 			}
 
 		});
@@ -146,20 +146,26 @@ public class Utils {
 		return Math.abs(l1 - l2) <= range;
 	}
 
-	public static TextTemplate parse(String in, boolean allowColors) {
+	public static TextTemplate parse(final String i, boolean allowColors) {
+		String in = i;
 		if (!allowColors) {
 			in = strip(in);
 		}
+		in = in.replace("%n", "\n");
 		if (!VAR_PATTERN.matcher(in).find()) {
 			return TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(in));
 		}
 		String[] textParts = in.split(VAR_PATTERN.pattern());
 		Matcher matcher = VAR_PATTERN.matcher(in);
-		matcher.find();
 		TextTemplate out = TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[0]));
-		for (int i = 0; i < matcher.groupCount(); i++) {
-			out = out.concat(TextTemplate.of(TextTemplate.arg(matcher.group(i))));
-			out = out.concat(TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[i + 1])));
+		int x = 1;
+		while (matcher.reset(in).find()) {
+			String mg = matcher.group().substring(1);
+			mg = mg.substring(0, mg.length() - 1);
+			out = out.concat(TextTemplate.of(TextTemplate.arg(mg)));
+			out = out.concat(TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[x])));
+			in = matcher.replaceFirst("");
+			x++;
 		}
 		return out;
 	}
@@ -647,12 +653,13 @@ public class Utils {
 		return list;
 	}
 
-	public static void updatePlayersAplha() {
+	public static void updatePlayersAlpha() {
 		playersAlphabetical = sort(sl(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers()));
 
 	}
 
 	public static List<Player> getPlayers() {
+		updatePlayersAlpha();
 		return sl(playersAlphabetical);
 	}
 
