@@ -40,7 +40,6 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -113,7 +112,6 @@ public class RayPlayer {
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
-	private Animation tabhfAnimation;
 
 	public boolean isIgnoring(RayPlayer player) {
 		return ignore.contains(player.uuid);
@@ -312,18 +310,4 @@ public class RayPlayer {
 		this.tabTask = tabTask;
 	}
 
-	/**
-	 * @return the tabhfAnimation
-	 */
-	public Animation getTabAnimation() {
-		return tabhfAnimation;
-	}
-
-	/**
-	 * @param tabhfAnimation
-	 *            the tabhfAnimation to set
-	 */
-	public void setTabAnimation(Animation tabhfAnimation) {
-		this.tabhfAnimation = tabhfAnimation;
-	}
 }

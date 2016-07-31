@@ -24,8 +24,6 @@ package me.Wundero.ProjectRay.framework.channel;
  */
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -36,43 +34,71 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
-import com.google.common.base.Preconditions;
+import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 public class ChatChannel implements MutableMessageChannel {
 
-	private List<MessageReceiver> members = Utils.sl();
+	private ChannelMemberCollection members = new ChannelMemberCollection();
 	private String name;
 	private String permission;
 	private Text tag;
 	private double range;
-	private List<MessageReceiver> mutes = Utils.sl();
 	private boolean hidden = false;
 	private ConfigurationNode node;
 	// TODO
 	/*
-	 * autojoin quickmessage multiworld enable/disable moderators bans whitelist
-	 * etc.
+	 * autojoin quickmessage
+	 * 
 	 */
 
-	public ChatChannel(ConfigurationNode node) {
-		this();
-		this.setNode(Preconditions.checkNotNull(node));
-		this.name = "";// TODO set this
-		this.permission = "ray.channel." + name;
+	public static TypeSerializer<ChatChannel> serializer() {
+		return new TypeSerializer<ChatChannel>() {
+
+			@Override
+			public ChatChannel deserialize(TypeToken<?> arg0, ConfigurationNode arg1) throws ObjectMappingException {
+				ChatChannel out = new ChatChannel();
+				out.name = arg1.getNode("name").getString();
+				out.permission = arg1.getNode("permission").getString("ray.channel." + out.name);
+				out.tag = TextSerializers.FORMATTING_CODE
+						.deserialize(arg1.getNode("tag").getString("[" + out.name.charAt(0) + "]"));
+				out.members = arg1.getNode("members").getValue(TypeToken.of(ChannelMemberCollection.class));
+				out.range = arg1.getNode("range").getDouble(-1);
+				out.hidden = arg1.getNode("hidden").getBoolean(false);
+				out.node = arg1;
+				return out;
+			}
+
+			@Override
+			public void serialize(TypeToken<?> arg0, ChatChannel arg1, ConfigurationNode arg2)
+					throws ObjectMappingException {
+				arg2.getNode("name").setValue(arg1.name);
+				arg2.getNode("permission").setValue(arg1.permission);
+				arg2.getNode("tag").setValue(TextSerializers.FORMATTING_CODE.serialize(arg1.tag));
+				arg2.getNode("members").setValue(TypeToken.of(ChannelMemberCollection.class), arg1.members);
+				arg2.getNode("range").setValue(arg1.range);
+				arg2.getNode("hidden").setValue(arg1.hidden);
+			}
+		};
 	}
 
-	private ChatChannel() {
+	public ChatChannel() {
 		members.addAll(MessageChannel.TO_CONSOLE.getMembers());
 	}
 
 	@Override
 	public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original, ChatType type) {
-		if (!members.contains(recipient)) {
+		if (!members.contains(recipient) || members.get(recipient).isBanned()) {
+			return Optional.empty();
+		}
+		if (sender instanceof MessageReceiver && !members.get((MessageReceiver) sender).canSpeak()) {
 			return Optional.empty();
 		}
 		if (range > 0 && sender instanceof Player && recipient instanceof Player) {
@@ -87,7 +113,7 @@ public class ChatChannel implements MutableMessageChannel {
 
 	@Override
 	public Collection<MessageReceiver> getMembers() {
-		return Collections.unmodifiableList(members);
+		return members.getMembers();
 	}
 
 	@Override
@@ -109,11 +135,22 @@ public class ChatChannel implements MutableMessageChannel {
 		return members.remove(member);
 	}
 
-	public boolean muteMember(MessageReceiver member) {
-		if (mutes.contains(member)) {
+	public void banMember(MessageReceiver member) {
+		members.get(member).setBanned(true);
+	}
+
+	public boolean setMemberRole(MessageReceiver member, Role role) {
+		if (!members.contains(member)) {
 			return false;
 		}
-		return mutes.add(member);
+		members.get(member).setRole(role);
+		return true;
+	}
+
+	public boolean muteMember(MessageReceiver member) {
+		boolean r = !members.get(member).isMuted();
+		members.get(member).setMuted(true);
+		return r;
 	}
 
 	public boolean muteMember(MessageReceiver member, long time, TimeUnit unit) {
@@ -126,7 +163,9 @@ public class ChatChannel implements MutableMessageChannel {
 	}
 
 	public boolean unmuteMember(MessageReceiver member) {
-		return mutes.remove(member);
+		boolean r = members.get(member).isMuted();
+		members.get(member).setMuted(false);
+		return r;
 	}
 
 	@Override
@@ -158,7 +197,4 @@ public class ChatChannel implements MutableMessageChannel {
 		return node;
 	}
 
-	private void setNode(ConfigurationNode node) {
-		this.node = node;
-	}
 }

@@ -96,7 +96,11 @@ public class Ray {
 		loadableSet = config.getNode("loadable").getValue() != null;
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
-		channels.load(null);// TODO this
+		try {
+			channels.load(null);
+		} catch (ObjectMappingException e) {
+			e.printStackTrace();
+		} // TODO this
 	}
 
 	public void setLoadable(UUID u) {
@@ -106,6 +110,7 @@ public class Ray {
 			} catch (ObjectMappingException e) {
 				config.getNode("loadable").setValue(u);
 			}
+			loadableSet = true;
 		}
 	}
 

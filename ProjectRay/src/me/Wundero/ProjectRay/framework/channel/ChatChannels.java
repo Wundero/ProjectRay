@@ -28,15 +28,24 @@ import java.util.Map;
 
 import org.spongepowered.api.entity.living.player.Player;
 
+import com.google.common.reflect.TypeToken;
+
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class ChatChannels {
 	private Map<String, ChatChannel> channels = Utils.sm();
 
-	public void load(ConfigurationNode node) {
-		// not implemented yet as i need to decide on how to structure config,
-		// and also how to deal with channels as a whole
+	public void load(ConfigurationNode node) throws ObjectMappingException {
+		if(node==null) {
+			return;
+		}
+		for (ConfigurationNode n : node.getChildrenMap().values()) {
+			String name = n.getKey().toString();
+			ChatChannel channel = n.getValue(TypeToken.of(ChatChannel.class));
+			channels.put(name, channel);
+		}
 	}
 
 	public ChatChannel getChannel(String name) {

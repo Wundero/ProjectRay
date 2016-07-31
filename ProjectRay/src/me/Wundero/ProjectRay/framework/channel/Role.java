@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.animation;
+package me.Wundero.ProjectRay.framework.channel;
 /*
  The MIT License (MIT)
 
@@ -23,26 +23,6 @@ package me.Wundero.ProjectRay.animation;
  SOFTWARE.
  */
 
-import java.util.List;
-
-import me.Wundero.ProjectRay.utils.Utils;
-
-public class FrameSequence {
-	private List<Frame> frames = Utils.sl();
-
-	public FrameSequence(Frame... frames) {
-		this(Utils.sl(frames));
-	}
-
-	public FrameSequence(List<Frame> frames) {
-		this.setFrames(frames);
-	}
-
-	public List<Frame> getFrames() {
-		return frames;
-	}
-
-	public void setFrames(List<Frame> frames) {
-		this.frames = frames;
-	}
+public enum Role {
+	GUEST, MEMBER, MOD;
 }
