@@ -31,12 +31,10 @@ public enum FormatType {
 			new String[] { "sm", "smsg", "sendmsg" }), MESSAGE_RECEIVE("receive_message",
 					new String[] { "rm", "rmsg", "receivemsg" }), DEATH("death", new String[] { "d" }), JOIN("join",
 							new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM("custom"), WELCOME(
-									"welcome", new String[] { "w" }), MOTD("motd", new String[] {}), ANNOUNCEMENT(
-											"announcement", new String[] { "a" }), TABLIST_ENTRY("tablist",
-													new String[] { "list", "t", "tab" }), TABLIST_HEADER("header",
-															new String[] {}), TABLIST_FOOTER("footer",
-																	new String[] {}), DEFAULT("default"), ACHIEVEMENT(
-																			"achievement"), KICK("kick");
+									"welcome",
+									new String[] { "w" }), MOTD("motd", new String[] {}), TABLIST_ENTRY("tablist",
+											new String[] { "list", "t", "tab" }), DEFAULT("default"), ACHIEVEMENT(
+													"achievement", new String[] { "a", "ach" }), KICK("kick");
 
 	// format types:
 	/*
@@ -48,13 +46,10 @@ public enum FormatType {
 	 * achievement-----------------------------------------------------------Y
 	 * kick------------------------------------------------------------------Y
 	 * death----------------------------------------------------------------/N
-	 * custom---------------------------------------------------------------/N
+	 * custom----------------------------------------------------------------Y
 	 * welcome---------------------------------------------------------------Y
 	 * modt------------------------------------------------------------------Y
-	 * announcement----------------------------------------------------------N
 	 * tablist_entry---------------------------------------------------------Y
-	 * tablist_header--------------------------------------------------------N
-	 * tablist_footer--------------------------------------------------------N
 	 * default---------------------------------------------------------------/
 	 */
 

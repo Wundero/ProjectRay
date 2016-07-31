@@ -103,6 +103,9 @@ public class Group {
 		if (getFormats(type) == null || getFormats(type).isEmpty()) {
 			return null;
 		}
+		if (getFormats(type).size() >= index) {
+			return null;
+		}
 		return getFormats(type).get(index);
 	}
 
@@ -120,6 +123,15 @@ public class Group {
 	public Format getRandomFormat(FormatType type) {
 		List<Format> fmats = getFormats(type);
 		return fmats.get(new Random().nextInt(fmats.size()));
+	}
+
+	public Format getFormat(FormatType type, String name) {
+		for (Format f : getFormats(type)) {
+			if (f.getName().equalsIgnoreCase(name)) {
+				return f;
+			}
+		}
+		return null;
 	}
 
 	public List<Format> getAllFormats() {

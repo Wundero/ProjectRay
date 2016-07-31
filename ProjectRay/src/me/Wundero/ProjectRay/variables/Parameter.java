@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay;
+package me.Wundero.ProjectRay.variables;
 /*
  The MIT License (MIT)
 
@@ -23,28 +23,6 @@ package me.Wundero.ProjectRay;
  SOFTWARE.
  */
 
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
-
-public class Variables {
-	// Doing it the lame way for now
-	public Object get(String key, Object... objects) {
-		switch (key) {
-		case "online":
-			return Sponge.getServer().getOnlinePlayers().size()+"";
-		case "displayname":
-			if (objects[0] == null) {
-				return "";
-			}
-			return ((Player) objects[0]).get(Keys.DISPLAY_NAME).isPresent()
-					? ((Player) objects[0]).get(Keys.DISPLAY_NAME).get() : ((Player) objects[0]).getName();
-		case "player":
-			if (objects[0] == null) {
-				return "";
-			}
-			return ((Player) objects[0]).getName();
-		}
-		return "";
-	}
+public enum Parameter {
+	SENDER, RECIPIENT, OBSERVER, FORMAT, TEMPLATE;
 }

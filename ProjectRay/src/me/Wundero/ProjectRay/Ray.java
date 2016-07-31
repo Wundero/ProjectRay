@@ -22,6 +22,7 @@ import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannels;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.variables.Variables;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
@@ -155,6 +156,8 @@ public class Ray {
 		this.groups = groups;
 	}
 
+	// TODO nested variables and variable data
+
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender,
 			Optional<Player> recip, Optional<Format> formatUsed, boolean useClickHover) {
 		if (sender == null) {
@@ -194,7 +197,8 @@ public class Ray {
 					irecip = true;
 				}
 				if (!out.containsKey(key)) {
-					Object var = getVariables().get(k, irecip ? recip.get() : sender);
+					Object var = getVariables().get(k, irecip ? recip.get() : sender,
+							irecip ? Optional.of(sender) : recip);
 					Object var2 = var;
 					if (args != null) {
 						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());

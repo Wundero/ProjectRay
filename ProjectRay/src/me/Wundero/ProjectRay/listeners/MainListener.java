@@ -67,11 +67,12 @@ public class MainListener {
 
 	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel) {
-		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty());
+		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty());
 	}
 
 	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
-			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip) {
+			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip,
+			Optional<String> formatName) {
 		if (p == null) {
 			return false;
 		}
@@ -80,7 +81,13 @@ public class MainListener {
 		if (g == null) {
 			return false;
 		}
-		final Format f = g.getFormat(t);
+		Format fx;
+		if (formatName.isPresent()) {
+			fx = g.getFormat(t, formatName.get());
+		} else {
+			fx = g.getFormat(t);
+		}
+		final Format f = fx;// final reference important
 		if (f == null) {
 			return false;
 		}
@@ -135,6 +142,12 @@ public class MainListener {
 	}
 
 	@Listener
+	public void message(MessageEvent event) {
+		Ray.get().getLogger().info("original: " + event.getOriginalMessage().toPlain());
+		Ray.get().getLogger().info("new: " + event.getMessage().toPlain());
+	}
+
+	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
 		Map<String, Object> vars = Utils.sm();
 		Player p = null;
@@ -145,14 +158,18 @@ public class MainListener {
 		if (event.getCause().containsNamed("formattype")) {
 			Optional<Player> sf = Optional.empty();
 			Optional<Player> st = Optional.empty();
+			Optional<String> fn = Optional.empty();
 			if (event.getCause().containsNamed("sendfrom")) {
 				sf = event.getCause().get("sendfrom", Player.class);
 			}
 			if (event.getCause().containsNamed("sendto")) {
 				st = event.getCause().get("sendto", Player.class);
 			}
+			if (event.getCause().containsNamed("formatname")) {
+				fn = event.getCause().get("formatname", String.class);
+			}
 			event.setCancelled(handle(event.getCause().get("formattype", FormatType.class).get(), event, vars, p,
-					event.getChannel().get(), sf, st));
+					event.getChannel().get(), sf, st, fn));
 		} else {
 			event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
 		}
