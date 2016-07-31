@@ -64,7 +64,6 @@ public class ConversationFactory {
 
 				@Override
 				public void onChat(Chat chat) {
-					System.out.println("works");
 				}
 
 				@Override

@@ -40,12 +40,12 @@ public class Store {
 		}
 		return Optional.of(vars.get(key));
 	}
-	
+
 	Param[] getParams(Variable v) {
-		if(parameters.containsKey(v)) {
+		if (parameters.containsKey(v)) {
 			return parameters.get(v);
 		}
-		return new Param[]{};
+		return new Param[] {};
 	}
 
 	public boolean registerVariable(Variable v) {
@@ -56,13 +56,13 @@ public class Store {
 		List<Param> params = Utils.sl();
 		try {
 			Method m = v.getClass().getMethod("parse", Map.class);
-			for(Param p : m.getAnnotation(Parameters.class).parameters()) {
+			for (Param p : m.getAnnotation(Parameters.class).parameters()) {
 				params.add(p);
 			}
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		parameters.put(v, (Param[]) params.toArray());
+		parameters.put(v, params.toArray(new Param[params.size()]));
 		return true;
 	}
 }

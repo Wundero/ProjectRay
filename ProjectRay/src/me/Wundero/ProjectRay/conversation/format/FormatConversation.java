@@ -74,8 +74,13 @@ public class FormatConversation {
 							return;
 						}
 						ConfigurationNode node = context.getData("wipable node");
+						boolean wipegroup = context.getData("wipegroup");
 						if (node != null) {
-							node.getParent().removeChild(node.getKey());
+							if (wipegroup) {
+								node.getParent().setValue(null);
+							} else {
+								node.setValue(null);
+							}
 						}
 					}
 
@@ -182,6 +187,7 @@ public class FormatConversation {
 			} else {
 				Group g = Ray.get().getGroups().load(node.getNode(text));
 				context.putData("group", g);
+				context.putData("wipegroup", true);
 			}
 			return new NamePrompt();
 		}

@@ -41,20 +41,38 @@ public abstract class ConversationListener {
 		this.conversation = convo;
 	}
 
-	@Listener
 	public abstract void onChat(ConversationEvent.Chat chat);
 
-	@Listener
 	public abstract void onFinish(ConversationEvent.Finish finish);
 
-	@Listener
 	public abstract void onCancel(ConversationEvent.Cancel cancel);
 
-	@Listener
 	public abstract void onNext(ConversationEvent.Next next);
 
-	@Listener
 	public abstract void onStart(ConversationEvent.Start start);
+	
+	@Listener
+	public final void f(ConversationEvent.Finish c) {
+		onFinish(c);
+	}
+	@Listener
+	public final void ch(ConversationEvent.Chat c) {
+		onChat(c);
+	}
+	@Listener
+	public final void ca(ConversationEvent.Cancel c) {
+		onCancel(c);
+	}
+	
+	@Listener
+	public final void s(ConversationEvent.Start c) {
+		onStart(c);
+	}
+	
+	@Listener
+	public final void n(ConversationEvent.Next c) {
+		onNext(c);
+	}
 
 	@Listener
 	public final void internalchat(MessageChannelEvent.Chat event) {

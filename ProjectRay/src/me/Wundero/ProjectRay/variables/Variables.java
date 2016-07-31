@@ -105,6 +105,7 @@ public class Variables {
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
+			@Parameters
 			@Override
 			public Text parse(Map<Param, Object> objects) {
 				task.accept(objects);
@@ -117,6 +118,7 @@ public class Variables {
 	public boolean registerVariable(String key, Supplier<Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
+			@Parameters
 			@Override
 			public Text parse(Map<Param, Object> objects) {
 				return replacer.get();
@@ -128,6 +130,7 @@ public class Variables {
 	public boolean registerVariable(String key, Function<Map<Param, Object>, Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
+			@Parameters
 			@Override
 			public Text parse(Map<Param, Object> objects) {
 				return replacer.apply(objects);
