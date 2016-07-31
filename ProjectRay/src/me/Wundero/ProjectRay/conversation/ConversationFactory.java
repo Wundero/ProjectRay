@@ -30,6 +30,11 @@ import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Cancel;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Chat;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Finish;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Next;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Start;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class ConversationFactory {
@@ -56,6 +61,27 @@ public class ConversationFactory {
 		};
 		if (listener == null) {
 			listener = new ConversationListener(convo) {
+
+				@Override
+				public void onChat(Chat chat) {
+					System.out.println("works");
+				}
+
+				@Override
+				public void onFinish(Finish finish) {
+				}
+
+				@Override
+				public void onCancel(Cancel cancel) {
+				}
+
+				@Override
+				public void onNext(Next next) {
+				}
+
+				@Override
+				public void onStart(Start start) {
+				}
 			};
 		}
 		convo.setCancellers(cancellers);

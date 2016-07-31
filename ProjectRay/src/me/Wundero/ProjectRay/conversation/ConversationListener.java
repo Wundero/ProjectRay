@@ -42,29 +42,19 @@ public abstract class ConversationListener {
 	}
 
 	@Listener
-	public void onChat(ConversationEvent.Chat chat) {
-
-	}
+	public abstract void onChat(ConversationEvent.Chat chat);
 
 	@Listener
-	public void onFinish(ConversationEvent.Finish finish) {
-
-	}
+	public abstract void onFinish(ConversationEvent.Finish finish);
 
 	@Listener
-	public void onCancel(ConversationEvent.Cancel cancel) {
-
-	}
+	public abstract void onCancel(ConversationEvent.Cancel cancel);
 
 	@Listener
-	public void onNext(ConversationEvent.Next next) {
-
-	}
+	public abstract void onNext(ConversationEvent.Next next);
 
 	@Listener
-	public void onStart(ConversationEvent.Start start) {
-
-	}
+	public abstract void onStart(ConversationEvent.Start start);
 
 	@Listener
 	public final void internalchat(MessageChannelEvent.Chat event) {
