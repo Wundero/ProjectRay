@@ -103,7 +103,7 @@ public class Group {
 		if (getFormats(type) == null || getFormats(type).isEmpty()) {
 			return null;
 		}
-		if (getFormats(type).size() >= index) {
+		if (getFormats(type).size() <= index) {
 			return null;
 		}
 		return getFormats(type).get(index);
@@ -167,6 +167,7 @@ public class Group {
 					return formats;
 				}
 			}
+			return Utils.sl();
 		}
 		return formats.get(type);
 	}

@@ -23,6 +23,7 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,15 +32,48 @@ import java.util.function.Supplier;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
+
+import me.Wundero.ProjectRay.framework.Format;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class Variables {
-	// Doing it the lame way for now
-	public Object get(String key, Object... objects) {
+	public Object get(String key, Optional<Player> sender, Optional<Player> recipient, Optional<Format> format,
+			Optional<TextTemplate> template) {
 		Optional<Variable> var = store.getVariable(key);
 		if (var.isPresent()) {
-			var.get().parse(objects);
+			Variable v = var.get();
+			Map<Param, Object> map = Utils.sm();
+			for (Param p : store.getParams(v)) {
+				switch (p) {
+				case SENDER:
+					if (!sender.isPresent()) {
+						break;
+					}
+					map.put(p, sender.get());
+					break;
+				case RECIPIENT:
+					if (!recipient.isPresent()) {
+						break;
+					}
+					map.put(p, recipient.get());
+					break;
+				case FORMAT:
+					if (!format.isPresent()) {
+						break;
+					}
+					map.put(p, format.get());
+					break;
+				case TEMPLATE:
+					if (!template.isPresent()) {
+						break;
+					}
+					map.put(p, template.get());
+					break;
+				}
+			}
+			return v.parse(map);
 		}
 		return "";
 	}
@@ -48,17 +82,17 @@ public class Variables {
 		store = new Store();
 		registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		registerVariable("player", (objects) -> {
-			if (objects[0] == null || !(objects[0] instanceof User)) {
+			if (!objects.containsKey(Param.SENDER)) {
 				return Text.of();
 			}
-			return Text.of(((User) objects[0]).getName());
+			return Text.of(((Player) objects.get(Param.SENDER)).getName());
 		});
 		registerVariable("displayname", (objects) -> {
-			if (objects[0] == null || !(objects[0] instanceof User)) {
+			if (!objects.containsKey(Param.SENDER)) {
 				return Text.of();
 			}
-			return ((Player) objects[0]).get(Keys.DISPLAY_NAME).isPresent()
-					? ((Player) objects[0]).get(Keys.DISPLAY_NAME).get() : Text.of(((Player) objects[0]).getName());
+			Player pl = (Player) objects.get(Param.SENDER);
+			return pl.get(Keys.DISPLAY_NAME).isPresent() ? pl.get(Keys.DISPLAY_NAME).get() : Text.of(pl.getName());
 		});
 	}
 
@@ -68,11 +102,11 @@ public class Variables {
 		return store.registerVariable(v);
 	}
 
-	public boolean registerVariable(String key, Consumer<Object[]> task) {
+	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
 			@Override
-			public Text parse(Object[] objects) {
+			public Text parse(Map<Param, Object> objects) {
 				task.accept(objects);
 				return Text.of();
 			}
@@ -84,18 +118,18 @@ public class Variables {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
 			@Override
-			public Text parse(Object[] objects) {
+			public Text parse(Map<Param, Object> objects) {
 				return replacer.get();
 			}
 
 		});
 	}
 
-	public boolean registerVariable(String key, Function<Object[], Text> replacer) {
+	public boolean registerVariable(String key, Function<Map<Param, Object>, Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
 			@Override
-			public Text parse(Object[] objects) {
+			public Text parse(Map<Param, Object> objects) {
 				return replacer.apply(objects);
 			}
 

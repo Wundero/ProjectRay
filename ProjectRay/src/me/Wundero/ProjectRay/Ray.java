@@ -197,8 +197,16 @@ public class Ray {
 					irecip = true;
 				}
 				if (!out.containsKey(key)) {
-					Object var = getVariables().get(k, irecip ? recip.get() : sender,
-							irecip ? Optional.of(sender) : recip);
+					Optional<Player> s1;
+					Optional<Player> r1;
+					if (irecip) {
+						s1 = recip;
+						r1 = Optional.of(sender);
+					} else {
+						s1 = Optional.of(sender);
+						r1 = recip;
+					}
+					Object var = getVariables().get(k, s1, r1, formatUsed, Optional.of(template));
 					Object var2 = var;
 					if (args != null) {
 						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());

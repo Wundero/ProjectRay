@@ -92,6 +92,7 @@ public class MainListener {
 			return false;
 		}
 		if (f.getTemplate() == null) {
+			System.out.println("y u do dis");
 			// possibly not loaded, but i don't care to figure out why formats
 			// don't always properly load templates
 			return true;
@@ -142,12 +143,6 @@ public class MainListener {
 	}
 
 	@Listener
-	public void message(MessageEvent event) {
-		Ray.get().getLogger().info("original: " + event.getOriginalMessage().toPlain());
-		Ray.get().getLogger().info("new: " + event.getMessage().toPlain());
-	}
-
-	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
 		Map<String, Object> vars = Utils.sm();
 		Player p = null;
@@ -193,18 +188,15 @@ public class MainListener {
 				RayPlayer plx = RayPlayer.get(pla);
 				Group g = plx.getActiveGroup();
 				if (g == null) {
-					Object o = Ray.get().getVariables().get("displayname", pla);
-					e.setDisplayName(o instanceof Text ? (Text) o : Text.of(o.toString()));
+					continue;
 				}
 				Format f = g.getFormat(FormatType.TABLIST_ENTRY);
 				if (f == null) {
-					Object o = Ray.get().getVariables().get("displayname", pla);
-					e.setDisplayName(o instanceof Text ? (Text) o : Text.of(o.toString()));
+					continue;
 				}
 				TextTemplate t = f.getTemplate();
 				if (t == null) {
-					Object o = Ray.get().getVariables().get("displayname", pla);
-					e.setDisplayName(o instanceof Text ? (Text) o : Text.of(o.toString()));
+					continue;
 				}
 				e.setDisplayName(
 						t.apply(Ray.get().setVars(Utils.sm(), t, pla, Optional.of(player), Optional.of(f), false))

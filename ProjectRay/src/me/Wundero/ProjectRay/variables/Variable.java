@@ -23,6 +23,8 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
+import java.util.Map;
+
 import org.spongepowered.api.text.Text;
 
 public abstract class Variable {
@@ -32,7 +34,8 @@ public abstract class Variable {
 		this.key = key.toLowerCase().trim();
 	}
 
-	public abstract Text parse(Object[] objects);
+	@Parameters
+	public abstract Text parse(Map<Param, Object> objects);
 
 	public final String getKey() {
 		return key;
