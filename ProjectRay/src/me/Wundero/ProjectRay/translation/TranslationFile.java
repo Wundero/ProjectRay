@@ -44,7 +44,7 @@ public class TranslationFile {
 
 	public TranslationFile(File file) {
 		this.setFile(file);
-		setLocale(Locale.forLanguageTag(file.getName()));
+		setLocale(Locale.forLanguageTag(file.getName().split(".")[0]));
 		parse(file, this);
 	}
 
@@ -59,8 +59,8 @@ public class TranslationFile {
 			@Override
 			public String get(Locale locale) {
 				String e = "";
-				if (!files.containsKey(locale)) {
-					if (!files.containsKey(Locales.DEFAULT)) {
+				if (!files.containsKey(locale) || !files.get(locale).usable) {
+					if (!files.containsKey(Locales.DEFAULT) || !files.get(Locales.DEFAULT).usable) {
 						return e;
 					}
 					String g = files.get(Locales.DEFAULT).lines.get(key);
@@ -94,6 +94,7 @@ public class TranslationFile {
 				return;
 			}
 		}).submit(Ray.get().getPlugin());
+		Ray.get().registerTask(t);
 		return t;
 	}
 
