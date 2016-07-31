@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.spongepowered</groupId>
 			<artifactId>spongeapi</artifactId>
-			<version>5.0.0-20160726.234650-89</version>
+			<version>5.0.0-20160731.174650-92</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
