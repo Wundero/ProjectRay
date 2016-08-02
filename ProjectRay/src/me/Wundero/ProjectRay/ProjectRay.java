@@ -151,7 +151,7 @@ public class ProjectRay {
 				.setPath(getConfigPath()).build();
 		try {
 			// This will allow safe editing out of game while still saving in
-			// game changes (in game has priority)
+			// game changes (in game has priority) (theoretically)
 			ConfigurationNode toMerge = loader.load();
 			ConfigurationNode node2 = config.mergeValuesFrom(toMerge);
 			loader.save(node2);

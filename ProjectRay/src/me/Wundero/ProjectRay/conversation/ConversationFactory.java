@@ -82,6 +82,8 @@ public class ConversationFactory {
 				public void onStart(Start start) {
 				}
 			};
+		} else {
+			listener.setConversation(convo);
 		}
 		convo.setCancellers(cancellers);
 		convo.setContext(context);
@@ -127,6 +129,7 @@ public class ConversationFactory {
 
 	public ConversationFactory withListener(ConversationListener listener) {
 		this.listener = listener;
+
 		return this;
 	}
 

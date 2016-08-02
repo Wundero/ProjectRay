@@ -69,6 +69,10 @@ public class ChannelMemberCollection {
 			}
 		};
 	}
+	
+	public int size() {
+		return members.size();
+	}
 
 	public void addAll(Iterable<MessageReceiver> receivers) {
 		for (MessageReceiver r : receivers) {

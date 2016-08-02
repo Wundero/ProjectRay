@@ -1,5 +1,7 @@
 package me.Wundero.ProjectRay;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +26,8 @@ import me.Wundero.ProjectRay.framework.channel.ChatChannels;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.Variables;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /*
@@ -89,6 +93,11 @@ public class Ray {
 	private Variables vars;
 	private ChatChannels channels;
 	private boolean loadableSet = false;
+	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
+
+	public void registerLoader(ConfigurationLoader<CommentedConfigurationNode> loader, ConfigurationNode node) {
+		toSave.put(loader, node);
+	}
 
 	public void load(ProjectRay plugin) {
 		this.setPlugin(plugin);
@@ -97,10 +106,18 @@ public class Ray {
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
 		try {
-			channels.load(null);
-		} catch (ObjectMappingException e) {
-			e.printStackTrace();
-		} // TODO this
+			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
+			if (!f.exists()) {
+				f.getParentFile().mkdirs();
+				f.createNewFile();
+			} else if (f.isDirectory()) {
+				f.delete();
+				f.createNewFile();
+			}
+			channels.load(Utils.load(f));
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
 	}
 
 	public void setLoadable(UUID u) {
@@ -134,6 +151,16 @@ public class Ray {
 			RayPlayer.saveAll();
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
+		}
+		for (ConfigurationLoader<?> loader : toSave.keySet()) {
+			try {
+				ConfigurationNode merger = loader.load();
+				ConfigurationNode mergable = toSave.get(loader);
+				ConfigurationNode node = mergable.mergeValuesFrom(merger);
+				loader.save(node);
+			} catch (IOException e) {
+				Utils.printError(e);
+			}
 		}
 	}
 
@@ -257,17 +284,10 @@ public class Ray {
 		this.vars = vars;
 	}
 
-	/**
-	 * @return the channels
-	 */
 	public ChatChannels getChannels() {
 		return channels;
 	}
 
-	/**
-	 * @param channels
-	 *            the channels to set
-	 */
 	public void setChannels(ChatChannels channels) {
 		this.channels = channels;
 	}

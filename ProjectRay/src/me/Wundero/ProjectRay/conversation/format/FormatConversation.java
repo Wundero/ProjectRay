@@ -82,6 +82,8 @@ public class FormatConversation {
 								node.setValue(null);
 							}
 						}
+						context.getHolder().sendMessage(
+								Text.of(TextColors.AQUA, "[Formats] ", TextColors.RED, "Format creation cancelled!"));
 					}
 
 				}).withFirstPrompt(new WorldPrompt()).build(player);

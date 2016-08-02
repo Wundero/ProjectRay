@@ -36,16 +36,37 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class ChatChannels {
 	private Map<String, ChatChannel> channels = Utils.sm();
+	private ConfigurationNode node;
 
 	public void load(ConfigurationNode node) throws ObjectMappingException {
-		if(node==null) {
+		if (node == null) {
 			return;
 		}
+		this.setNode(node);
 		for (ConfigurationNode n : node.getChildrenMap().values()) {
 			String name = n.getKey().toString();
 			ChatChannel channel = n.getValue(TypeToken.of(ChatChannel.class));
 			channels.put(name, channel);
 		}
+	}
+
+	public void addChannel(ConfigurationNode node) throws ObjectMappingException {
+		String name = node.getKey().toString();
+		ChatChannel channel = node.getValue(TypeToken.of(ChatChannel.class));
+		channels.put(name, channel);
+	}
+
+	public ChatChannel getChannel(String name, boolean startWith) {
+		ChatChannel out = getChannel(name);
+		if (out != null || !startWith) {
+			return out;
+		}
+		for (ChatChannel c : channels.values()) {
+			if (c.getName().startsWith(name)) {
+				return c;
+			}
+		}
+		return null;
 	}
 
 	public ChatChannel getChannel(String name) {
@@ -55,14 +76,14 @@ public class ChatChannels {
 		return channels.get(name);
 	}
 
-	public List<ChatChannel> getJoinableChannels(Player player) {
+	public List<ChatChannel> getJoinableChannels(Player player, boolean showHidden) {
 		List<ChatChannel> l = getAllChannels();
 		List<ChatChannel> o = Utils.sl();
 		for (ChatChannel c : l) {
-			if (c.isHidden()) {
+			if (c.isHidden() && !showHidden) {
 				continue;
 			}
-			if (player.hasPermission(c.getPermission())) {
+			if (c.canJoin(player)) {
 				o.add(c);
 			}
 
@@ -72,5 +93,13 @@ public class ChatChannels {
 
 	public List<ChatChannel> getAllChannels() {
 		return Utils.sl(channels.values());
+	}
+
+	public ConfigurationNode getNode() {
+		return node;
+	}
+
+	public void setNode(ConfigurationNode node) {
+		this.node = node;
 	}
 }

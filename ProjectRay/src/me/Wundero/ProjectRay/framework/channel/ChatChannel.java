@@ -44,7 +44,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-public class ChatChannel implements MutableMessageChannel {
+public class ChatChannel implements MutableMessageChannel, Comparable<ChatChannel> {
 
 	private ChannelMemberCollection members = new ChannelMemberCollection();
 	private String name;
@@ -52,10 +52,11 @@ public class ChatChannel implements MutableMessageChannel {
 	private Text tag;
 	private double range;
 	private boolean hidden = false;
+	private boolean autojoin = true;
 	private ConfigurationNode node;
 	// TODO
 	/*
-	 * autojoin quickmessage
+	 * quickmessage
 	 * 
 	 */
 
@@ -66,12 +67,13 @@ public class ChatChannel implements MutableMessageChannel {
 			public ChatChannel deserialize(TypeToken<?> arg0, ConfigurationNode arg1) throws ObjectMappingException {
 				ChatChannel out = new ChatChannel();
 				out.name = arg1.getNode("name").getString();
-				out.permission = arg1.getNode("permission").getString("ray.channel." + out.name);
+				out.permission = arg1.getNode("permission").getString(null);
 				out.tag = TextSerializers.FORMATTING_CODE
 						.deserialize(arg1.getNode("tag").getString("[" + out.name.charAt(0) + "]"));
 				out.members = arg1.getNode("members").getValue(TypeToken.of(ChannelMemberCollection.class));
 				out.range = arg1.getNode("range").getDouble(-1);
 				out.hidden = arg1.getNode("hidden").getBoolean(false);
+				out.autojoin = arg1.getNode("autojoin").getBoolean(true);
 				out.node = arg1;
 				return out;
 			}
@@ -80,11 +82,14 @@ public class ChatChannel implements MutableMessageChannel {
 			public void serialize(TypeToken<?> arg0, ChatChannel arg1, ConfigurationNode arg2)
 					throws ObjectMappingException {
 				arg2.getNode("name").setValue(arg1.name);
-				arg2.getNode("permission").setValue(arg1.permission);
+				if (arg1.permission != null && !arg1.permission.isEmpty()) {
+					arg2.getNode("permission").setValue(arg1.permission);
+				}
 				arg2.getNode("tag").setValue(TextSerializers.FORMATTING_CODE.serialize(arg1.tag));
 				arg2.getNode("members").setValue(TypeToken.of(ChannelMemberCollection.class), arg1.members);
 				arg2.getNode("range").setValue(arg1.range);
 				arg2.getNode("hidden").setValue(arg1.hidden);
+				arg2.getNode("autojoin").setValue(arg1.autojoin);
 			}
 		};
 	}
@@ -109,6 +114,17 @@ public class ChatChannel implements MutableMessageChannel {
 			}
 		}
 		return Optional.of(original);
+	}
+
+	public boolean canJoin(Player player) {
+		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
+			return false;
+		}
+		ChannelMember m = members.get(player);
+		if (m.isBanned()) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -195,6 +211,19 @@ public class ChatChannel implements MutableMessageChannel {
 
 	public ConfigurationNode getNode() {
 		return node;
+	}
+
+	public boolean isAutojoin() {
+		return autojoin;
+	}
+
+	public void setAutojoin(boolean autojoin) {
+		this.autojoin = autojoin;
+	}
+
+	@Override
+	public int compareTo(ChatChannel o) {
+		return members.size() - o.members.size();
 	}
 
 }

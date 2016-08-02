@@ -39,6 +39,8 @@ public class Commands {
 	static {
 		children.put(Utils.sl("format"), CommandSpec.builder().permission("ray.formatbuilder")
 				.description(Text.of("Create a new format.")).executor(new FormatConversationCommand()).build());
+		children.put(Utils.sl("channel"), CommandSpec.builder().permission("ray.channelbuilder")
+				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
 		/*
 		 * children.put(Lists.newArrayList("m", "msg", "message", "t", "tell",
 		 * "w", "whisper"),

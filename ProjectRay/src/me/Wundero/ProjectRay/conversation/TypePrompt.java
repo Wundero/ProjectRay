@@ -124,6 +124,11 @@ public abstract class TypePrompt<T> extends Prompt {
 		return Optional.empty();
 	}
 
+	@Override
+	public Optional<List<Option>> options(ConversationContext context) {
+		return Optional.empty();
+	}
+
 	public abstract Prompt onTypeInput(T object, String text, ConversationContext context);
 
 	@Override

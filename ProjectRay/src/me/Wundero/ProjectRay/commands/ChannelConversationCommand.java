@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.ProjectRay.commands;
 /*
  The MIT License (MIT)
 
@@ -23,6 +23,27 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
-public enum Param {
-	SENDER, RECIPIENT, FORMAT, TEMPLATE, DATA;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import me.Wundero.ProjectRay.conversation.channel.ChatChannelConversation;
+
+public class ChannelConversationCommand implements CommandExecutor {
+
+	@Override
+	public CommandResult execute(CommandSource source, CommandContext arguments) throws CommandException {
+		if (!(source instanceof Player)) {
+			source.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
+		}
+		Player player = (Player) source;
+		ChatChannelConversation.start(player);
+		return CommandResult.success();
+	}
+
 }

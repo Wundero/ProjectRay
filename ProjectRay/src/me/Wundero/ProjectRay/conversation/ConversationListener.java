@@ -35,8 +35,10 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
 
 public abstract class ConversationListener {
-	private final Conversation conversation;
-
+	private Conversation conversation;
+	
+	public ConversationListener(){}
+	
 	public ConversationListener(Conversation convo) {
 		this.conversation = convo;
 	}
@@ -121,6 +123,10 @@ public abstract class ConversationListener {
 		if ((conversation.getContext().getHolder().getUniqueId().equals(p.getUniqueId()))) {
 			conversation.cancel(Optional.empty());
 		}
+	}
+	
+	final void setConversation(Conversation convo) {
+		this.conversation = convo;
 	}
 
 	public final Conversation getConversation() {

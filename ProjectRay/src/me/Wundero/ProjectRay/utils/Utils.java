@@ -236,8 +236,34 @@ public class Utils {
 		return new InternalHoverAction.ShowTemplate(t);
 	}
 
-	public static Text transIf(String s, User u) {
+	/*
+	 * private static String addProtocol(String url) { if
+	 * (!url.startsWith("http")) { url = "http://" + url; } return url; }
+	 * 
+	 * public static Text clickifyLinks(Text t, User u) { if (u != null &&
+	 * !u.hasPermission("ray.url")) { return t; } String text = t.toPlain(); if
+	 * (!URL_PATTERN.matcher(text).find()) { return t; } String textColored =
+	 * TextSerializers.FORMATTING_CODE.serialize(t); String[] colorParts =
+	 * textColored.split("[\\&][a-fmnolkr0-9]"); Map<String, String> colours =
+	 * sm(); for (String s : colorParts) { String s2 = Pattern.quote(s); s2 =
+	 * "([\\&][a-fmnolkr0-9])+(" + s2 + ")"; if
+	 * (Pattern.compile(s2).matcher(textColored).find()) { Matcher m =
+	 * Pattern.compile(s2).matcher(textColored); m.find(); String f = m.group();
+	 * f = f.replace(s, ""); colours.put(s, f); } else { colours.put(s, ""); } }
+	 * Map<String, List<Integer>> indices = sm(); Map<Integer, String>
+	 * reversedIndices = sm(); for (String s : colorParts) { int startIndex =
+	 * text.indexOf(s); int endIndex = startIndex + s.length() - 1;
+	 * List<Integer> in = sl(); for (int i = startIndex; i <= endIndex; i++) {
+	 * in.add(i); reversedIndices.put(i, s); } indices.put(s, in); } Map<String,
+	 * List<Integer>> urls = sm(); Map<Integer, String> rurls = sm(); Matcher m
+	 * = URL_PATTERN.matcher(text); int in = 0; while (m.find()) { int s =
+	 * m.start(); int e = m.end(); String st = m.group(); List<Integer> ur =
+	 * sl(); for (int i = s + in; i <= e + in; i++) { ur.add(i); rurls.put(i,
+	 * st); } in += e; urls.put(st, ur); m = m.reset(text.substring(e)); }
+	 * return t; }
+	 */
 
+	public static Text transIf(String s, User u) {
 		if (u == null || u.hasPermission("ray.color")) {
 			return TextSerializers.FORMATTING_CODE.deserialize(s);
 		} else {
@@ -249,7 +275,9 @@ public class Utils {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(config)
 				.build();
 		try {
-			return loader.load(ProjectRay.updateSerializers(loader.getDefaultOptions()));
+			ConfigurationNode node = loader.load(ProjectRay.updateSerializers(loader.getDefaultOptions()));
+			Ray.get().registerLoader(loader, node);
+			return node;
 		} catch (Exception e) {
 			Utils.printError(e);
 			return null;

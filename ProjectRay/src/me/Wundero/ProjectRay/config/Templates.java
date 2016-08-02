@@ -42,4 +42,29 @@ public class Templates {
 				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
 				.build();
 	}
+
+	public static Template MULTI_GROUP(Template.Builder t) {
+		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
+				.withText(Text.of(" ")).withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build()
+				.withFormat("join").withArg(DefaultArgs.DISPLAYNAME)
+				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
+				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
+				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
+				.withGroup("admin").withPriority(1).withParent("default").withPermission("ray.group.admin")
+				.withFormat("chat")
+				.withText(
+						Text.of(TextColors.BLACK, "[", TextColors.RED, "Admin", TextColors.BLACK, "]", TextColors.AQUA))
+				.withArg(DefaultArgs.DISPLAYNAME).withText(Text.of(" "))
+				.withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build().withFormat("join")
+				.withText(
+						Text.of(TextColors.BLACK, "[", TextColors.RED, "Admin", TextColors.BLACK, "]", TextColors.AQUA))
+				.withArg(DefaultArgs.DISPLAYNAME)
+				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
+				.withFormat("leave")
+				.withText(
+						Text.of(TextColors.BLACK, "[", TextColors.RED, "Admin", TextColors.BLACK, "]", TextColors.AQUA))
+				.withArg(DefaultArgs.DISPLAYNAME)
+				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
+				.build();
+	}
 }

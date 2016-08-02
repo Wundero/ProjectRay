@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.ProjectRay.listeners;
 /*
  The MIT License (MIT)
 
@@ -23,6 +23,33 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
-public enum Param {
-	SENDER, RECIPIENT, FORMAT, TEMPLATE, DATA;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+
+import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+
+public class ChatChannelListener {
+
+	@Listener(order = Order.EARLY)
+	public void onJoin(ClientConnectionEvent.Join event) {
+		ChatChannel mostIn = null;
+		for (ChatChannel c : Ray.get().getChannels().getJoinableChannels(event.getTargetEntity(), true)) {
+			if (c.isAutojoin()) {
+				c.addMember(event.getTargetEntity());
+				if (mostIn == null) {
+					mostIn = c;
+				} else {
+					if (mostIn.compareTo(c) < 0) {
+						mostIn = c;
+					}
+				}
+			}
+		}
+		if (mostIn != null) {
+			event.getTargetEntity().setMessageChannel(mostIn);
+		}
+	}
+
 }

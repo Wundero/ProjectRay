@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -54,13 +56,13 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayPlayer;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class MainListener {
@@ -96,11 +98,6 @@ public class MainListener {
 			// possibly not loaded, but i don't care to figure out why formats
 			// don't always properly load templates
 			return true;
-		}
-		if (channel instanceof ChatChannel) {
-			ChatChannel c = (ChatChannel) channel;
-			v.put("channel", c.getTag());
-			v.put("channelname", c.getName());
 		}
 		final TextTemplate template = f.getTemplate();
 		final Map<String, Object> args = Utils.sm(v);
@@ -284,6 +281,19 @@ public class MainListener {
 			return;
 		}
 		Map<String, Object> vars = Utils.sm();
+		String text = event.getOriginalMessage().toString();
+		String firstpart = "Text\\{children\\=\\[Text\\{children\\=\\[Text\\{children\\=\\[Text\\{children\\=\\[Text\\{SpongeTranslation\\{id\\=[A-Za-z0-9\\.]+\\}\\,";
+		Matcher m = Pattern.compile(firstpart).matcher(text);
+		m.find();
+		text = m.group();
+		text = text.substring(
+				"Text{children=[Text{children=[Text{children=[Text{children=[Text{SpongeTranslation{id=".length(),
+				text.length() - 2);
+		System.out.println(text);
+		// text is what client sees as translatable
+		// TODO translate this and figure out how to parse variables n stuff
+		String json = "{\"translate\":\"" + text + "\",\"with\":[\"DEAD\",\"KILLER\",\"ITEM\"]}";
+		((Player) event.getTargetEntity()).sendMessage(TextSerializers.JSON.deserialize(json));
 		event.setMessageCancelled(
 				handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(), event.getChannel().get()));
 	}
