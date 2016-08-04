@@ -65,7 +65,7 @@ public class Variables {
 		if (var.isPresent()) {
 			Variable v = var.get();
 			Map<Param, Object> map = Utils.sm();
-			for (Param p : store.getParams(v)) {
+			for (Param p : Param.values()) {
 				switch (p) {
 				case SENDER:
 					if (!sender.isPresent()) {
@@ -120,33 +120,29 @@ public class Variables {
 			Player pl = (Player) objects.get(Param.SENDER);
 			return pl.get(Keys.DISPLAY_NAME).isPresent() ? pl.get(Keys.DISPLAY_NAME).get() : Text.of(pl.getName());
 		});
-		registerVariable(new Variable("sound") {
-			@Parameters(parameters = { Param.SENDER, Param.DATA })
-			@Override
-			public Text parse(Map<Param, Object> objects) {
-				if (!objects.containsKey(Param.SENDER) || !objects.containsKey(Param.DATA)) {
-					return Text.of();
-				}
-				Player sender = (Player) objects.get(Param.SENDER);
-				String soundname = (String) objects.get(Param.DATA);
-				soundname = soundname.replace(" ", "_").toUpperCase();
-				Class<?> sts = SoundTypes.class;
-				SoundType type = null;
-				for (Field f : sts.getDeclaredFields()) {
-					if (f.getName().equals(soundname)) {
-						try {
-							boolean a = f.isAccessible();
-							f.setAccessible(true);
-							type = (SoundType) f.get(null);
-							f.setAccessible(a);
-						} catch (IllegalArgumentException | IllegalAccessException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-				sender.playSound(type, sender.getLocation().getPosition(), 1.0);
+		registerVariable("sound", (objects) -> {
+			if (!objects.containsKey(Param.RECIPIENT) || !objects.containsKey(Param.DATA)) {
 				return Text.of();
 			}
+			Player sender = (Player) objects.get(Param.RECIPIENT);
+			String soundname = (String) objects.get(Param.DATA);
+			soundname = soundname.replace(" ", "_").toUpperCase();
+			Class<?> sts = SoundTypes.class;
+			SoundType type = null;
+			for (Field f : sts.getDeclaredFields()) {
+				if (f.getName().equals(soundname)) {
+					try {
+						boolean a = f.isAccessible();
+						f.setAccessible(true);
+						type = (SoundType) f.get(null);
+						f.setAccessible(a);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			sender.playSound(type, sender.getLocation().getPosition(), 1.0);
+			return Text.of();
 		});
 		registerVariable("channel", (objects) -> {
 			if (!objects.containsKey(Param.SENDER)) {
@@ -186,7 +182,6 @@ public class Variables {
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
-			@Parameters
 			@Override
 			public Text parse(Map<Param, Object> objects) {
 				task.accept(objects);
@@ -199,7 +194,6 @@ public class Variables {
 	public boolean registerVariable(String key, Supplier<Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
-			@Parameters
 			@Override
 			public Text parse(Map<Param, Object> objects) {
 				return replacer.get();
@@ -211,7 +205,6 @@ public class Variables {
 	public boolean registerVariable(String key, Function<Map<Param, Object>, Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
-			@Parameters
 			@Override
 			public Text parse(Map<Param, Object> objects) {
 				return replacer.apply(objects);

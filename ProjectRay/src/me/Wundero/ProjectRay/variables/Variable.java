@@ -34,7 +34,6 @@ public abstract class Variable {
 		this.key = key.toLowerCase().trim();
 	}
 
-	@Parameters
 	public abstract Text parse(Map<Param, Object> objects);
 
 	public final String getKey() {

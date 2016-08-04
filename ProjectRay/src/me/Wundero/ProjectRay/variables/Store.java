@@ -23,8 +23,6 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
-import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,7 +30,6 @@ import me.Wundero.ProjectRay.utils.Utils;
 
 public class Store {
 	private Map<String, Variable> vars = Utils.sm();
-	private Map<Variable, Param[]> parameters = Utils.sm();
 
 	public Optional<Variable> getVariable(String key) {
 		if (!vars.containsKey(key)) {
@@ -41,28 +38,11 @@ public class Store {
 		return Optional.of(vars.get(key));
 	}
 
-	Param[] getParams(Variable v) {
-		if (parameters.containsKey(v)) {
-			return parameters.get(v);
-		}
-		return new Param[] {};
-	}
-
 	public boolean registerVariable(Variable v) {
 		if (vars.containsKey(v.getKey())) {
 			return false;
 		}
 		vars.put(v.getKey(), v);
-		List<Param> params = Utils.sl();
-		try {
-			Method m = v.getClass().getMethod("parse", Map.class);
-			for (Param p : m.getAnnotation(Parameters.class).parameters()) {
-				params.add(p);
-			}
-		} catch (NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-		parameters.put(v, params.toArray(new Param[params.size()]));
 		return true;
 	}
 }
