@@ -25,6 +25,7 @@ package me.Wundero.ProjectRay.framework.channel;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.spongepowered.api.entity.living.player.Player;
@@ -54,11 +55,6 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private boolean hidden = false;
 	private boolean autojoin = true;
 	private ConfigurationNode node;
-	// TODO
-	/*
-	 * quickmessage
-	 * 
-	 */
 
 	public static TypeSerializer<ChatChannel> serializer() {
 		return new TypeSerializer<ChatChannel>() {
@@ -98,19 +94,27 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		members.addAll(MessageChannel.TO_CONSOLE.getMembers());
 	}
 
+	private boolean c(MessageReceiver recipient) {
+		if (recipient instanceof Player) {
+			return members.contains(((Player) recipient).getUniqueId());
+		}
+		return members.contains(recipient);
+	}
+
 	@Override
 	public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original, ChatType type) {
-		if (!members.contains(recipient) || members.get(recipient).isBanned()) {
-			return Optional.empty();
+		if (!c(recipient) || members.get(recipient).isBanned()) {
+			return Optional.of(Text.EMPTY);
 		}
-		if (sender instanceof MessageReceiver && !members.get((MessageReceiver) sender).canSpeak()) {
-			return Optional.empty();
+		if (sender instanceof MessageReceiver
+				&& (!members.contains((MessageReceiver) sender) || !members.get((MessageReceiver) sender).canSpeak())) {
+			return Optional.of(Text.EMPTY);
 		}
 		if (range > 0 && sender instanceof Player && recipient instanceof Player) {
 			Player p = (Player) sender;
 			Player r = (Player) recipient;
 			if (!Utils.inRange(p.getLocation(), r.getLocation(), range)) {
-				return Optional.empty();
+				return Optional.of(Text.EMPTY);
 			}
 		}
 		return Optional.of(original);
@@ -120,8 +124,12 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
 			return false;
 		}
+		if (members == null) {
+			members = new ChannelMemberCollection();
+			members.addAll(MessageChannel.TO_CONSOLE.getMembers());
+		}
 		ChannelMember m = members.get(player);
-		if (m.isBanned()) {
+		if (m != null && m.isBanned()) {
 			return false;
 		}
 		return true;
@@ -134,12 +142,16 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 
 	@Override
 	public boolean addMember(MessageReceiver member) {
-		if (members.contains(member)) {
-			return false;
+		if (c(member)) {
+			if (member instanceof Player) {
+				members.remove(((Player) member).getUniqueId());
+			} else {
+				members.remove(member);
+			}
 		}
 		if (member instanceof Player) {
 			Player p = (Player) member;
-			if (!p.hasPermission(permission)) {
+			if (permission != null && !permission.isEmpty() && !p.hasPermission(permission)) {
 				return false;
 			}
 		}
@@ -149,6 +161,10 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	@Override
 	public boolean removeMember(MessageReceiver member) {
 		return members.remove(member);
+	}
+
+	public boolean removeMember(UUID uuid) {
+		return members.remove(uuid);
 	}
 
 	public void banMember(MessageReceiver member) {
@@ -219,6 +235,10 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 
 	public void setAutojoin(boolean autojoin) {
 		this.autojoin = autojoin;
+	}
+
+	public ChannelMemberCollection getMembersCollection() {
+		return members;
 	}
 
 	@Override

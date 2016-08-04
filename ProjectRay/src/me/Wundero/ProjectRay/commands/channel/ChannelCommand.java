@@ -70,7 +70,7 @@ public class ChannelCommand implements CommandExecutor {
 		Text out = Text.of();
 		out = out.concat(channel.getTag());
 		out = out.concat(Text.of(TextColors.AQUA, " " + channel.getName()));
-		out = out.concat(Text.of(TextColors.GRAY, ": ", TextColors.AQUA, channel.getMembers().size()));
+		out = out.concat(Text.of(TextColors.GRAY, ": ", TextColors.AQUA, channel.getMembers().size() - 1));
 		return out;
 	}
 

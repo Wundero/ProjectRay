@@ -133,7 +133,7 @@ public abstract class TypePrompt<T> extends Prompt {
 
 	@Override
 	public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-		return onTypeInput(type.isPresent() ? type.get().cast(selected.get()) : null, text, context);
+		return onTypeInput(type.isPresent() ? type.get().cast(selected.get().getValue()) : null, text, context);
 	}
 
 }

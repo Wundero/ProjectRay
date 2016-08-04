@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -88,11 +90,9 @@ public class Utils {
 		return load(config.toPath());
 	}
 
-	public static <T> List<T> sl(Iterable<T> objs) {
+	public static <T> List<T> sl(Collection<T> objs) {
 		List<T> l = sl();
-		for (T t : objs) {
-			l.add(t);
-		}
+		l.addAll(objs);
 		return l;
 	}
 
@@ -111,6 +111,21 @@ public class Utils {
 		return Collections.synchronizedList(new ArrayList<T>() {
 
 			private static final long serialVersionUID = -9083645937669914699L;
+
+			@Override
+			public int indexOf(Object o) {
+				if (o == null) {
+					for (int i = 0; i < size(); i++)
+						if (get(i) == null)
+							return i;
+				} else {
+					for (int i = 0; i < size(); i++)
+						if (get(i).equals(o))// switched equals operator:
+												// matters for channelmember
+							return i;
+				}
+				return -1;
+			}
 
 			@SuppressWarnings("unchecked")
 			@Override
@@ -496,7 +511,7 @@ public class Utils {
 	}
 
 	public static void printError(Exception e) {
-		List<String> toPrint = sl(e.getMessage());
+		List<String> toPrint = sl(e.getMessage() == null ? "" : e.getMessage());
 		for (StackTraceElement element : e.getStackTrace()) {
 			toPrint.add("at " + element.toString());
 		}
@@ -573,6 +588,10 @@ public class Utils {
 			f = sep;
 		}
 		return o;
+	}
+
+	public static <T> List<T> removeDuplicates(List<T> list) {
+		return sl(list.stream().distinct().collect(Collectors.toList()));
 	}
 
 	public static boolean call(Event e) {

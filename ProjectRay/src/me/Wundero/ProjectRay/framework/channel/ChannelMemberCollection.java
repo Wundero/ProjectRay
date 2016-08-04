@@ -25,6 +25,7 @@ package me.Wundero.ProjectRay.framework.channel;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.spongepowered.api.text.channel.MessageReceiver;
 
@@ -38,7 +39,12 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 public class ChannelMemberCollection {
 	private List<ChannelMember> members = Utils.sl();
 
+	public void fix() {
+		members = Utils.removeDuplicates(members);
+	}
+
 	public List<MessageReceiver> getMembers() {
+		fix();
 		List<MessageReceiver> l = Utils.sl();
 		for (ChannelMember m : members) {
 			l.add(m.getReceiver());
@@ -69,8 +75,15 @@ public class ChannelMemberCollection {
 			}
 		};
 	}
-	
+
+	@Override
+	public String toString() {
+		fix();
+		return members.toString();
+	}
+
 	public int size() {
+		fix();
 		return members.size();
 	}
 
@@ -85,6 +98,17 @@ public class ChannelMemberCollection {
 	}
 
 	public ChannelMember get(MessageReceiver receiver) {
+		if (!contains(receiver)) {
+			return null;
+		}
+		return members.get(members.indexOf(receiver));
+	}
+
+	public ChannelMember get(UUID receiver) {
+		if (!contains(receiver)) {
+			System.out.println("how?");
+			return null;
+		}
 		return members.get(members.indexOf(receiver));
 	}
 
@@ -94,6 +118,14 @@ public class ChannelMemberCollection {
 
 	public boolean contains(ChannelMember member) {
 		return members.contains(member);
+	}
+
+	public boolean contains(UUID uuid) {
+		return members.contains(uuid);
+	}
+
+	public boolean remove(UUID uuid) {
+		return members.remove(uuid);
 	}
 
 	public boolean remove(ChannelMember member) {
@@ -110,9 +142,11 @@ public class ChannelMemberCollection {
 
 	public boolean add(ChannelMember member) {
 		if (members.contains(member)) {
+			System.out.println("cc");
 			return false;
 		}
 		members.add(member);
+		fix();
 		return true;
 	}
 }

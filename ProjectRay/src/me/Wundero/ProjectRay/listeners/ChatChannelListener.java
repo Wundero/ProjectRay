@@ -28,6 +28,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 
 public class ChatChannelListener {
@@ -37,7 +38,9 @@ public class ChatChannelListener {
 		ChatChannel mostIn = null;
 		for (ChatChannel c : Ray.get().getChannels().getJoinableChannels(event.getTargetEntity(), true)) {
 			if (c.isAutojoin()) {
-				c.addMember(event.getTargetEntity());
+				if (c.canJoin(event.getTargetEntity())) {
+					c.addMember(event.getTargetEntity());
+				}
 				if (mostIn == null) {
 					mostIn = c;
 				} else {
@@ -48,7 +51,21 @@ public class ChatChannelListener {
 			}
 		}
 		if (mostIn != null) {
-			event.getTargetEntity().setMessageChannel(mostIn);
+			if (RayPlayer.get(event.getTargetEntity()).getActiveChannel() == null) {
+				RayPlayer.get(event.getTargetEntity()).setActiveChannel(mostIn);
+			} else {
+				RayPlayer.get(event.getTargetEntity()).applyChannel();
+			}
+		}
+
+	}
+
+	@Listener(order = Order.LATE)
+	public void onLeave(ClientConnectionEvent.Disconnect event) {
+		for (ChatChannel c : Ray.get().getChannels().getAllChannels()) {
+			if (c.getMembersCollection().contains(event.getTargetEntity().getUniqueId())) {
+				c.removeMember(event.getTargetEntity().getUniqueId());//not removing properly?
+			}
 		}
 	}
 

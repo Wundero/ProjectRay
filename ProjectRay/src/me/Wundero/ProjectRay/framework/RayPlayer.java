@@ -132,6 +132,14 @@ public class RayPlayer {
 		return activeChannel;
 	}
 
+	public void applyChannel() {
+		if (activeChannel != null) {
+			if (user.isOnline() && user.getPlayer().isPresent()) {
+				user.getPlayer().get().setMessageChannel(activeChannel);
+			}
+		}
+	}
+
 	public void setActiveChannel(ChatChannel channel) {
 		if (channel == null) {
 			return;
@@ -164,6 +172,8 @@ public class RayPlayer {
 	public RayPlayer(User u) {
 		// TODO pass config node that's loaded already if single file for all
 		// players is desired
+		this.setUser(u);
+		this.uuid = u.getUniqueId();
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
 		File f = new File(p, u.getUniqueId() + ".conf");
 		if (!p.exists()) {
@@ -184,8 +194,6 @@ public class RayPlayer {
 			}
 			config = Utils.load(f);
 		}
-		this.setUser(u);
-		this.uuid = u.getUniqueId();
 		cache.put(uuid, this);
 		this.setGroups(Ray.get().getGroups().getGroups(u));
 	}

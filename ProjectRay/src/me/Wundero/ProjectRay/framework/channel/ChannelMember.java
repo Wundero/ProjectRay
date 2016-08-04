@@ -46,15 +46,32 @@ public class ChannelMember {
 	public UUID getUUID() {
 		return uuid;
 	}
-	
+
 	public UUID getUniqueId() {
 		return getUUID();
 	}
-	
+
+	public void setUUID(UUID uuid) {
+		this.uuid = uuid;
+	}
+
+	@Override
+	public String toString() {
+		String out = "uuid=" + uuid.toString();
+		out += ", object=" + receiver.toString();
+		out += ", banned=" + banned;
+		out += ", muted=" + muted;
+		out += ", role=" + role.name();
+		return out;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof UUID) {
 			return uuid.equals(o);
+		}
+		if (o instanceof Player) {
+			return ((Player) o).getUniqueId().equals(uuid);
 		}
 		if (o instanceof ChannelMember) {
 			if (this.receiver != null && ((ChannelMember) o).receiver != null) {
@@ -115,7 +132,7 @@ public class ChannelMember {
 	}
 
 	public ChannelMember(MessageReceiver r) {
-		this(r, Role.GUEST);
+		this(r, Role.MEMBER);
 	}
 
 	public MessageReceiver getReceiver() {

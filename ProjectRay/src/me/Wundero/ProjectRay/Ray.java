@@ -154,9 +154,7 @@ public class Ray {
 		}
 		for (ConfigurationLoader<?> loader : toSave.keySet()) {
 			try {
-				ConfigurationNode merger = loader.load();
-				ConfigurationNode mergable = toSave.get(loader);
-				ConfigurationNode node = mergable.mergeValuesFrom(merger);
+				ConfigurationNode node = toSave.get(loader);
 				loader.save(node);
 			} catch (IOException e) {
 				Utils.printError(e);

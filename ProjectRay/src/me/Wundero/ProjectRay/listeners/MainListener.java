@@ -57,6 +57,7 @@ import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.text.transform.SimpleTextFormatter;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Format;
@@ -111,7 +112,7 @@ public class MainListener {
 					Player s = (Player) sender;
 					Player r = (Player) recipient;
 					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
-						return Optional.empty();
+						return Optional.of(Text.EMPTY);
 					}
 				}
 
@@ -123,7 +124,7 @@ public class MainListener {
 							msgrecip.isPresent() ? msgrecip : Optional.empty(), Optional.of(f), true));
 				}
 				if (template == null) {
-					return Optional.of(original);
+					return Optional.empty();
 				}
 				Text t = template.apply(args).build();
 				return Optional.of(t);
@@ -279,6 +280,9 @@ public class MainListener {
 	public void onDeath(DestructEntityEvent.Death event) {
 		if (!(event.getTargetEntity() instanceof Player)) {
 			return;
+		}
+		for (SimpleTextFormatter f : event.getFormatter().getAll()) {
+			System.out.println(f.toString() + ": " + f.toText().toPlain());
 		}
 		Map<String, Object> vars = Utils.sm();
 		String text = event.getOriginalMessage().toString();

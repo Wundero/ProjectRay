@@ -24,6 +24,8 @@ import com.google.inject.Inject;
 import me.Wundero.ProjectRay.commands.Commands;
 import me.Wundero.ProjectRay.commands.MessageCommand;
 import me.Wundero.ProjectRay.commands.ReplyCommand;
+import me.Wundero.ProjectRay.commands.channel.ChannelCommand;
+import me.Wundero.ProjectRay.commands.channel.ChannelQMCommand;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.config.Template;
@@ -32,6 +34,7 @@ import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.framework.channel.ChannelMember;
 import me.Wundero.ProjectRay.framework.channel.ChannelMemberCollection;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.listeners.ChatChannelListener;
 import me.Wundero.ProjectRay.listeners.MainListener;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -170,6 +173,7 @@ public class ProjectRay {
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
 		Ray.get().setGroups(new Groups(config.getNode("worlds")));
+		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
 	}
 
 	@Listener
@@ -188,6 +192,16 @@ public class ProjectRay {
 						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
 						.executor(new ReplyCommand()).build(),
 				"r", "reply");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
+						.executor(new ChannelCommand()).child(
+								CommandSpec.builder().executor(new ChannelQMCommand())
+										.arguments(GenericArguments.string(Text.of("channel")),
+												GenericArguments.remainingJoinedStrings(Text.of("message")))
+										.build(),
+								"quickmessage", "qm")
+						.build(),
+				"channel", "ch");
 	}
 
 	@Listener
