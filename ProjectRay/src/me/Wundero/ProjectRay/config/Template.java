@@ -161,12 +161,29 @@ public class Template {
 					return withArg(key, click, null);
 				}
 
+				public FormatBuilder withArg(String key, boolean optional) {
+					return withArg(key, null, null);
+				}
+
+				public FormatBuilder withArg(String key, InternalHoverAction<?> hover, boolean optional) {
+					return withArg(key, null, hover);
+				}
+
+				public FormatBuilder withArg(String key, InternalClickAction<?> click, boolean optional) {
+					return withArg(key, click, null);
+				}
+
 				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover) {
-					return withArg(TextTemplate.arg(key), click, hover);
+					return withArg(key, click, hover, false);
+				}
+
+				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover,
+						boolean optional) {
+					return withArg(TextTemplate.arg(key), click, hover, optional);
 				}
 
 				public FormatBuilder withArg(DefaultArg arg) {
-					return withArg(arg.getBuilder(), arg.getClick(), arg.getHover());
+					return withArg(arg.getBuilder(), arg.getClick(), arg.getHover(), arg.isOptional());
 				}
 
 				public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover) {
@@ -181,8 +198,26 @@ public class Template {
 					return withArg(builder, null, null);
 				}
 
+				public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover, boolean optional) {
+					return withArg(builder, null, hover, optional);
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click, boolean optional) {
+					return withArg(builder, click, null, optional);
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder, boolean optional) {
+					return withArg(builder, null, null, optional);
+				}
+
 				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
 						InternalHoverAction<?> hover) {
+					return withArg(builder, click, hover, false);
+				}
+
+				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
+						InternalHoverAction<?> hover, boolean optional) {
+					builder.optional(optional);
 					Arg built = builder.build();
 					if (click != null) {
 						clicks.put(built, click);
@@ -194,6 +229,13 @@ public class Template {
 					return this;
 				}
 
+				public FormatBuilder withText(String... texts) {
+					for(String s : texts) {
+						template = template.concat(TextTemplate.of(s));
+					}
+					return this;
+				}
+				
 				public FormatBuilder withText(Text... texts) {
 					for (Text t : texts) {
 						template = template.concat(TextTemplate.of(t));

@@ -45,7 +45,7 @@ import me.Wundero.ProjectRay.utils.Utils;
 
 public class Variables {
 	public Object get(String key, Optional<Player> sender, Optional<Player> recipient, Optional<Format> format,
-			Optional<TextTemplate> template) {
+			Optional<TextTemplate> template, Optional<Player> observer) {
 		String data = null;
 		if (key.contains(":")) {
 			String[] ks = key.split(":");
@@ -97,6 +97,12 @@ public class Variables {
 					}
 					map.put(p, data);
 					break;
+				case OBSERVER:
+					if (!observer.isPresent()) {
+						break;
+					}
+					map.put(p, observer.get());
+					break;
 				}
 			}
 			return v.parse(map);
@@ -108,17 +114,71 @@ public class Variables {
 		store = new Store();
 		registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		registerVariable("player", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
+			Param playerToUse = Param.SENDER;
+			Player player = null;
+			if (objects.containsKey(Param.DATA)) {
+				String data = (String) objects.get(Param.DATA);
+				switch (data) {
+				case "sender":
+					break;
+				case "recipient":
+				case "recip":
+					playerToUse = Param.RECIPIENT;
+					break;
+				case "observer":
+				case "killer":
+					playerToUse = Param.OBSERVER;
+					break;
+				default:
+					playerToUse = Param.DATA;
+					Optional<Player> po = Sponge.getServer().getPlayer(data);
+					if (!po.isPresent()) {
+						return Text.of();
+					}
+					player = po.get();
+				}
+			}
+			if (!objects.containsKey(playerToUse)) {
 				return Text.of();
 			}
-			return Text.of(((Player) objects.get(Param.SENDER)).getName());
+			if (player == null) {
+				player = (Player) objects.get(playerToUse);
+			}
+			return Text.of(player.getName());
 		});
 		registerVariable("displayname", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
+			Param playerToUse = Param.SENDER;
+			Player player = null;
+			if (objects.containsKey(Param.DATA)) {
+				String data = (String) objects.get(Param.DATA);
+				switch (data) {
+				case "sender":
+					break;
+				case "recipient":
+				case "recip":
+					playerToUse = Param.RECIPIENT;
+					break;
+				case "observer":
+				case "killer":
+					playerToUse = Param.OBSERVER;
+					break;
+				default:
+					playerToUse = Param.DATA;
+					Optional<Player> po = Sponge.getServer().getPlayer(data);
+					if (!po.isPresent()) {
+						return Text.of();
+					}
+					player = po.get();
+				}
+			}
+			if (!objects.containsKey(playerToUse)) {
 				return Text.of();
 			}
-			Player pl = (Player) objects.get(Param.SENDER);
-			return pl.get(Keys.DISPLAY_NAME).isPresent() ? pl.get(Keys.DISPLAY_NAME).get() : Text.of(pl.getName());
+			if (player == null) {
+				player = (Player) objects.get(playerToUse);
+			}
+			return player.get(Keys.DISPLAY_NAME).isPresent() ? player.get(Keys.DISPLAY_NAME).get()
+					: Text.of(player.getName());
 		});
 		registerVariable("sound", (objects) -> {
 			if (!objects.containsKey(Param.RECIPIENT) || !objects.containsKey(Param.DATA)) {

@@ -24,5 +24,5 @@ package me.Wundero.ProjectRay.variables;
  */
 
 public enum Param {
-	SENDER, RECIPIENT, FORMAT, TEMPLATE, DATA;
+	SENDER, RECIPIENT, FORMAT, TEMPLATE, DATA, OBSERVER;
 }

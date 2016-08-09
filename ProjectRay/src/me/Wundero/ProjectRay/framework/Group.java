@@ -142,6 +142,36 @@ public class Group {
 		return out;
 	}
 
+	public List<Format> getAllFormats(boolean inherits, int recurseTimes) {
+		List<Format> out2 = Utils.sl();
+		out2.addAll(getAllFormats());
+		List<Group> groups = getParentsGroups();
+		for (Group g : groups) {
+			out2.addAll(recurseTimes > 0 ? g.getAllFormats(inherits, recurseTimes - 1) : g.getAllFormats());
+		}
+		return out2;
+	}
+
+	public List<Group> getParentsGroups() {
+		List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
+		List<Group> torem = Utils.sl();
+		for (Group g : groups) {
+			if (!parents.contains(g.name)) {
+				torem.add(g);
+			}
+		}
+		for (Group g : torem) {
+			groups.remove(g);
+		}
+		groups.sort(new Comparator<Group>() {
+			@Override
+			public int compare(Group o1, Group o2) {
+				return o1.priority - o2.priority;
+			}
+		});
+		return groups;
+	}
+
 	public List<Format> getFormats(FormatType type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
 			List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());

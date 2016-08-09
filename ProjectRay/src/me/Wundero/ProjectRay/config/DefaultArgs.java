@@ -33,8 +33,8 @@ public class DefaultArgs {
 	public static final DefaultArg DISPLAYNAME = new DefaultArg(TextTemplate.arg("displayname").color(TextColors.AQUA),
 			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
 			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
-					TextTemplate.arg("displayname").color(TextColors.GRAY).build(), "\n",
-					Text.builder("Say hello!").color(TextColors.AQUA).build())));
+					TextTemplate.arg("displayname").color(TextColors.AQUA).build(), "\n",
+					Text.builder("Say hello!").color(TextColors.GOLD).build())));
 	public static final DefaultArg CHANNEL = new DefaultArg("channel",
 			Utils.suggestTemplate(Utils.parse("/ch join {channelname}", false)),
 			Utils.showTemplate(Utils.parse("&7Channel: {channelname}\n&bClick to join!", true)));

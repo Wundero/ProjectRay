@@ -107,7 +107,8 @@ public abstract class Prompt {
 	public Text formatTemplate(ConversationContext context) {
 		Map<String, Object> args = Utils.sm();
 		args.put("options", buildList(options(context)));
-		args = Ray.get().setVars(args, template, context.getHolder(), Optional.empty(), Optional.empty(), false);
+		args = Ray.get().setVars(args, template, context.getHolder(), Optional.empty(), Optional.empty(),
+				Optional.empty(), false);
 		return template.apply(args).build();
 	}
 }

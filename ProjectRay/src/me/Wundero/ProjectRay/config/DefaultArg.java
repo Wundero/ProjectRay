@@ -30,6 +30,7 @@ public class DefaultArg {
 	private Arg.Builder builder;
 	private InternalClickAction<?> click;
 	private InternalHoverAction<?> hover;
+	private boolean optional = false;
 
 	public DefaultArg(Arg.Builder b, InternalClickAction<?> c, InternalHoverAction<?> h) {
 		this.setBuilder(b);
@@ -63,6 +64,14 @@ public class DefaultArg {
 
 	public void setHover(InternalHoverAction<?> hover) {
 		this.hover = hover;
+	}
+
+	public boolean isOptional() {
+		return optional;
+	}
+
+	public void setOptional(boolean optional) {
+		this.optional = optional;
 	}
 
 }

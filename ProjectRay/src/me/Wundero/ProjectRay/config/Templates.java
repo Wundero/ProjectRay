@@ -34,13 +34,15 @@ public class Templates {
 	}
 
 	public static Template ADVANCED(Template.Builder t) {
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" ")).withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build()
-				.withFormat("join").withArg(DefaultArgs.DISPLAYNAME)
+		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.CHANNEL)
+				.withText(Text.of(" ")).withArg(DefaultArgs.DISPLAYNAME).withText(Text.of(" "))
+				.withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build().withFormat("join")
+				.withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
 				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
-				.build();
+				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build()
+				.withFormat("death").withArg(DefaultArgs.DISPLAYNAME).withText(" ").withArg("message", false)
+				.withText(" ").withArg("killer", true).withText(" ").withArg("item", true).build().build().build();
 	}
 
 	public static Template MULTI_GROUP(Template.Builder t) {

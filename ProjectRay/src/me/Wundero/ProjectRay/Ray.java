@@ -186,10 +186,10 @@ public class Ray {
 		this.groups = groups;
 	}
 
-	// TODO nested variables and variable data
+	// TODO nested variables
 
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender,
-			Optional<Player> recip, Optional<Format> formatUsed, boolean useClickHover) {
+			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
 		if (sender == null) {
 			return known;
 		}
@@ -221,6 +221,9 @@ public class Ray {
 				if (k.toLowerCase().startsWith("recip_") && !recip.isPresent()) {
 					continue;
 				}
+				if (k.equalsIgnoreCase("killer") && !out.containsKey(key)) {
+					k = "displayname:killer";
+				}
 				boolean irecip = false;
 				if (k.toLowerCase().startsWith("recip_")) {
 					k = k.substring("recip_".length());
@@ -236,7 +239,7 @@ public class Ray {
 						s1 = Optional.of(sender);
 						r1 = recip;
 					}
-					Object var = getVariables().get(k, s1, r1, formatUsed, Optional.of(template));
+					Object var = getVariables().get(k, s1, r1, formatUsed, Optional.of(template), observer);
 					Object var2 = var;
 					if (args != null) {
 						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());
@@ -249,15 +252,17 @@ public class Ray {
 										.getValue(TypeToken.of(InternalHoverAction.class));
 								if (click != null) {
 									if (click instanceof InternalClickAction.ATemplate) {
-										((InternalClickAction.ATemplate) click).apply(setVars(known,
-												(TextTemplate) click.getResult(), sender, recip, formatUsed, false));
+										((InternalClickAction.ATemplate) click)
+												.apply(setVars(known, (TextTemplate) click.getResult(), sender, recip,
+														observer, formatUsed, false));
 									}
 									click.applyTo(newVar);
 								}
 								if (hover != null) {
 									if (hover instanceof InternalHoverAction.ShowTemplate) {
-										((InternalHoverAction.ShowTemplate) hover).apply(setVars(known,
-												(TextTemplate) hover.getResult(), sender, recip, formatUsed, false));
+										((InternalHoverAction.ShowTemplate) hover)
+												.apply(setVars(known, (TextTemplate) hover.getResult(), sender, recip,
+														observer, formatUsed, false));
 									}
 									hover.applyTo(newVar);
 								}

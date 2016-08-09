@@ -33,6 +33,10 @@ import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
@@ -40,12 +44,16 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
@@ -56,8 +64,8 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.api.text.transform.SimpleTextFormatter;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Format;
@@ -70,12 +78,12 @@ public class MainListener {
 
 	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel) {
-		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty());
+		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 	}
 
 	private boolean handle(FormatType t, MessageChannelEvent e, Map<String, Object> v, final Player p,
-			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip,
-			Optional<String> formatName) {
+			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip, Optional<String> formatName,
+			Optional<Player> observer) {
 		if (p == null) {
 			return false;
 		}
@@ -118,10 +126,11 @@ public class MainListener {
 
 				if (recipient instanceof Player) {
 					args.putAll(Ray.get().setVars(args, template, msgsender.isPresent() ? msgsender.get() : p,
-							msgrecip.isPresent() ? msgrecip : Optional.of((Player) recipient), Optional.of(f), true));
+							msgrecip.isPresent() ? msgrecip : Optional.of((Player) recipient), observer, Optional.of(f),
+							true));
 				} else {
 					args.putAll(Ray.get().setVars(args, template, msgsender.isPresent() ? msgsender.get() : p,
-							msgrecip.isPresent() ? msgrecip : Optional.empty(), Optional.of(f), true));
+							msgrecip.isPresent() ? msgrecip : Optional.empty(), observer, Optional.of(f), true));
 				}
 				if (template == null) {
 					return Optional.empty();
@@ -152,6 +161,7 @@ public class MainListener {
 			Optional<Player> sf = Optional.empty();
 			Optional<Player> st = Optional.empty();
 			Optional<String> fn = Optional.empty();
+			Optional<Player> o = Optional.empty();
 			if (event.getCause().containsNamed("sendfrom")) {
 				sf = event.getCause().get("sendfrom", Player.class);
 			}
@@ -161,8 +171,11 @@ public class MainListener {
 			if (event.getCause().containsNamed("formatname")) {
 				fn = event.getCause().get("formatname", String.class);
 			}
+			if (event.getCause().contains("observer")) {
+				o = event.getCause().get("observer", Player.class);
+			}
 			event.setCancelled(handle(event.getCause().get("formattype", FormatType.class).get(), event, vars, p,
-					event.getChannel().get(), sf, st, fn));
+					event.getChannel().get(), sf, st, fn, o));
 		} else {
 			event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
 		}
@@ -196,9 +209,8 @@ public class MainListener {
 				if (t == null) {
 					continue;
 				}
-				e.setDisplayName(
-						t.apply(Ray.get().setVars(Utils.sm(), t, pla, Optional.of(player), Optional.of(f), false))
-								.build());
+				e.setDisplayName(t.apply(Ray.get().setVars(Utils.sm(), t, pla, Optional.of(player), Optional.empty(),
+						Optional.of(f), false)).build());
 			}
 		});
 
@@ -281,9 +293,6 @@ public class MainListener {
 		if (!(event.getTargetEntity() instanceof Player)) {
 			return;
 		}
-		for (SimpleTextFormatter f : event.getFormatter().getAll()) {
-			System.out.println(f.toString() + ": " + f.toText().toPlain());
-		}
 		Map<String, Object> vars = Utils.sm();
 		String text = event.getOriginalMessage().toString();
 		String firstpart = "Text\\{children\\=\\[Text\\{children\\=\\[Text\\{children\\=\\[Text\\{children\\=\\[Text\\{SpongeTranslation\\{id\\=[A-Za-z0-9\\.]+\\}\\,";
@@ -297,9 +306,71 @@ public class MainListener {
 		// text is what client sees as translatable
 		// TODO translate this and figure out how to parse variables n stuff
 		String json = "{\"translate\":\"" + text + "\",\"with\":[\"DEAD\",\"KILLER\",\"ITEM\"]}";
+		Optional<DamageSource> s = event.getCause().first(DamageSource.class);
+		Optional<Player> killer = Optional.empty();
+		Optional<ItemStack> used = Optional.empty();
+		if (s.isPresent()) {
+			DamageSource source = s.get();
+			if (source instanceof IndirectEntityDamageSource) {
+				IndirectEntityDamageSource ieds = (IndirectEntityDamageSource) source;
+				Entity k = ieds.getSource();
+				if (!(k instanceof Living)) {
+					k = ieds.getIndirectSource();
+				}
+				if (k instanceof Player) {
+					Player p = (Player) k;
+					used = p.getItemInHand(HandTypes.MAIN_HAND);
+					if (used.isPresent()) {
+						Optional<Text> t = used.get().get(Keys.DISPLAY_NAME);
+						if (t.isPresent()) {
+							vars.put("item",
+									Text.of("using ")
+											.concat(Text.builder("[").append(t.get()).append(Text.of("]"))
+													.color(TextColors.AQUA).style(TextStyles.ITALIC)
+													.onHover(TextActions.showItem(used.get())).build()));
+						}
+					}
+					killer = Optional.of(p);
+				} else {
+					String name = k.getType().getName();
+					Text.Builder b = Text.builder(name);
+					if (k.get(Keys.DISPLAY_NAME).isPresent()) {
+						b = k.get(Keys.DISPLAY_NAME).get().toBuilder();
+						name = k.get(Keys.DISPLAY_NAME).get().toPlain();
+					}
+					vars.put("killer", b.onHover(TextActions.showEntity(k, name)));
+				}
+			} else if (source instanceof EntityDamageSource) {
+				Entity k = ((EntityDamageSource) source).getSource();
+				if (k instanceof Player) {
+					Player p = (Player) k;
+					used = p.getItemInHand(HandTypes.MAIN_HAND);
+					if (used.isPresent()) {
+						Optional<Text> t = used.get().get(Keys.DISPLAY_NAME);
+						if (t.isPresent()) {
+							vars.put("item",
+									Text.of("using ")
+											.concat(Text.builder("[").append(t.get()).append(Text.of("]"))
+													.color(TextColors.AQUA).style(TextStyles.ITALIC)
+													.onHover(TextActions.showItem(used.get())).build()));
+						}
+					}
+					killer = Optional.of(p);
+				} else {
+					String name = k.getType().getName();
+					Text.Builder b = Text.builder(name);
+					if (k.get(Keys.DISPLAY_NAME).isPresent()) {
+						b = k.get(Keys.DISPLAY_NAME).get().toBuilder();
+						name = k.get(Keys.DISPLAY_NAME).get().toPlain();
+					}
+					vars.put("killer", b.onHover(TextActions.showEntity(k, name)));
+				}
+			}
+		}
 		((Player) event.getTargetEntity()).sendMessage(TextSerializers.JSON.deserialize(json));
-		event.setMessageCancelled(
-				handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(), event.getChannel().get()));
+		event.setMessageCancelled(handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(),
+				event.getChannel().orElse(event.getOriginalChannel()), Optional.empty(), Optional.empty(),
+				Optional.empty(), killer));
 	}
 
 	@Listener
