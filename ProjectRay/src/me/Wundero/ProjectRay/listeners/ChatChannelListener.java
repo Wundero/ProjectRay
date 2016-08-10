@@ -40,6 +40,7 @@ public class ChatChannelListener {
 			if (c.isAutojoin()) {
 				if (c.canJoin(event.getTargetEntity())) {
 					c.addMember(event.getTargetEntity());
+					RayPlayer.get(event.getTargetEntity()).addListenChannel(c);
 				}
 				if (mostIn == null) {
 					mostIn = c;

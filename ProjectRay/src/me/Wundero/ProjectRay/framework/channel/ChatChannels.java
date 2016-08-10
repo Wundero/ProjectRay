@@ -23,6 +23,7 @@ package me.Wundero.ProjectRay.framework.channel;
  SOFTWARE.
  */
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,17 @@ public class ChatChannels {
 			ChatChannel channel = n.getValue(TypeToken.of(ChatChannel.class));
 			channels.put(name, channel);
 		}
+	}
+
+	public List<ChatChannel> getChannels(Collection<String> names, boolean startWith) {
+		List<ChatChannel> out = Utils.sl();
+		for (String s : names) {
+			ChatChannel c = getChannel(s, startWith);
+			if (c != null) {
+				out.add(c);
+			}
+		}
+		return out;
 	}
 
 	public void addChannel(ConfigurationNode node) throws ObjectMappingException {

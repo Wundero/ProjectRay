@@ -79,16 +79,16 @@ public class TranslationFile {
 	}
 
 	// TODO ditch scanner?
-	private Task parse(final File f, final TranslationFile tf) {
+	private static Task parse(final File f, final TranslationFile tf) {
 		Task t = Task.builder().async().execute((task) -> {
 			try {
 				Scanner scn = new Scanner(f);
 				while (scn.hasNextLine()) {
-					put(scn.nextLine());
+					tf.put(scn.nextLine());
 				}
 				scn.close();
-				setUsable(true);
-				files.put(locale, tf);
+				tf.setUsable(true);
+				files.put(tf.locale, tf);
 			} catch (Exception e) {
 				task.cancel();
 				return;
@@ -96,6 +96,10 @@ public class TranslationFile {
 		}).submit(Ray.get().getPlugin());
 		Ray.get().registerTask(t);
 		return t;
+	}
+
+	public String put(String key, String value) {
+		return lines.put(key, value);
 	}
 
 	private void put(String toSplit) {

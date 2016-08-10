@@ -112,6 +112,30 @@ public class RayPlayer {
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
+	private List<String> listenChannels = Utils.sl();
+	
+	public boolean listeningTo(ChatChannel c) {
+		return listeningTo(c.getName());
+	}
+	
+	public boolean listeningTo(String channel) {
+		return listenChannels.contains(channel);
+	}
+	
+	public void removeListenChannel(ChatChannel c) {
+		removeListenChannel(c.getName());
+	}
+	
+	public boolean removeListenChannel(String s) {
+		if(!listenChannels.contains(s)) {
+			return false;
+		}
+		return listenChannels.remove(s);
+	}
+	
+	public void addListenChannel(ChatChannel c) {
+		listenChannels.add(c.getName());
+	}
 
 	public boolean isIgnoring(RayPlayer player) {
 		return ignore.contains(player.uuid);
@@ -316,6 +340,20 @@ public class RayPlayer {
 	 */
 	public void setTabTask(Runnable tabTask) {
 		this.tabTask = tabTask;
+	}
+
+	/**
+	 * @return the listenChannels
+	 */
+	public List<String> getListenChannels() {
+		return listenChannels;
+	}
+
+	/**
+	 * @param listenChannels the listenChannels to set
+	 */
+	public void setListenChannels(List<String> listenChannels) {
+		this.listenChannels = listenChannels;
 	}
 
 }

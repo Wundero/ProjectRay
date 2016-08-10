@@ -48,6 +48,7 @@ import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatBuilder;
 import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
+import me.Wundero.ProjectRay.translation.M;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -58,8 +59,7 @@ public class FormatConversation {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));
 			return;
 		}
-		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ", TextColors.GREEN,
-				"You can cancel at any time by typing \"exit\"."));
+		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ").concat(M.t("conversation.exit.reminder")));
 		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(true)
 				.withPrefix(Text.of(TextColors.AQUA, "[Formats]")).withCanceller(new ConversationCanceller() {
 

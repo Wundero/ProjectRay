@@ -6,6 +6,14 @@
 	<version>0.0.1</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>C:\RayTranslations</directory>
+				<includes>
+					<include>**/*.txt</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -15,30 +23,6 @@
 					<target>1.8</target>
 					<includeDependencySources>true</includeDependencySources>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<configuration>
-							<target>
-								<delete>
-									<fileset dir="D:/Sponge Test Server/mods">
-										<include name="**/*Ray*.jar" />
-									</fileset>
-								</delete>
-								<copy
-									file="${project.build.directory}/${project.build.finalName}.jar"
-									todir="D:/Sponge Test Server/mods" />
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
