@@ -186,8 +186,6 @@ public class Ray {
 		this.groups = groups;
 	}
 
-	// TODO nested variables
-
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender,
 			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
 		if (sender == null) {

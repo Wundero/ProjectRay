@@ -46,32 +46,36 @@ public class DefaultArg {
 		return builder;
 	}
 
-	public void setBuilder(Arg.Builder builder) {
+	public DefaultArg setBuilder(Arg.Builder builder) {
 		this.builder = builder;
+		return this;
 	}
 
 	public InternalClickAction<?> getClick() {
 		return click;
 	}
 
-	public void setClick(InternalClickAction<?> click) {
+	public DefaultArg setClick(InternalClickAction<?> click) {
 		this.click = click;
+		return this;
 	}
 
 	public InternalHoverAction<?> getHover() {
 		return hover;
 	}
 
-	public void setHover(InternalHoverAction<?> hover) {
+	public DefaultArg setHover(InternalHoverAction<?> hover) {
 		this.hover = hover;
+		return this;
 	}
 
 	public boolean isOptional() {
 		return optional;
 	}
 
-	public void setOptional(boolean optional) {
+	public DefaultArg setOptional(boolean optional) {
 		this.optional = optional;
+		return this;
 	}
 
 }

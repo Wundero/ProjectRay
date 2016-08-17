@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
@@ -41,6 +42,13 @@ public class Commands {
 				.description(Text.of("Create a new format.")).executor(new FormatConversationCommand()).build());
 		children.put(Utils.sl("channel"), CommandSpec.builder().permission("ray.channelbuilder")
 				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
+		children.put(Utils.sl("fake"),
+				CommandSpec.builder().permission("ray.fake").description(Text.of("Send a fake message."))
+						.executor(new FakeMessageCommand())
+						.arguments(GenericArguments.flags().valueFlag(GenericArguments.player(Text.of("player")), "p")
+								.buildWith(GenericArguments.seq(GenericArguments.string(Text.of("type")),
+										GenericArguments.remainingJoinedStrings(Text.of("message")))))
+						.build());
 		/*
 		 * children.put(Lists.newArrayList("m", "msg", "message", "t", "tell",
 		 * "w", "whisper"),

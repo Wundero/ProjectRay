@@ -54,6 +54,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private double range;
 	private boolean hidden = false;
 	private boolean autojoin = true;
+	private boolean obfuscateRanged = false;
 	private ConfigurationNode node;
 
 	public static TypeSerializer<ChatChannel> serializer() {
@@ -70,6 +71,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				out.range = arg1.getNode("range").getDouble(-1);
 				out.hidden = arg1.getNode("hidden").getBoolean(false);
 				out.autojoin = arg1.getNode("autojoin").getBoolean(true);
+				out.obfuscateRanged = arg1.getNode("range-obfuscation").getBoolean(false);
 				out.node = arg1;
 				return out;
 			}
@@ -86,6 +88,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				arg2.getNode("range").setValue(arg1.range);
 				arg2.getNode("hidden").setValue(arg1.hidden);
 				arg2.getNode("autojoin").setValue(arg1.autojoin);
+				arg2.getNode("range-obfuscation").setValue(arg1.obfuscateRanged);
 			}
 		};
 	}
@@ -113,13 +116,24 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		if (range > 0 && sender instanceof Player && recipient instanceof Player) {
 			Player p = (Player) sender;
 			Player r = (Player) recipient;
-			if (!Utils.inRange(p.getLocation(), r.getLocation(), range)) {
+			boolean ir = Utils.inRange(p.getLocation(), r.getLocation(), range);
+			double delta = Utils.difference(p.getLocation(), r.getLocation());
+			if (!ir && !this.isObfuscateRanged()) {
 				return Optional.of(Text.EMPTY);
+			} else if (!ir) {
+				int percentObfuscation = (int) ((delta - range) / (delta * (2 * (range / delta)))) * 100;
+				int percentDiscoloration = (int) ((delta - range) / delta) * 100;
+				return Optional.of(Utils.obfuscate(original, percentObfuscation, percentDiscoloration));
 			}
 		}
+
 		return Optional.of(original);
 	}
 
+	public double range() {
+		return range;
+	}
+	
 	public boolean canJoin(Player player) {
 		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
 			return false;
@@ -244,6 +258,21 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	@Override
 	public int compareTo(ChatChannel o) {
 		return members.size() - o.members.size();
+	}
+
+	/**
+	 * @return the obfuscateRanged
+	 */
+	public boolean isObfuscateRanged() {
+		return obfuscateRanged;
+	}
+
+	/**
+	 * @param obfuscateRanged
+	 *            the obfuscateRanged to set
+	 */
+	public void setObfuscateRanged(boolean obfuscateRanged) {
+		this.obfuscateRanged = obfuscateRanged;
 	}
 
 }

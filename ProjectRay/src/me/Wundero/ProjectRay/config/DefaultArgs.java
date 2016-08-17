@@ -35,6 +35,11 @@ public class DefaultArgs {
 			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
 					TextTemplate.arg("displayname").color(TextColors.AQUA).build(), "\n",
 					Text.builder("Say hello!").color(TextColors.GOLD).build())));
+	public static final DefaultArg KILLER = new DefaultArg(TextTemplate.arg("killer").color(TextColors.AQUA),
+			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("killer").build(), " ")),
+			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
+					TextTemplate.arg("killer").color(TextColors.AQUA).build(), "\n",
+					Text.builder("Say hello!").color(TextColors.GOLD).build()))).setOptional(true);
 	public static final DefaultArg CHANNEL = new DefaultArg("channel",
 			Utils.suggestTemplate(Utils.parse("/ch join {channelname}", false)),
 			Utils.showTemplate(Utils.parse("&7Channel: {channelname}\n&bClick to join!", true)));

@@ -106,7 +106,6 @@ public class ChannelMemberCollection {
 
 	public ChannelMember get(UUID receiver) {
 		if (!contains(receiver)) {
-			System.out.println("how?");
 			return null;
 		}
 		return members.get(members.indexOf(receiver));

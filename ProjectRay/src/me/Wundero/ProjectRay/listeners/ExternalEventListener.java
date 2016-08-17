@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.ProjectRay.listeners;
 /*
  The MIT License (MIT)
 
@@ -23,28 +23,16 @@ package me.Wundero.ProjectRay.commands;
  SOFTWARE.
  */
 
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.message.MessageChannelEvent;
 
-import me.Wundero.ProjectRay.conversation.format.FormatConversation;
+public class ExternalEventListener {
 
-public class FormatConversationCommand implements CommandExecutor {
-
-	@Override
-	public CommandResult execute(CommandSource source, CommandContext arguments) throws CommandException {
-		if (!(source instanceof Player)) {
-			source.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
-			return CommandResult.success();
-		}
-		Player player = (Player) source;
-		FormatConversation.start(player);
-		return CommandResult.success();
+	@Listener
+	public void onOut(MessageChannelEvent event) {
+		// This is potentially a filter that all messages go through, TODO
+		// verify this
+		System.out.println(event.getCause());
+		System.out.println(event.getMessage().toPlain());
 	}
-
 }

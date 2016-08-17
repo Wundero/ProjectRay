@@ -31,33 +31,30 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.utils.Utils;
 
-public class ChannelCommand implements CommandExecutor {
+public class ChannelHelpCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!(src instanceof Player)) {
-			src.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
-			return CommandResult.builder().successCount(0).build();
-		}
-		Player sender = (Player) src;
-		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.BLACK,
-				"]", " ", TextColors.GRAY, "Available channels:");
 		List<Text> texts = Utils.sl();
-		for (ChatChannel channel : Ray.get().getChannels().getJoinableChannels(sender, false)) {
-			texts.add(buildForChannel(channel, sender));
-		}
+		texts.add(cmdgen("channel", "View a list of channels.", "", false, "ch"));
+		texts.add(cmdgen("help", "View a list of channel commands.", "", true, "h"));
+		texts.add(cmdgen("join", "Join a channel.", "<channel>", true, "j"));
+		texts.add(cmdgen("leave", "Leave a channel.", "[channel]", true, "l"));
+		texts.add(
+				cmdgen("quickmessage", "Message a channel without joining it.", "<channel> <message...>", true, "qm"));
+		texts.add(cmdgen("role", "View or edit channel member roles.", "[player] [set <role>]", true, "r"));
+		texts.add(cmdgen("who", "View who is in a channel.", "[channel]", true, "w"));
+		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.BLACK,
+				"]", " ", TextColors.GRAY, "Channel commands:");
 		PaginationService ps = Sponge.getServiceManager().provide(PaginationService.class).get();
 		PaginationList.Builder b = ps.builder();
 		b.contents(texts);
@@ -67,15 +64,32 @@ public class ChannelCommand implements CommandExecutor {
 		return CommandResult.success();
 	}
 
-	private Text buildForChannel(ChatChannel channel, Player source) {
-		Text out = Text.of();
-		out = out.concat(channel.getTag());
-		out = out.concat(Text.of(TextColors.AQUA, " " + channel.getName()));
-		TextColor c = TextColors.AQUA;
-		if (channel.getMembersCollection().contains(source.getUniqueId())) {
-			c = TextColors.GOLD;
+	private Text cmdgen(String name, String desc, String args, boolean chprefix, String... aliases) {
+		if (chprefix) {
+			name = "ch " + name;
 		}
-		out = out.concat(Text.of(TextColors.GRAY, ": ", c, channel.getMembers().size() - 1));
+		String cmd = "/" + name + " ";
+		String cmd2 = cmd;
+		String a = "(";
+		boolean f = true;
+		for (String s : aliases) {
+			if (f) {
+				f = false;
+			} else {
+				a += "|";
+			}
+			a += s;
+		}
+		a += ")";
+		if (!a.equals("()")) {
+			cmd += a + " ";
+		}
+		cmd += args;
+		cmd2 += args;
+		Text out = Text.builder(cmd).color(TextColors.AQUA).onClick(TextActions.suggestCommand(cmd2))
+				.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to use the command!"))).build();
+		out = out.concat(Text.of(TextColors.GRAY, " - "));
+		out = out.concat(Text.of(TextColors.AQUA, desc));
 		return out;
 	}
 

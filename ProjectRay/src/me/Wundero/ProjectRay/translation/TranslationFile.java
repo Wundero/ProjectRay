@@ -23,10 +23,14 @@ package me.Wundero.ProjectRay.translation;
  SOFTWARE.
  */
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.translation.Translation;
@@ -78,15 +82,18 @@ public class TranslationFile {
 		};
 	}
 
-	// TODO ditch scanner?
 	private static Task parse(final File f, final TranslationFile tf) {
 		Task t = Task.builder().async().execute((task) -> {
 			try {
-				Scanner scn = new Scanner(f);
-				while (scn.hasNextLine()) {
-					tf.put(scn.nextLine());
-				}
-				scn.close();
+				BufferedReader reader = new BufferedReader(new FileReader(f));
+				Stream<String> lines = reader.lines();
+				Map<String, String> k = lines.filter(s -> s.contains(":"))
+						.collect(Collectors.toMap(
+								(Function<? super String, ? extends String>) (String in) -> in.split(":")[0],
+								(Function<? super String, ? extends String>) (String in) -> in
+										.replace(in.split(":")[0] + ":", "")));
+				tf.lines = k;
+				reader.close();
 				tf.setUsable(true);
 				files.put(tf.locale, tf);
 			} catch (Exception e) {
@@ -100,13 +107,6 @@ public class TranslationFile {
 
 	public String put(String key, String value) {
 		return lines.put(key, value);
-	}
-
-	private void put(String toSplit) {
-		int index = toSplit.indexOf(':');
-		String key = toSplit.substring(0, index);
-		String value = toSplit.substring(index + 1);
-		lines.put(key, value);
 	}
 
 	public Locale getLocale() {

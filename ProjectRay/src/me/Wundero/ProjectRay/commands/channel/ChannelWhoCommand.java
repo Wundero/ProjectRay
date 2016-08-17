@@ -24,7 +24,9 @@ package me.Wundero.ProjectRay.commands.channel;
  */
 
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -35,48 +37,61 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.utils.Utils;
 
-public class ChannelCommand implements CommandExecutor {
+public class ChannelWhoCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!(src instanceof Player)) {
-			src.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
-			return CommandResult.builder().successCount(0).build();
+		Optional<String> cn = args.<String>getOne("channel");
+		if (!cn.isPresent() && !(src instanceof Player)) {
+			src.sendMessage(Text.of(TextColors.RED, "You must specify a channel!"));
+			return CommandResult.success();
 		}
-		Player sender = (Player) src;
+		ChatChannel c = null;
+		if (!cn.isPresent()) {
+			Player sender = (Player) src;
+			c = RayPlayer.get(sender).getActiveChannel();
+		} else {
+			String ch = cn.get();
+			c = Ray.get().getChannels().getChannel(ch, true);
+		}
+		if (c == null) {
+			src.sendMessage(Text.of(TextColors.RED, "That is not a valid channel!"));
+			return CommandResult.success();
+		}
 		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.BLACK,
-				"]", " ", TextColors.GRAY, "Available channels:");
+				"]", " ", TextColors.GRAY, "Players in channel " + c.getName() + ":");
 		List<Text> texts = Utils.sl();
-		for (ChatChannel channel : Ray.get().getChannels().getJoinableChannels(sender, false)) {
-			texts.add(buildForChannel(channel, sender));
+		for (MessageReceiver m : c.getMembers()) {
+			if (m instanceof Player) {
+				Object v = Ray.get().getVariables().get("displayname", Optional.of((Player) m), Optional.empty(),
+						Optional.empty(), Optional.empty(), Optional.empty());
+				Text t;
+				if (v instanceof Text) {
+					t = (Text) v;
+				} else {
+					t = Text.of(v.toString());
+				}
+				t = t.concat(Text.of(TextColors.GRAY, ":", TextColors.GOLD,
+						StringUtils.capitalize(c.getMembersCollection().get(m).getRole().name().toLowerCase())));
+				texts.add(t);
+			}
 		}
 		PaginationService ps = Sponge.getServiceManager().provide(PaginationService.class).get();
 		PaginationList.Builder b = ps.builder();
 		b.contents(texts);
-		b.title(Text.of(TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.GREEN));
+		b.title(Text.of(TextColors.AQUA, TextStyles.BOLD, "Players", TextColors.GREEN));
 		b.header(header).padding(Text.of(TextColors.GREEN, "="));
 		b.sendTo(src);
 		return CommandResult.success();
-	}
-
-	private Text buildForChannel(ChatChannel channel, Player source) {
-		Text out = Text.of();
-		out = out.concat(channel.getTag());
-		out = out.concat(Text.of(TextColors.AQUA, " " + channel.getName()));
-		TextColor c = TextColors.AQUA;
-		if (channel.getMembersCollection().contains(source.getUniqueId())) {
-			c = TextColors.GOLD;
-		}
-		out = out.concat(Text.of(TextColors.GRAY, ": ", c, channel.getMembers().size() - 1));
-		return out;
 	}
 
 }

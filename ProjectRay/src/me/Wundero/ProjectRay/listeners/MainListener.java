@@ -72,6 +72,7 @@ import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayPlayer;
+import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class MainListener {
@@ -98,7 +99,7 @@ public class MainListener {
 		} else {
 			fx = g.getFormat(t);
 		}
-		final Format f = fx;// final reference important
+		final Format f = fx;
 		if (f == null) {
 			return false;
 		}
@@ -110,17 +111,25 @@ public class MainListener {
 		}
 		final TextTemplate template = f.getTemplate();
 		final Map<String, Object> args = Utils.sm(v);
+		boolean obfuscate = channel instanceof ChatChannel && ((ChatChannel) channel).isObfuscateRanged();
+		double range = obfuscate ? ((ChatChannel) channel).range() : -1;
 		MessageChannel newchan = MessageChannel.combined(channel, new MessageChannel() {
 
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
-
 				if (recipient instanceof Player && sender instanceof Player) {
 					Player s = (Player) sender;
 					Player r = (Player) recipient;
 					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
 						return Optional.of(Text.EMPTY);
+					}
+					if (obfuscate) {
+						double delta = Utils.difference(s.getLocation(), r.getLocation());
+						int percentObfuscation = (int) ((delta - range) / (delta * (2 * (range / delta)))) * 100;
+						int percentDiscoloration = (int) ((delta - range) / delta) * 100;
+						Text m = Utils.obfuscate((Text) args.get("message"), percentObfuscation, percentDiscoloration);
+						args.put("message", m);
 					}
 				}
 

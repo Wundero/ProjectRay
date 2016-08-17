@@ -22,13 +22,16 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
 import me.Wundero.ProjectRay.commands.Commands;
+import me.Wundero.ProjectRay.commands.IgnoreCommand;
 import me.Wundero.ProjectRay.commands.MessageCommand;
 import me.Wundero.ProjectRay.commands.ReplyCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelCommand;
+import me.Wundero.ProjectRay.commands.channel.ChannelHelpCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelJoinCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelLeaveCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelQMCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelRoleCommand;
+import me.Wundero.ProjectRay.commands.channel.ChannelWhoCommand;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.config.Template;
@@ -195,29 +198,41 @@ public class ProjectRay {
 						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
 						.executor(new ReplyCommand()).build(),
 				"r", "reply");
-		Sponge.getCommandManager().register(this, CommandSpec.builder().permission("ray.channel")
-				.description(Text.of("Chat channels command."))
-				.executor(new ChannelCommand()).child(
-						CommandSpec.builder().executor(new ChannelQMCommand())
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new IgnoreCommand())
+						.arguments(GenericArguments.player(Text.of("player"))).description(Text.of("Ignore a player."))
+						.permission("ray.ignore").build(),
+				"ignore");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
+						.executor(new ChannelCommand())
+						.child(CommandSpec.builder().executor(new ChannelQMCommand())
 								.arguments(GenericArguments.string(Text.of("channel")),
 										GenericArguments.remainingJoinedStrings(Text.of("message")))
-								.build(),
-						"quickmessage", "qm")
-				.child(CommandSpec.builder().executor(new ChannelRoleCommand())
-						.description(Text.of("View or set roles in a channel."))
-						.arguments(GenericArguments.optional(GenericArguments.player(Text.of("target"))),
-								GenericArguments
-										.optional(GenericArguments.seq(GenericArguments.literal(Text.of("set"), "set"),
-												GenericArguments.remainingJoinedStrings(Text.of("role")))))
-						.build(), "role")
-				.child(CommandSpec.builder().executor(new ChannelJoinCommand()).description(Text.of("Join a channel."))
-						.arguments(GenericArguments.remainingJoinedStrings(Text.of("channel"))).build(), "join", "j")
-				.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
-						.description(Text.of("Leave a channel."))
-						.arguments(
-								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("channel"))))
-						.build(), "leave", "l")
-				.build(), "channel", "ch");
+								.description(Text.of("Message a channel without joining it."))
+								.permission("ray.channel.quickmessage").build(), "quickmessage", "qm")
+						.child(CommandSpec.builder().executor(new ChannelRoleCommand())
+								.description(Text.of("View or set roles in a channel.")).permission("ray.channel.role")
+								.arguments(GenericArguments.optional(GenericArguments.player(Text.of("target"))),
+										GenericArguments.optional(
+												GenericArguments.seq(GenericArguments.literal(Text.of("set"), "set"),
+														GenericArguments.remainingJoinedStrings(Text.of("role")))))
+								.build(), "role", "r")
+						.child(CommandSpec.builder().executor(new ChannelJoinCommand())
+								.description(Text.of("Join a channel."))
+								.arguments(GenericArguments.string(Text.of("channel"))).build(), "join", "j")
+						.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
+								.description(Text.of("Leave a channel."))
+								.arguments(GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+								.build(), "leave", "l")
+						.child(CommandSpec.builder().executor(new ChannelWhoCommand())
+								.description(Text.of("List the players in a channel."))
+								.arguments(GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+								.build(), "who", "w")
+						.child(CommandSpec.builder().executor(new ChannelHelpCommand())
+								.description(Text.of("List channel commands.")).build(), "help", "h")
+						.build(),
+				"channel", "ch");
 	}
 
 	@Listener

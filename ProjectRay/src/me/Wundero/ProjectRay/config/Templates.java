@@ -42,7 +42,7 @@ public class Templates {
 				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build()
 				.withFormat("death").withArg(DefaultArgs.DISPLAYNAME).withText(" ").withArg("message", false)
-				.withText(" ").withArg("killer", true).withText(" ").withArg("item", true).build().build().build();
+				.withText(" ").withArg(DefaultArgs.KILLER).withText(" ").withArg("item", true).build().build().build();
 	}
 
 	public static Template MULTI_GROUP(Template.Builder t) {

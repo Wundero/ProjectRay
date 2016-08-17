@@ -25,56 +25,35 @@ package me.Wundero.ProjectRay.commands;
 
 import java.util.Optional;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.FormatType;
+import me.Wundero.ProjectRay.framework.RayPlayer;
 
-public class FakeMessageCommand implements CommandExecutor {
+public class IgnoreCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!args.hasAny("type") || FormatType.fromString(args.<String>getOne("type").get()) == FormatType.DEFAULT) {
-			src.sendMessage(Text.of(TextColors.RED, "You must specify a proper type!"));
+		if (!(src instanceof Player)) {
+			src.sendMessage(Text.of(TextColors.RED, "You must be a player to ignore people!"));
 			return CommandResult.success();
 		}
-		if (!args.hasAny("message")) {
-			src.sendMessage(Text.of(TextColors.RED, "You must specify a message!"));
+		Optional<Player> target = args.<Player>getOne("player");
+		if (!target.isPresent()) {
+			src.sendMessage(Text.of(TextColors.RED, "You must specify a player to ignore!"));
 			return CommandResult.success();
 		}
-		Player target = null;
-		if (args.hasAny("p")) {
-			target = args.<Player>getOne("player").get();
-		} else {
-			if (!(src instanceof Player)) {
-				src.sendMessage(Text.of(TextColors.RED, "You must be a player to send a fake message as yourself!"));
-				return CommandResult.success();
-			}
-			target = (Player) src;
-		}
-		String type = args.<String>getOne("type").get();
-		String message = args.<String>getOne("message").get();
-		MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get().getPlugin()).named("formattype", FormatType.fromString(type)).build(),
-				target.getMessageChannel(), Optional.of(target.getMessageChannel()),
-				new MessageEvent.MessageFormatter(Text.of(message)), Text.of(message), false);
-		Sponge.getEventManager().post(ev2);
-		if (!ev2.isCancelled()) {
-			ev2.getChannel().get().send(target, ev2.getMessage(), ChatTypes.CHAT);
-		}
+		Player t = target.get();
+		RayPlayer s = RayPlayer.get((Player) src);
+		RayPlayer tr = RayPlayer.get(t);
+		s.toggleIgnore(tr);
+		src.sendMessage(Text.of(TextColors.GREEN));
 		return CommandResult.success();
 	}
 

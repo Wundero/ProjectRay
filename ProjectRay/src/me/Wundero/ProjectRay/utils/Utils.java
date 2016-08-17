@@ -34,6 +34,7 @@ import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
@@ -146,6 +147,14 @@ public class Utils {
 		return new ConcurrentHashMap<K, V>();
 	}
 
+	public static double difference(Location<World> loc1, Location<World> loc2) {
+		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
+				z2 = loc2.getZ();
+		double l1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2) + Math.pow(z1, 2)),
+				l2 = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2) + Math.pow(z2, 2));
+		return Math.abs(l1 - l2);
+	}
+
 	public static boolean inRange(Location<World> loc1, Location<World> loc2, double range) {
 		// pythagorean range calc
 		if (range < 0) {
@@ -154,11 +163,39 @@ public class Utils {
 		if (range == 0) {
 			return false;
 		}
-		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
-				z2 = loc2.getZ();
-		double l1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2) + Math.pow(z1, 2)),
-				l2 = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2) + Math.pow(z2, 2));
-		return Math.abs(l1 - l2) <= range;
+		return difference(loc1, loc2) <= range;
+	}
+
+	public static Text obfuscate(Text original, Integer percentObfuscation, Integer percentDiscoloration) {
+		List<Text> children = original.getChildren();
+		original = original.toBuilder().removeAll().build();
+		Text.Builder out = Text.builder().color(original.getColor());
+		char[] chars = original.toPlain().toCharArray();
+		Integer obC = percentDiscoloration;
+		Integer obS = percentObfuscation;
+		List<Text> cs = sl();
+		Random rng = new Random();
+		TextColor co = original.getColor();
+		for (Character c : chars) {
+			if (rng.nextInt(100) < obS) {
+				cs.add(Text.of(co, " "));
+			} else {
+				cs.add(Text.of(co, c));
+			}
+		}
+		List<Text> toBuild = sl();
+		for (Text t : cs) {
+			if (rng.nextInt(100) < obC) {
+				toBuild.add(t.toBuilder().color(TextColors.DARK_GRAY).build());
+			} else {
+				toBuild.add(t);
+			}
+		}
+		out.append(toBuild);
+		for (Text t : children) {
+			out.append(obfuscate(t, obS, obC));
+		}
+		return out.build();
 	}
 
 	public static TextTemplate parse(final String i, boolean allowColors) {

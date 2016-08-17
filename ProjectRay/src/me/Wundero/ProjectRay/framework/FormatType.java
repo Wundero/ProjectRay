@@ -51,6 +51,45 @@ public enum FormatType {
 	 * modt------------------------------------------------------------------Y
 	 * tablist_entry---------------------------------------------------------Y
 	 * default---------------------------------------------------------------/
+	 * 
+	 * Format types to add maybe:
+	 * afk--------------------------------------------------------------------
+	 * helpop-----------------------------------------------------------------
+	 * mail-------------------------------------------------------------------
+	 * me (action)------------------------------------------------------------
+	 * broadcast--------------------------------------------------------------
+	 * announcement-----------------------------------------------------------
+	 * animatable formats: ---------------------------------------------------
+	 * -- tablist_header -----------------------------------------------------
+	 * -- tablist_footer -----------------------------------------------------
+	 * -- tablist_entry ------------------------------------------------------
+	 * -- bossbar ------------------------------------------------------------
+	 * -- scoreboard ---------------------------------------------------------
+	 * -- title --------------------------------------------------------------
+	 * -- actionbar ----------------------------------------------------------
+	 * 
+	 */
+
+	/*
+	 * Since this seems to be where i dump ideas, todo:-----------------------
+	 * range obfuscation (chat messages out of range of channels but still in
+	 * world get slowly degenerated) should be done but not tested. ----------
+	 * nicknames--------------------------------------------------------------
+	 * permission setup ------------------------------------------------------
+	 * prefixes/suffixes/displayname modification-----------------------------
+	 * different types of chat (whisper, talk, yell)--------------------------
+	 * message spying---------------------------------------------------------
+	 * mute command-----------------------------------------------------------
+	 * helpop command---------------------------------------------------------
+	 * afk command------------------------------------------------------------
+	 * broadcast command------------------------------------------------------
+	 * me command-------------------------------------------------------------
+	 * mail command-----------------------------------------------------------
+	 * format non-ray messages (events) - sort of done with custom formats but
+	 * needs to be properly implemented for messages that are sent by other
+	 * plugins. I would like to figure out if I can determine if the message is
+	 * plugin sent or player sent, however that seems impractical as plugins
+	 * don't consistently set themselves as senders.--------------------------
 	 */
 
 	// TODO add more formats as seen fit

@@ -40,6 +40,7 @@ public class ChannelConversationCommand implements CommandExecutor {
 	public CommandResult execute(CommandSource source, CommandContext arguments) throws CommandException {
 		if (!(source instanceof Player)) {
 			source.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
+			return CommandResult.success();
 		}
 		Player player = (Player) source;
 		ChatChannelConversation.start(player);

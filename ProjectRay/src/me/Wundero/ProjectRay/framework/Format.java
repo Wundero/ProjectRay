@@ -33,6 +33,7 @@ import com.google.common.reflect.TypeToken;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class Format {
 	private TextTemplate template;
@@ -97,21 +98,35 @@ public class Format {
 				: FormatType.fromString(node.getNode("type").getString()));
 		node.getNode("type").setValue(type.getName());// forces type to be
 														// present
-		Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
-			try {
-				TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
-				if (template == null) {
-					return;
+		if (node.getNode("simple").isVirtual()) {
+			Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
+				try {
+					TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
+					if (template == null) {
+						return;
+					}
+					setTemplate(template);
+				} catch (Exception e) {
+					Utils.printError(e);
 				}
-				setTemplate(template);
-			} catch (Exception e) {
-				Utils.printError(e);
+				usable = true;
+				task.cancel();
+				Ray.get().finishFormatTask(task);
+			}).submit(Ray.get().getPlugin());
+			Ray.get().registerFormatTask(t);
+		} else {
+			String simple = node.getNode("simple").getString();
+			node.getNode("simple").setValue(null);
+			setTemplate(Utils.parse(simple, true));
+			usable = template != null;
+			if (usable) {
+				try {
+					node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
+				} catch (ObjectMappingException e) {
+					Utils.printError(e);
+				}
 			}
-			usable = true;
-			task.cancel();
-			Ray.get().finishFormatTask(task);
-		}).submit(Ray.get().getPlugin());
-		Ray.get().registerFormatTask(t);
+		}
 	}
 
 	public boolean usable() {

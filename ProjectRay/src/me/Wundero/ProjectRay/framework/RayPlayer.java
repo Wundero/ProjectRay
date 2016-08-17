@@ -35,6 +35,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.reflect.TypeToken;
@@ -47,7 +48,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class RayPlayer {
 
-	// TODO conversations
 	// TODO file saving - save to individual files with world - group map
 
 	private boolean conversing = false;
@@ -113,32 +113,40 @@ public class RayPlayer {
 	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
 	private List<String> listenChannels = Utils.sl();
-	
+
 	public boolean listeningTo(ChatChannel c) {
 		return listeningTo(c.getName());
 	}
-	
+
 	public boolean listeningTo(String channel) {
 		return listenChannels.contains(channel);
 	}
-	
+
 	public void removeListenChannel(ChatChannel c) {
 		removeListenChannel(c.getName());
 	}
-	
+
 	public boolean removeListenChannel(String s) {
-		if(!listenChannels.contains(s)) {
+		if (!listenChannels.contains(s)) {
 			return false;
 		}
 		return listenChannels.remove(s);
 	}
-	
+
 	public void addListenChannel(ChatChannel c) {
 		listenChannels.add(c.getName());
 	}
 
 	public boolean isIgnoring(RayPlayer player) {
 		return ignore.contains(player.uuid);
+	}
+
+	public boolean toggleIgnore(RayPlayer player) {
+		if (isIgnoring(player)) {
+			return unignore(player);
+		} else {
+			return ignore(player);
+		}
 	}
 
 	public boolean unignore(RayPlayer player) {
@@ -190,12 +198,27 @@ public class RayPlayer {
 		config.getNode("ignoring").setValue(ignore);
 		config.getNode("channel").setValue(activeChannel == null ? null : activeChannel.getName());
 		config.getNode("lastname").setValue(user.getName());
-		// TODO save displayname
+		if (getDisplayName().isPresent()) {
+			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
+		}
+	}
+
+	public Optional<Text> getDisplayName() {
+		return Optional.ofNullable(displayname);
+	}
+
+	private Text displayname = null;
+
+	public void checkDisplayname() {
+		if (!user.isOnline() || !user.getPlayer().isPresent()) {
+			return;
+		}
+		Object o = Ray.get().getVariables().get("displayname", Optional.of(this.getUser().getPlayer().get()),
+				Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+		displayname = o instanceof Text ? (Text) o : Text.of(o);
 	}
 
 	public RayPlayer(User u) {
-		// TODO pass config node that's loaded already if single file for all
-		// players is desired
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
@@ -220,6 +243,7 @@ public class RayPlayer {
 		}
 		cache.put(uuid, this);
 		this.setGroups(Ray.get().getGroups().getGroups(u));
+		this.checkDisplayname();
 	}
 
 	public UUID getUniqueId() {
@@ -350,7 +374,8 @@ public class RayPlayer {
 	}
 
 	/**
-	 * @param listenChannels the listenChannels to set
+	 * @param listenChannels
+	 *            the listenChannels to set
 	 */
 	public void setListenChannels(List<String> listenChannels) {
 		this.listenChannels = listenChannels;
