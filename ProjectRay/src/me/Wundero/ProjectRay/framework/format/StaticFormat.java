@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.ProjectRay.framework.format;
 /*
  The MIT License (MIT)
 
@@ -23,81 +23,27 @@ package me.Wundero.ProjectRay.framework;
  SOFTWARE.
  */
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
-public class Format {
+public class StaticFormat extends Format {
 	private TextTemplate template;
-	private FormatType type;
-	private String name;
-	private boolean usable = false;
-	private Optional<ConfigurationNode> node;
 
-	private Format() {
-		setNode(Optional.empty());
-	}
-
-	public static Format builder() {
-		return new Format();
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public Format withSection(Object... text) {
-		if (template == null) {
-			template = TextTemplate.of(text);
-		} else {
-			template = template.concat(TextTemplate.of(text));
-		}
-		return this;
-	}
-
-	public Format build() {
-		if (type == null && (name != null && !name.isEmpty())) {
-			type = FormatType.fromString(name);
-		}
-		if (template == null || type == null || name == null || name.isEmpty()) {
-			return null;
-		}
-		usable = true;
-		return this;
-	}
-
-	public Format withType(FormatType type) {
-		return setType(type);
-	}
-
-	public Format withTypeFromString(String type) {
-		return withType(FormatType.fromString(type));
-	}
-
-	public Format withName(String name) {
-		return setName(name);
-	}
-
-	public Format setName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public Format(final ConfigurationNode node) {
-		this.setNode(Optional.of(node));
-		name = node.getKey().toString();
-		setType(node.getNode("type").isVirtual() ? FormatType.fromString(name)
-				: FormatType.fromString(node.getNode("type").getString()));
-		node.getNode("type").setValue(type.getName());// forces type to be
-														// present
+	public StaticFormat(ConfigurationNode node) {
+		super(node);
 		if (node.getNode("simple").isVirtual()) {
 			Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
 				try {
@@ -129,33 +75,31 @@ public class Format {
 		}
 	}
 
-	public boolean usable() {
-		return usable;
-	}
-
-	public TextTemplate getTemplate() {
-		return template;
-	}
-
-	public Format setTemplate(TextTemplate template) {
+	private void setTemplate(TextTemplate template) {
 		this.template = template;
-		return this;
 	}
 
-	public FormatType getType() {
-		return type;
+	public Optional<TextTemplate> getTemplate() {
+		if (usable) {
+			return Optional.ofNullable(template);
+		}
+		return Optional.empty();
 	}
 
-	public Format setType(FormatType type) {
-		this.type = type;
-		return this;
+	@Override
+	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
+		if (!getTemplate().isPresent()) {
+			return false;
+		}
+		return this.s(f, args, getTemplate().get());
 	}
 
-	public Optional<ConfigurationNode> getNode() {
-		return node;
+	@Override
+	public boolean send(Function<Text, Boolean> f, ParsableData data) {
+		if (!getTemplate().isPresent()) {
+			return false;
+		}
+		return this.s(f, data, getTemplate().get());
 	}
 
-	public void setNode(Optional<ConfigurationNode> node) {
-		this.node = node;
-	}
 }

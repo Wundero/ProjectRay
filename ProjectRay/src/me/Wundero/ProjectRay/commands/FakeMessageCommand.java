@@ -41,7 +41,7 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.FormatType;
+import me.Wundero.ProjectRay.framework.format.FormatType;
 
 public class FakeMessageCommand implements CommandExecutor {
 

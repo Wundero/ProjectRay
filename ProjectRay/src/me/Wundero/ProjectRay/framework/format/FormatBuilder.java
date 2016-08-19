@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.ProjectRay.framework.format;
 /*
  The MIT License (MIT)
 
@@ -34,6 +34,7 @@ import com.google.common.reflect.TypeToken;
 import me.Wundero.ProjectRay.config.DefaultArg;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
+import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -66,7 +67,7 @@ public class FormatBuilder {
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
-		return new Format(node);
+		return new StaticFormat(node);
 	}
 
 	public static FormatBuilder builder(Group group, String name) {

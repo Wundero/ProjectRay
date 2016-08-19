@@ -40,6 +40,7 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
@@ -57,7 +58,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -68,12 +68,14 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.Format;
-import me.Wundero.ProjectRay.framework.FormatType;
+import me.Wundero.ProjectRay.ValueHolder;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.format.Format;
+import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.variables.ParsableData;
 
 public class MainListener {
 
@@ -99,17 +101,10 @@ public class MainListener {
 		} else {
 			fx = g.getFormat(t);
 		}
-		final Format f = fx;
-		if (f == null) {
+		if (fx == null) {
 			return false;
 		}
-		if (f.getTemplate() == null) {
-			System.out.println("y u do dis");
-			// possibly not loaded, but i don't care to figure out why formats
-			// don't always properly load templates
-			return true;
-		}
-		final TextTemplate template = f.getTemplate();
+		final Format f = fx;
 		final Map<String, Object> args = Utils.sm(v);
 		boolean obfuscate = channel instanceof ChatChannel && ((ChatChannel) channel).isObfuscateRanged();
 		double range = obfuscate ? ((ChatChannel) channel).range() : -1;
@@ -133,19 +128,19 @@ public class MainListener {
 					}
 				}
 
-				if (recipient instanceof Player) {
-					args.putAll(Ray.get().setVars(args, template, msgsender.isPresent() ? msgsender.get() : p,
-							msgrecip.isPresent() ? msgrecip : Optional.of((Player) recipient), observer, Optional.of(f),
-							true));
-				} else {
-					args.putAll(Ray.get().setVars(args, template, msgsender.isPresent() ? msgsender.get() : p,
-							msgrecip.isPresent() ? msgrecip : Optional.empty(), observer, Optional.of(f), true));
-				}
-				if (template == null) {
+				ValueHolder<Text> vv = new ValueHolder<Text>();
+				if (!f.send((text) -> {
+					if (vv.getValue() != null) {
+						return false;
+					}
+					vv.setValue(text);
+					return true;
+				}, new ParsableData().setKnown(args).setSender(msgsender.orElse(p))
+						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
+						.setClickHover(true).setObserver(observer))) {
 					return Optional.empty();
 				}
-				Text t = template.apply(args).build();
-				return Optional.of(t);
+				return Optional.of(vv.getValue());
 			}
 
 			@Override
@@ -197,7 +192,7 @@ public class MainListener {
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
 		p.setTabTask(() -> {
 			Player player = event.getTargetEntity();
-			TabList list = player.getTabList();
+			final TabList list = player.getTabList();
 			List<TabListEntry> lx = Utils.sl(list.getEntries());
 			for (TabListEntry e : lx) {
 				Optional<Player> h = Sponge.getServer().getPlayer(e.getProfile().getUniqueId());
@@ -214,12 +209,17 @@ public class MainListener {
 				if (f == null) {
 					continue;
 				}
-				TextTemplate t = f.getTemplate();
-				if (t == null) {
-					continue;
-				}
-				e.setDisplayName(t.apply(Ray.get().setVars(Utils.sm(), t, pla, Optional.of(player), Optional.empty(),
-						Optional.of(f), false)).build());
+				f.send((text) -> {
+					TabListEntry e2 = e;
+					if (!list.getEntry(e.getProfile().getUniqueId()).isPresent()) {
+						return false;
+					}
+					if (!(list.getEntry(e.getProfile().getUniqueId()).get().equals(e))) {
+						e2 = list.getEntry(e.getProfile().getUniqueId()).get();
+					}
+					e2.setDisplayName(text);
+					return true;
+				}, new ParsableData().setClickHover(false).setSender(pla).setRecipient(player));
 			}
 		});
 
@@ -297,9 +297,19 @@ public class MainListener {
 
 	// TODO figure out way to customize messages - locale is retrivable so use
 	// translations?
+
+	/*
+	 * For now, I'm going to skip working on this. I cannot figure out a simple
+	 * way to properly handle this; it will take a lot of config (either
+	 * translations *ugh* or a terrible .conf file) and will likely be
+	 * bug-ridden. If I can think of a simple, consistent method of handling
+	 * this that works with what I have completed to this point, I will
+	 * implement that. For now, I will just leave this as dead code.
+	 */
 	@Listener
 	public void onDeath(DestructEntityEvent.Death event) {
-		if (!(event.getTargetEntity() instanceof Player)) {
+		// for now, not handling deaths.
+		if (!(event.getTargetEntity() instanceof Player) || event instanceof Event) {
 			return;
 		}
 		Map<String, Object> vars = Utils.sm();

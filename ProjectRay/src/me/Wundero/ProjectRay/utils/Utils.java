@@ -30,6 +30,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
@@ -89,6 +90,10 @@ public class Utils {
 
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
+	}
+
+	public static Task schedule(Task.Builder b) {
+		return b.submit(Ray.get().getPlugin());
 	}
 
 	public static <T> List<T> sl(Collection<T> objs) {

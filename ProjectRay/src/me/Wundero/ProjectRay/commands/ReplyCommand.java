@@ -41,8 +41,8 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.FormatType;
 import me.Wundero.ProjectRay.framework.RayPlayer;
+import me.Wundero.ProjectRay.framework.format.FormatType;
 
 public class ReplyCommand implements CommandExecutor {
 

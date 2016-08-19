@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.ProjectRay.framework.format;
 
 import java.util.regex.Pattern;
 
@@ -31,10 +31,10 @@ public enum FormatType {
 			new String[] { "sm", "smsg", "sendmsg" }), MESSAGE_RECEIVE("receive_message",
 					new String[] { "rm", "rmsg", "receivemsg" }), DEATH("death", new String[] { "d" }), JOIN("join",
 							new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM("custom"), WELCOME(
-									"welcome",
-									new String[] { "w" }), MOTD("motd", new String[] {}), TABLIST_ENTRY("tablist",
-											new String[] { "list", "t", "tab" }), DEFAULT("default"), ACHIEVEMENT(
-													"achievement", new String[] { "a", "ach" }), KICK("kick");
+									"welcome", new String[] { "w" }), MOTD("motd", new String[] {}), TABLIST_ENTRY(
+											"tablist", new String[] { "list", "t", "tab" },
+											true), DEFAULT("default"), ACHIEVEMENT("achievement",
+													new String[] { "a", "ach" }), KICK("kick");
 
 	// format types:
 	/*
@@ -99,6 +99,7 @@ public enum FormatType {
 
 	private String[] aliases;
 	private String name;
+	private boolean animated;
 
 	FormatType(String name) {
 		this.setName(name);
@@ -108,6 +109,11 @@ public enum FormatType {
 	FormatType(String name, String[] aliases) {
 		this.setName(name);
 		this.setAliases(aliases);
+	}
+
+	FormatType(String name, String[] aliases, boolean animatable) {
+		this(name, aliases);
+		this.setAnimated(animatable);
 	}
 
 	public String[] getAliases() {
@@ -144,5 +150,20 @@ public enum FormatType {
 			}
 		}
 		return DEFAULT;
+	}
+
+	/**
+	 * @return the animated
+	 */
+	public boolean isAnimated() {
+		return animated;
+	}
+
+	/**
+	 * @param animated
+	 *            the animated to set
+	 */
+	public void setAnimated(boolean animated) {
+		this.animated = animated;
 	}
 }

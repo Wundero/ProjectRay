@@ -8,6 +8,8 @@ import java.util.Random;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.framework.format.Format;
+import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -83,7 +85,7 @@ public class Group {
 			nod2 = nod.getNode("formats");
 		}
 		for (ConfigurationNode node : nod2.getChildrenMap().values()) {
-			Format f = new Format(node);
+			Format f = Format.create(node);
 			FormatType type = f.getType();
 			if (!formats.containsKey(type)) {
 				formats.put(type, Utils.sl(f));

@@ -38,9 +38,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class Variables {

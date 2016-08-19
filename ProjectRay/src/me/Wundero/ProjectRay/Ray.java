@@ -19,10 +19,11 @@ import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
-import me.Wundero.ProjectRay.framework.Format;
 import me.Wundero.ProjectRay.framework.Groups;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannels;
+import me.Wundero.ProjectRay.framework.format.Format;
+import me.Wundero.ProjectRay.framework.format.StaticFormat;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.Variables;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -186,14 +187,17 @@ public class Ray {
 		this.groups = groups;
 	}
 
-	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Player sender,
+	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Optional<Player> sender,
 			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
-		if (sender == null) {
+		if (known == null) {
+			known = Utils.sm();
+		}
+		if (sender == null || !sender.isPresent()) {
 			return known;
 		}
 		if (template == null) {
-			if (formatUsed.isPresent()) {
-				TextTemplate t2 = formatUsed.get().getTemplate();
+			if (formatUsed.isPresent() && formatUsed.get() instanceof StaticFormat) {
+				TextTemplate t2 = ((StaticFormat) formatUsed.get()).getTemplate().orElse(null);
 				if (t2 != null) {
 					template = t2;
 				} else {
@@ -232,9 +236,9 @@ public class Ray {
 					Optional<Player> r1;
 					if (irecip) {
 						s1 = recip;
-						r1 = Optional.of(sender);
+						r1 = sender;
 					} else {
-						s1 = Optional.of(sender);
+						s1 = sender;
 						r1 = recip;
 					}
 					Object var = getVariables().get(k, s1, r1, formatUsed, Optional.of(template), observer);
