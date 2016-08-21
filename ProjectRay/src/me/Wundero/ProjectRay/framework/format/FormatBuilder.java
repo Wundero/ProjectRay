@@ -24,6 +24,7 @@ package me.Wundero.ProjectRay.framework.format;
  */
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -47,6 +48,7 @@ public class FormatBuilder {
 	private TextTemplate template;
 	private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
 	private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
+	private Optional<FormatType> type;
 
 	public FormatBuilder(ConfigurationNode node, String name) {
 		this.node = node;
@@ -64,6 +66,7 @@ public class FormatBuilder {
 			for (Arg a : hovers.keySet()) {
 				args.getNode(a.getName(), "hover").setValue(TypeToken.of(InternalHoverAction.class), hovers.get(a));
 			}
+			type.ifPresent(type -> node.getNode("type").setValue(type.getName()));
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
@@ -72,6 +75,14 @@ public class FormatBuilder {
 
 	public static FormatBuilder builder(Group group, String name) {
 		return new FormatBuilder(group.getConfig().getNode("format", name), name);
+	}
+
+	public FormatBuilder withType(FormatType type) {
+		if (type == FormatType.DEFAULT) {
+			return this;
+		}
+		this.type = Optional.ofNullable(type);
+		return this;
 	}
 
 	public FormatBuilder withArg(String key) {

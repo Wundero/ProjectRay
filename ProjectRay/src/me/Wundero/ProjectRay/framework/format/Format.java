@@ -60,6 +60,7 @@ public abstract class Format {
 		try {
 			b = f.apply(get(t, d));
 		} catch (Exception e) {
+			e.printStackTrace();
 			b = false;
 		}
 		return b;
@@ -74,8 +75,11 @@ public abstract class Format {
 	}
 
 	protected Map<String, Object> parse(TextTemplate t, ParsableData data) {
-		return Ray.get().setVars(Utils.sm(), t, data.getSender(), data.getRecipient(), data.getObserver(),
-				Optional.of(this), false);
+		if (data == null) {
+			return Utils.sm();
+		}
+		return Ray.get().setVars(data.getKnown().orElse(Utils.sm()), t, data.getSender(), data.getRecipient(),
+				data.getObserver(), Optional.of(this), data.isClickHover());
 	}
 
 	public String getName() {
@@ -102,6 +106,9 @@ public abstract class Format {
 		if (getDaType(node) == null || !getDaType(node).isAnimated()) {
 			return new StaticFormat(node);
 		} else {
+			if (node.getNode("frames").isVirtual()) {
+				return new StaticFormat(node);
+			}
 			return new AnimatedFormat(node);
 		}
 	}

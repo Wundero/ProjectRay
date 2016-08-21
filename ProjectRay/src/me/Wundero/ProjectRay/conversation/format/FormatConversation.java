@@ -45,6 +45,7 @@ import me.Wundero.ProjectRay.conversation.ConversationFactory;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.framework.Group;
+import me.Wundero.ProjectRay.framework.format.AnimatedFormat;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.FormatBuilder;
 import me.Wundero.ProjectRay.framework.format.FormatType;
@@ -166,10 +167,8 @@ public class FormatConversation {
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.sl();
 			for (String g : Ray.get().getGroups().getGroups(context.getData("world").toString()).keySet()) {
-				options.add(new Option(g,
-						Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
-								.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!")))
-								.build(),
+				options.add(new Option(g, Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
+						.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!"))).build(),
 						Ray.get().getGroups().getGroup(g, context.getData("world").toString())));
 			}
 			return Optional.of(options);
@@ -363,17 +362,182 @@ public class FormatConversation {
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			context.putData("formattype", selected.get().getValue());
-			FormatBuilder fb = new FormatBuilder(context.getData("node"), context.getData("name"));
-			context.putData("builder", fb);
 			ConfigurationNode node = context.getData("node");
 			String type = ((FormatType) context.getData("formattype")).getName();
 			node.getNode("type").setValue(type);
-			return new TemplateBuilderTypePrompt();
+			FormatType t = FormatType.fromString(type);
+			if (t.isAnimated()) {
+				return new ShouldAnimatePrompt();
+			}
+			return new TemplateBuilderTypePrompt(true, context);
+		}
+
+	}
+
+	private static class ShouldAnimatePrompt extends Prompt {
+
+		public ShouldAnimatePrompt() {
+			this(TextTemplate.of(TextColors.AQUA, "Do you want to animate this format?"));
+		}
+
+		public ShouldAnimatePrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			switch (input.toLowerCase().trim()) {
+			case "y":
+			case "yes":
+			case "n":
+			case "no":
+			case "true":
+			case "t":
+			case "f":
+			case "false":
+			case "0":
+			case "1":
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		private boolean parseInput(String input) {
+			switch (input.toLowerCase().trim()) {
+			case "y":
+			case "yes":
+			case "true":
+			case "t":
+			case "1":
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return this.formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid input! Try yes or no.");
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			if (parseInput(text)) {
+				context.putData("framenumber", 0);
+				context.putData("animated", true);
+				ConfigurationNode n = context.getData("node");
+				context.putData("frame0", n.getNode("frames", "frame0"));
+			}
+			return new TemplateBuilderTypePrompt(true, context);
+		}
+	}
+
+	private static class FramePrompt extends Prompt {
+
+		public FramePrompt() {
+			this(TextTemplate.of(TextColors.AQUA, "Would you like to add another frame?"));
+		}
+
+		public FramePrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return this.formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid input! Try yes or no.");
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			switch (input.toLowerCase().trim()) {
+			case "y":
+			case "yes":
+			case "n":
+			case "no":
+			case "true":
+			case "t":
+			case "f":
+			case "false":
+			case "0":
+			case "1":
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		private boolean parseInput(String input) {
+			switch (input.toLowerCase().trim()) {
+			case "y":
+			case "yes":
+			case "true":
+			case "t":
+			case "1":
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			if (parseInput(text)) {
+				int framenumber = context.getData("framenumber");
+				ConfigurationNode frame = context.getData("frame" + framenumber);
+				frame.getNode("number").setValue(framenumber);
+				context.putData("framenumber", framenumber + 1);
+				ConfigurationNode node = context.getData("node");
+				context.putData("frame" + (framenumber + 1), node.getNode("frames", "frame" + (framenumber + 1)));
+				return new TemplateBuilderTypePrompt(true, context);
+			} else {
+				int framenumber = context.getData("framenumber");
+				ConfigurationNode frame = context.getData("frame" + framenumber);
+				frame.getNode("number").setValue(framenumber);
+				Group group = context.getData("group");
+				group.addFormat(new AnimatedFormat(context.getData("node")));
+				context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix().concat(
+						Text.of(TextColors.GREEN, "Format " + context.getData("name") + " successfully created!")));
+				Ray.get().getPlugin().save();
+				return null;
+			}
 		}
 
 	}
 
 	private static class TemplateBuilderTypePrompt extends Prompt {
+
+		public TemplateBuilderTypePrompt(boolean constructNewBuilder, ConversationContext context) {
+			this();
+			if (!constructNewBuilder) {
+				return;
+			}
+			FormatBuilder fb = new FormatBuilder(context.hasData("animated")
+					? context.getData("frame" + (int) context.getData("framenumber")) : context.getData("node"),
+					context.getData("name"));
+			fb.withType(context.getData("formattype"));
+			context.putData("builder", fb);
+		}
 
 		public TemplateBuilderTypePrompt() {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add, or type \"done\" to finish: "),
@@ -401,8 +565,13 @@ public class FormatConversation {
 					.onHover(TextActions.showText(Text.of("Click this to select variable!", TextColors.AQUA))).build();
 			Text t2 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
 					.onHover(TextActions.showText(Text.of("Click this to select text!", TextColors.AQUA))).build();
+			Text t3 = Text.builder("stay").color(TextColors.GOLD).onClick(TextActions.runCommand("stay"))
+					.onHover(TextActions.showText(Text.of("Click this to select stay!", TextColors.AQUA))).build();
 			options.add(new Option("variable", t1, "variable"));
 			options.add(new Option("text", t2, "text"));
+			if (context.hasData("animated")) {
+				options.add(new Option("stay", t3, "stay"));
+			}
 			return Optional.of(options);
 		}
 
@@ -413,13 +582,20 @@ public class FormatConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			text = text.toLowerCase();
 			if (text.equals("variable")) {
 				return new ArgTypePrompt();
 			}
 			if (text.equals("text")) {
 				return new TextTypePrompt();
 			}
+			if (text.equals("stay") && context.hasData("animated")) {
+				return new StayPrompt();
+			}
 			Format format = ((FormatBuilder) context.getData("builder")).build();
+			if (context.hasData("animated")) {
+				return new FramePrompt();
+			}
 			Group group = context.getData("group");
 			group.addFormat(format);
 			context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
@@ -427,6 +603,36 @@ public class FormatConversation {
 			Ray.get().getPlugin().save();
 			return null;
 		}
+	}
+
+	private static class StayPrompt extends me.Wundero.ProjectRay.conversation.TypePrompt<Integer> {
+
+		public StayPrompt() {
+			this(TextTemplate.of(TextColors.AQUA, "How many ticks would you like this frame to stay?"),
+					Optional.of(Integer.class));
+		}
+
+		public StayPrompt(TextTemplate template, Optional<Class<Integer>> type) {
+			super(template, type);
+		}
+
+		@Override
+		public Prompt onTypeInput(Integer object, String text, ConversationContext context) {
+			ConfigurationNode n = context.getData("frame" + context.getData("framenumber"));
+			n.getNode("stay").setValue(object);
+			return new TemplateBuilderTypePrompt();
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid number!");
+		}
+
 	}
 
 	private static class ArgTypePrompt extends Prompt {
@@ -460,13 +666,12 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.sl();
-			options.add(
-					new Option("key",
-							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
-									.onHover(TextActions.showText(Text
-											.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
-									.build(),
-							"key"));
+			options.add(new Option("key",
+					Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
+							.onHover(TextActions.showText(
+									Text.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
+							.build(),
+					"key"));
 			Text t2 = Text.builder("click").color(TextColors.GOLD).onClick(TextActions.runCommand("click"))
 					.onHover(TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))).build();
 			Text t3 = Text.builder("hover").color(TextColors.GOLD).onClick(TextActions.runCommand("hover"))
@@ -553,7 +758,6 @@ public class FormatConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			System.out.println(value);
 			if (value.contains(" ")) {
 				value = value.split(" ")[0];
 			}
@@ -575,7 +779,6 @@ public class FormatConversation {
 					text = text.substring(4);
 				}
 				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
-				System.out.println(text);
 				return new ArgTypePrompt(this);
 			case "hover":
 				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))

@@ -214,7 +214,8 @@ public class Ray {
 			}
 		}
 		ConfigurationNode args = null;
-		if (formatUsed.isPresent() && formatUsed.get().getNode().isPresent()) {
+		if (formatUsed.isPresent() && formatUsed.get().getNode().isPresent()
+				&& formatUsed.get() instanceof StaticFormat) {
 			args = formatUsed.get().getNode().get().getNode("format_args", "arguments");
 		}
 		if (template != null && template.getArguments() != null) {

@@ -33,12 +33,14 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public abstract class ConversationListener {
 	private Conversation conversation;
-	
-	public ConversationListener(){}
-	
+
+	public ConversationListener() {
+	}
+
 	public ConversationListener(Conversation convo) {
 		this.conversation = convo;
 	}
@@ -52,25 +54,27 @@ public abstract class ConversationListener {
 	public abstract void onNext(ConversationEvent.Next next);
 
 	public abstract void onStart(ConversationEvent.Start start);
-	
+
 	@Listener
 	public final void f(ConversationEvent.Finish c) {
 		onFinish(c);
 	}
+
 	@Listener
 	public final void ch(ConversationEvent.Chat c) {
 		onChat(c);
 	}
+
 	@Listener
 	public final void ca(ConversationEvent.Cancel c) {
 		onCancel(c);
 	}
-	
+
 	@Listener
 	public final void s(ConversationEvent.Start c) {
 		onStart(c);
 	}
-	
+
 	@Listener
 	public final void n(ConversationEvent.Next c) {
 		onNext(c);
@@ -96,7 +100,7 @@ public abstract class ConversationListener {
 					input);
 			if (!Sponge.getEventManager().post(event1)) {
 				if (conversation.isEchoInputs()) {
-					p.sendMessage(conversation.getPrefix().concat(Text.of(input)));
+					p.sendMessage(conversation.getPrefix().concat(Text.of(TextColors.RESET, input)));
 				}
 				for (ConversationCanceller c : conversation.getCancellers()) {
 					if (c.checkCancel(conversation, input)) {
@@ -124,7 +128,7 @@ public abstract class ConversationListener {
 			conversation.cancel(Optional.empty());
 		}
 	}
-	
+
 	final void setConversation(Conversation convo) {
 		this.conversation = convo;
 	}

@@ -171,13 +171,19 @@ public class Utils {
 		return difference(loc1, loc2) <= range;
 	}
 
-	public static Text obfuscate(Text original, Integer percentObfuscation, Integer percentDiscoloration) {
+	public static Text obfuscate(Text original, Double percentObfuscation, Double percentDiscoloration) {
+		System.out.println("obf");
+		if (original == null) {
+			return Text.of();
+		}
 		List<Text> children = original.getChildren();
 		original = original.toBuilder().removeAll().build();
 		Text.Builder out = Text.builder().color(original.getColor());
 		char[] chars = original.toPlain().toCharArray();
-		Integer obC = percentDiscoloration;
-		Integer obS = percentObfuscation;
+		Integer obC = percentDiscoloration.intValue();
+		Integer obS = percentObfuscation.intValue();
+		System.out.println(percentDiscoloration + ": " + obC);
+		System.out.println(percentObfuscation + ": " + obS);
 		List<Text> cs = sl();
 		Random rng = new Random();
 		TextColor co = original.getColor();
@@ -198,7 +204,7 @@ public class Utils {
 		}
 		out.append(toBuild);
 		for (Text t : children) {
-			out.append(obfuscate(t, obS, obC));
+			out.append(obfuscate(t, percentObfuscation, percentDiscoloration));
 		}
 		return out.build();
 	}
@@ -320,6 +326,7 @@ public class Utils {
 	 * return t; }
 	 */
 
+	// TODO URLS
 	public static Text transIf(String s, User u) {
 		if (u == null || u.hasPermission("ray.color")) {
 			return TextSerializers.FORMATTING_CODE.deserialize(s);

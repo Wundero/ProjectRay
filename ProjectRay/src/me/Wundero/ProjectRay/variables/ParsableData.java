@@ -30,11 +30,11 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 
 public class ParsableData {
-	private Optional<Map<String, Object>> known;
-	private Optional<Player> sender;
-	private Optional<Player> recipient;
-	private Optional<Player> observer;
-	private boolean clickHover;
+	private Optional<Map<String, Object>> known = Optional.empty();
+	private Optional<Player> sender = Optional.empty();
+	private Optional<Player> recipient = Optional.empty();
+	private Optional<Player> observer = Optional.empty();
+	private boolean clickHover = false;
 
 	public ParsableData() {
 	}

@@ -70,6 +70,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.ValueHolder;
 import me.Wundero.ProjectRay.framework.Group;
+import me.Wundero.ProjectRay.framework.RayCombinedMessageChannel;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.Format;
@@ -106,28 +107,31 @@ public class MainListener {
 		}
 		final Format f = fx;
 		final Map<String, Object> args = Utils.sm(v);
+		System.out.println(channel instanceof ChatChannel);
 		boolean obfuscate = channel instanceof ChatChannel && ((ChatChannel) channel).isObfuscateRanged();
-		double range = obfuscate ? ((ChatChannel) channel).range() : -1;
-		MessageChannel newchan = MessageChannel.combined(channel, new MessageChannel() {
-
+		double range = channel instanceof ChatChannel ? ((ChatChannel) channel).range() : -1;
+		MessageChannel newchan = new RayCombinedMessageChannel(channel, new MessageChannel() {
+			// TODO figure out why obfuscation only sometimes works
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
+				Map<String, Object> mc = Utils.sm(args);
 				if (recipient instanceof Player && sender instanceof Player) {
 					Player s = (Player) sender;
 					Player r = (Player) recipient;
 					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
-						return Optional.of(Text.EMPTY);
+						return Optional.empty();
 					}
-					if (obfuscate) {
+					if (obfuscate && !Utils.inRange(r.getLocation(), s.getLocation(), range)) {
 						double delta = Utils.difference(s.getLocation(), r.getLocation());
-						int percentObfuscation = (int) ((delta - range) / (delta * (2 * (range / delta)))) * 100;
-						int percentDiscoloration = (int) ((delta - range) / delta) * 100;
-						Text m = Utils.obfuscate((Text) args.get("message"), percentObfuscation, percentDiscoloration);
-						args.put("message", m);
+						double percentDiscoloration = ((delta - range) / delta) * 100;
+						double percentObfuscation = Math.sqrt(percentDiscoloration);
+						Text m = Utils.obfuscate((Text) mc.get("message"), percentObfuscation, percentDiscoloration);
+						mc.put("message", m);
+					} else if (!Utils.inRange(s.getLocation(), r.getLocation(), range)) {
+						return Optional.empty();
 					}
 				}
-
 				ValueHolder<Text> vv = new ValueHolder<Text>();
 				if (!f.send((text) -> {
 					if (vv.getValue() != null) {
@@ -135,7 +139,7 @@ public class MainListener {
 					}
 					vv.setValue(text);
 					return true;
-				}, new ParsableData().setKnown(args).setSender(msgsender.orElse(p))
+				}, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
 						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
 						.setClickHover(true).setObserver(observer))) {
 					return Optional.empty();

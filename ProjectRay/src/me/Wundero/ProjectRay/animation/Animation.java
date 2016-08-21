@@ -37,7 +37,7 @@ public class Animation<T> {
 	private final Function<T, Integer> update;
 	private final Function<T, Boolean> frameCheck;
 
-	private boolean loop, running;
+	private boolean loop = true, running = false;
 	private Runnable stop;
 	private Iterator<T> iter;
 
@@ -73,7 +73,7 @@ public class Animation<T> {
 	}
 
 	public void start() {
-		if (!running) {
+		if (!running && iter.hasNext()) {
 			running = true;
 			update(iter.next());
 		}

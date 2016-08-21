@@ -111,7 +111,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		}
 		if (sender instanceof MessageReceiver
 				&& (!members.contains((MessageReceiver) sender) || !members.get((MessageReceiver) sender).canSpeak())) {
-			return Optional.of(Text.EMPTY);
+			return Optional.empty();
 		}
 		if (range > 0 && sender instanceof Player && recipient instanceof Player) {
 			Player p = (Player) sender;
@@ -119,10 +119,10 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 			boolean ir = Utils.inRange(p.getLocation(), r.getLocation(), range);
 			double delta = Utils.difference(p.getLocation(), r.getLocation());
 			if (!ir && !this.isObfuscateRanged()) {
-				return Optional.of(Text.EMPTY);
+				return Optional.empty();
 			} else if (!ir) {
-				int percentObfuscation = (int) ((delta - range) / (delta * (2 * (range / delta)))) * 100;
-				int percentDiscoloration = (int) ((delta - range) / delta) * 100;
+				double percentObfuscation = ((delta - range) / (delta * (2 * (range / delta)))) * 100;
+				double percentDiscoloration = ((delta - range) / delta) * 100;
 				return Optional.of(Utils.obfuscate(original, percentObfuscation, percentDiscoloration));
 			}
 		}
@@ -133,7 +133,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	public double range() {
 		return range;
 	}
-	
+
 	public boolean canJoin(Player player) {
 		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
 			return false;

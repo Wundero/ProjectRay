@@ -144,6 +144,7 @@ public class Groups {
 	public Group getMainGroup(User p, String world) {
 		Group cg = null;
 		for (Group g : getGroups(world).values()) {
+			// TODO ensure non null group returns for first server join
 			if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
 				if (cg == null) {
 					cg = g;

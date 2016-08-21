@@ -200,6 +200,11 @@ public class ChatChannelConversation {
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select autojoin!")))
 							.build(),
 					"boolean"));
+			out.add(new Option("obfuscate",
+					Text.builder("obfuscate").onClick(TextActions.runCommand("obfuscate"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select obfuscate!")))
+							.build(),
+					"boolean"));
 			return Optional.of(out);
 		}
 
