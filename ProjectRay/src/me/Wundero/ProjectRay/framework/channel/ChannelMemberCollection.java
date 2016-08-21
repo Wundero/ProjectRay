@@ -41,6 +41,15 @@ public class ChannelMemberCollection {
 
 	public void fix() {
 		members = Utils.removeDuplicates(members);
+		List<ChannelMember> m = Utils.sl();
+		for (ChannelMember me : members) {
+			if (!m.contains(me)) {
+				m.add(me);
+			}
+		}
+		if (m.size() < members.size()) {
+			members = m;
+		}
 	}
 
 	public List<MessageReceiver> getMembers() {
@@ -141,7 +150,6 @@ public class ChannelMemberCollection {
 
 	public boolean add(ChannelMember member) {
 		if (members.contains(member)) {
-			System.out.println("cc");
 			return false;
 		}
 		members.add(member);

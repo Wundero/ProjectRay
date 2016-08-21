@@ -67,6 +67,9 @@ public class ChannelMember {
 
 	@Override
 	public boolean equals(Object o) {
+		if (uuid == null) {
+			return o == null;
+		}
 		if (o instanceof UUID) {
 			return uuid.equals(o);
 		}
@@ -74,9 +77,6 @@ public class ChannelMember {
 			return ((Player) o).getUniqueId().equals(uuid);
 		}
 		if (o instanceof ChannelMember) {
-			if (this.receiver != null && ((ChannelMember) o).receiver != null) {
-				return ((ChannelMember) o).receiver.equals(this.receiver);
-			}
 			return uuid.equals(((ChannelMember) o).uuid);
 		}
 		if (this.receiver == null) {

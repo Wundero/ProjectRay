@@ -75,7 +75,7 @@ public class ChannelCommand implements CommandExecutor {
 		if (channel.getMembersCollection().contains(source.getUniqueId())) {
 			c = TextColors.GOLD;
 		}
-		out = out.concat(Text.of(TextColors.GRAY, ": ", c, channel.getMembers().size() - 1));
+		out = out.concat(Text.of(TextColors.GRAY, ": ", c, channel.getMembersCollection().size() - 1));
 		return out;
 	}
 

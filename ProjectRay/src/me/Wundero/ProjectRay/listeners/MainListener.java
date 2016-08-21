@@ -107,11 +107,10 @@ public class MainListener {
 		}
 		final Format f = fx;
 		final Map<String, Object> args = Utils.sm(v);
-		System.out.println(channel instanceof ChatChannel);
-		boolean obfuscate = channel instanceof ChatChannel && ((ChatChannel) channel).isObfuscateRanged();
-		double range = channel instanceof ChatChannel ? ((ChatChannel) channel).range() : -1;
+		ChatChannel pc = r.getActiveChannel();
+		boolean obfuscate = pc != null && pc.isObfuscateRanged();
+		double range = pc == null ? -1 : pc.range();
 		MessageChannel newchan = new RayCombinedMessageChannel(channel, new MessageChannel() {
-			// TODO figure out why obfuscation only sometimes works
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
