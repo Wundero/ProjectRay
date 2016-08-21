@@ -165,7 +165,7 @@ public class Utils {
 		if (range < 0) {
 			return true;
 		}
-		if (range == 0) {
+		if (range == 0 || !loc1.getExtent().equals(loc2.getExtent())) {
 			return false;
 		}
 		return difference(loc1, loc2) <= range;

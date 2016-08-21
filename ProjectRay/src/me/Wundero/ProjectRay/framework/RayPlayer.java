@@ -48,8 +48,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class RayPlayer {
 
-	// TODO file saving - save to individual files with world - group map
-
 	private boolean conversing = false;
 	private static Map<UUID, RayPlayer> cache = Utils.sm();
 
