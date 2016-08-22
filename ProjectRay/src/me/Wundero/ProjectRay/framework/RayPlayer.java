@@ -25,6 +25,7 @@ package me.Wundero.ProjectRay.framework;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -110,7 +111,61 @@ public class RayPlayer {
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
+	private Task tabHFTask = null;
+	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
+
+	public synchronized void queueFooter(Text t) {
+		if (t != null) {
+			synchronized (footerQueue) {
+				footerQueue.add(t);
+			}
+		}
+	}
+
+	public synchronized void queueHeader(Text t) {
+		if (t != null) {
+			synchronized (headerQueue) {
+				headerQueue.add(t);
+			}
+		}
+	}
+
+	public void stopTabHFTask() {
+		tabHFTask.cancel();
+	}
+
+	public void startTabHFTask() {
+		tabHFTask = Task.builder().execute(t -> {
+			if (!user.isOnline() || !user.getPlayer().isPresent()) {
+				t.cancel();
+				return;
+			}
+
+			Player p = user.getPlayer().get();
+			boolean h = !headerQueue.isEmpty();
+			boolean f = !footerQueue.isEmpty();
+			if (h && f) {
+				synchronized (headerQueue) {
+					synchronized (footerQueue) {
+						Text he = headerQueue.pop();
+						Text fo = footerQueue.pop();
+						p.getTabList().setHeaderAndFooter(he, fo);
+					}
+				}
+			} else if (h) {
+				synchronized (headerQueue) {
+					Text he = headerQueue.pop();
+					p.getTabList().setHeader(he);
+				}
+			} else if (f) {
+				synchronized (footerQueue) {
+					Text he = footerQueue.pop();
+					p.getTabList().setFooter(he);
+				}
+			}
+		}).intervalTicks(1).submit(Ray.get().getPlugin());
+	}
 
 	public boolean listeningTo(ChatChannel c) {
 		return listeningTo(c.getName());

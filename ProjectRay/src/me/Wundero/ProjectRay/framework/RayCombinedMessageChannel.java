@@ -56,6 +56,9 @@ public class RayCombinedMessageChannel implements MessageChannel {
 		Text text = original;
 		for (MessageChannel channel : this.channels) {
 			text = channel.transformMessage(sender, recipient, text, type).orElse(null);
+			if (text == null) {
+				break;
+			}
 		}
 
 		return Optional.ofNullable(text);

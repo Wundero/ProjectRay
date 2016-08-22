@@ -27,14 +27,23 @@ import java.util.regex.Pattern;
  */
 public enum FormatType {
 
-	CHAT("chat", new String[] { "c" }), MESSAGE_SEND("send_message",
-			new String[] { "sm", "smsg", "sendmsg" }), MESSAGE_RECEIVE("receive_message",
-					new String[] { "rm", "rmsg", "receivemsg" }), DEATH("death", new String[] { "d" }), JOIN("join",
-							new String[] { "j" }), LEAVE("leave", new String[] { "l" }), CUSTOM("custom"), WELCOME(
-									"welcome", new String[] { "w" }), MOTD("motd", new String[] {}), TABLIST_ENTRY(
-											"tablist", new String[] { "list", "t", "tab" },
-											true), DEFAULT("default"), ACHIEVEMENT("achievement",
-													new String[] { "a", "ach" }), KICK("kick");
+	/* God I hate eclipse formatting sometimes */
+
+	CHAT("chat", new String[] { "c" }), // --------------------------------------------
+	MESSAGE_SEND("send_message", new String[] { "sm", "smsg", "sendmsg" }), // --------
+	MESSAGE_RECEIVE("receive_message", new String[] { "rm", "rmsg", "receivemsg" }), //
+	DEATH("death", new String[] { "d" }), // ------------------------------------------
+	JOIN("join", new String[] { "j" }), // --------------------------------------------
+	LEAVE("leave", new String[] { "l" }), // ------------------------------------------
+	CUSTOM("custom"), // --------------------------------------------------------------
+	WELCOME("welcome", new String[] { "w" }), // --------------------------------------
+	MOTD("motd"), // ------------------------------------------------------------------
+	TABLIST_ENTRY("tablist", new String[] { "list", "t", "tab" }, true), // -----------
+	DEFAULT("default"), // ------------------------------------------------------------
+	ACHIEVEMENT("achievement", new String[] { "a", "ach" }), // -----------------------
+	KICK("kick", new String[] { "k" }), // --------------------------------------------
+	TABLIST_HEADER("header", new String[] { "h" }, true), // --------------------------
+	TABLIST_FOOTER("footer", new String[] { "f" }, true); // --------------------------
 
 	// format types:
 	/*
@@ -49,8 +58,10 @@ public enum FormatType {
 	 * custom----------------------------------------------------------------Y
 	 * welcome---------------------------------------------------------------Y
 	 * modt------------------------------------------------------------------Y
-	 * tablist_entry---------------------------------------------------------Y
+	 * tablist_entry--------------------------------------------------------AY
 	 * default---------------------------------------------------------------/
+	 * tablist_footer-------------------------------------------------------AY
+	 * tablist_header-------------------------------------------------------AY
 	 * 
 	 * Format types to add maybe:
 	 * afk--------------------------------------------------------------------
@@ -60,9 +71,6 @@ public enum FormatType {
 	 * broadcast--------------------------------------------------------------
 	 * announcement-----------------------------------------------------------
 	 * animatable formats: ---------------------------------------------------
-	 * -- tablist_header -----------------------------------------------------
-	 * -- tablist_footer -----------------------------------------------------
-	 * -- tablist_entry ------------------------------------------------------
 	 * -- bossbar ------------------------------------------------------------
 	 * -- scoreboard ---------------------------------------------------------
 	 * -- title --------------------------------------------------------------
@@ -78,13 +86,14 @@ public enum FormatType {
 	 * permission setup ------------------------------------------------------
 	 * prefixes/suffixes/displayname modification-----------------------------
 	 * different types of chat (whisper, talk, yell)--------------------------
-	 * message spying---------------------------------------------------------
+	 * message spying (includes being on all channels and stuff)--------------
 	 * mute command-----------------------------------------------------------
 	 * helpop command---------------------------------------------------------
 	 * afk command------------------------------------------------------------
 	 * broadcast command------------------------------------------------------
 	 * me command-------------------------------------------------------------
 	 * mail command-----------------------------------------------------------
+	 * death messages + translations (I HATE THIS ONE :()---------------------
 	 * format non-ray messages (events) - sort of done with custom formats but
 	 * needs to be properly implemented for messages that are sent by other
 	 * plugins. I would like to figure out if I can determine if the message is

@@ -53,7 +53,8 @@ public class IgnoreCommand implements CommandExecutor {
 		RayPlayer s = RayPlayer.get((Player) src);
 		RayPlayer tr = RayPlayer.get(t);
 		s.toggleIgnore(tr);
-		src.sendMessage(Text.of(TextColors.GREEN));
+		String st = s.isIgnoring(tr) ? "w " : " longer ";
+		src.sendMessage(Text.of(TextColors.GREEN, "You are no" + st + "ignoring player " + t.getName() + "!"));
 		return CommandResult.success();
 	}
 

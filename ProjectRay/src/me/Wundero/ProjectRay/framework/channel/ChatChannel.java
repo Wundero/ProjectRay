@@ -107,7 +107,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	@Override
 	public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original, ChatType type) {
 		if (!c(recipient) || members.get(recipient).isBanned()) {
-			return Optional.of(Text.EMPTY);
+			return Optional.empty();
 		}
 		if (sender instanceof MessageReceiver
 				&& (!members.contains((MessageReceiver) sender) || !members.get((MessageReceiver) sender).canSpeak())) {
@@ -126,7 +126,6 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				return Optional.of(Utils.obfuscate(original, percentObfuscation, percentDiscoloration));
 			}
 		}
-
 		return Optional.of(original);
 	}
 
