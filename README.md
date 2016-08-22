@@ -58,5 +58,6 @@ TODO
 - more default generated args
 - gradle and maven support (repo as well)
 - continuous integration
+- releases on github
 
 more that i can't think of right now
