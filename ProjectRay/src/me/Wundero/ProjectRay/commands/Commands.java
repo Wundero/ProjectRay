@@ -49,7 +49,7 @@ public class Commands {
 								.buildWith(GenericArguments.seq(GenericArguments.string(Text.of("type")),
 										GenericArguments.remainingJoinedStrings(Text.of("message")))))
 						.build());
-		children.put(Utils.sl("testtranslate"),
+		children.put(Utils.sl("test-translate"),
 				CommandSpec.builder().permission("ray.translate.test").executor(new TranslationTestCommand())
 						.arguments(GenericArguments.string(Text.of("key")),
 								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("args"))))
