@@ -38,8 +38,14 @@ public class TranslationTestCommand implements CommandExecutor {
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		String key = (String) args.getOne("key")
 				.orElseThrow(() -> new CommandException(Text.of("You need to specify a key!")));
-		Object[] argz = (Object[]) args.getOne("args").orElse(new String[] {});
-		Text t = M.t(key, argz);
+		String argz = (String) args.getOne("args").orElse(null);
+		Text t = Text.of();
+		if (argz != null) {
+			Object[] a = argz.split(" ");
+			t = M.t(key, a);
+		} else {
+			t = M.t(key);
+		}
 		src.sendMessage(t);
 		return CommandResult.success();
 	}
