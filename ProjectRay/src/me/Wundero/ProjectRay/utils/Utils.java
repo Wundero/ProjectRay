@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
@@ -153,6 +154,7 @@ public class Utils {
 	}
 
 	public static double difference(Location<World> loc1, Location<World> loc2) {
+		Validate.isTrue(loc1.getExtent().equals(loc2.getExtent()), "different worlds");
 		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
 				z2 = loc2.getZ();
 		double l1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2) + Math.pow(z1, 2)),
@@ -172,7 +174,6 @@ public class Utils {
 	}
 
 	public static Text obfuscate(Text original, Double percentObfuscation, Double percentDiscoloration) {
-		System.out.println("obf");
 		if (original == null) {
 			return Text.of();
 		}
@@ -182,8 +183,6 @@ public class Utils {
 		char[] chars = original.toPlain().toCharArray();
 		Integer obC = percentDiscoloration.intValue();
 		Integer obS = percentObfuscation.intValue();
-		System.out.println(percentDiscoloration + ": " + obC);
-		System.out.println(percentObfuscation + ": " + obS);
 		List<Text> cs = sl();
 		Random rng = new Random();
 		TextColor co = original.getColor();
