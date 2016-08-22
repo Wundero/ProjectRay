@@ -4,7 +4,28 @@ Open Source chat manager
 
 TODO
 
-- death messages
+- death messages THIS ONE SUCKS :( I've been avoiding this because I don't even know how to go about it. Idea dump just in case I think one will work:
+  - translation files:
+    - for example, in a file: death.fall.void: %s fell into the void!
+    - the formatting for %s n stuff would come from format data
+    - allows for language support (get from client support :D)
+    - variables might suck for this one, unless I don't use %s and instead opt for {...}
+    - probably the one I will have to use
+  - translation through client:
+    - this one doesn't allow nice custom messages or whatever, but colors and formats are supported
+    - I think I can pass it args like player name and killer and item and stuff
+  - translation through server:
+    - same thing as before, but grabbing locale serverside and translating it there
+    - less performant but could be more customizable (not sure how though)
+  - one format for every death type
+    - call death-cactus or whatever format for deaths
+    - most customizable (except I think translation files)
+    - bulky af
+  - multi-template formats:
+    - example: death-cactus-1: {...} death-cactus-2: {...} death-lava: {...}
+    - events would look for formatting template of proper name
+    - problem is that it doesn't allow for proper conformation to format#send(...) calls; would need a way to do that
+    - also bulky but less so than format per death type
 - fix ranged obfuscation (and make numbers bigger)
 - more format types (See FormatType.java for details)
 - nicknames
@@ -25,6 +46,8 @@ TODO
 - clearing chat
 - first join (new server) groups null - IMPORTANT TO FIX THIS
 - translation files
+  - I think the framework is there, but I need to run tests. For now I will probably implement a testing command that lets you call whatever key and it translates that for you (passing args too?)
+  - Once framework is done and dusted (afaik), I will need to create a bunch of these files. That's gonna suck.
 - fake messages
 - message editor/remover/adder (only considering since it consumes more memory than i think i would like)
   - might make this as a mod addon instead
