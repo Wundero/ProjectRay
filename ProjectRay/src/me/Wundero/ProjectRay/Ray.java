@@ -67,6 +67,8 @@ public class Ray {
 			asyncTasks.add(t);
 		}
 	}
+	
+	//yeah
 
 	public boolean hasFormatTask() {
 		return !formatTasks.isEmpty();
