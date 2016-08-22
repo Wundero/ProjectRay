@@ -56,5 +56,7 @@ TODO
 - api
 - more config templates
 - more default generated args
+- gradle and maven support (repo as well)
+- continuous integration
 
 more that i can't think of right now
