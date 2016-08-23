@@ -74,7 +74,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
  SOFTWARE.
  */
 
-@Plugin(id = "ray", name = "Ray", version = "0.0.1", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = "ray", name = "Ray", version = "1.0.0", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 
