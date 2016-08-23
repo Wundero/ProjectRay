@@ -4,6 +4,21 @@
 	<groupId>me.Wundero</groupId>
 	<artifactId>Ray</artifactId>
 	<version>0.0.1</version>
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-cy6ergn0m-maven</id>
+			<name>bintray-plugins</name>
+			<url>http://dl.bintray.com/cy6ergn0m/maven</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<scm>
+		<connection>scm:git:git@github.com:Wundero/ProjectRay.git</connection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -15,6 +30,26 @@
 					<target>1.8</target>
 					<includeDependencySources>true</includeDependencySources>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>cy.github</groupId>
+				<artifactId>github-release-plugin</artifactId>
+				<version>${plugin.version}</version>
+
+				<configuration>
+					<tagName>${project.artifactId}-${project.version}</tagName>
+					<preRelease>true</preRelease>
+				</configuration>
+
+				<executions>
+					<execution>
+						<goals>
+							<goal>gh-upload</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<finalName>${project.artifactId}</finalName>
