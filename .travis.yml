@@ -1,10 +1,11 @@
 language: java
 jdk:
   - oraclejdk8
-script: mvn clean verify -f /home/travis/build/Wundero/ProjectRay/ProjectRay/pom.xml
+script:
+  - mvn clean verify -f /home/travis/build/Wundero/ProjectRay/ProjectRay/pom.xml
 deploy:
   provider: releases
-  api_key: "665a4a6e577248e0f4ee88348274aab0ca9a79a7"
+  api_key: "993f59507d9de97ab2811db985e2f524bf9ae35c"
   file: "Ray.jar"
   skip_cleanup: true
   on:
