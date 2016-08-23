@@ -99,18 +99,33 @@ public abstract class Format {
 		}
 	}
 
+	public static Format create(ConfigurationNode node, boolean allowNonstatic) {
+		if (allowNonstatic) {
+			return create(node);
+		} else {
+			return new StaticFormat(node);
+		}
+	}
+
 	public static Format create(ConfigurationNode node) {
 		if (node == null || node.isVirtual()) {
 			return null;
 		}
 		if (getDaType(node) == null || !getDaType(node).isAnimated()) {
-			return new StaticFormat(node);
+			return statormulti(node);
 		} else {
 			if (node.getNode("frames").isVirtual()) {
-				return new StaticFormat(node);
+				return statormulti(node);
 			}
 			return new AnimatedFormat(node);
 		}
+	}
+
+	private static Format statormulti(ConfigurationNode node) {
+		if (node.getNode("formats").isVirtual()) {
+			return new StaticFormat(node);
+		}
+		return new MultiFormat(node);
 	}
 
 	public Format(final ConfigurationNode node) {

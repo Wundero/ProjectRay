@@ -40,9 +40,11 @@ public class TranslationTestCommand implements CommandExecutor {
 				.orElseThrow(() -> new CommandException(Text.of("You need to specify a key!")));
 		String argz = (String) args.getOne("args").orElse(null);
 		Text t = Text.of();
-		if (argz != null) {
+		if (argz != null && argz.contains(" ")) {
 			Object[] a = argz.split(" ");
 			t = M.t(key, a);
+		} else if (argz != null) {
+			t = M.t(key, argz);
 		} else {
 			t = M.t(key);
 		}

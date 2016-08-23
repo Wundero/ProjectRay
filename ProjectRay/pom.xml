@@ -6,14 +6,6 @@
 	<version>0.0.1</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>C:\RayTranslations</directory>
-				<includes>
-					<include>**/*.txt</include>
-				</includes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

@@ -74,7 +74,7 @@ public class AnimatedFormat extends Format {
 		for (ConfigurationNode frame : frames.getChildrenMap().values()) {
 			Format f = null;
 			try {
-				f = Format.create(frame);
+				f = Format.create(frame, false);
 				if (f == null || f instanceof AnimatedFormat) {
 					continue;
 				}
