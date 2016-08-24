@@ -35,6 +35,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 public class TranslatableFormat extends Format implements Translatable {
 
+	// TODO decide how to do this
+
 	public TranslatableFormat(ConfigurationNode node) {
 		super(node);
 		// TODO Auto-generated constructor stub
