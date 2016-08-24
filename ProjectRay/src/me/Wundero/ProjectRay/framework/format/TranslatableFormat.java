@@ -35,7 +35,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 public class TranslatableFormat extends Format implements Translatable {
 
-	// TODO decide how to do this
+	// TODO decide how to do this. Options: Single key translatable, variable
+	// translatable, more that i can't think of
 
 	public TranslatableFormat(ConfigurationNode node) {
 		super(node);
