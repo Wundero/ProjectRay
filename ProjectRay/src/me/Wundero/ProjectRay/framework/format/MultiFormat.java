@@ -43,7 +43,7 @@ public class MultiFormat extends Format {
 	private Random r = new Random();
 	private ArrayDeque<Format> unused;
 
-	private Format getNext() {
+	private synchronized Format getNext() {
 		switch (mode) {
 		case SHUFFLE:
 		case SEQUENCE:
@@ -57,6 +57,9 @@ public class MultiFormat extends Format {
 	}
 
 	private void populateDeque() {
+		if (mode == Mode.SHUFFLE) {
+			formats = Utils.scramble(formats);
+		}
 		unused = formats.stream().collect(Collectors.toCollection(ArrayDeque::new));
 	}
 

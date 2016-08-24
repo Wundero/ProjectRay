@@ -101,17 +101,10 @@ public enum FormatType {
 		return DEFAULT;
 	}
 
-	/**
-	 * @return the animated
-	 */
 	public boolean isAnimated() {
 		return animated;
 	}
 
-	/**
-	 * @param animated
-	 *            the animated to set
-	 */
 	public void setAnimated(boolean animated) {
 		this.animated = animated;
 	}
