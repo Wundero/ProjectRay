@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -68,7 +70,9 @@ public class Ray {
 	private List<Task> asyncTasks = Utils.sl();
 	// tasks when formats load - shouldn't be necessary to have this but i need
 	// it for some reason
-	private List<Task> formatTasks = Utils.sl();
+	private Task formatloader = null;
+	private boolean no = true;
+	private List<Supplier<Boolean>> formatTasks = Utils.sl();
 
 	public void registerTask(Task t) {
 		if (t.isAsynchronous()) {
@@ -80,13 +84,19 @@ public class Ray {
 		return !formatTasks.isEmpty();
 	}
 
-	public void registerFormatTask(Task t) {
-		registerTask(t);
+	public void registerFormatTask(Supplier<Boolean> t) {
+		if (formatloader == null || no) {
+			no = false;
+			formatloader = Task.builder().intervalTicks(20).execute((ta) -> {
+				formatTasks = Utils.sl(formatTasks.stream().filter((task) -> !task.get()).collect(Collectors.toList()));
+				if (formatTasks.isEmpty()) {
+					ta.cancel();
+					no = true;
+				}
+			}).submit(getPlugin());
+		}
 		formatTasks.add(t);
-	}
 
-	public void finishFormatTask(Task t) {
-		formatTasks.remove(t);
 	}
 
 	private Ray() {

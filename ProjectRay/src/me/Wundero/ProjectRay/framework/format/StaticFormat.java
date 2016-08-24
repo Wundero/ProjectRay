@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
@@ -45,21 +44,16 @@ public class StaticFormat extends Format {
 	public StaticFormat(ConfigurationNode node) {
 		super(node);
 		if (node.getNode("simple").isVirtual()) {
-			Task t = (Task) Task.builder().intervalTicks(20).execute((task) -> {
+			Ray.get().registerFormatTask(() -> {
+				Optional<TextTemplate> template;
 				try {
-					TextTemplate template = node.getNode("format").getValue(TypeToken.of(TextTemplate.class));
-					if (template == null) {
-						return;
-					}
-					setTemplate(template);
-				} catch (Exception e) {
-					Utils.printError(e);
+					template = Optional.ofNullable(node.getNode("format").getValue(TypeToken.of(TextTemplate.class)));
+				} catch (ObjectMappingException e) {
+					return false;
 				}
-				usable = true;
-				task.cancel();
-				Ray.get().finishFormatTask(task);
-			}).submit(Ray.get().getPlugin());
-			Ray.get().registerFormatTask(t);
+				template.ifPresent(t -> setTemplate(t));
+				return template.isPresent();
+			});
 		} else {
 			String simple = node.getNode("simple").getString();
 			node.getNode("simple").setValue(null);
@@ -71,6 +65,8 @@ public class StaticFormat extends Format {
 				} catch (ObjectMappingException e) {
 					Utils.printError(e);
 				}
+			} else {
+				Utils.printError(new Exception("You must set a format!"));
 			}
 		}
 	}

@@ -212,6 +212,9 @@ public class Utils {
 	}
 
 	public static TextTemplate parse(final String i, boolean allowColors) {
+		if (i == null) {
+			return null;
+		}
 		String in = i;
 		if (!allowColors) {
 			in = strip(in);

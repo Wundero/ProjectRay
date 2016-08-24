@@ -27,8 +27,6 @@ import java.util.regex.Pattern;
  */
 public enum FormatType {
 
-	/* God I hate eclipse formatting sometimes */
-
 	CHAT("chat", new String[] { "c" }), // --------------------------------------------
 	MESSAGE_SEND("send_message", new String[] { "sm", "smsg", "sendmsg" }), // --------
 	MESSAGE_RECEIVE("receive_message", new String[] { "rm", "rmsg", "receivemsg" }), //
@@ -44,67 +42,6 @@ public enum FormatType {
 	KICK("kick", new String[] { "k" }), // --------------------------------------------
 	TABLIST_HEADER("header", new String[] { "h" }, true), // --------------------------
 	TABLIST_FOOTER("footer", new String[] { "f" }, true); // --------------------------
-
-	// format types:
-	/*
-	 * chat------------------------------------------------------------------Y
-	 * message_send----------------------------------------------------------Y
-	 * message_receive-------------------------------------------------------Y
-	 * join------------------------------------------------------------------Y
-	 * leave-----------------------------------------------------------------Y
-	 * achievement-----------------------------------------------------------Y
-	 * kick------------------------------------------------------------------Y
-	 * death----------------------------------------------------------------/N
-	 * custom----------------------------------------------------------------Y
-	 * welcome---------------------------------------------------------------Y
-	 * modt------------------------------------------------------------------Y
-	 * tablist_entry--------------------------------------------------------AY
-	 * default---------------------------------------------------------------/
-	 * tablist_footer-------------------------------------------------------AY
-	 * tablist_header-------------------------------------------------------AY
-	 * 
-	 * Format types to add maybe:
-	 * afk--------------------------------------------------------------------
-	 * helpop-----------------------------------------------------------------
-	 * mail-------------------------------------------------------------------
-	 * me (action)------------------------------------------------------------
-	 * broadcast--------------------------------------------------------------
-	 * announcement-----------------------------------------------------------
-	 * animatable formats: ---------------------------------------------------
-	 * -- bossbar ------------------------------------------------------------
-	 * -- scoreboard ---------------------------------------------------------
-	 * -- title --------------------------------------------------------------
-	 * -- actionbar ----------------------------------------------------------
-	 * 
-	 */
-
-	/*
-	 * Since this seems to be where i dump ideas, todo:-----------------------
-	 * range obfuscation (chat messages out of range of channels but still in
-	 * world get slowly degenerated) should be done but not tested. ----------
-	 * effects for animations (e.g. scroll)-----------------------------------
-	 * option to make animation async ----------------------------------------
-	 * comment config nodes---------------------------------------------------
-	 * nicknames--------------------------------------------------------------
-	 * permission setup ------------------------------------------------------
-	 * prefixes/suffixes/displayname modification-----------------------------
-	 * different types of chat (whisper, talk, yell)--------------------------
-	 * message spying (includes being on all channels and stuff)--------------
-	 * mute command-----------------------------------------------------------
-	 * helpop command---------------------------------------------------------
-	 * afk command------------------------------------------------------------
-	 * broadcast command------------------------------------------------------
-	 * me command-------------------------------------------------------------
-	 * mail command-----------------------------------------------------------
-	 * death messages + translations (I HATE THIS ONE :()---------------------
-	 * format non-ray messages (events) - sort of done with custom formats but
-	 * needs to be properly implemented for messages that are sent by other
-	 * plugins. I would like to figure out if I can determine if the message is
-	 * plugin sent or player sent, however that seems impractical as plugins
-	 * don't consistently set themselves as senders.--------------------------
-	 */
-
-	// TODO add more formats as seen fit
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);

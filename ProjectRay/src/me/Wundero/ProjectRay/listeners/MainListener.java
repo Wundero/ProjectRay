@@ -68,7 +68,6 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.ValueHolder;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayCombinedMessageChannel;
 import me.Wundero.ProjectRay.framework.RayPlayer;
@@ -76,6 +75,7 @@ import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.utils.ValueHolder;
 import me.Wundero.ProjectRay.variables.ParsableData;
 
 public class MainListener {
@@ -140,7 +140,6 @@ public class MainListener {
 						return Optional.empty();
 					}
 				}
-				// prolly count have used a supplieer here but meh
 				ValueHolder<Text> vv = new ValueHolder<Text>();
 				if (!f.send((text) -> {
 					if (vv.getValue() != null) {
