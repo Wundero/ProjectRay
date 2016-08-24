@@ -55,11 +55,19 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  SOFTWARE.
  */
 
+/**
+ * Singleton instance for all pseudo-singleton access classes. Keeps things in a
+ * central place and is more secure.
+ * 
+ */
 public class Ray {
 
 	private static Ray singleton = new Ray();
 
+	// registering async tasks so they can be cancelled on termination
 	private List<Task> asyncTasks = Utils.sl();
+	// tasks when formats load - shouldn't be necessary to have this but i need
+	// it for some reason
 	private List<Task> formatTasks = Utils.sl();
 
 	public void registerTask(Task t) {
@@ -88,12 +96,20 @@ public class Ray {
 		return singleton;
 	}
 
+	// instance of the plugin to give to things like tasks and sponge singleton
+	// calls
 	private ProjectRay plugin;
+	// config file
 	private ConfigurationNode config;
+	// groups that are loaded from file
 	private Groups groups;
+	// variable parser
 	private Variables vars;
+	// channels store
 	private ChatChannels channels;
+	// this was a test to see if i could properly load formats, but nope
 	private boolean loadableSet = false;
+	// all configs created/loaded by the plugin through Utils are saved here.
 	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
 
 	public void registerLoader(ConfigurationLoader<CommentedConfigurationNode> loader, ConfigurationNode node) {
@@ -144,7 +160,7 @@ public class Ray {
 		return getPlugin().getLogger();
 	}
 
-	public void terminate() {
+	public void terminate() {// end async tasks and save configs and players
 		for (Task t : asyncTasks) {
 			t.cancel();
 		}
@@ -187,14 +203,15 @@ public class Ray {
 		this.groups = groups;
 	}
 
+	// create map for args in a template to apply - is recursive if
+	// useClickHover is true
+	// TODO add support for vars in non-arg clickhover
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Optional<Player> sender,
 			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
 		if (known == null) {
 			known = Utils.sm();
 		}
-		if (sender == null || !sender.isPresent()) {
-			return known;
-		}
+		// template is required to get the args to fill
 		if (template == null) {
 			if (formatUsed.isPresent() && formatUsed.get() instanceof StaticFormat) {
 				TextTemplate t2 = ((StaticFormat) formatUsed.get()).getTemplate().orElse(null);
@@ -207,23 +224,27 @@ public class Ray {
 				return known;
 			}
 		}
+
+		// for every key that is known that exists in the template, add it to
+		// fill
 		Map<String, Object> out = Utils.sm();
 		for (String key : known.keySet()) {
 			if (template.getArguments().containsKey(key)) {
 				out.put(key, known.get(key));
 			}
 		}
+		// if this is not null, click and hover will be applied to args.
 		ConfigurationNode args = null;
 		if (formatUsed.isPresent() && formatUsed.get().getNode().isPresent()
 				&& formatUsed.get() instanceof StaticFormat) {
 			args = formatUsed.get().getNode().get().getNode("format_args", "arguments");
 		}
+		// for the unfilled args
 		if (template != null && template.getArguments() != null) {
 			for (String key : template.getArguments().keySet()) {
 				String k = key;
-				if (k.toLowerCase().startsWith("recip_") && !recip.isPresent()) {
-					continue;
-				}
+				// killer replaced with displayname killer for var parsing
+				// purposes; not replaced in template
 				if (k.equalsIgnoreCase("killer") && !out.containsKey(key)) {
 					k = "displayname:killer";
 				}
@@ -235,24 +256,28 @@ public class Ray {
 				if (!out.containsKey(key)) {
 					Optional<Player> s1;
 					Optional<Player> r1;
-					if (irecip) {
+					if (irecip) {// who is parsed as sender depends on recip tag
 						s1 = recip;
 						r1 = sender;
 					} else {
 						s1 = sender;
 						r1 = recip;
 					}
+					// parse var into object
 					Object var = getVariables().get(k, s1, r1, formatUsed, Optional.of(template), observer);
 					Object var2 = var;
 					if (args != null) {
+						// apply var parsing to args
 						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());
 						Text.Builder newVar = t.toBuilder();
-						if (useClickHover) {
+						if (useClickHover) { // recursive/unsafe format failsafe
 							try {
 								InternalClickAction<?> click = args.getNode(key, "click")
 										.getValue(TypeToken.of(InternalClickAction.class));
 								InternalHoverAction<?> hover = args.getNode(key, "hover")
 										.getValue(TypeToken.of(InternalHoverAction.class));
+								// get values for args and apply if they are
+								// there
 								if (click != null) {
 									if (click instanceof InternalClickAction.ATemplate) {
 										((InternalClickAction.ATemplate) click)

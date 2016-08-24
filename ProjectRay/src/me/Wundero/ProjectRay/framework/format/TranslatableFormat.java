@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.ProjectRay.framework.format;
 /*
  The MIT License (MIT)
 
@@ -23,43 +23,39 @@ package me.Wundero.ProjectRay.conversation;
  SOFTWARE.
  */
 
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.channel.MessageChannel;
+import java.util.Map;
+import java.util.function.Function;
 
-import me.Wundero.ProjectRay.DataHolder;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.translation.Translatable;
+import org.spongepowered.api.text.translation.Translation;
 
-public class ConversationContext extends DataHolder {
-	// data for conversation
-	private Player holder;
-	private Object plugin;
-	private MessageChannel original;
+import me.Wundero.ProjectRay.variables.ParsableData;
+import ninja.leaping.configurate.ConfigurationNode;
 
-	ConversationContext(Object plugin, Player holder) {
-		this.setPlugin(plugin);
-		this.setHolder(holder);
+public class TranslatableFormat extends Format implements Translatable {
+
+	public TranslatableFormat(ConfigurationNode node) {
+		super(node);
+		// TODO Auto-generated constructor stub
 	}
 
-	public Player getHolder() {
-		return holder;
+	@Override
+	public Translation getTranslation() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	private void setHolder(Player holder) {
-		this.holder = holder;
+	@Override
+	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
-	public Object getPlugin() {
-		return plugin;
+	@Override
+	public boolean send(Function<Text, Boolean> f, ParsableData data) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
-	private void setPlugin(Object plugin) {
-		this.plugin = plugin;
-	}
-
-	public MessageChannel getOriginal() {
-		return original;
-	}
-
-	public void setOriginal(MessageChannel original) {
-		this.original = original;
-	}
 }

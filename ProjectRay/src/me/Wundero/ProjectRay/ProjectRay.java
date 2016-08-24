@@ -74,6 +74,9 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
  SOFTWARE.
  */
 
+/**
+ * Ray - A comprehensive and inclusive chat plugin. By Wundero.
+ */
 @Plugin(id = "ray", name = "Ray", version = "1.0.0", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
@@ -100,7 +103,7 @@ public class ProjectRay {
 		return game;
 	}
 
-	public String getVersion() {
+	public String getVersion() {// not really sure if this is usefull but meh
 		Optional<String> opt = game.getPluginManager().getPlugin("ray").get().getVersion();
 		if (!opt.isPresent()) {
 			return "1.0.0";
@@ -112,7 +115,8 @@ public class ProjectRay {
 		return configDir;
 	}
 
-	public Path getConfigPath() {
+	public Path getConfigPath() { // ensures config exists and returns path with
+									// file info
 		File f = new File(configDir.toFile(), "ray.conf");
 		if (!configDir.toFile().exists()) {
 			configDir.toFile().mkdirs();
@@ -128,6 +132,7 @@ public class ProjectRay {
 	}
 
 	public static ConfigurationOptions updateSerializers(ConfigurationOptions opts) {
+		// adding custom serializers - makes config read/write easier
 		TypeSerializerCollection t = opts.getSerializers();
 		t.registerType(TypeToken.of(InternalClickAction.class), InternalClickAction.serializer());
 		t.registerType(TypeToken.of(InternalHoverAction.class), InternalHoverAction.serializer());
@@ -149,6 +154,8 @@ public class ProjectRay {
 	}
 
 	private void tryLoadDefaults() {
+		// if main info is missing, load a default template. Using advanced
+		// template here, but in the future I will add more templates.
 		if (config.getNode("worlds").isVirtual()) {
 			Templates.ADVANCED(Template.builder(config));
 			saveConfig();
@@ -160,7 +167,8 @@ public class ProjectRay {
 				.setPath(getConfigPath()).build();
 		try {
 			// This will allow safe editing out of game while still saving in
-			// game changes (in game has priority) (theoretically)
+			// game changes (in game has priority) (theoretically) - not sure if
+			// this works properly though
 			ConfigurationNode toMerge = loader.load();
 			ConfigurationNode node2 = config.mergeValuesFrom(toMerge);
 			loader.save(node2);
@@ -175,6 +183,7 @@ public class ProjectRay {
 
 	@Listener
 	public void onStart(GameInitializationEvent event) {
+		// registering listeners and loading singleton classes (safely-ish)
 		loadConfig();
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
@@ -184,6 +193,7 @@ public class ProjectRay {
 
 	@Listener
 	public void registerCommandEvent(GameStartingServerEvent event) {
+		// register all commands. Might make this neater in the future.
 		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
 				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();
 		Sponge.getCommandManager().register(this, myCommandSpec, "ray", "projectray");
@@ -237,6 +247,7 @@ public class ProjectRay {
 
 	@Listener
 	public void onStop(GameStoppingServerEvent event) {
+		// run termination code
 		saveConfig();
 		Ray.get().terminate();
 	}

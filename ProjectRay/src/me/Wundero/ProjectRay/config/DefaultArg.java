@@ -26,6 +26,7 @@ package me.Wundero.ProjectRay.config;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
+//really only useful for internals, but nice to have; saves time when repeating similar args
 public class DefaultArg {
 	private Arg.Builder builder;
 	private InternalClickAction<?> click;

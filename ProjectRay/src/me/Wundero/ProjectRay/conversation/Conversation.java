@@ -35,6 +35,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 
+//bukkit conversation api but not built in and slightly simpler
 public abstract class Conversation {
 	private Prompt currentPrompt;
 	private ConversationListener listener;

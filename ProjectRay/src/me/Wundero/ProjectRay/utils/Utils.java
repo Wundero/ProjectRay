@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,9 +45,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import me.Wundero.ProjectRay.ProjectRay;
@@ -151,6 +150,10 @@ public class Utils {
 
 	public static <K, V> Map<K, V> sm() {
 		return new ConcurrentHashMap<K, V>();
+	}
+
+	public static boolean classinstanceof(Class<?> main, Class<?> sub) {
+		return main.isAssignableFrom(sub);
 	}
 
 	public static double difference(Location<World> loc1, Location<World> loc2) {
@@ -370,18 +373,18 @@ public class Utils {
 		return true;
 	}
 
-	public static <T> ArrayList<T> scramble(ArrayList<T> list) {
+	public static <T> List<T> scramble(List<T> list) {
 		List<T> out = sl();
 		List<T> in = sl(list);
 		Random r = new Random();
 		while (!in.isEmpty()) {
 			out.add(in.remove(r.nextInt(in.size())));
 		}
-		return (ArrayList<T>) out;
+		return out;
 	}
 
-	public static boolean containsOf(ArrayList<?> arr, ArrayList<?> comp) {
-		for (Object o : comp) {
+	public static <T> boolean containsOf(List<T> arr, List<T> comp) {
+		for (T o : comp) {
 			if (arr.contains(o)) {
 				return true;
 			}
@@ -398,6 +401,9 @@ public class Utils {
 			} else {
 				flag |= i;
 			}
+		}
+		if (flag == Integer.MIN_VALUE) {
+			return Pattern.compile(pattern);
 		}
 		return Pattern.compile(pattern, flag);
 	}
@@ -501,12 +507,12 @@ public class Utils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T[] toArray(Iterable<T> collection) {
-		ArrayList<T> wrappedCollection = Lists.newArrayList(collection);
+	public static <T> T[] toArray(Collection<T> collection) {
+		List<T> wrappedCollection = sl(collection);
 		return (T[]) wrappedCollection.toArray(new Object[wrappedCollection.size()]);
 	}
 
-	public static <T> List<String> toStringList(ArrayList<T> o, Optional<Method> toCall) {
+	public static <T> List<String> toStringList(List<T> o, Optional<Method> toCall) {
 		List<String> out = sl();
 		if (!toCall.isPresent() || toCall.get().getReturnType() != String.class
 				|| toCall.get().getParameters().length > 0) {
@@ -533,16 +539,6 @@ public class Utils {
 
 	public static boolean isFormat(TextElement paramColor) {
 		return paramColor instanceof TextStyle;
-	}
-
-	public static String concat(String sep, String... a) {
-		String o = "";
-		String f = "";
-		for (String s : a) {
-			o += f + s;
-			f = sep;
-		}
-		return o;
 	}
 
 	public static Text trans(String s) {
@@ -628,16 +624,6 @@ public class Utils {
 		return o;
 	}
 
-	public static String concat(String sep, Iterable<String> a) {
-		String o = "";
-		String f = "";
-		for (String s : a) {
-			o += f + s;
-			f = sep;
-		}
-		return o;
-	}
-
 	public static <T> List<T> removeDuplicates(List<T> list) {
 		return sl(list.stream().distinct().collect(Collectors.toList()));
 	}
@@ -698,18 +684,18 @@ public class Utils {
 		return s;
 	}
 
-	public static <T> T getFirst(ArrayList<T> list) {
+	public static <T> Optional<T> getFirst(List<T> list) {
 		if (list.isEmpty()) {
-			return null;
+			return Optional.empty();
 		}
-		return list.get(0);
+		return Optional.ofNullable(list.get(0));
 	}
 
-	public static <T> T getLast(ArrayList<T> list) {
+	public static <T> Optional<T> getLast(List<T> list) {
 		if (list.isEmpty()) {
-			return null;
+			return Optional.empty();
 		}
-		return list.get(list.size() - 1);
+		return Optional.ofNullable(list.get(list.size() - 1));
 	}
 
 	public static Character makeUnicode(Character c) {

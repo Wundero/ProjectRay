@@ -36,6 +36,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 public abstract class ConversationListener {
+
+	// allow custom handles on event calls
+
 	private Conversation conversation;
 
 	public ConversationListener() {
@@ -54,6 +57,9 @@ public abstract class ConversationListener {
 	public abstract void onNext(ConversationEvent.Next next);
 
 	public abstract void onStart(ConversationEvent.Start start);
+
+	// private event calls to abstract - had to do this because annotations
+	// cannot be forced.
 
 	@Listener
 	public final void f(ConversationEvent.Finish c) {
@@ -79,6 +85,8 @@ public abstract class ConversationListener {
 	public final void n(ConversationEvent.Next c) {
 		onNext(c);
 	}
+
+	// handles conversing chat inputs
 
 	@Listener
 	public final void internalchat(MessageChannelEvent.Chat event) {
@@ -113,6 +121,7 @@ public abstract class ConversationListener {
 		}
 	}
 
+	// ends conversations safely
 	@Listener
 	public final void internalquit(ClientConnectionEvent.Disconnect event) {
 		if (!conversation.isStarted()) {

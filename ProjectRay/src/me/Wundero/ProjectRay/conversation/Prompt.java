@@ -36,6 +36,9 @@ import me.Wundero.ProjectRay.utils.Utils;
 
 public abstract class Prompt {
 
+	// prompt for information - gets a question and displays it, choose from
+	// options if you want, parse input and handle it
+
 	protected TextTemplate template;
 
 	public Prompt(TextTemplate template) {

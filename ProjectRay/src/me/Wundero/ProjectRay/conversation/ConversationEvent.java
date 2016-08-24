@@ -30,6 +30,7 @@ import org.spongepowered.api.event.cause.Cause;
  SOFTWARE.
  */
 
+//event called when things happen in conversations
 public abstract class ConversationEvent implements Event, Cancellable {
 
 	private Cause cause;

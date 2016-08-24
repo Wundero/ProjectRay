@@ -336,7 +336,8 @@ public class MainListener {
 	 */
 	@Listener
 	public void onDeath(DestructEntityEvent.Death event) {
-		// for now, not handling deaths.
+		// for now, not handling deaths. This weird check is so that I don't get
+		// dead code errors.
 		if (!(event.getTargetEntity() instanceof Player) || event instanceof Event) {
 			return;
 		}

@@ -28,12 +28,18 @@ import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
 public class Templates {
+
+	// pseudo-enum methods that create configs when they are not already there.
+
 	public static Template DEFAULT(Template.Builder t) {
+		// basic chat format
 		return t.withGroup("default").withPriority(0).withFormat("chat").withArg("player").withText(Text.of(" "))
 				.withArg("message").build().build().build();
 	}
 
 	public static Template ADVANCED(Template.Builder t) {
+		// chat, join, leave and death (death is to be removed temporarily.
+		// Death messages suck.
 		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.CHANNEL)
 				.withText(Text.of(" ")).withArg(DefaultArgs.DISPLAYNAME).withText(Text.of(" "))
 				.withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build().withFormat("join")
@@ -46,6 +52,7 @@ public class Templates {
 	}
 
 	public static Template MULTI_GROUP(Template.Builder t) {
+		// chat join and leave for two groups
 		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
 				.withText(Text.of(" ")).withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build()
 				.withFormat("join").withArg(DefaultArgs.DISPLAYNAME)

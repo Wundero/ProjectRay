@@ -32,6 +32,9 @@ import org.spongepowered.api.text.TextTemplate;
 
 public abstract class TypePrompt<T> extends Prompt {
 
+	// prompt that tries to parse a value from a class - if it does not have the
+	// right method, doesn't work
+
 	protected Optional<Class<T>> type = Optional.empty();
 
 	public TypePrompt(TextTemplate template, Optional<Class<T>> type) {
@@ -55,10 +58,13 @@ public abstract class TypePrompt<T> extends Prompt {
 			try {
 				Method m = null;
 				try {
-					m = t.getDeclaredMethod("valueOf", String.class);
+					m = t.getDeclaredMethod("valueOf", String.class);// integer
+																		// class,
+																		// etc.
 				} catch (NoSuchMethodException e1) {
 					try {
-						m = t.getDeclaredMethod("deserialize", String.class);
+						m = t.getDeclaredMethod("deserialize", String.class);// serializable
+																				// classesF
 					} catch (Exception e) {
 						return false;
 					}
@@ -68,7 +74,7 @@ public abstract class TypePrompt<T> extends Prompt {
 				}
 				boolean a = m.isAccessible();
 				m.setAccessible(true);
-				Object ob = m.invoke(null, input);
+				Object ob = m.invoke(null, input);// apply method
 				m.setAccessible(a);
 				if (ob != null) {
 					return true;
@@ -84,6 +90,7 @@ public abstract class TypePrompt<T> extends Prompt {
 
 	@Override
 	public Optional<Option> getSelected(ConversationContext context, String input) {
+		// same as above except returns values and not booleans
 		Optional<List<Option>> o = options(context);
 		if (o != null && o.isPresent()) {
 			List<Option> opts = options(context).get();
@@ -131,6 +138,7 @@ public abstract class TypePrompt<T> extends Prompt {
 
 	public abstract Prompt onTypeInput(T object, String text, ConversationContext context);
 
+	// parse and cast value
 	@Override
 	public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 		return onTypeInput(type.isPresent() ? type.get().cast(selected.get().getValue()) : null, text, context);

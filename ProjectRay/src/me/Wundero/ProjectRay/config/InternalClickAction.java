@@ -44,7 +44,8 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 /**
- * Represents a {@link TextAction} that responds to clicks.
+ * Represents a {@link TextAction} that responds to clicks. This version has
+ * been modified to add support for text templates.
  *
  * @param <R>
  *            The type of the result of the action
@@ -166,7 +167,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		TextTemplate t = ((ATemplate) this).getTemplate();
 		Map<String, Object> p = Utils.sm();
 		for (String k : t.getArguments().keySet()) {
-			p.put(k, "");
+			p.put(k, t.getOpenArgString() + k + t.getCloseArgString());
 		}
 		String plain = t.apply(p).build().toPlain();
 		if (this instanceof RunTemplate) {

@@ -38,6 +38,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  SOFTWARE.
  */
 
+//stores a bunch of formats and is chosen based on permission
 public class Group {
 	private Map<FormatType, List<Format>> formats = Utils.sm();
 	private List<String> parents = Utils.sl();

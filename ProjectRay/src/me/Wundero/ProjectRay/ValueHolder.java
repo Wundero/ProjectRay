@@ -23,20 +23,23 @@ package me.Wundero.ProjectRay;
  SOFTWARE.
  */
 
+/**
+ * Class used as a simpler supplier
+ */
 public class ValueHolder<T> {
 	private T value;
-	
+
 	public ValueHolder(T t) {
 		this.value = t;
 	}
-	
+
 	public ValueHolder() {
 	}
-	
+
 	public void setValue(T t) {
 		this.value = t;
 	}
-	
+
 	public T getValue() {
 		return value;
 	}

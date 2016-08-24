@@ -52,7 +52,8 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 /**
- * Represents a {@link TextAction} that responds to hovers.
+ * Represents a {@link TextAction} that responds to hovers. This version has
+ * been modified to add support for text templates.
  *
  * @param <R>
  *            The type of the result of the action
@@ -176,7 +177,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		TextTemplate t = ((ShowTemplate) this).template;
 		Map<String, Object> p = Utils.sm();
 		for (String k : t.getArguments().keySet()) {
-			p.put(k, "");
+			p.put(k, t.getOpenArgString() + k + t.getCloseArgString());
 		}
 		return TextActions.showText(t.apply(p).build());
 	}
@@ -305,7 +306,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			 *            The name of the entity
 			 */
 			public Ref(UUID uuid, String name) {
-				this(uuid, name, Optional.<EntityType> empty());
+				this(uuid, name, Optional.<EntityType>empty());
 			}
 
 			/**

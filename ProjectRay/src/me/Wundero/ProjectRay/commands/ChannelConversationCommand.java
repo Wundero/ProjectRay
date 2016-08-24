@@ -42,6 +42,7 @@ public class ChannelConversationCommand implements CommandExecutor {
 			source.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
 			return CommandResult.success();
 		}
+		// start conversation
 		Player player = (Player) source;
 		ChatChannelConversation.start(player);
 		return CommandResult.success();

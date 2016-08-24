@@ -25,6 +25,7 @@ package me.Wundero.ProjectRay.conversation;
 
 import org.spongepowered.api.text.Text;
 
+//allows you to have choosable options - like a fixed set stuff
 public class Option {
 	private final Text display;
 	private final String key;

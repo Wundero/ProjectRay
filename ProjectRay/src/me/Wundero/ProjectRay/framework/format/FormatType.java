@@ -82,6 +82,9 @@ public enum FormatType {
 	 * Since this seems to be where i dump ideas, todo:-----------------------
 	 * range obfuscation (chat messages out of range of channels but still in
 	 * world get slowly degenerated) should be done but not tested. ----------
+	 * effects for animations (e.g. scroll)-----------------------------------
+	 * option to make animation async ----------------------------------------
+	 * comment config nodes---------------------------------------------------
 	 * nicknames--------------------------------------------------------------
 	 * permission setup ------------------------------------------------------
 	 * prefixes/suffixes/displayname modification-----------------------------

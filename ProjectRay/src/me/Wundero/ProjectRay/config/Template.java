@@ -36,6 +36,7 @@ import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+//config template class
 public class Template {
 
 	private ConfigurationNode node = null;
@@ -48,6 +49,8 @@ public class Template {
 		return new Builder(node);
 	}
 
+	// builder automatically applies to config instead of creating
+	// groups/formats without important info
 	public static class Builder {
 
 		private Template template;
@@ -230,12 +233,12 @@ public class Template {
 				}
 
 				public FormatBuilder withText(String... texts) {
-					for(String s : texts) {
+					for (String s : texts) {
 						template = template.concat(TextTemplate.of(s));
 					}
 					return this;
 				}
-				
+
 				public FormatBuilder withText(Text... texts) {
 					for (Text t : texts) {
 						template = template.concat(TextTemplate.of(t));

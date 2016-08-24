@@ -39,6 +39,8 @@ import me.Wundero.ProjectRay.utils.Utils;
 
 public class ConversationFactory {
 
+	// builds a conversation for you
+
 	private Prompt firstPrompt;
 	private ConversationListener listener = null;
 	private ConversationContext context;

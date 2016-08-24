@@ -1,10 +1,9 @@
 package me.Wundero.ProjectRay;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.common.collect.Maps;
+import me.Wundero.ProjectRay.utils.Utils;
 
 /*
  The MIT License (MIT)
@@ -29,11 +28,26 @@ import com.google.common.collect.Maps;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+/**
+ * Class used to store transient information. More of a random utility than
+ * anything used a lot. Casts are not required. Class is also synchronous to
+ * prevent thread errors.
+ */
+
 public abstract class DataHolder {
 
-	protected HashMap<String, Object> data = Maps.newHashMap();
+	// data
+	protected Map<String, Object> data = Utils.sm();
 
-	protected UUID uuid;
+	// a uuid for equals comparators
+	protected UUID uuid = UUID.randomUUID();
+
+	// uuid is only thing that really matters
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof DataHolder && ((DataHolder) o).uuid.equals(uuid);
+	}
 
 	public synchronized void putAll(Map<String, Object> values) {
 		data.putAll(values);
@@ -53,8 +67,9 @@ public abstract class DataHolder {
 		return (T) data.remove(key);
 	}
 
-	public synchronized Object putData(String key, Object value) {
-		return data.put(key, value);
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T putData(String key, T value) {
+		return (T) data.put(key, value);
 	}
 
 	public synchronized void clearData() {

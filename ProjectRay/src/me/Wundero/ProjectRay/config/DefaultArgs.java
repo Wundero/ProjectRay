@@ -30,6 +30,7 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class DefaultArgs {
+	// random default args
 	public static final DefaultArg DISPLAYNAME = new DefaultArg(TextTemplate.arg("displayname").color(TextColors.AQUA),
 			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
 			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),

@@ -32,14 +32,24 @@ import me.Wundero.ProjectRay.utils.Utils;
  SOFTWARE.
  */
 
+/**
+ * generic animation class
+ */
 public class Animation<T> {
-	private final List<T> frames;
-	private final Function<T, Integer> update;
-	private final Function<T, Boolean> frameCheck;
 
+	// TODO may not be in this class, but support interuptable (pausable)
+	// animations
+
+	private final List<T> frames; // list of objects
+	private final Function<T, Integer> update; // apply frame + return delay to
+												// next frame
+	private final Function<T, Boolean> frameCheck; // check to see if frame can
+													// be displayed
+
+	// loop is if the anim is to repeat, running is state detection
 	private boolean loop = true, running = false;
-	private Runnable stop;
-	private Iterator<T> iter;
+	private Runnable stop;// what happens on stop
+	private Iterator<T> iter; // frames iter - removes need for index var
 
 	public Animation(List<T> frames, Function<T, Integer> update, Function<T, Boolean> frameCheck) {
 		this.frames = frames;
@@ -48,31 +58,37 @@ public class Animation<T> {
 		iter = frames.iterator();
 	}
 
-	public void update(final T frame) {
+	public void update(final T frame) {// display frame call
 		if (!frameCheck.apply(frame)) {
+			// if frame cannot be displayed
 			stop();
 		}
-		if (!running) {
+		if (!running) {// if not running
 			return;
 		}
+		// apply frame
 		int delayTicks = update.apply(frame);
 		if (delayTicks < 0) {
+			// if no more frames or frame display went wrong
 			stop();
 		}
 		if (!running) {
 			return;
 		}
+		// if we've run out of frames and we need to loop
 		if (!iter.hasNext() && loop) {
 			iter = frames.iterator();
 		}
+		// if we can proceed
 		if (iter.hasNext()) {
+			// execute next frame update with a delay set by the current frame
 			Utils.schedule(Task.builder().execute(() -> update(iter.next())).delayTicks(delayTicks));
 		} else {
 			stop();
 		}
 	}
 
-	public void start() {
+	public void start() {// execute first frame update if possible
 		if (!running && iter.hasNext()) {
 			running = true;
 			update(iter.next());

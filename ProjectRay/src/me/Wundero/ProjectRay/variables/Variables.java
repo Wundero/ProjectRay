@@ -44,6 +44,7 @@ import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class Variables {
+	// parse for provided data
 	public Object get(String key, Optional<Player> sender, Optional<Player> recipient, Optional<Format> format,
 			Optional<TextTemplate> template, Optional<Player> observer) {
 		String data = null;
@@ -66,6 +67,7 @@ public class Variables {
 			Variable v = var.get();
 			Map<Param, Object> map = Utils.sm();
 			for (Param p : Param.values()) {
+				// add all params that are available to map
 				switch (p) {
 				case SENDER:
 					if (!sender.isPresent()) {
@@ -112,6 +114,7 @@ public class Variables {
 
 	public Variables() {
 		store = new Store();
+		// register some default variables
 		registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		registerVariable("player", (objects) -> {
 			Param playerToUse = Param.SENDER;
@@ -143,6 +146,9 @@ public class Variables {
 			}
 			if (player == null) {
 				player = (Player) objects.get(playerToUse);
+			}
+			if (player == null) {
+				return Text.of();
 			}
 			return Text.of(player.getName());
 		});
@@ -177,12 +183,15 @@ public class Variables {
 			if (player == null) {
 				player = (Player) objects.get(playerToUse);
 			}
+			if (player == null) {
+				return Text.of();
+			}
 			return player.get(Keys.DISPLAY_NAME).isPresent() ? player.get(Keys.DISPLAY_NAME).get()
 					: Text.of(player.getName());
 		});
 		registerVariable("sound", (objects) -> {
 			if (!objects.containsKey(Param.RECIPIENT) || !objects.containsKey(Param.DATA)) {
-				return Text.of();
+				return;
 			}
 			Player sender = (Player) objects.get(Param.RECIPIENT);
 			String soundname = (String) objects.get(Param.DATA);
@@ -202,7 +211,6 @@ public class Variables {
 				}
 			}
 			sender.playSound(type, sender.getLocation().getPosition(), 1.0);
-			return Text.of();
 		});
 		registerVariable("channel", (objects) -> {
 			if (!objects.containsKey(Param.SENDER)) {
@@ -239,6 +247,9 @@ public class Variables {
 		return store.registerVariable(v);
 	}
 
+	// these methods allow you to register with lamdas
+
+	// just acts on data
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
@@ -251,6 +262,7 @@ public class Variables {
 		});
 	}
 
+	// just returns static info
 	public boolean registerVariable(String key, Supplier<Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
@@ -262,6 +274,7 @@ public class Variables {
 		});
 	}
 
+	// returns info based on data
 	public boolean registerVariable(String key, Function<Map<Param, Object>, Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 
