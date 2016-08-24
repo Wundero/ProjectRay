@@ -128,7 +128,11 @@ public class MainListener {
 					}
 					if (obfuscate && !Utils.inRange(r.getLocation(), s.getLocation(), range)) {
 						double delta = Utils.difference(s.getLocation(), r.getLocation());
-						double percentDiscoloration = ((delta - range) / delta) * 100;
+						// percent difference calc adjusted to make the percent
+						// larger but never above 100 (range is 10% smaller than
+						// normal)
+						// lim(delta->infinity) (func %dc) = 100
+						double percentDiscoloration = ((delta - (range / 1.1)) / delta) * 100;
 						double percentObfuscation = Math.sqrt(percentDiscoloration);
 						Text m = Utils.obfuscate((Text) mc.get("message"), percentObfuscation, percentDiscoloration);
 						mc.put("message", m);
@@ -136,6 +140,7 @@ public class MainListener {
 						return Optional.empty();
 					}
 				}
+				// prolly count have used a supplieer here but meh
 				ValueHolder<Text> vv = new ValueHolder<Text>();
 				if (!f.send((text) -> {
 					if (vv.getValue() != null) {
