@@ -23,6 +23,7 @@ package me.Wundero.ProjectRay.framework.format;
  SOFTWARE.
  */
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,29 +32,40 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 
+import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.conversation.ConversationContext;
+import me.Wundero.ProjectRay.conversation.Option;
+import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class EventFormat extends Format {
 
-	private Optional<Class<?>> eventClass = Optional.empty();
+	private Optional<String> eventClass = Optional.empty();
 
 	private Format internal;
 
-	public EventFormat(ConfigurationNode node) {
+	public EventFormat(ConfigurationNode node, Format f) {
 		super(node);
-		internal = Format.create(node.getNode("format"));
+		if (node == null || node.isVirtual()) {
+			return;
+		}
+		internal = f;
 		String cname = node.getNode("event").getString();
 		if (cname != null) {
-			try {
-				eventClass = Optional.ofNullable(Class.forName(cname));
-			} catch (ClassNotFoundException e) {
-				Utils.printError(e);
-			}
+			eventClass = Optional.of(cname);
 		}
+		Task.builder().intervalTicks(20).execute((task) -> {
+			if (f.usable) {
+				Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
+				task.cancel();
+			}
+		}).submit(Ray.get().getPlugin());
 	}
 
 	private boolean checkClass(Class<?> clazz) {
@@ -102,6 +114,35 @@ public class EventFormat extends Format {
 	@Override
 	public boolean send(Function<Text, Boolean> f, ParsableData data) {
 		return internal.send(f, data);
+	}
+
+	@Override
+	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
+		return new Prompt(TextTemplate.of("What event would you like to fire this format on?")) {
+
+			@Override
+			public Text getQuestion(ConversationContext context) {
+				return formatTemplate(context);
+			}
+
+			@Override
+			public Optional<List<Option>> options(ConversationContext context) {
+				return Optional.empty();
+			}
+
+			@Override
+			public Text getFailedText(ConversationContext context, String failedInput) {
+				return Text.of("Yikes! This should not happen!");
+			}
+
+			@Override
+			public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+				ConfigurationNode node = context.getData("node");
+				node.getNode("event").setValue(text);
+				return returnTo;
+			}
+
+		};
 	}
 
 }

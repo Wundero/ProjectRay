@@ -62,6 +62,9 @@ public class TranslationFile {
 
 			@Override
 			public String get(Locale locale) {
+				if (key == null) {
+					return "";
+				}
 				String e = "";
 				if (!files.containsKey(locale) || !files.get(locale).usable) {
 					if (!files.containsKey(Locales.DEFAULT) || !files.get(Locales.DEFAULT).usable) {

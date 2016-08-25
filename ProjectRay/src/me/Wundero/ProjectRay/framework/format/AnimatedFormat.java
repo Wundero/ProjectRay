@@ -25,12 +25,19 @@ package me.Wundero.ProjectRay.framework.format;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.animation.Animation;
+import me.Wundero.ProjectRay.conversation.ConversationContext;
+import me.Wundero.ProjectRay.conversation.Option;
+import me.Wundero.ProjectRay.conversation.Prompt;
+import me.Wundero.ProjectRay.conversation.TypePrompt;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -68,14 +75,17 @@ public class AnimatedFormat extends Format {
 
 	public AnimatedFormat(ConfigurationNode node) {
 		super(node);
+		if (node == null || node.isVirtual()) {
+			return;
+		}
 		ConfigurationNode frames = node.getNode("frames");
 		Map<Format, Integer> t = Utils.sm();
 		List<Frame> framez = Utils.sl();
 		for (ConfigurationNode frame : frames.getChildrenMap().values()) {
 			Format f = null;
 			try {
-				f = Format.create(frame, false);
-				if (f == null || f instanceof AnimatedFormat) {
+				f = Format.create(frame);
+				if (f == null) {
 					continue;
 				}
 			} catch (Exception e) {
@@ -124,4 +134,121 @@ public class AnimatedFormat extends Format {
 		return true;
 	}
 
+	private static class FramePrompt extends Prompt {
+
+		private Prompt p;
+
+		public FramePrompt(Prompt p) {
+			this(TextTemplate.of(TextColors.AQUA, "Would you like to add another frame?"));
+			this.p = p;
+		}
+
+		public FramePrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return this.formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid input! Try yes or no.");
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			switch (input.toLowerCase().trim()) {
+			case "y":
+			case "yes":
+			case "n":
+			case "no":
+			case "true":
+			case "t":
+			case "f":
+			case "false":
+			case "0":
+			case "1":
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		private boolean parseInput(String input) {
+			switch (input.toLowerCase().trim()) {
+			case "y":
+			case "yes":
+			case "true":
+			case "t":
+			case "1":
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			if (parseInput(text)) {
+				int framenumber = context.getData("framenumber");
+				ConfigurationNode frame = context.getData("frame" + framenumber);
+				frame.getNode("number").setValue(framenumber);
+				context.putData("framenumber", framenumber + 1);
+				ConfigurationNode node = context.getData("node");
+				context.putData("frame" + (framenumber + 1), node.getNode("frames", "frame" + (framenumber + 1)));
+				return Format.buildConversation(new StayPrompt(p), context,
+						node.getNode("frames", "frame" + (framenumber + 1)));
+			} else {
+				int framenumber = context.getData("framenumber");
+				ConfigurationNode frame = context.getData("frame" + framenumber);
+				frame.getNode("number").setValue(framenumber);
+				return p;
+			}
+		}
+	}
+
+	private static class StayPrompt extends TypePrompt<Integer> {
+
+		private Prompt p;
+
+		public StayPrompt(Prompt p) {
+			this(TextTemplate.of(TextColors.AQUA, "How many ticks would you like this frame to stay?"),
+					Optional.of(Integer.class));
+			this.p = p;
+		}
+
+		public StayPrompt(TextTemplate template, Optional<Class<Integer>> type) {
+			super(template, type);
+		}
+
+		@Override
+		public Prompt onTypeInput(Integer object, String text, ConversationContext context) {
+			ConfigurationNode n = context.getData("frame" + context.getData("framenumber"));
+			n.getNode("stay").setValue(object);
+			return new FramePrompt(p);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid number!");
+		}
+
+	}
+
+	@Override
+	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
+		return new StayPrompt(returnTo);
+	}
 }

@@ -82,6 +82,9 @@ public enum FormatType {
 	}
 
 	public static FormatType fromString(String s) {
+		if(s==null) {
+			return DEFAULT;
+		}
 		s = s.trim().toUpperCase().replace(" ", "_");
 		if (namepat.matcher(s).matches()) {
 			s = altpat.matcher(s).replaceAll("");

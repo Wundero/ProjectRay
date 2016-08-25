@@ -26,12 +26,18 @@ package me.Wundero.ProjectRay.framework.format;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 
+import me.Wundero.ProjectRay.conversation.BooleanPrompt;
+import me.Wundero.ProjectRay.conversation.ConversationContext;
+import me.Wundero.ProjectRay.conversation.Option;
+import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -83,10 +89,13 @@ public class MultiFormat extends Format {
 
 	public MultiFormat(ConfigurationNode node) {
 		super(node);
+		if (node == null || node.isVirtual()) {
+			return;
+		}
 		mode = Mode.getMode(node.getNode("mode").getString("shuffle"));
 		ConfigurationNode subs = node.getNode("formats");
 		for (ConfigurationNode f : subs.getChildrenMap().values()) {
-			formats.add(Format.create(f, false));
+			formats.add(Format.create(f));
 		}
 		populateDeque();
 	}
@@ -99,6 +108,45 @@ public class MultiFormat extends Format {
 	@Override
 	public boolean send(Function<Text, Boolean> f, ParsableData data) {
 		return getNext().send(f, data);
+	}
+
+	@Override
+	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
+		return Format.buildConversation(new BooleanPrompt(
+				TextTemplate.of("Would you like to add another format? ", TextTemplate.arg("options"))) {
+
+			@Override
+			public Prompt onBooleanInput(boolean value, String text, ConversationContext context) {
+				return value ? new Prompt(TextTemplate.of("What would you like to call this format?")) {
+
+					@Override
+					public Text getQuestion(ConversationContext context) {
+						return formatTemplate(context);
+					}
+
+					@Override
+					public Optional<List<Option>> options(ConversationContext context) {
+						return Optional.empty();
+					}
+
+					@Override
+					public Text getFailedText(ConversationContext context, String failedInput) {
+						return Text.of("Yikes! Something went wrong.");
+					}
+
+					@Override
+					public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+						ConfigurationNode node = context.getData("node");
+						return Format.buildConversation(this, context, node.getNode("formats", text));
+					}
+				} : returnTo;
+			}
+
+			@Override
+			public Text getQuestion(ConversationContext context) {
+				return formatTemplate(context);
+			}
+		}, context, context.getData("node"));
 	}
 
 }

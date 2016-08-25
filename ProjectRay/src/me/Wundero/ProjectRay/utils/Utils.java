@@ -2,6 +2,7 @@ package me.Wundero.ProjectRay.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Path;
@@ -37,6 +38,8 @@ import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
@@ -52,6 +55,8 @@ import me.Wundero.ProjectRay.ProjectRay;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
+import me.Wundero.ProjectRay.framework.format.Format;
+import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -152,8 +157,12 @@ public class Utils {
 		return new ConcurrentHashMap<K, V>();
 	}
 
-	public static boolean classinstanceof(Class<?> main, Class<?> sub) {
-		return main.isAssignableFrom(sub);
+	public static boolean classinstanceof(String main, Class<?> sub) {
+		boolean b = sub.getName().equalsIgnoreCase(main);
+		if (!b && sub.equals(Object.class)) {
+			return false;
+		}
+		return b ? b : classinstanceof(main, sub.getSuperclass());
 	}
 
 	public static double difference(Location<World> loc1, Location<World> loc2) {
@@ -725,6 +734,49 @@ public class Utils {
 		}
 		return s;
 
+	}
+
+	public static Text parse(Text text, ParsableData data, Optional<Format> format) throws Exception {
+		if (data == null) {
+			return text;
+		}
+		Text.Builder builder = text.toBuilder();
+		List<Text> children = builder.getChildren();
+		builder.removeAll();
+		Map<String, Object> vars = sm();
+		TextTemplate template = parse(TextSerializers.FORMATTING_CODE.serialize(builder.build()), true);
+		vars = Ray.get().setVars(data.getKnown().orElse(sm()), template, data.getSender(), data.getRecipient(),
+				data.getObserver(), format, true);
+		Text f = template.apply(vars).build();
+		Text.Builder builder2 = f.toBuilder();
+		if (builder.getClickAction().isPresent() && builder.getClickAction().get().getResult() instanceof String) {
+			ClickAction<?> act = builder.getClickAction().get();
+			Constructor<?> cost = act.getClass().getConstructor(act.getResult().getClass());
+			boolean a = cost.isAccessible();
+			cost.setAccessible(true);
+			String s = act.getResult().toString();
+			TextTemplate c = parse(s, false);
+			Text t = c.apply(Ray.get().setVars(data.getKnown().orElse(sm()), c, data.getSender(), data.getRecipient(),
+					data.getObserver(), format, true)).build();
+			builder2.onClick((ClickAction<?>) cost.newInstance(t.toPlain()));
+			cost.setAccessible(a);
+		}
+		if (builder.getHoverAction().isPresent() && builder.getHoverAction().get().getResult() instanceof Text) {
+			HoverAction<?> act = builder.getHoverAction().get();
+			Constructor<?> cost = act.getClass().getConstructor(act.getResult().getClass());
+			boolean a = cost.isAccessible();
+			cost.setAccessible(true);
+			String s = TextSerializers.FORMATTING_CODE.serialize((Text) act.getResult());
+			TextTemplate c = parse(s, true);
+			Text t = c.apply(Ray.get().setVars(data.getKnown().orElse(sm()), c, data.getSender(), data.getRecipient(),
+					data.getObserver(), format, true)).build();
+			builder2.onHover((HoverAction<?>) cost.newInstance(t));
+			cost.setAccessible(a);
+		}
+		for (Text t : children) {
+			builder2.append(parse(t, data, format));
+		}
+		return builder2.build();
 	}
 
 	private static List<Player> playersAlphabetical = sl();

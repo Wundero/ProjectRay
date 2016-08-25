@@ -24,6 +24,7 @@ package me.Wundero.ProjectRay.conversation;
  */
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
 import me.Wundero.ProjectRay.DataHolder;
@@ -37,6 +38,12 @@ public class ConversationContext extends DataHolder {
 	ConversationContext(Object plugin, Player holder) {
 		this.setPlugin(plugin);
 		this.setHolder(holder);
+	}
+
+	public void sendMessage(Text message) {
+		Conversation convo = getData("conversation");
+		Text prefix = convo.getPrefix();
+		holder.sendMessage(prefix.concat(message));
 	}
 
 	public Player getHolder() {
