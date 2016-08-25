@@ -249,6 +249,11 @@ public class AnimatedFormat extends Format {
 
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		return new StayPrompt(returnTo);
+		ConfigurationNode node = context.getData("node");
+		int framenumber = 0;
+		context.putData("framenumber", framenumber);
+		context.putData("animated", true);
+		context.putData("frame0", node.getNode("frames", "frame0"));
+		return Format.buildConversation(new StayPrompt(returnTo), context, context.getData("frame0"));
 	}
 }

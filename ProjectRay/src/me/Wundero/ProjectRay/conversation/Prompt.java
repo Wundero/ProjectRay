@@ -45,6 +45,10 @@ public abstract class Prompt {
 		this.template = template;
 	}
 
+	public final TextTemplate getTemplate() {
+		return template;
+	}
+	
 	public abstract Text getQuestion(ConversationContext context);
 
 	public abstract Optional<List<Option>> options(ConversationContext context);
@@ -84,8 +88,8 @@ public abstract class Prompt {
 		if (isInputValid(context, input)) {
 			return onInput(getSelected(context, input), input, context);
 		} else {
-			context.getHolder().sendMessage(
-					((Conversation) context.getData("conversation")).getPrefix().concat(getFailedText(context, input)));
+			context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
+					.concat(getFailedText(context, input).toBuilder().color(TextColors.RED).build()));
 			return this;
 		}
 	}

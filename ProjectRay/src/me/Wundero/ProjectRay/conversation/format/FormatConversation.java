@@ -50,10 +50,6 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 public class FormatConversation {
 
-	// TODO more format class builders
-
-	// builds formats
-
 	public static void start(Player player) {
 		if (!player.hasPermission("ray.formatbuilder")) {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));

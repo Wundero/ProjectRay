@@ -110,43 +110,74 @@ public class MultiFormat extends Format {
 		return getNext().send(f, data);
 	}
 
-	@Override
-	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		return Format.buildConversation(new BooleanPrompt(
-				TextTemplate.of("Would you like to add another format? ", TextTemplate.arg("options"))) {
+	private static class NamePrompt extends Prompt {
 
-			@Override
-			public Prompt onBooleanInput(boolean value, String text, ConversationContext context) {
-				return value ? new Prompt(TextTemplate.of("What would you like to call this format?")) {
+		private Prompt r;
 
-					@Override
-					public Text getQuestion(ConversationContext context) {
-						return formatTemplate(context);
-					}
+		public NamePrompt(Prompt r) {
+			this(TextTemplate.of("What would you like to call this format?"));
+			this.r = r;
+		}
 
-					@Override
-					public Optional<List<Option>> options(ConversationContext context) {
-						return Optional.empty();
-					}
+		public NamePrompt(TextTemplate template) {
+			super(template);
+		}
 
-					@Override
-					public Text getFailedText(ConversationContext context, String failedInput) {
-						return Text.of("Yikes! Something went wrong.");
-					}
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
 
-					@Override
-					public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-						ConfigurationNode node = context.getData("node");
-						return Format.buildConversation(this, context, node.getNode("formats", text));
-					}
-				} : returnTo;
-			}
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return Optional.empty();
+		}
 
-			@Override
-			public Text getQuestion(ConversationContext context) {
-				return formatTemplate(context);
-			}
-		}, context, context.getData("node"));
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of("Yikes! Something went wrong.");
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			ConfigurationNode node = context.getData("node");
+			node = node.getNode("formats", text);
+			return Format.buildConversation(new AnotherFormatPrompt(r), context, node);
+		}
+
 	}
 
+	private static class AnotherFormatPrompt extends BooleanPrompt {
+
+		public AnotherFormatPrompt(Prompt r) {
+			this(TextTemplate.of("Would you like to add another format? ", TextTemplate.arg("options").build()));
+			this.r = r;
+		}
+
+		private Prompt r;
+
+		public AnotherFormatPrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Prompt onBooleanInput(boolean value, String text, ConversationContext context) {
+			if (value) {
+				return new NamePrompt(r);
+			} else {
+				return r;
+			}
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+	}
+
+	@Override
+	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
+		return new NamePrompt(returnTo);
+	}
 }

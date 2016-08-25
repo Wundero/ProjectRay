@@ -30,12 +30,15 @@ import java.util.function.Function;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
+import me.Wundero.ProjectRay.conversation.TypePrompt;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -48,8 +51,115 @@ public abstract class Format {
 
 	public abstract Prompt getConversationBuilder(Prompt returnTo, ConversationContext context);
 
-	public static Prompt buildConversation(Prompt p, ConversationContext c, ConfigurationNode newNode) {
-		return;//not letting this build compile as this is unfinished
+	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode) {
+		ConfigurationNode oldNode = c.getData("node");
+		oldNode.getNode("type").setValue(FormatType.fromString(c.getData("formattype")).getName());
+		newNode.getNode("type").setValue(FormatType.fromString(c.getData("formattype")).getName());
+		c.putData("node", newNode);
+		return new FormatPrompt(p == null ? null : new WrapperPrompt(p, oldNode, c));
+	}
+
+	private static class WrapperPrompt extends Prompt {
+
+		private Runnable r;
+
+		public WrapperPrompt(Prompt p, final ConfigurationNode n, final ConversationContext c) {
+			this(p.getTemplate());
+			this.p = p;
+			r = () -> c.putData("node", n);
+		}
+
+		public WrapperPrompt(TextTemplate template) {
+			super(template);
+		}
+
+		private Prompt p;
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			r.run();
+			return p.getQuestion(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			return p.options(context);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return p.getFailedText(context, failedInput);
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			return p.onInput(selected, text, context);
+		}
+	}
+
+	private static class FormatPrompt extends TypePrompt<Format> {
+
+		private Prompt returnTo;
+
+		public FormatPrompt(Prompt returnTo) {
+			this(TextTemplate.of("What type of format would you like to make (you can type \"done\" to exit)? ",
+					get("animated", "event", "multi", "translatable", "static")), Optional.of(Format.class));
+			this.returnTo = returnTo;
+		}
+
+		private static Text get(String... types) {
+			Text out = Text.of(TextColors.GOLD);
+			String f = "[%s]";
+			TextColor color = TextColors.GOLD;
+			String c = "%s";
+			String h = "Click here to select %s!";
+			TextColor hc = TextColors.AQUA;
+			boolean ft = true;
+			for (String t : types) {
+				if (ft) {
+					ft = false;
+				} else {
+					out = out.concat(Text.of(" "));
+				}
+				out = out.concat(Text.builder(String.format(f, t)).color(color)
+						.onClick(TextActions.runCommand(String.format(c, t)))
+						.onHover(TextActions.showText(Text.of(hc, String.format(h, t)))).build());
+			}
+			return out;
+		}
+
+		@Override
+		public boolean isInputValid(ConversationContext context, String input) {
+			return input.equalsIgnoreCase("done") || super.isInputValid(context, input);
+		}
+
+		public FormatPrompt(TextTemplate template, Optional<Class<Format>> type) {
+			super(template, type);
+		}
+
+		@Override
+		public Prompt onTypeInput(Format object, String text, ConversationContext context) {
+			if (text.equalsIgnoreCase("done") || object == null) {
+				if (returnTo == null) {
+					context.sendMessage(Text.of(TextColors.GREEN,
+							"Format created successfully! Please restart for changes to take effect."));
+					Ray.get().getPlugin().save();
+				}
+				return returnTo;
+			}
+			return object.getConversationBuilder(returnTo, context);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid format!");
+		}
+
 	}
 
 	public abstract boolean send(Function<Text, Boolean> f, Map<String, Object> args);
@@ -60,7 +170,7 @@ public abstract class Format {
 		Function<Text, Boolean> f2 = (text) -> {
 			Text t2 = text;
 			try {
-				t2 = Utils.parse(text, new ParsableData().setKnown(a), Optional.of(this));
+				t2 = Utils.parse(text, new ParsableData().setKnown(a));
 			} catch (Exception e) {
 				return f.apply(text);
 			}
@@ -79,7 +189,7 @@ public abstract class Format {
 		Function<Text, Boolean> f2 = (text) -> {
 			Text t2 = text;
 			try {
-				t2 = Utils.parse(text, d, Optional.of(this));
+				t2 = Utils.parse(text, d);
 			} catch (Exception e) {
 				return f.apply(text);
 			}
@@ -190,81 +300,6 @@ public abstract class Format {
 			return tf;
 		}
 		return sf;
-	}
-
-	private static class ShouldAnimatePrompt extends Prompt {
-
-		private Prompt p;
-
-		public ShouldAnimatePrompt(Prompt p) {
-			this(TextTemplate.of(TextColors.AQUA, "Do you want to animate this format?"));
-			this.p = p;
-		}
-
-		public ShouldAnimatePrompt(TextTemplate template) {
-			super(template);
-		}
-
-		@Override
-		public boolean isInputValid(ConversationContext context, String input) {
-			switch (input.toLowerCase().trim()) {
-			case "y":
-			case "yes":
-			case "n":
-			case "no":
-			case "true":
-			case "t":
-			case "f":
-			case "false":
-			case "0":
-			case "1":
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		private boolean parseInput(String input) {
-			switch (input.toLowerCase().trim()) {
-			case "y":
-			case "yes":
-			case "true":
-			case "t":
-			case "1":
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		@Override
-		public Text getQuestion(ConversationContext context) {
-			return this.formatTemplate(context);
-		}
-
-		@Override
-		public Optional<List<Option>> options(ConversationContext context) {
-			return Optional.empty();
-		}
-
-		@Override
-		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(TextColors.RED, "That is not a valid input! Try yes or no.");
-		}
-
-		@Override
-		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			if (parseInput(text)) {
-				context.putData("framenumber", 0);
-				context.putData("animated", true);
-				ConfigurationNode n = context.getData("node");
-				context.putData("frame0", n.getNode("frames", "frame0"));
-				return Format.buildConversation(af.getConversationBuilder(p, context), context,
-						n.getNode("frames", "frame0"));
-			} else {
-				return p;
-			}
-		}
 	}
 
 	private static AnimatedFormat af = new AnimatedFormat(null);

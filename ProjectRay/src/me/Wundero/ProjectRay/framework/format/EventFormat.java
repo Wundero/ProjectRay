@@ -139,7 +139,7 @@ public class EventFormat extends Format {
 			public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 				ConfigurationNode node = context.getData("node");
 				node.getNode("event").setValue(text);
-				return returnTo;
+				return Format.buildConversation(returnTo, context, node);
 			}
 
 		};

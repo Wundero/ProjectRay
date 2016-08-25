@@ -43,7 +43,6 @@ import me.Wundero.ProjectRay.conversation.Conversation;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
-import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -153,13 +152,8 @@ public class StaticFormat extends Format {
 					.onHover(TextActions.showText(Text.of("Click this to select variable!", TextColors.AQUA))).build();
 			Text t2 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
 					.onHover(TextActions.showText(Text.of("Click this to select text!", TextColors.AQUA))).build();
-			Text t3 = Text.builder("stay").color(TextColors.GOLD).onClick(TextActions.runCommand("stay"))
-					.onHover(TextActions.showText(Text.of("Click this to select stay!", TextColors.AQUA))).build();
 			options.add(new Option("variable", t1, "variable"));
 			options.add(new Option("text", t2, "text"));
-			if (context.hasData("animated")) {
-				options.add(new Option("stay", t3, "stay"));
-			}
 			return Optional.of(options);
 		}
 
@@ -177,12 +171,7 @@ public class StaticFormat extends Format {
 			if (text.equals("text")) {
 				return new TextTypePrompt();
 			}
-			Format format = ((FormatBuilder) context.getData("builder")).build();
-			Group group = context.getData("group");
-			group.addFormat(format);
-			context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
-					.concat(Text.of(TextColors.GREEN, "Format " + context.getData("name") + " successfully created!")));
-			Ray.get().getPlugin().save();
+			((FormatBuilder) context.getData("builder")).build();
 			return returnTo;
 		}
 	}

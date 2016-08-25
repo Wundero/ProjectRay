@@ -55,7 +55,6 @@ import me.Wundero.ProjectRay.ProjectRay;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
-import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -736,7 +735,7 @@ public class Utils {
 
 	}
 
-	public static Text parse(Text text, ParsableData data, Optional<Format> format) throws Exception {
+	public static Text parse(Text text, ParsableData data) throws Exception {
 		if (data == null) {
 			return text;
 		}
@@ -746,7 +745,7 @@ public class Utils {
 		Map<String, Object> vars = sm();
 		TextTemplate template = parse(TextSerializers.FORMATTING_CODE.serialize(builder.build()), true);
 		vars = Ray.get().setVars(data.getKnown().orElse(sm()), template, data.getSender(), data.getRecipient(),
-				data.getObserver(), format, true);
+				data.getObserver(), Optional.empty(), false);
 		Text f = template.apply(vars).build();
 		Text.Builder builder2 = f.toBuilder();
 		if (builder.getClickAction().isPresent() && builder.getClickAction().get().getResult() instanceof String) {
@@ -757,7 +756,7 @@ public class Utils {
 			String s = act.getResult().toString();
 			TextTemplate c = parse(s, false);
 			Text t = c.apply(Ray.get().setVars(data.getKnown().orElse(sm()), c, data.getSender(), data.getRecipient(),
-					data.getObserver(), format, true)).build();
+					data.getObserver(), Optional.empty(), false)).build();
 			builder2.onClick((ClickAction<?>) cost.newInstance(t.toPlain()));
 			cost.setAccessible(a);
 		}
@@ -769,12 +768,12 @@ public class Utils {
 			String s = TextSerializers.FORMATTING_CODE.serialize((Text) act.getResult());
 			TextTemplate c = parse(s, true);
 			Text t = c.apply(Ray.get().setVars(data.getKnown().orElse(sm()), c, data.getSender(), data.getRecipient(),
-					data.getObserver(), format, true)).build();
+					data.getObserver(), Optional.empty(), true)).build();
 			builder2.onHover((HoverAction<?>) cost.newInstance(t));
 			cost.setAccessible(a);
 		}
 		for (Text t : children) {
-			builder2.append(parse(t, data, format));
+			builder2.append(parse(t, data));
 		}
 		return builder2.build();
 	}
