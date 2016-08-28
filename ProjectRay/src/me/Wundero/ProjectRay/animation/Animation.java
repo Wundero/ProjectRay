@@ -37,9 +37,6 @@ import me.Wundero.ProjectRay.utils.Utils;
  */
 public class Animation<T> {
 
-	// TODO may not be in this class, but support interuptable (pausable)
-	// animations
-
 	private final List<T> frames; // list of objects
 	private final Function<T, Integer> update; // apply frame + return delay to
 												// next frame
@@ -47,7 +44,7 @@ public class Animation<T> {
 													// be displayed
 
 	// loop is if the anim is to repeat, running is state detection
-	private boolean loop = true, running = false;
+	private boolean loop = true, running = false, async = false;
 	private Runnable stop;// what happens on stop
 	private Iterator<T> iter; // frames iter - removes need for index var
 
@@ -56,6 +53,10 @@ public class Animation<T> {
 		this.update = update;
 		this.frameCheck = frameCheck;
 		iter = frames.iterator();
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 
 	public void update(final T frame) {// display frame call
@@ -82,22 +83,41 @@ public class Animation<T> {
 		// if we can proceed
 		if (iter.hasNext()) {
 			// execute next frame update with a delay set by the current frame
-			Utils.schedule(Task.builder().execute(() -> update(iter.next())).delayTicks(delayTicks));
+			cancellable = Utils.schedule(
+					Task.builder().execute(() -> update(curFrame = iter.next())).delayTicks(delayTicks), async);
 		} else {
 			stop();
 		}
 	}
 
+	private T curFrame;
+	private Task cancellable;
+
 	public void start() {// execute first frame update if possible
 		if (!running && iter.hasNext()) {
 			running = true;
-			update(iter.next());
+			update(curFrame = iter.next());
+		}
+	}
+
+	public void play() {
+		if (!running) {
+			running = true;
+			update(curFrame);
+		}
+	}
+
+	public void pause() {
+		if (running) {
+			running = false;
+			cancellable.cancel();
 		}
 	}
 
 	public void stop() {
 		if (running) {
 			running = false;
+			cancellable.cancel();
 			if (stop != null) {
 				stop.run();
 			}
@@ -110,6 +130,18 @@ public class Animation<T> {
 
 	public void loop(boolean b) {
 		this.loop = b;
+	}
+
+	public void async(boolean b) {
+		this.async = b;
+	}
+
+	public boolean isAsync() {
+		return async;
+	}
+
+	public Runnable getOnStop() {
+		return stop;
 	}
 
 	public void onStop(Runnable s) {

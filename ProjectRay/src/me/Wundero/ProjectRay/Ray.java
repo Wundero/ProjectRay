@@ -85,6 +85,7 @@ public class Ray {
 	}
 
 	public void registerFormatTask(Supplier<Boolean> t) {
+		formatTasks.add(t);
 		if (formatloader == null || no) {
 			no = false;
 			formatloader = Task.builder().intervalTicks(20).execute((ta) -> {
@@ -95,7 +96,6 @@ public class Ray {
 				}
 			}).submit(getPlugin());
 		}
-		formatTasks.add(t);
 
 	}
 

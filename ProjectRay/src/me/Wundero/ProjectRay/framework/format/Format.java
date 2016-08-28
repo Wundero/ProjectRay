@@ -53,8 +53,8 @@ public abstract class Format {
 
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode) {
 		ConfigurationNode oldNode = c.getData("node");
-		oldNode.getNode("type").setValue(FormatType.fromString(c.getData("formattype")).getName());
-		newNode.getNode("type").setValue(FormatType.fromString(c.getData("formattype")).getName());
+		oldNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
+		newNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
 		c.putData("node", newNode);
 		return new FormatPrompt(p == null ? null : new WrapperPrompt(p, oldNode, c));
 	}
@@ -128,25 +128,12 @@ public abstract class Format {
 			return out;
 		}
 
-		@Override
-		public boolean isInputValid(ConversationContext context, String input) {
-			return input.equalsIgnoreCase("done") || super.isInputValid(context, input);
-		}
-
 		public FormatPrompt(TextTemplate template, Optional<Class<Format>> type) {
 			super(template, type);
 		}
 
 		@Override
 		public Prompt onTypeInput(Format object, String text, ConversationContext context) {
-			if (text.equalsIgnoreCase("done") || object == null) {
-				if (returnTo == null) {
-					context.sendMessage(Text.of(TextColors.GREEN,
-							"Format created successfully! Please restart for changes to take effect."));
-					Ray.get().getPlugin().save();
-				}
-				return returnTo;
-			}
 			return object.getConversationBuilder(returnTo, context);
 		}
 
@@ -167,18 +154,24 @@ public abstract class Format {
 	public abstract boolean send(Function<Text, Boolean> f, ParsableData data);
 
 	protected boolean s(Function<Text, Boolean> f, Map<String, Object> a, TextTemplate t) {
+		System.out.println(t);
 		Function<Text, Boolean> f2 = (text) -> {
 			Text t2 = text;
 			try {
 				t2 = Utils.parse(text, new ParsableData().setKnown(a));
+				System.out.println(t2);
+				if (t2 == null) {
+					return f.apply(text);
+				}
 			} catch (Exception e) {
 				return f.apply(text);
 			}
 			return f.apply(t2);
 		};
 		boolean b = false;
+		Text te = get(t, a);
 		try {
-			b = f2.apply(get(t, a));
+			b = f2.apply(te);
 		} catch (Exception e) {
 			b = false;
 		}
@@ -190,14 +183,19 @@ public abstract class Format {
 			Text t2 = text;
 			try {
 				t2 = Utils.parse(text, d);
+				System.out.println(t2);
+				if (t2 == null) {
+					return f.apply(text);
+				}
 			} catch (Exception e) {
 				return f.apply(text);
 			}
 			return f.apply(t2);
 		};
 		boolean b = false;
+		Text te = get(t, d);
 		try {
-			b = f2.apply(get(t, d));
+			b = f2.apply(te);
 		} catch (Exception e) {
 			e.printStackTrace();
 			b = false;

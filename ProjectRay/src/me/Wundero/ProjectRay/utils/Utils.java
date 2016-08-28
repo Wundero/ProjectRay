@@ -2,7 +2,6 @@ package me.Wundero.ProjectRay.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Path;
@@ -40,6 +39,7 @@ import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
@@ -96,7 +96,10 @@ public class Utils {
 		return load(config.toPath());
 	}
 
-	public static Task schedule(Task.Builder b) {
+	public static Task schedule(Task.Builder b, boolean async) {
+		if (async) {
+			b.async();
+		}
 		return b.submit(Ray.get().getPlugin());
 	}
 
@@ -232,6 +235,9 @@ public class Utils {
 			return TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(in));
 		}
 		String[] textParts = in.split(VAR_PATTERN.pattern());
+		if (textParts.length == 0) {
+			return TextTemplate.of(TextTemplate.arg(in));
+		}
 		Matcher matcher = VAR_PATTERN.matcher(in);
 		TextTemplate out = TextTemplate.of(TextSerializers.FORMATTING_CODE.deserialize(textParts[0]));
 		int x = 1;
@@ -735,8 +741,12 @@ public class Utils {
 
 	}
 
-	public static Text parse(Text text, ParsableData data) throws Exception {
+	// THIS IS BROKEN TODO FIX
+	public static Text parse(Text text, ParsableData data) {
 		if (data == null) {
+			return text;
+		}
+		if (String.class.getSimpleName().equals("String")) {
 			return text;
 		}
 		Text.Builder builder = text.toBuilder();
@@ -745,35 +755,28 @@ public class Utils {
 		Map<String, Object> vars = sm();
 		TextTemplate template = parse(TextSerializers.FORMATTING_CODE.serialize(builder.build()), true);
 		vars = Ray.get().setVars(data.getKnown().orElse(sm()), template, data.getSender(), data.getRecipient(),
-				data.getObserver(), Optional.empty(), false);
+				data.getObserver(), Optional.empty(), true);
 		Text f = template.apply(vars).build();
 		Text.Builder builder2 = f.toBuilder();
 		if (builder.getClickAction().isPresent() && builder.getClickAction().get().getResult() instanceof String) {
 			ClickAction<?> act = builder.getClickAction().get();
-			Constructor<?> cost = act.getClass().getConstructor(act.getResult().getClass());
-			boolean a = cost.isAccessible();
-			cost.setAccessible(true);
 			String s = act.getResult().toString();
 			TextTemplate c = parse(s, false);
 			Text t = c.apply(Ray.get().setVars(data.getKnown().orElse(sm()), c, data.getSender(), data.getRecipient(),
 					data.getObserver(), Optional.empty(), false)).build();
-			builder2.onClick((ClickAction<?>) cost.newInstance(t.toPlain()));
-			cost.setAccessible(a);
+			boolean sf = act instanceof ClickAction.SuggestCommand;
+			builder2.onClick(sf ? TextActions.suggestCommand(t.toPlain()) : TextActions.runCommand(t.toPlain()));
 		}
 		if (builder.getHoverAction().isPresent() && builder.getHoverAction().get().getResult() instanceof Text) {
 			HoverAction<?> act = builder.getHoverAction().get();
-			Constructor<?> cost = act.getClass().getConstructor(act.getResult().getClass());
-			boolean a = cost.isAccessible();
-			cost.setAccessible(true);
 			String s = TextSerializers.FORMATTING_CODE.serialize((Text) act.getResult());
 			TextTemplate c = parse(s, true);
 			Text t = c.apply(Ray.get().setVars(data.getKnown().orElse(sm()), c, data.getSender(), data.getRecipient(),
-					data.getObserver(), Optional.empty(), true)).build();
-			builder2.onHover((HoverAction<?>) cost.newInstance(t));
-			cost.setAccessible(a);
+					data.getObserver(), Optional.empty(), false)).build();
+			builder2.onHover(TextActions.showText(t));
 		}
-		for (Text t : children) {
-			builder2.append(parse(t, data));
+		for (Text tf : children) {
+			builder2 = builder2.append(parse(tf, data));
 		}
 		return builder2.build();
 	}

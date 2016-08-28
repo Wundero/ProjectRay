@@ -38,6 +38,7 @@ import me.Wundero.ProjectRay.conversation.ConversationContext;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.conversation.TypePrompt;
+import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -130,7 +131,15 @@ public class AnimatedFormat extends Format {
 		}, (template) -> {
 			return template != null;
 		});
-		anim.start();
+		if (data.getObserver().isPresent()) {
+			RayPlayer.get(data.getObserver().get()).queueAnimation(this.getType(), anim);
+		} else if (data.getRecipient().isPresent()) {
+			RayPlayer.get(data.getRecipient().get()).queueAnimation(this.getType(), anim);
+		} else if (data.getSender().isPresent()) {
+			RayPlayer.get(data.getSender().get()).queueAnimation(this.getType(), anim);
+		} else {
+			anim.start();
+		}
 		return true;
 	}
 
@@ -254,6 +263,7 @@ public class AnimatedFormat extends Format {
 		context.putData("framenumber", framenumber);
 		context.putData("animated", true);
 		context.putData("frame0", node.getNode("frames", "frame0"));
+		context.sendMessage(Text.of("Creating first frame..."));
 		return Format.buildConversation(new StayPrompt(returnTo), context, context.getData("frame0"));
 	}
 }

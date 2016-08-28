@@ -64,7 +64,10 @@ public class StaticFormat extends Format {
 				} catch (ObjectMappingException e) {
 					return false;
 				}
-				template.ifPresent(t -> setTemplate(t));
+				template.ifPresent(t -> {
+					setTemplate(t);
+					usable = true;
+				});
 				return template.isPresent();
 			});
 		} else {
@@ -116,8 +119,7 @@ public class StaticFormat extends Format {
 		private Prompt returnTo;
 
 		public TemplateBuilderTypePrompt(boolean constructNewBuilder, ConversationContext context, Prompt returnTo) {
-			this();
-			this.returnTo = returnTo;
+			this(returnTo);
 			if (!constructNewBuilder) {
 				return;
 			}
@@ -126,9 +128,10 @@ public class StaticFormat extends Format {
 			context.putData("builder", fb);
 		}
 
-		public TemplateBuilderTypePrompt() {
+		public TemplateBuilderTypePrompt(Prompt returnTo) {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add, or type \"done\" to finish: "),
 					TextTemplate.arg("options").color(TextColors.GOLD).build()));
+			this.returnTo = returnTo;
 		}
 
 		public TemplateBuilderTypePrompt(TextTemplate template) {
@@ -166,10 +169,10 @@ public class StaticFormat extends Format {
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			text = text.toLowerCase();
 			if (text.equals("variable")) {
-				return new ArgTypePrompt();
+				return new ArgTypePrompt(returnTo);
 			}
 			if (text.equals("text")) {
-				return new TextTypePrompt();
+				return new TextTypePrompt(returnTo);
 			}
 			((FormatBuilder) context.getData("builder")).build();
 			return returnTo;
@@ -179,15 +182,17 @@ public class StaticFormat extends Format {
 	private static class ArgTypePrompt extends Prompt {
 
 		private ArgBuilderPrompt p = null;
+		private Prompt r;
 
-		private ArgTypePrompt(ArgBuilderPrompt p) {
-			this();
+		private ArgTypePrompt(ArgBuilderPrompt p, Prompt r) {
+			this(r);
 			this.p = p;
 		}
 
-		public ArgTypePrompt() {
+		public ArgTypePrompt(Prompt r) {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add: "),
 					TextTemplate.arg("options").color(TextColors.GOLD).build()));
+			this.r = r;
 		}
 
 		public ArgTypePrompt(TextTemplate template) {
@@ -234,7 +239,7 @@ public class StaticFormat extends Format {
 				if (p != null) {
 					p.apply(context);
 				}
-				return new ArgBuilderPrompt(null, null, null, "key");
+				return new ArgBuilderPrompt(r, null, null, null, "key");
 			case "click":
 				text = text
 						+ " (put url:, run:, or suggest: in front of the click to change it's type (default is suggest))";
@@ -250,9 +255,9 @@ public class StaticFormat extends Format {
 				if (p != null) {
 					p.apply(context);
 				}
-				return new TemplateBuilderTypePrompt();
+				return new TemplateBuilderTypePrompt(r);
 			}
-			return null;
+			return r;
 		}
 	}
 
@@ -262,9 +267,12 @@ public class StaticFormat extends Format {
 		private InternalClickAction<?> click;
 		private InternalHoverAction<?> hover;
 		private String value;
+		private Prompt r;
 
-		public ArgBuilderPrompt(String key, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
+		public ArgBuilderPrompt(Prompt r, String key, InternalClickAction<?> click, InternalHoverAction<?> hover,
+				String value) {
 			this(null);
+			this.r = r;
 			this.key = key;
 			this.hover = hover;
 			this.click = click;
@@ -305,7 +313,7 @@ public class StaticFormat extends Format {
 			switch (value) {
 			case "key":
 				key = text;
-				return new ArgTypePrompt(this);
+				return new ArgTypePrompt(this, r);
 			case "click":
 				Class<?> clickType = InternalClickAction.SuggestTemplate.class;
 				if (text.toLowerCase().startsWith("run:")) {
@@ -320,11 +328,11 @@ public class StaticFormat extends Format {
 					text = text.substring(4);
 				}
 				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
-				return new ArgTypePrompt(this);
+				return new ArgTypePrompt(this, r);
 			case "hover":
 				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))
 						.build(InternalHoverAction.ShowTemplate.class);
-				return new ArgTypePrompt(this);
+				return new ArgTypePrompt(this, r);
 			}
 			return this;
 		}
@@ -334,15 +342,17 @@ public class StaticFormat extends Format {
 	private static class TextTypePrompt extends Prompt {
 
 		private TextBuilderPrompt p = null;
+		private Prompt r;
 
-		private TextTypePrompt(TextBuilderPrompt p) {
-			this();
+		private TextTypePrompt(TextBuilderPrompt p, Prompt r) {
+			this(r);
 			this.p = p;
 		}
 
-		public TextTypePrompt() {
+		public TextTypePrompt(Prompt r) {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose an element to add: "),
 					TextTemplate.arg("options").color(TextColors.GOLD).build()));
+			this.r = r;
 		}
 
 		public TextTypePrompt(TextTemplate template) {
@@ -388,7 +398,7 @@ public class StaticFormat extends Format {
 				if (p != null) {
 					p.apply(context);
 				}
-				return new TextBuilderPrompt(null, null, null, "text");
+				return new TextBuilderPrompt(r, null, null, null, "text");
 			case "click":
 				text = text
 						+ " (put url:, run:, or suggest: in front of the click to change it's type (default is suggest))";
@@ -404,9 +414,9 @@ public class StaticFormat extends Format {
 				if (p != null) {
 					p.apply(context);
 				}
-				return new TemplateBuilderTypePrompt();
+				return new TemplateBuilderTypePrompt(r);
 			}
-			return null;
+			return r;
 		}
 	}
 
@@ -416,13 +426,16 @@ public class StaticFormat extends Format {
 		private InternalClickAction<?> click;
 		private InternalHoverAction<?> hover;
 		private String value;
+		private Prompt r;
 
-		public TextBuilderPrompt(Text text, InternalClickAction<?> click, InternalHoverAction<?> hover, String value) {
+		public TextBuilderPrompt(Prompt r, Text text, InternalClickAction<?> click, InternalHoverAction<?> hover,
+				String value) {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please input a " + value + ":")));
 			this.text = text;
 			this.hover = hover;
 			this.click = click;
 			this.value = value;
+			this.r = r;
 		}
 
 		public TextBuilderPrompt(TextTemplate template) {
@@ -463,7 +476,7 @@ public class StaticFormat extends Format {
 			switch (value) {
 			case "text":
 				this.text = TextSerializers.FORMATTING_CODE.deserialize(text);
-				return new TextTypePrompt(this);
+				return new TextTypePrompt(this, r);
 			case "click":
 				Class<?> clickType = InternalClickAction.SuggestTemplate.class;
 				if (text.toLowerCase().startsWith("run:")) {
@@ -478,11 +491,11 @@ public class StaticFormat extends Format {
 					text = text.substring(4);
 				}
 				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
-				return new TextTypePrompt(this);
+				return new TextTypePrompt(this, r);
 			case "hover":
 				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))
 						.build(InternalHoverAction.ShowTemplate.class);
-				return new TextTypePrompt(this);
+				return new TextTypePrompt(this, r);
 			}
 			return this;
 		}

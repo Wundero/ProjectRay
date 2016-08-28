@@ -58,6 +58,15 @@ public abstract class DataHolder {
 		return (T) data.get(key);
 	}
 
+	public synchronized <T> T getData(String key, T def) {
+		if (!hasData(key)) {
+			return def;
+		}
+		@SuppressWarnings("unchecked")
+		T out = (T) data.get(key);
+		return out == null ? def : out;
+	}
+
 	public synchronized boolean hasData(String key) {
 		return data.containsKey(key);
 	}

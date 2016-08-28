@@ -42,6 +42,7 @@ import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
 import org.spongepowered.api.event.cause.Cause;
@@ -140,6 +141,7 @@ public class MainListener {
 						return Optional.empty();
 					}
 				}
+
 				ValueHolder<Text> vv = new ValueHolder<Text>();
 				if (!f.send((text) -> {
 					if (vv.getValue() != null) {
@@ -182,6 +184,7 @@ public class MainListener {
 				sf = event.getCause().get("sendfrom", Player.class);
 			}
 			if (event.getCause().containsNamed("sendto")) {
+
 				st = event.getCause().get("sendto", Player.class);
 			}
 			if (event.getCause().containsNamed("formatname")) {
@@ -197,7 +200,7 @@ public class MainListener {
 		}
 	}
 
-	@Listener
+	@Listener(order = Order.LATE)
 	public void onJoin(ClientConnectionEvent.Join event) {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		Ray.get().setLoadable(event.getTargetEntity());
@@ -254,8 +257,6 @@ public class MainListener {
 						.setRecipient(event.getTargetEntity()));
 			}
 		}
-
-		// TODO tablist header/footer
 
 		if (event.getChannel().isPresent()) {
 			event.setMessageCancelled(true);

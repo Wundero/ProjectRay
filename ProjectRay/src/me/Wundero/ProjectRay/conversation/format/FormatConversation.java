@@ -38,7 +38,13 @@ import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.conversation.Conversation;
 import me.Wundero.ProjectRay.conversation.ConversationCanceller;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Cancel;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Chat;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Finish;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Next;
+import me.Wundero.ProjectRay.conversation.ConversationEvent.Start;
 import me.Wundero.ProjectRay.conversation.ConversationFactory;
+import me.Wundero.ProjectRay.conversation.ConversationListener;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.framework.Group;
@@ -70,7 +76,7 @@ public class FormatConversation {
 							return;
 						}
 						ConfigurationNode node = context.getData("wipable node");
-						boolean wipegroup = context.getData("wipegroup");
+						boolean wipegroup = context.getData("wipegroup", false);
 						if (node != null) {
 							if (wipegroup) {
 								node.getParent().setValue(null);
@@ -82,6 +88,31 @@ public class FormatConversation {
 								Text.of(TextColors.AQUA, "[Formats] ", TextColors.RED, "Format creation cancelled!"));
 					}
 
+				}).withListener(new ConversationListener() {
+
+					@Override
+					public void onChat(Chat chat) {
+					}
+
+					@Override
+					public void onFinish(Finish finish) {
+						ConversationContext context = finish.getContext();
+						context.sendMessage(Text.of(TextColors.GREEN,
+								"Format created successfully! Please restart for changes to take effect."));
+						Ray.get().getPlugin().save();
+					}
+
+					@Override
+					public void onCancel(Cancel cancel) {
+					}
+
+					@Override
+					public void onNext(Next next) {
+					}
+
+					@Override
+					public void onStart(Start start) {
+					}
 				}).withFirstPrompt(new WorldPrompt()).build(player);
 		convo.start();
 	}

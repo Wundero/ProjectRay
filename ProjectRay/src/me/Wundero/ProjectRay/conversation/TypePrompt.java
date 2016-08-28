@@ -64,7 +64,7 @@ public abstract class TypePrompt<T> extends Prompt {
 				} catch (NoSuchMethodException e1) {
 					try {
 						m = t.getDeclaredMethod("deserialize", String.class);// serializable
-																				// classesF
+																				// classes
 					} catch (Exception e) {
 						return false;
 					}
@@ -85,7 +85,7 @@ public abstract class TypePrompt<T> extends Prompt {
 				return false;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -141,7 +141,8 @@ public abstract class TypePrompt<T> extends Prompt {
 	// parse and cast value
 	@Override
 	public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-		return onTypeInput(type.isPresent() ? type.get().cast(selected.get().getValue()) : null, text, context);
+		return onTypeInput(type.isPresent() && selected.isPresent() ? type.get().cast(selected.get().getValue()) : null,
+				text, context);
 	}
 
 }

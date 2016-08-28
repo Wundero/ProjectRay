@@ -42,7 +42,10 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.animation.Animation;
+import me.Wundero.ProjectRay.animation.AnimationQueue;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -114,6 +117,14 @@ public class RayPlayer {
 	private Task tabHFTask = null;
 	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
+	private Map<FormatType, AnimationQueue> animations = Utils.sm();
+
+	public void queueAnimation(FormatType type, Animation<?> anim) {
+		if (!animations.containsKey(type)) {
+			animations.put(type, new AnimationQueue());
+		}
+		animations.get(type).queueAnimation(anim);
+	}
 
 	public synchronized void queueFooter(Text t) {
 		if (t != null) {
