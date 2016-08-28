@@ -103,7 +103,7 @@ public abstract class Format {
 
 		public FormatPrompt(Prompt returnTo) {
 			this(TextTemplate.of("What type of format would you like to make (you can type \"done\" to exit)? ",
-					get("animated", "event", "multi", "translatable", "static")), Optional.of(Format.class));
+					get("animated", "event", "multi", "translatable", "command", "static")), Optional.of(Format.class));
 			this.returnTo = returnTo;
 		}
 
@@ -233,16 +233,28 @@ public abstract class Format {
 			return null;
 		}
 		boolean event = !node.getNode("event").isVirtual();
+		boolean cmd = !node.getNode("command").isVirtual();
 		if (!node.getNode("frames").isVirtual()) {
-			return event ? new EventFormat(node, new AnimatedFormat(node)) : new AnimatedFormat(node);
+			return buildFormat(node, new AnimatedFormat(node), event, cmd);
 		}
 		if (!node.getNode("formats").isVirtual()) {
-			return event ? new EventFormat(node, new MultiFormat(node)) : new MultiFormat(node);
+			return buildFormat(node, new MultiFormat(node), event, cmd);
 		}
 		if (!node.getNode("key").isVirtual()) {
-			return event ? new EventFormat(node, new TranslatableFormat(node)) : new TranslatableFormat(node);
+			return buildFormat(node, new TranslatableFormat(node), event, cmd);
 		}
-		return event ? new EventFormat(node, new StaticFormat(node)) : new StaticFormat(node);
+		return buildFormat(node, new StaticFormat(node), event, cmd);
+	}
+
+	private static Format buildFormat(ConfigurationNode node, Format towrap, boolean event, boolean command) {
+		Format out = towrap;
+		if (event) {
+			out = new EventFormat(node, out);
+		}
+		if (command) {
+			out = new CommandFormat(node, out);
+		}
+		return out;
 	}
 
 	public Format(final ConfigurationNode node) {
@@ -296,6 +308,10 @@ public abstract class Format {
 		case "translate":
 		case "t":
 			return tf;
+		case "command":
+		case "cmd":
+		case "c":
+			return cf;
 		}
 		return sf;
 	}
@@ -305,4 +321,5 @@ public abstract class Format {
 	private static EventFormat ef = new EventFormat(null, null);
 	private static MultiFormat mf = new MultiFormat(null);
 	private static TranslatableFormat tf = new TranslatableFormat(null);
+	private static CommandFormat cf = new CommandFormat(null, null);
 }
