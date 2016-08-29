@@ -151,18 +151,15 @@ public class RayPlayer {
 			if (!user.isOnline() || !user.getPlayer().isPresent()) {
 				return;
 			}
-			System.out.println("checking tab queue");
 			Player p = user.getPlayer().get();
 			boolean h = !headerQueue.isEmpty();
 			boolean f = !footerQueue.isEmpty();
 			if (h && f) {
-				System.out.println("h and f");
 				synchronized (headerQueue) {
 					synchronized (footerQueue) {
 						Text he = headerQueue.pop();
 						Text fo = footerQueue.pop();
 						p.getTabList().setHeaderAndFooter(he, fo);
-						System.out.println("h and f send");
 					}
 				}
 			} else if (h) {
@@ -170,14 +167,12 @@ public class RayPlayer {
 				synchronized (headerQueue) {
 					Text he = headerQueue.pop();
 					p.getTabList().setHeader(he);
-					System.out.println("h send");
+					System.out.println(p.getTabList().getClass().getName());
 				}
 			} else if (f) {
-				System.out.println("f");
 				synchronized (footerQueue) {
 					Text he = footerQueue.pop();
 					p.getTabList().setFooter(he);
-					System.out.println("f send");
 				}
 			}
 		}).intervalTicks(1).submit(Ray.get().getPlugin());

@@ -154,12 +154,10 @@ public abstract class Format {
 	public abstract boolean send(Function<Text, Boolean> f, ParsableData data);
 
 	protected boolean s(Function<Text, Boolean> f, Map<String, Object> a, TextTemplate t) {
-		System.out.println(t);
 		Function<Text, Boolean> f2 = (text) -> {
 			Text t2 = text;
 			try {
 				t2 = Utils.parse(text, new ParsableData().setKnown(a));
-				System.out.println(t2);
 				if (t2 == null) {
 					return f.apply(text);
 				}
@@ -183,7 +181,6 @@ public abstract class Format {
 			Text t2 = text;
 			try {
 				t2 = Utils.parse(text, d);
-				System.out.println(t2);
 				if (t2 == null) {
 					return f.apply(text);
 				}

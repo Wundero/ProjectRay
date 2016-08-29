@@ -238,24 +238,26 @@ public class MainListener {
 			}
 		});
 		p.startTabHFTask();
-		Group g = p.getActiveGroup();
+		final Group g = p.getActiveGroup();
 		if (g != null) {
-			Format h = g.getFormat(FormatType.TABLIST_HEADER);
-			Format f = g.getFormat(FormatType.TABLIST_FOOTER);
-			if (h != null) {
-				h.send(text -> {
-					p.queueHeader(text);
-					return true;
-				}, new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
-						.setRecipient(event.getTargetEntity()));
-			}
-			if (f != null) {
-				f.send(text -> {
-					p.queueHeader(text);
-					return true;
-				}, new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
-						.setRecipient(event.getTargetEntity()));
-			}
+			Task.builder().delayTicks(20).execute(() -> {
+				Format h = g.getFormat(FormatType.TABLIST_HEADER);
+				Format f = g.getFormat(FormatType.TABLIST_FOOTER);
+				if (h != null) {
+					h.send(text -> {
+						p.queueHeader(text);
+						return true;
+					}, new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
+							.setRecipient(event.getTargetEntity()));
+				}
+				if (f != null) {
+					f.send(text -> {
+						p.queueHeader(text);
+						return true;
+					}, new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
+							.setRecipient(event.getTargetEntity()));
+				}
+			}).submit(Ray.get().getPlugin());
 		}
 
 		if (event.getChannel().isPresent()) {
