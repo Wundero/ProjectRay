@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -643,6 +644,10 @@ public class Utils {
 
 	public static <T> List<T> removeDuplicates(List<T> list) {
 		return sl(list.stream().distinct().collect(Collectors.toList()));
+	}
+
+	public static <T> T pop(Deque<T> deque, T def) {
+		return deque.isEmpty() ? def : deque.pop();
 	}
 
 	public static boolean call(Event e) {

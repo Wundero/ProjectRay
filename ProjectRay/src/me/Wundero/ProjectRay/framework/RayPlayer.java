@@ -34,10 +34,12 @@ import java.util.UUID;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
@@ -146,32 +148,39 @@ public class RayPlayer {
 		tabHFTask.cancel();
 	}
 
+	private synchronized Text pop(ArrayDeque<Text> from, Text def) {
+		return Utils.pop(from, def);
+	}
+
+	private static final Text EMPTY_TEXT_HEADER = TextSerializers.JSON.deserialize("{\"translate\":\"\"}");
+
 	public void startTabHFTask() {
 		tabHFTask = Task.builder().execute(t -> {
 			if (!user.isOnline() || !user.getPlayer().isPresent()) {
 				return;
 			}
 			Player p = user.getPlayer().get();
-			boolean h = !headerQueue.isEmpty();
-			boolean f = !footerQueue.isEmpty();
+			TabList list = p.getTabList();
+			boolean h = !headerQueue.isEmpty() || !list.getHeader().isPresent();
+			boolean f = !footerQueue.isEmpty() || !list.getFooter().isPresent();
 			if (h && f) {
 				synchronized (headerQueue) {
 					synchronized (footerQueue) {
-						Text he = headerQueue.pop();
-						Text fo = footerQueue.pop();
+						Text he = pop(headerQueue, EMPTY_TEXT_HEADER);
+						Text fo = pop(footerQueue, EMPTY_TEXT_HEADER);
 						p.getTabList().setHeaderAndFooter(he, fo);
 					}
 				}
 			} else if (h) {
 				System.out.println("h");
 				synchronized (headerQueue) {
-					Text he = headerQueue.pop();
+					Text he = pop(headerQueue, EMPTY_TEXT_HEADER);
 					p.getTabList().setHeader(he);
 					System.out.println(p.getTabList().getClass().getName());
 				}
 			} else if (f) {
 				synchronized (footerQueue) {
-					Text he = footerQueue.pop();
+					Text he = pop(footerQueue, EMPTY_TEXT_HEADER);
 					p.getTabList().setFooter(he);
 				}
 			}

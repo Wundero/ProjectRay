@@ -163,7 +163,14 @@ public class Groups {
 	public Map<String, Group> getGroups(User user) {
 		Map<String, Group> out = Utils.sm();
 		for (String world : groups.keySet()) {
+			if (getMainGroup(user, world) == null) {
+				continue;
+			}
 			out.put(world, getMainGroup(user, world));
+		}
+		if (out.isEmpty()) {
+			// This shuold not happen if a default group is set; TODO test why
+			// it might be
 		}
 		return out;
 	}
