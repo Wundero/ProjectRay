@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -68,35 +66,11 @@ public class Ray {
 
 	// registering async tasks so they can be cancelled on termination
 	private List<Task> asyncTasks = Utils.sl();
-	// tasks when formats load - shouldn't be necessary to have this but i need
-	// it for some reason
-	private Task formatloader = null;
-	private boolean no = true;
-	private List<Supplier<Boolean>> formatTasks = Utils.sl();
 
 	public void registerTask(Task t) {
 		if (t.isAsynchronous()) {
 			asyncTasks.add(t);
 		}
-	}
-
-	public boolean hasFormatTask() {
-		return !formatTasks.isEmpty();
-	}
-
-	public void registerFormatTask(Supplier<Boolean> t) {
-		formatTasks.add(t);
-		if (formatloader == null || no) {
-			no = false;
-			formatloader = Task.builder().intervalTicks(20).execute((ta) -> {
-				formatTasks = Utils.sl(formatTasks.stream().filter((task) -> !task.get()).collect(Collectors.toList()));
-				if (formatTasks.isEmpty()) {
-					ta.cancel();
-					no = true;
-				}
-			}).submit(getPlugin());
-		}
-
 	}
 
 	private Ray() {

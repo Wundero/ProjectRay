@@ -36,7 +36,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.conversation.Conversation;
@@ -57,19 +56,14 @@ public class StaticFormat extends Format {
 			return;
 		}
 		if (node.getNode("simple").isVirtual()) {
-			Ray.get().registerFormatTask(() -> {
-				Optional<TextTemplate> template;
-				try {
-					template = Optional.ofNullable(node.getNode("format").getValue(TypeToken.of(TextTemplate.class)));
-				} catch (ObjectMappingException e) {
-					return false;
-				}
-				template.ifPresent(t -> {
-					setTemplate(t);
-					usable = true;
-				});
-				return template.isPresent();
-			});
+			TextTemplate.of("").apply();// instantiates type token if not
+										// present
+			try {
+				setTemplate(node.getNode("format").getValue(TypeToken.of(TextTemplate.class)));
+				usable = true;
+			} catch (ObjectMappingException e) {
+				usable = false;
+			}
 		} else {
 			String simple = node.getNode("simple").getString();
 			node.getNode("simple").setValue(null);
