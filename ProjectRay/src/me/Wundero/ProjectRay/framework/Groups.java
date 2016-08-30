@@ -67,39 +67,6 @@ public class Groups {
 		return group;
 	}
 
-	// gonna remove this, don't feel that it's necessary with format builders
-
-	/*
-	 * public Groups(File path) { if (path.exists() && path.isFile()) { throw
-	 * new IllegalArgumentException("Path is single file, use other constructor"
-	 * ); } if (!path.exists()) { path.mkdirs(); } for (File f :
-	 * path.listFiles()) { if (!f.exists()) { continue; } String world =
-	 * f.getName(); boolean global = world.equalsIgnoreCase("all"); if
-	 * (f.isFile()) { ConfigurationNode groups =
-	 * Utils.load(f).getNode("groups"); for (ConfigurationNode group :
-	 * groups.getChildrenMap().values()) { String name =
-	 * group.getKey().toString(); if (!this.groups.containsKey(world)) {
-	 * Map<String, Group> map = Maps.newHashMap(); map.put(name, new
-	 * Group(world, group, null, global)); this.groups.put(world, map); } else {
-	 * Map<String, Group> map = this.groups.get(world); map.put(name, new
-	 * Group(world, group, null, global)); this.groups.put(world, map); } } }
-	 * else { File f1 = new File(f, "groups"); if (f1.exists() && f1.isFile()) {
-	 * ConfigurationNode groups = Utils.load(f1).getNode("groups"); for
-	 * (ConfigurationNode group : groups.getChildrenMap().values()) { String
-	 * name = group.getKey().toString(); if (!this.groups.containsKey(world)) {
-	 * Map<String, Group> map = Maps.newHashMap(); map.put(name, new
-	 * Group(world, group, null, global)); this.groups.put(world, map); } else {
-	 * Map<String, Group> map = this.groups.get(world); map.put(name, new
-	 * Group(world, group, null, global)); this.groups.put(world, map); } } }
-	 * else { for (File g : f.listFiles()) { String name = g.getName();
-	 * ConfigurationNode group = Utils.load(g); if
-	 * (!this.groups.containsKey(world)) { Map<String, Group> map =
-	 * Maps.newHashMap(); map.put(name, new Group(world, group, null, global));
-	 * this.groups.put(world, map); } else { Map<String, Group> map =
-	 * this.groups.get(world); map.put(name, new Group(world, group, null,
-	 * global)); this.groups.put(world, map); } } } } } }
-	 */
-
 	public List<Group> getAllGroups() {
 		List<Group> groups = Utils.sl();
 		for (Map<String, Group> g1 : this.groups.values()) {
@@ -112,32 +79,11 @@ public class Groups {
 
 	public Group getMainGroup(User p) {
 		if (!p.isOnline()) {
-			Group cg = null;
-			for (Group g : getGroups("all").values()) {
-				if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
-					if (cg == null) {
-						cg = g;
-					} else if (cg.getPriority() < g.getPriority()) {
-						cg = g;
-					}
-				}
-
-			}
-			return cg;
+			return getMainGroup(p, "all");
 		} else {
 			World w = p.getPlayer().get().getWorld();
 			String wname = w.getName().toLowerCase();
-			Group cg = null;
-			for (Group g : getGroups(wname).values()) {
-				if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
-					if (cg == null) {
-						cg = g;
-					} else if (cg.getPriority() < g.getPriority()) {
-						cg = g;
-					}
-				}
-			}
-			return cg;
+			return getMainGroup(p, wname);
 		}
 	}
 
@@ -169,7 +115,7 @@ public class Groups {
 			out.put(world, getMainGroup(user, world));
 		}
 		if (out.isEmpty()) {
-			// This shuold not happen if a default group is set; TODO test why
+			// This should not happen if a default group is set; TODO test why
 			// it might be
 		}
 		return out;
@@ -177,8 +123,8 @@ public class Groups {
 
 	public Map<String, Group> getGroups(String world) {
 		Map<String, Group> out = groups.get(world) == null ? Utils.sm() : groups.get(world);
-		if (groups.containsKey("all")) {
-			out.putAll(groups.get("all"));
+		if (!world.equalsIgnoreCase("all")) {
+			out.putAll(getGroups("all"));
 		}
 		return out;
 	}
