@@ -116,7 +116,7 @@ public class Groups {
 		}
 		if (out.isEmpty()) {
 			// This should not happen if a default group is set; TODO test why
-			// it might be
+			// it might be happening in that circumstance
 		}
 		return out;
 	}

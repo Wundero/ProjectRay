@@ -33,34 +33,22 @@ public class Templates {
 
 	public static Template DEFAULT(Template.Builder t) {
 		// basic chat format
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg("player").withText(Text.of(" "))
-				.withArg("message").build().build().build();
+		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.BASIC_CHAT).build().build();
 	}
 
 	public static Template ADVANCED(Template.Builder t) {
-		// chat, join, leave and death (death is to be removed temporarily.
-		// Death messages suck.
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.CHANNEL)
-				.withText(Text.of(" ")).withArg(DefaultArgs.DISPLAYNAME).withText(Text.of(" "))
-				.withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build().withFormat("join")
-				.withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
-				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build()
-				.withFormat("death").withArg(DefaultArgs.DISPLAYNAME).withText(" ").withArg("message", false)
-				.withText(" ").withArg(DefaultArgs.KILLER).withText(" ").withArg("item", true).build().build().build();
+		// chat, join, leave and msg
+		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)
+				.withFormat(DefaultFormats.LEAVE).withFormat(DefaultFormats.MSG_RECEIVE)
+				.withFormat(DefaultFormats.MSG_SEND).build().build();
 	}
 
 	public static Template MULTI_GROUP(Template.Builder t) {
-		// chat join and leave for two groups
-		return t.withGroup("default").withPriority(0).withFormat("chat").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" ")).withArg(TextTemplate.arg("message").color(TextColors.GRAY)).build()
-				.withFormat("join").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has joined!").color(TextColors.AQUA).build()).build()
-				.withFormat("leave").withArg(DefaultArgs.DISPLAYNAME)
-				.withText(Text.of(" "), Text.builder("has left!").color(TextColors.RED).build()).build().build()
-				.withGroup("admin").withPriority(1).withParent("default").withPermission("ray.group.admin")
-				.withFormat("chat")
+		// chat join and leave for two groups - not gonna use def formats
+		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)
+				.withFormat(DefaultFormats.LEAVE).withFormat(DefaultFormats.MSG_RECEIVE)
+				.withFormat(DefaultFormats.MSG_SEND).build().withGroup("admin").withPriority(1).withParent("default")
+				.withPermission("ray.group.admin").withFormat("chat")
 				.withText(
 						Text.of(TextColors.BLACK, "[", TextColors.RED, "Admin", TextColors.BLACK, "]", TextColors.AQUA))
 				.withArg(DefaultArgs.DISPLAYNAME).withText(Text.of(" "))

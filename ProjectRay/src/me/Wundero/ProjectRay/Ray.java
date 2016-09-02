@@ -24,6 +24,7 @@ import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannels;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.StaticFormat;
+import me.Wundero.ProjectRay.tag.TagStore;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.Variables;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -95,6 +96,7 @@ public class Ray {
 	private boolean loadableSet = false;
 	// all configs created/loaded by the plugin through Utils are saved here.
 	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
+	private TagStore tags;
 
 	public void registerLoader(ConfigurationLoader<CommentedConfigurationNode> loader, ConfigurationNode node) {
 		toSave.put(loader, node);
@@ -106,6 +108,7 @@ public class Ray {
 		loadableSet = config.getNode("loadable").getValue() != null;
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
+		this.setTags(new TagStore());
 		try {
 			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
 			if (!f.exists()) {
@@ -305,5 +308,20 @@ public class Ray {
 
 	public void setChannels(ChatChannels channels) {
 		this.channels = channels;
+	}
+
+	/**
+	 * @return the tags
+	 */
+	public TagStore getTags() {
+		return tags;
+	}
+
+	/**
+	 * @param tags
+	 *            the tags to set
+	 */
+	public void setTags(TagStore tags) {
+		this.tags = tags;
 	}
 }

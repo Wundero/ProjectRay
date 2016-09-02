@@ -48,6 +48,7 @@ import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.animation.AnimationQueue;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.tag.SelectableTag;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -120,6 +121,19 @@ public class RayPlayer {
 	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
 	private Map<FormatType, AnimationQueue> animations = Utils.sm();
+	private Map<SelectableTag, String> selectedTags = Utils.sm();
+
+	public String getSelected(SelectableTag tag) {
+		return selectedTags.get(tag);
+	}
+
+	public String getSelected(String name) {
+		if (Ray.get().getTags().get(name, Map.class).isPresent()) {
+			return selectedTags.get(Ray.get().getTags().get(name, Map.class).get());
+		} else {
+			return null;
+		}
+	}
 
 	public void queueAnimation(FormatType type, Animation<?> anim) {
 		if (!animations.containsKey(type)) {

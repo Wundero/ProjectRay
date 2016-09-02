@@ -25,6 +25,7 @@ package me.Wundero.ProjectRay.config;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -32,6 +33,7 @@ import org.spongepowered.api.text.TextTemplate.Arg;
 
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -113,6 +115,10 @@ public class Template {
 				return this;
 			}
 
+			public GroupBuilder withFormat(DefaultFormat f) {
+				return f.applyTo(this);
+			}
+
 			public FormatBuilder withFormat(String name) {
 				return new FormatBuilder(node.getNode("formats", name), name, this);
 			}
@@ -122,6 +128,7 @@ public class Template {
 				private ConfigurationNode node;
 				@SuppressWarnings("unused")
 				private String name;
+				private Optional<FormatType> type = Optional.empty();
 				private GroupBuilder parent;
 				private TextTemplate template;
 				private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
@@ -146,10 +153,18 @@ public class Template {
 							args.getNode(a.getName(), "hover").setValue(TypeToken.of(InternalHoverAction.class),
 									hovers.get(a));
 						}
+						if (type.isPresent()) {
+							node.getNode("type").setValue(type.get().getName());
+						}
 					} catch (ObjectMappingException e) {
 						Utils.printError(e);
 					}
 					return parent;
+				}
+
+				public FormatBuilder withType(FormatType type) {
+					this.type = Optional.ofNullable(type);
+					return this;
 				}
 
 				public FormatBuilder withArg(String key) {

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.animation;
+package me.Wundero.ProjectRay.animation.effect;
 /*
  The MIT License (MIT)
 
@@ -26,6 +26,7 @@ package me.Wundero.ProjectRay.animation;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class Effect<T> {
@@ -34,6 +35,7 @@ public class Effect<T> {
 	private final BiFunction<T, Integer, T> mod;
 	private final int frames;
 	private final int delay;
+	private List<T> objects = Utils.sl();
 
 	private Animation<T> anim;
 
@@ -94,6 +96,7 @@ public class Effect<T> {
 			} catch (Exception e) {
 			}
 		}
+		setObjects(framez);
 		anim = new Animation<T>(framez, (f) -> delay, (f) -> true);
 	}
 
@@ -111,5 +114,13 @@ public class Effect<T> {
 
 	public BiFunction<T, Integer, T> getMod() {
 		return mod;
+	}
+
+	public List<T> getObjects() {
+		return objects;
+	}
+
+	public void setObjects(List<T> objects) {
+		this.objects = objects;
 	}
 }

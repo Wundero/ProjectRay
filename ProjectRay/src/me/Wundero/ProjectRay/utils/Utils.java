@@ -118,6 +118,17 @@ public class Utils {
 		}
 		return l;
 	}
+	
+	public static <K, V> OptionalMap<K, V> om(Map<K, V> pre) {
+		OptionalMap<K, V> o = new OptionalMap<K, V>();
+		
+		return o;
+	}
+
+
+	public static <K, V> OptionalMap<K, V> om() {
+		return new OptionalMap<K, V>();
+	}
 
 	public static <T> List<T> sl() {
 		// returns a new arraylist that copies itself for iteration (makes
@@ -751,16 +762,17 @@ public class Utils {
 		if (data == null) {
 			return text;
 		}
-		if (String.class.getSimpleName().equals("String")) {
+		if ("".isEmpty()) {
 			return text;
 		}
 		Text.Builder builder = text.toBuilder();
 		List<Text> children = builder.getChildren();
 		builder.removeAll();
-		Map<String, Object> vars = sm();
+		Map<String, Object> vars = data.getKnown().orElse(sm());
 		TextTemplate template = parse(TextSerializers.FORMATTING_CODE.serialize(builder.build()), true);
-		vars = Ray.get().setVars(data.getKnown().orElse(sm()), template, data.getSender(), data.getRecipient(),
-				data.getObserver(), Optional.empty(), true);
+		System.out.println(template);
+		vars = Ray.get().setVars(vars, template, data.getSender(), data.getRecipient(), data.getObserver(),
+				Optional.empty(), true);
 		Text f = template.apply(vars).build();
 		Text.Builder builder2 = f.toBuilder();
 		if (builder.getClickAction().isPresent() && builder.getClickAction().get().getResult() instanceof String) {

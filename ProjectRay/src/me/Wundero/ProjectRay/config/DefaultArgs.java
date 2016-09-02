@@ -36,6 +36,12 @@ public class DefaultArgs {
 			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
 					TextTemplate.arg("displayname").color(TextColors.AQUA).build(), "\n",
 					Text.builder("Say hello!").color(TextColors.GOLD).build())));
+	public static final DefaultArg RECIP_DISPLAYNAME = new DefaultArg(
+			TextTemplate.arg("recip_displayname").color(TextColors.AQUA),
+			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("recip_displayname").build(), " ")),
+			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
+					TextTemplate.arg("recip_displayname").color(TextColors.AQUA).build(), "\n",
+					Text.builder("Say hello!").color(TextColors.GOLD).build())));
 	public static final DefaultArg KILLER = new DefaultArg(TextTemplate.arg("killer").color(TextColors.AQUA),
 			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("killer").build(), " ")),
 			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
