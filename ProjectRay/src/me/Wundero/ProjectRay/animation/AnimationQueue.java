@@ -23,6 +23,11 @@ package me.Wundero.ProjectRay.animation;
  SOFTWARE.
  */
 
+/**
+ * Queue of animations - if one is queued, the currently running one is
+ * interrupted; if the queued animation is not looping the current animation
+ * resumes on termination of the queued animation
+ */
 public class AnimationQueue {
 
 	private Animation<?> currentAnimation;

@@ -74,6 +74,7 @@ public class Template {
 		public static class GroupBuilder {
 
 			private ConfigurationNode node;
+			@SuppressWarnings("unused")
 			private String name;
 			private int priority = 0;
 			private String permission = "";
@@ -87,11 +88,10 @@ public class Template {
 			}
 
 			public Builder build() {
-				if (permission.isEmpty()) {
-					permission = "ray." + name;
-				}
 				node.getNode("priority").setValue(priority);
-				node.getNode("permission").setValue(permission);
+				if (!permission.isEmpty()) {
+					node.getNode("permission").setValue(permission);
+				}
 				if (!parents.isEmpty()) {
 					node.getNode("parents").setValue(parents);
 				}
@@ -104,6 +104,9 @@ public class Template {
 			}
 
 			public GroupBuilder withPermission(String permission) {
+				if (permission == null) {
+					return this;
+				}
 				this.permission = permission;
 				return this;
 			}

@@ -29,6 +29,7 @@ import java.util.Map;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.World;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -91,7 +92,7 @@ public class Groups {
 		Group cg = null;
 		for (Group g : getGroups(world).values()) {
 			// TODO ensure non null group returns for first server join
-			if (g.getPermission().isEmpty() || p.hasPermission(g.getPermission())) {
+			if (!g.getPermission().isPresent() || p.hasPermission(g.getPermission().get())) {
 				if (cg == null) {
 					cg = g;
 				} else if (cg.getPriority() < g.getPriority()) {
@@ -115,8 +116,7 @@ public class Groups {
 			out.put(world, getMainGroup(user, world));
 		}
 		if (out.isEmpty()) {
-			// This should not happen if a default group is set; TODO test why
-			// it might be happening in that circumstance
+			Ray.get().getLogger().warn("No groups loaded for player: " + user.getName());
 		}
 		return out;
 	}

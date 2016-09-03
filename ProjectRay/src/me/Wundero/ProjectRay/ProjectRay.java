@@ -155,7 +155,8 @@ public class ProjectRay {
 
 	private void tryLoadDefaults() {
 		// if main info is missing, load a default template. Using advanced
-		// template here, but in the future I will add more templates.
+		// template here, but in the future I will add more templates, and allow
+		// for users to specify which to load either via cmd or config params
 		if (config.getNode("worlds").isVirtual()) {
 			Templates.ADVANCED(Template.builder(config));
 			saveConfig();

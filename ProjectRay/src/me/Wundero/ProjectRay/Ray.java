@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -92,20 +90,20 @@ public class Ray {
 	private Variables vars;
 	// channels store
 	private ChatChannels channels;
-	// this was a test to see if i could properly load formats, but nope
-	private boolean loadableSet = false;
 	// all configs created/loaded by the plugin through Utils are saved here.
 	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
+	// tag store
 	private TagStore tags;
 
+	// registers config for saving on termination
 	public void registerLoader(ConfigurationLoader<CommentedConfigurationNode> loader, ConfigurationNode node) {
 		toSave.put(loader, node);
 	}
 
 	public void load(ProjectRay plugin) {
+		// instantiates all singletons contained within this class
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
-		loadableSet = config.getNode("loadable").getValue() != null;
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
 		this.setTags(new TagStore());
@@ -122,21 +120,6 @@ public class Ray {
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
-	}
-
-	public void setLoadable(UUID u) {
-		if (!loadableSet) {
-			try {
-				config.getNode("loadable").setValue(TypeToken.of(UUID.class), u);
-			} catch (ObjectMappingException e) {
-				config.getNode("loadable").setValue(u);
-			}
-			loadableSet = true;
-		}
-	}
-
-	public void setLoadable(User u) {
-		setLoadable(u.getUniqueId());
 	}
 
 	public ProjectRay getPlugin() {

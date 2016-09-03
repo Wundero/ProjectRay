@@ -3,6 +3,7 @@ package me.Wundero.ProjectRay.framework;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import com.google.common.reflect.TypeToken;
@@ -44,7 +45,7 @@ public class Group {
 	private List<String> parents = Utils.sl();
 	private String world;
 	private int priority;
-	private String permission;
+	private Optional<String> permission;
 	private ConfigurationNode config;
 	private String name;
 	private boolean global = false;
@@ -237,12 +238,12 @@ public class Group {
 		this.priority = priority;
 	}
 
-	public String getPermission() {
-		return permission == null ? "" : permission;
+	public Optional<String> getPermission() {
+		return permission;
 	}
 
 	public void setPermission(String permission) {
-		this.permission = permission;
+		this.permission = Optional.ofNullable(permission);
 	}
 
 	public String getName() {

@@ -44,9 +44,9 @@ public class TagStore {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> Optional<Tag<T>> get(String name, Class<T> expected) {
+	public <T> Optional<Tag<T>> get(String name, T verifiable) {
 		Tag<?> t = tags.get(name);
-		if (!expected.isInstance(t.object)) {
+		if (!t.verify(verifiable)) {
 			return Optional.empty();
 		}
 		return Optional.ofNullable((Tag<T>) t);

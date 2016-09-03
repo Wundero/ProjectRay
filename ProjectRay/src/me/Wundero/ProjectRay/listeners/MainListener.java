@@ -203,7 +203,6 @@ public class MainListener {
 	@Listener(order = Order.LATE)
 	public void onJoin(ClientConnectionEvent.Join event) {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
-		Ray.get().setLoadable(event.getTargetEntity());
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
 		p.setTabTask(() -> {
 			Player player = event.getTargetEntity();

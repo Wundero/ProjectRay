@@ -118,13 +118,12 @@ public class Utils {
 		}
 		return l;
 	}
-	
+
 	public static <K, V> OptionalMap<K, V> om(Map<K, V> pre) {
 		OptionalMap<K, V> o = new OptionalMap<K, V>();
-		
+
 		return o;
 	}
-
 
 	public static <K, V> OptionalMap<K, V> om() {
 		return new OptionalMap<K, V>();

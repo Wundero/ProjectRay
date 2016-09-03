@@ -186,11 +186,9 @@ public class RayPlayer {
 					}
 				}
 			} else if (h) {
-				System.out.println("h");
 				synchronized (headerQueue) {
 					Text he = pop(headerQueue, EMPTY_TEXT_HEADER);
 					p.getTabList().setHeader(he);
-					System.out.println(p.getTabList().getClass().getName());
 				}
 			} else if (f) {
 				synchronized (footerQueue) {
@@ -308,6 +306,8 @@ public class RayPlayer {
 	public RayPlayer(User u) {
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
+		this.setGroups(Ray.get().getGroups().getGroups(u));
+		this.checkDisplayname();
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
 		File f = new File(p, u.getUniqueId() + ".conf");
 		if (!p.exists()) {
@@ -329,8 +329,6 @@ public class RayPlayer {
 			config = Utils.load(f);
 		}
 		cache.put(uuid, this);
-		this.setGroups(Ray.get().getGroups().getGroups(u));
-		this.checkDisplayname();
 	}
 
 	public UUID getUniqueId() {
@@ -349,16 +347,13 @@ public class RayPlayer {
 		this.user = user;
 	}
 
-	/**
-	 * @return the group
-	 */
 	public Map<String, Group> getGroups() {
 		return groups;
 	}
 
 	public Group getActiveGroup() {
 		if (!user.isOnline()) {
-			return null;
+			return gg("all");
 		}
 		return gg((user.getPlayer().get()).getWorld().getName()) == null ? gg("all")
 				: gg((user.getPlayer().get()).getWorld().getName());
@@ -368,17 +363,10 @@ public class RayPlayer {
 		return getGroups().get(world);
 	}
 
-	/**
-	 * @param group
-	 *            the group to set
-	 */
 	public void setGroups(Map<String, Group> groups) {
 		this.groups = groups;
 	}
 
-	/**
-	 * @return the conversing
-	 */
 	public boolean isConversing() {
 		return conversing;
 	}
@@ -387,10 +375,6 @@ public class RayPlayer {
 		this.setGroups(Ray.get().getGroups().getGroups(this.getUser()));
 	}
 
-	/**
-	 * @param conversing
-	 *            the conversing to set
-	 */
 	public void setConversing(boolean conversing) {
 		if (!user.isOnline()) {
 			conversing = false;
@@ -402,17 +386,10 @@ public class RayPlayer {
 		}
 	}
 
-	/**
-	 * @return the lastMessaged
-	 */
 	public Optional<RayPlayer> getLastMessaged() {
 		return lastMessaged;
 	}
 
-	/**
-	 * @param lastMessaged
-	 *            the lastMessaged to set
-	 */
 	public void setLastMessaged(Optional<RayPlayer> lastMessaged, boolean recurse) {
 		if (!lastMessaged.isPresent()) {
 			return;
@@ -423,47 +400,26 @@ public class RayPlayer {
 		this.lastMessaged = lastMessaged;
 	}
 
-	/**
-	 * @return the config
-	 */
 	public ConfigurationNode getConfig() {
 		return config;
 	}
 
-	/**
-	 * @param config
-	 *            the config to set
-	 */
 	public void setConfig(ConfigurationNode config) {
 		this.config = config;
 	}
 
-	/**
-	 * @return the tabTask
-	 */
 	public Runnable getTabTask() {
 		return tabTask;
 	}
 
-	/**
-	 * @param tabTask
-	 *            the tabTask to set
-	 */
 	public void setTabTask(Runnable tabTask) {
 		this.tabTask = tabTask;
 	}
 
-	/**
-	 * @return the listenChannels
-	 */
 	public List<String> getListenChannels() {
 		return listenChannels;
 	}
 
-	/**
-	 * @param listenChannels
-	 *            the listenChannels to set
-	 */
 	public void setListenChannels(List<String> listenChannels) {
 		this.listenChannels = listenChannels;
 	}

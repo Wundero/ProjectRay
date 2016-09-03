@@ -41,29 +41,19 @@ public abstract class Tag<T> {
 		Ray.get().getTags().register(this);
 	}
 
-	public abstract Optional<Text> get(ParsableData data);
+	public abstract boolean verify(Object o);
 
-	public abstract Optional<Text> get();
+	public abstract Optional<Text> get(Optional<ParsableData> data);
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	/**
-	 * @return the object
-	 */
-	public T getObject() {
+	public final T getObject() {
 		return object;
 	}
 
-	/**
-	 * @param object
-	 *            the object to set
-	 */
-	public void setObject(T object) {
+	public final void setObject(T object) {
 		this.object = object;
 	}
 

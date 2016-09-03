@@ -38,8 +38,26 @@ public class SelectableTag extends Tag<Map<String, Text>> {
 		super(name, object);
 	}
 
+	@SuppressWarnings("unchecked")
+	public boolean verify(Object o) {
+		if (!(o instanceof Map)) {
+			return false;
+		}
+		try {
+			Map<String, Text> m = (Map<String, Text>) o;// possible class cast
+			m.put("", Text.of());// more likely class cast
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
-	public Optional<Text> get(ParsableData data) {
+	public Optional<Text> get(Optional<ParsableData> d) {
+		if (!d.isPresent()) {
+			return Optional.empty();
+		}
+		ParsableData data = d.get();
 		if (!data.getSender().isPresent()) {
 			return Optional.empty();
 		}
@@ -51,10 +69,4 @@ public class SelectableTag extends Tag<Map<String, Text>> {
 		}
 		return Optional.ofNullable(this.object.get(v));
 	}
-
-	@Override
-	public Optional<Text> get() {
-		return Optional.empty();
-	}
-
 }
