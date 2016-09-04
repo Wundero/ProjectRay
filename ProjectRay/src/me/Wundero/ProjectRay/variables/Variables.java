@@ -107,7 +107,7 @@ public class Variables {
 					break;
 				}
 			}
-			return v.parse(map);
+			return Utils.urlsIf(v.parse(map));
 		}
 		return "";
 	}

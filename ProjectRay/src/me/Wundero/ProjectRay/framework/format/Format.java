@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
@@ -155,9 +156,12 @@ public abstract class Format {
 
 	protected boolean s(Function<Text, Boolean> f, Map<String, Object> a, TextTemplate t) {
 		Function<Text, Boolean> f2 = (text) -> {
+			if (!(text instanceof LiteralText)) {
+				return f.apply(text);
+			}
 			Text t2 = text;
 			try {
-				t2 = Utils.parse(text, new ParsableData().setKnown(a));
+				t2 = Utils.parseForVariables((LiteralText) text, new ParsableData().setKnown(a));
 				if (t2 == null) {
 					return f.apply(text);
 				}
@@ -168,6 +172,9 @@ public abstract class Format {
 		};
 		boolean b = false;
 		Text te = get(t, a);
+		if (te instanceof LiteralText) {
+			te = Utils.makeURLClickable((LiteralText) te);
+		}
 		try {
 			b = f2.apply(te);
 		} catch (Exception e) {
@@ -178,9 +185,12 @@ public abstract class Format {
 
 	protected boolean s(Function<Text, Boolean> f, ParsableData d, TextTemplate t) {
 		Function<Text, Boolean> f2 = (text) -> {
+			if (!(text instanceof LiteralText)) {
+				return f.apply(text);
+			}
 			Text t2 = text;
 			try {
-				t2 = Utils.parse(text, d);
+				t2 = Utils.parseForVariables((LiteralText) text, d);
 				if (t2 == null) {
 					return f.apply(text);
 				}
@@ -191,6 +201,9 @@ public abstract class Format {
 		};
 		boolean b = false;
 		Text te = get(t, d);
+		if (te instanceof LiteralText) {
+			te = Utils.makeURLClickable((LiteralText) te);
+		}
 		try {
 			b = f2.apply(te);
 		} catch (Exception e) {
