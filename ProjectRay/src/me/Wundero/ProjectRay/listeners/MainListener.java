@@ -313,13 +313,42 @@ public class MainListener {
 	}
 
 	// Logs ALL commands that are handled by the server
-	@Listener
+	@Listener(order=Order.POST)
 	public void onCommand(SendCommandEvent event) {
 		String player = "";
+		CommandSource trs = null;
 		if (event.getCause().containsType(CommandSource.class)) {
-			player = event.getCause().first(CommandSource.class).get().getName() + ": ";
+			trs = Utils.getTrueSource(event.getCause().first(CommandSource.class).get());
+			player = trs.getName() + ": ";
+		} else {
+			Ray.get().getLogger().info(player + "/" + event.getCommand() + " " + event.getArguments());
+			return;
 		}
 		Ray.get().getLogger().info(player + "/" + event.getCommand() + " " + event.getArguments());
+		if (!(trs instanceof Player)) {
+			return;
+		}
+		if (!Ray.get().getConfig().getNode("spy", event.getCommand()).getBoolean(false)) {
+			return;
+		}
+		Player sendto = (Player) trs;
+		Text msg = Text.of(player + "/" + event.getCommand() + " " + event.getArguments());
+
+		List<MessageReceiver> spies = Utils.sl();
+		for (Player p : Sponge.getServer().getOnlinePlayers()) {
+			RayPlayer r = RayPlayer.get(p);
+			if (r.spy() && !p.getName().equals(player)) {
+				spies.add(p);
+			}
+		}
+		MessageChannelEvent.Chat spyevent = SpongeEventFactory.createMessageChannelEventChat(
+				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SPY).named("sendfrom", sendto).build(),
+				sendto.getMessageChannel(),
+				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),
+				new MessageEvent.MessageFormatter(Text.of(msg)), Text.of(msg), false);
+		if (Utils.call(spyevent)) {
+			spyevent.getChannel().get().send(sendto, spyevent.getMessage());
+		}
 	}
 
 	@Listener

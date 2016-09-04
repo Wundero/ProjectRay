@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ProxySource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -388,6 +389,14 @@ public class Utils {
 	 * st); } in += e; urls.put(st, ur); m = m.reset(text.substring(e)); }
 	 * return t; }
 	 */
+
+	public static CommandSource getTrueSource(CommandSource src) {
+		CommandSource out = src;
+		while (out instanceof ProxySource) {
+			out = ((ProxySource) out).getOriginalSource();
+		}
+		return out;
+	}
 
 	// TODO URLS
 	public static Text transIf(String s, User u) {
