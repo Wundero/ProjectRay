@@ -44,12 +44,18 @@ public class TagStore {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> Optional<Tag<T>> get(String name, T verifiable) {
+	public <T, R extends Tag<T>> Optional<R> get(String name, T verifiable, Class<R> tagClass) {
 		Tag<?> t = tags.get(name);
-		if (!t.verify(verifiable)) {
+		if (t == null) {
 			return Optional.empty();
 		}
-		return Optional.ofNullable((Tag<T>) t);
+		if (tagClass.isAssignableFrom(t.getClass())) {
+			if (!t.verify(verifiable)) {
+				return Optional.empty();
+			}
+			return Optional.ofNullable((R) t);
+		}
+		return Optional.empty();
 	}
 
 }

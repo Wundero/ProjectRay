@@ -122,14 +122,27 @@ public class RayPlayer {
 	private List<String> listenChannels = Utils.sl();
 	private Map<FormatType, AnimationQueue> animations = Utils.sm();
 	private Map<SelectableTag, String> selectedTags = Utils.sm();
+	private boolean spy = false;
 
+	public boolean spy() {
+		return spy;
+	}
+	
+	public void setSpy(boolean spy) {
+		if(user.hasPermission("ray.spy") && spy) {
+			this.spy = spy;
+		} else {
+			this.spy = false;
+		}
+	}
+	
 	public String getSelected(SelectableTag tag) {
 		return selectedTags.get(tag);
 	}
 
 	public String getSelected(String name) {
-		if (Ray.get().getTags().get(name, Map.class).isPresent()) {
-			return selectedTags.get(Ray.get().getTags().get(name, Map.class).get());
+		if (Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).isPresent()) {
+			return selectedTags.get(Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).get());
 		} else {
 			return null;
 		}
@@ -267,6 +280,7 @@ public class RayPlayer {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void load() throws ObjectMappingException {
 		if (config == null) {
 			return;
@@ -274,18 +288,44 @@ public class RayPlayer {
 		ConfigurationNode i = config.getNode("ignoring");
 		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)));
 		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
+		this.spy = config.getNode("spy").getBoolean(false);
+		this.selectedTags = deconvert(config.getNode("tags")
+				.getValue(TypeToken.of((Class<Map<String, String>>) PARAMETERIZED_MAP.getClass())));
 	}
 
+	private static Map<SelectableTag, String> deconvert(Map<String, String> in) {
+		Map<SelectableTag, String> out = Utils.sm();
+		for (String t : in.keySet()) {
+			out.put(Ray.get().getTags().get(t, Utils.sm(), SelectableTag.class).get(), out.get(t));
+		}
+		return out;
+	}
+
+	private static Map<String, String> convert(Map<SelectableTag, String> in) {
+		Map<String, String> out = Utils.sm();
+		for (SelectableTag t : in.keySet()) {
+			out.put(t.getName(), in.get(t));
+		}
+		return out;
+	}
+
+	private static final Map<String, String> PARAMETERIZED_MAP = Utils.sm();
+
+	@SuppressWarnings("unchecked")
 	public void save() throws ObjectMappingException {
 		if (config == null) {
 			return;
 		}
 		config.getNode("ignoring").setValue(ignore);
-		config.getNode("channel").setValue(activeChannel == null ? null : activeChannel.getName());
+		config.getNode("channel")
+				.setValue(activeChannel == null ? config.getNode("channel").getString(null) : activeChannel.getName());
+		config.getNode("tags").setValue(TypeToken.of((Class<Map<String, String>>) PARAMETERIZED_MAP.getClass()),
+				convert(selectedTags));
 		config.getNode("lastname").setValue(user.getName());
 		if (getDisplayName().isPresent()) {
 			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
 		}
+		config.getNode("spy").setValue(spy);
 	}
 
 	public Optional<Text> getDisplayName() {

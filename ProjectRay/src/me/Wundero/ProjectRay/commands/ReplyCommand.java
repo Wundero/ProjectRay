@@ -23,6 +23,7 @@ package me.Wundero.ProjectRay.commands;
  SOFTWARE.
  */
 
+import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
@@ -38,11 +39,13 @@ import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class ReplyCommand implements CommandExecutor {
 
@@ -65,21 +68,40 @@ public class ReplyCommand implements CommandExecutor {
 		MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(
 				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SEND).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
-				sendfrom.getMessageChannel(),
-				Optional.of(MessageChannel.combined(MessageChannel.fixed(sendfrom), MessageChannel.TO_CONSOLE)),
+				sendfrom.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendfrom))),
 				new MessageEvent.MessageFormatter(Text.of("You to ", sendto.getName()), Text.of(message)),
 				Text.of(message), false);
 		MessageChannelEvent.Chat event2 = SpongeEventFactory.createMessageChannelEventChat(
 				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_RECEIVE).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
-				sendto.getMessageChannel(),
-				Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto), MessageChannel.TO_CONSOLE)),
+				sendto.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto))),
 				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"), Text.of(message)),
+				Text.of(message), false);
+		List<MessageReceiver> spies = Utils.sl();
+		for (Player p : Sponge.getServer().getOnlinePlayers()) {
+			if (!RayPlayer.get(p).spy()) {
+				continue;
+			}
+			if (p.getName().equals(sendto) || p.getName().equals(sendfrom)) {
+				continue;
+			}
+			spies.add(p);
+		}
+		MessageChannelEvent.Chat spyevent = SpongeEventFactory.createMessageChannelEventChat(
+				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SPY).named("sendfrom", sendfrom)
+						.named("sendto", sendto).build(),
+				sendto.getMessageChannel(),
+				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),
+				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to " + sendto.getName()),
+						Text.of(message)),
 				Text.of(message), false);
 		if (!Sponge.getEventManager().post(event) && !Sponge.getEventManager().post(event2)) {
 			event.getChannel().get().send(sendfrom, event.getMessage());
 			event2.getChannel().get().send(sendfrom, event2.getMessage());
 			RayPlayer.getRay(sendto).setLastMessaged(Optional.of(RayPlayer.getRay(sendfrom)), true);
+			if (Utils.call(spyevent)) {
+				spyevent.getChannel().get().send(sendfrom, spyevent.getMessage());
+			}
 		}
 		return CommandResult.success();
 	}

@@ -30,7 +30,7 @@ public enum FormatType {
 	CHAT("chat", new String[] { "c" }), // --------------------------------------------
 	MESSAGE_SEND("send_message", new String[] { "sm", "smsg", "sendmsg" }), // --------
 	MESSAGE_RECEIVE("receive_message", new String[] { "rm", "rmsg", "receivemsg" }), //
-	DEATH("death", new String[] { "d" }), // ------------------------------------------
+	MESSAGE_SPY("spy", new String[] { "message spy" }), DEATH("death", new String[] { "d" }), // ------------------------------------------
 	JOIN("join", new String[] { "j" }), // --------------------------------------------
 	LEAVE("leave", new String[] { "l" }), // ------------------------------------------
 	CUSTOM("custom"), // --------------------------------------------------------------
@@ -82,7 +82,7 @@ public enum FormatType {
 	}
 
 	public static FormatType fromString(String s) {
-		if(s==null) {
+		if (s == null) {
 			return DEFAULT;
 		}
 		s = s.trim().toUpperCase().replace(" ", "_");

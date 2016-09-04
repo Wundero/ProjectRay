@@ -151,7 +151,8 @@ public class MainListener {
 					return true;
 				}, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
 						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
-						.setClickHover(true).setObserver(observer))) {
+						.setClickHover(true)
+						.setObserver(observer.isPresent() ? observer : Optional.of((Player) recipient)))) {
 					return Optional.empty();
 				}
 				return Optional.of(vv.getValue());
