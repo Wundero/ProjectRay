@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.conversation.BooleanPrompt;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
@@ -176,8 +177,50 @@ public class MultiFormat extends Format {
 
 	}
 
+	private static class OrderPrompt extends Prompt {
+
+		private Prompt r;
+
+		public OrderPrompt(Prompt r) {
+			this(TextTemplate.of(TextColors.AQUA, "What order would you like the formats to be chosen in? ",
+					TextTemplate.arg("options").build()));
+			this.r = r;
+		}
+
+		public OrderPrompt(TextTemplate template) {
+			super(template);
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return this.formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			List<Option> list = Utils.sl();
+			list.add(Option.build("sequence", "sequence"));
+			list.add(Option.build("shuffle", "shuffle"));
+			list.add(Option.build("random", "random"));
+			return Optional.of(list);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid order!");
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			ConfigurationNode node = context.getData("node");
+			node.getNode("mode").setValue(selected.get().getValue().toString());
+			return new NamePrompt(r);
+		}
+
+	}
+
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		return new NamePrompt(returnTo);
+		return new OrderPrompt(returnTo);
 	}
 }

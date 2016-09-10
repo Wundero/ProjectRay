@@ -42,9 +42,10 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.variables.ParsableData;
 
 public class ChannelWhoCommand implements CommandExecutor {
 
@@ -72,8 +73,8 @@ public class ChannelWhoCommand implements CommandExecutor {
 		List<Text> texts = Utils.sl();
 		for (MessageReceiver m : c.getMembers()) {
 			if (m instanceof Player) {
-				Object v = Ray.get().getVariables().get("displayname", Optional.of((Player) m), Optional.empty(),
-						Optional.empty(), Optional.empty(), Optional.empty());
+				Object v = Ray.get().getVariables().get("displayname", new ParsableData().withSender((Player) m),
+						Optional.empty(), Optional.empty());
 				Text t;
 				if (v instanceof Text) {
 					t = (Text) v;

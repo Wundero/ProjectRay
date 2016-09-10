@@ -35,8 +35,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
 
 public class ChannelLeaveCommand implements CommandExecutor {
 

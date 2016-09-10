@@ -1,4 +1,7 @@
-package me.Wundero.ProjectRay.tag;
+package me.Wundero.ProjectRay.interfaces;
+
+import org.spongepowered.api.entity.living.player.Player;
+
 /*
  The MIT License (MIT)
 
@@ -23,46 +26,8 @@ package me.Wundero.ProjectRay.tag;
  SOFTWARE.
  */
 
-import java.util.Map;
-import java.util.Optional;
+public interface Purchasable {
 
-import org.apache.commons.lang3.Validate;
-
-import me.Wundero.ProjectRay.utils.Utils;
-
-public class TagStore {
-
-	private Map<String, Tag<?>> tags = Utils.sm();
-
-	void register(Tag<?> t) {
-		if (has(t.getName())) {
-			return;
-		}
-		this.tags.put(t.getName(), t);
-	}
-
-	public boolean has(String name) {
-		return tags.containsKey(name);
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T, R extends Tag<T>> Optional<R> get(String name, T verifiable, Class<R> tagClass) {
-		Tag<?> t = get(name).orElse(null);
-		if (t == null) {
-			return Optional.empty();
-		}
-		if (tagClass.isAssignableFrom(t.getClass())) {
-			if (!t.verify(verifiable)) {
-				return Optional.empty();
-			}
-			return Optional.ofNullable((R) t);
-		}
-		return Optional.empty();
-	}
-
-	public Optional<Tag<?>> get(String name) {
-		Validate.notEmpty(name);
-		return Optional.ofNullable(tags.get(name));
-	}
+	public boolean purchase(Player purchaser, Object... args);
 
 }

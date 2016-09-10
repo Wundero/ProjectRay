@@ -28,8 +28,8 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
 
 public class ChatChannelListener {
 

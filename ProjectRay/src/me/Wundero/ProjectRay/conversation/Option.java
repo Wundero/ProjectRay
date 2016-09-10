@@ -24,6 +24,8 @@ package me.Wundero.ProjectRay.conversation;
  */
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
 
 //allows you to have choosable options - like a fixed set stuff
 public class Option {
@@ -53,5 +55,11 @@ public class Option {
 
 	public Object getValue() {
 		return value;
+	}
+
+	public static Option build(String name, Object value) {
+		return new Option(name, Text.builder(name).color(TextColors.GOLD).onClick(TextActions.runCommand(name))
+				.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + name + "!"))).build(),
+				value);
 	}
 }

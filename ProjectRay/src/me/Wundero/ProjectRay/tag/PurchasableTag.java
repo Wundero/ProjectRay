@@ -23,46 +23,31 @@ package me.Wundero.ProjectRay.tag;
  SOFTWARE.
  */
 
-import java.util.Map;
-import java.util.Optional;
+import org.spongepowered.api.entity.living.player.Player;
 
-import org.apache.commons.lang3.Validate;
-
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.ProjectRay.interfaces.Purchasable;
 import me.Wundero.ProjectRay.utils.Utils;
 
-public class TagStore {
+public abstract class PurchasableTag<T> extends Tag<T> implements Purchasable {
 
-	private Map<String, Tag<?>> tags = Utils.sm();
+	private double cost;
 
-	void register(Tag<?> t) {
-		if (has(t.getName())) {
-			return;
-		}
-		this.tags.put(t.getName(), t);
+	public PurchasableTag(String name, T object, double price) {
+		super(name, object);
+		this.cost = price;
 	}
 
-	public boolean has(String name) {
-		return tags.containsKey(name);
-	}
+	public abstract boolean finishpurchase(Player player, Object... args);
 
-	@SuppressWarnings("unchecked")
-	public <T, R extends Tag<T>> Optional<R> get(String name, T verifiable, Class<R> tagClass) {
-		Tag<?> t = get(name).orElse(null);
-		if (t == null) {
-			return Optional.empty();
-		}
-		if (tagClass.isAssignableFrom(t.getClass())) {
-			if (!t.verify(verifiable)) {
-				return Optional.empty();
+	@Override
+	public boolean purchase(Player purchaser, Object... args) {
+		if (RayPlayer.get(purchaser) != null) {
+			if (Utils.charge(purchaser, cost)) {
+				return finishpurchase(purchaser, args);
 			}
-			return Optional.ofNullable((R) t);
 		}
-		return Optional.empty();
-	}
-
-	public Optional<Tag<?>> get(String name) {
-		Validate.notEmpty(name);
-		return Optional.ofNullable(tags.get(name));
+		return false;
 	}
 
 }

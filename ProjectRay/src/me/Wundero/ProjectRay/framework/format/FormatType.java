@@ -30,7 +30,8 @@ public enum FormatType {
 	CHAT("chat", new String[] { "c" }), // --------------------------------------------
 	MESSAGE_SEND("send_message", new String[] { "sm", "smsg", "sendmsg" }), // --------
 	MESSAGE_RECEIVE("receive_message", new String[] { "rm", "rmsg", "receivemsg" }), //
-	MESSAGE_SPY("spy", new String[] { "message spy" }), DEATH("death", new String[] { "d" }), // ------------------------------------------
+	MESSAGE_SPY("spy", new String[] { "message spy" }), // ----------------------------
+	DEATH("death", new String[] { "d" }), // ------------------------------------------
 	JOIN("join", new String[] { "j" }), // --------------------------------------------
 	LEAVE("leave", new String[] { "l" }), // ------------------------------------------
 	CUSTOM("custom"), // --------------------------------------------------------------
@@ -38,10 +39,11 @@ public enum FormatType {
 	MOTD("motd"), // ------------------------------------------------------------------
 	TABLIST_ENTRY("tablist", new String[] { "list", "t", "tab" }, true), // -----------
 	DEFAULT("default"), // ------------------------------------------------------------
-	ACHIEVEMENT("achievement", new String[] { "a", "ach" }), // -----------------------
+	ACHIEVEMENT("achievement", new String[] { "ach" }), // ---------------------------
 	KICK("kick", new String[] { "k" }), // --------------------------------------------
 	TABLIST_HEADER("header", new String[] { "h" }, true), // --------------------------
-	TABLIST_FOOTER("footer", new String[] { "f" }, true); // --------------------------
+	TABLIST_FOOTER("footer", new String[] { "f" }, true), // --------------------------
+	ANNOUNCEMENT("announcement", new String[] { "a" }); // ----------------------------
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);

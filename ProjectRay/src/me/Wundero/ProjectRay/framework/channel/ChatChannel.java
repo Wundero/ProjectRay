@@ -55,6 +55,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private boolean hidden = false;
 	private boolean autojoin = true;
 	private boolean obfuscateRanged = false;
+	private double costJoin, costChat;
 	private ConfigurationNode node;
 
 	public static TypeSerializer<ChatChannel> serializer() {

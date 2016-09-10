@@ -35,9 +35,9 @@ public abstract class TypePrompt<T> extends Prompt {
 	// prompt that tries to parse a value from a class - if it does not have the
 	// right method, doesn't work
 
-	protected Optional<Class<T>> type = Optional.empty();
+	protected Optional<Class<? extends T>> type = Optional.empty();
 
-	public TypePrompt(TextTemplate template, Optional<Class<T>> type) {
+	public TypePrompt(TextTemplate template, Optional<Class<? extends T>> type) {
 		super(template);
 		this.type = type;
 	}
@@ -54,7 +54,7 @@ public abstract class TypePrompt<T> extends Prompt {
 			}
 			return false;
 		} else if (type.isPresent()) {
-			Class<T> t = type.get();
+			Class<? extends T> t = type.get();
 			try {
 				Method m = null;
 				try {
@@ -100,7 +100,7 @@ public abstract class TypePrompt<T> extends Prompt {
 				}
 			}
 		} else if (type.isPresent()) {
-			Class<T> t = type.get();
+			Class<? extends T> t = type.get();
 			try {
 				Method m = null;
 				try {

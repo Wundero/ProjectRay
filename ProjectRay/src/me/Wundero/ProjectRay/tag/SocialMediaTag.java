@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.ProjectRay.tag;
 /*
  The MIT License (MIT)
 
@@ -23,39 +23,46 @@ package me.Wundero.ProjectRay.commands;
  SOFTWARE.
  */
 
+import java.net.URL;
 import java.util.Optional;
 
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.ProjectRay.framework.player.SocialMedia;
+import me.Wundero.ProjectRay.variables.ParsableData;
 
-public class IgnoreCommand implements CommandExecutor {
+public class SocialMediaTag extends Tag<SocialMedia> {
+
+	public SocialMediaTag(String name, SocialMedia medium) {
+		super(name, medium);
+	}
 
 	@Override
-	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!(src instanceof Player)) {
-			src.sendMessage(Text.of(TextColors.RED, "You must be a player to ignore people!"));
-			return CommandResult.success();
+	public boolean verify(Object o) {
+		return o instanceof SocialMedia;
+	}
+
+	@Override
+	public Optional<Text> get(Optional<ParsableData> data) {
+		if (data.isPresent()) {
+			ParsableData d = data.get();
+			if (d.getSender().isPresent()) {
+				Player s = d.getSender().get();
+				RayPlayer rp = RayPlayer.get(s);
+				URL u = rp.getMediaURL(this.getObject());
+				if (u != null) {
+					return Optional.of(getObject().formatTag(u));
+				} else {
+					return Optional.empty();
+				}
+			} else {
+				return Optional.empty();
+			}
+		} else {
+			return Optional.empty();
 		}
-		Optional<Player> target = args.<Player>getOne("player");
-		if (!target.isPresent()) {
-			src.sendMessage(Text.of(TextColors.RED, "You must specify a player to ignore!"));
-			return CommandResult.success();
-		}
-		Player t = target.get();
-		RayPlayer s = RayPlayer.get((Player) src);
-		RayPlayer tr = RayPlayer.get(t);
-		s.toggleIgnore(tr);
-		String st = s.isIgnoring(tr) ? "w " : " longer ";
-		src.sendMessage(Text.of(TextColors.GREEN, "You are no" + st + "ignoring player " + t.getName() + "!"));
-		return CommandResult.success();
 	}
 
 }

@@ -28,12 +28,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.Tristate;
 
 public class SendableAnimation<T> extends Animation<T> {
 
 	private final Player player;
 
-	public SendableAnimation(List<T> frames, BiFunction<T, Player, Integer> update, Function<T, Boolean> frameCheck,
+	public SendableAnimation(List<T> frames, BiFunction<T, Player, Integer> update, Function<T, Tristate> frameCheck,
 			Player sendTo) {
 		super(frames, (t) -> {
 			return update.apply(t, sendTo);

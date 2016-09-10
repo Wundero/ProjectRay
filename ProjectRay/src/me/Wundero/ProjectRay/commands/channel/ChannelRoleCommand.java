@@ -10,8 +10,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.Role;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
 
 /*
  The MIT License (MIT)

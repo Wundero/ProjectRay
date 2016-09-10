@@ -18,12 +18,13 @@ import com.google.common.reflect.TypeToken;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.framework.Groups;
-import me.Wundero.ProjectRay.framework.RayPlayer;
 import me.Wundero.ProjectRay.framework.channel.ChatChannels;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.StaticFormat;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.tag.TagStore;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.variables.ParsableData;
 import me.Wundero.ProjectRay.variables.Variables;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -234,7 +235,9 @@ public class Ray {
 						r1 = recip;
 					}
 					// parse var into object
-					Object var = getVariables().get(k, s1, r1, formatUsed, Optional.of(template), observer);
+					Object var = getVariables().get(k,
+							new ParsableData().withSender(s1).withRecipient(r1).withObserver(observer), formatUsed,
+							Optional.of(template));
 					Object var2 = var;
 					if (args != null) {
 						// apply var parsing to args

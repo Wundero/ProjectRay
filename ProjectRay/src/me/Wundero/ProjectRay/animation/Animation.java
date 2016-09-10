@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Tristate;
 
 import me.Wundero.ProjectRay.utils.Utils;
 
@@ -40,7 +41,7 @@ public class Animation<T> {
 	private final List<T> frames; // list of objects
 	private final Function<T, Integer> update; // apply frame + return delay to
 												// next frame
-	private final Function<T, Boolean> frameCheck; // check to see if frame can
+	private final Function<T, Tristate> frameCheck; // check to see if frame can
 													// be displayed
 
 	// loop is if the anim is to repeat, running is state detection
@@ -48,7 +49,7 @@ public class Animation<T> {
 	private Runnable stop;// what happens on stop
 	private Iterator<T> iter; // frames iter - removes need for index var
 
-	public Animation(List<T> frames, Function<T, Integer> update, Function<T, Boolean> frameCheck) {
+	public Animation(List<T> frames, Function<T, Integer> update, Function<T, Tristate> frameCheck) {
 		this.frames = frames;
 		this.update = update;
 		this.frameCheck = frameCheck;
@@ -60,9 +61,29 @@ public class Animation<T> {
 	}
 
 	public void update(final T frame) {// display frame call
-		if (!frameCheck.apply(frame)) {
-			// if frame cannot be displayed
+		Tristate t = frameCheck.apply(frame);
+		if (t == Tristate.FALSE) {
+			// if animation cannot be displayed
 			stop();
+		} else if (t == Tristate.UNDEFINED) {
+
+			// if the frame cannot be displayed
+			// dif. from anim because it does not stop, just skips the frame and
+			// goes to the next.
+
+			// if loop is needed
+			if (!iter.hasNext() && loop) {
+				iter = frames.iterator();
+			}
+			// if we can proceed
+			if (iter.hasNext()) {
+				// execute next frame update with a delay set by the current
+				// frame
+				cancellable = Utils.schedule(Task.builder().execute(() -> update(curFrame = iter.next())), async);
+			} else {
+				stop();
+			}
+			return;
 		}
 		if (!running) {// if not running
 			return;

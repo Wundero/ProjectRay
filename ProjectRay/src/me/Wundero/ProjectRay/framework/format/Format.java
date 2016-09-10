@@ -60,6 +60,15 @@ public abstract class Format {
 		return new FormatPrompt(p == null ? null : new WrapperPrompt(p, oldNode, c));
 	}
 
+	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode,
+			final Format chosen) {
+		ConfigurationNode oldNode = c.getData("node");
+		oldNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
+		newNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
+		c.putData("node", newNode);
+		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
+	}
+
 	private static class WrapperPrompt extends Prompt {
 
 		private Runnable r;
@@ -129,7 +138,7 @@ public abstract class Format {
 			return out;
 		}
 
-		public FormatPrompt(TextTemplate template, Optional<Class<Format>> type) {
+		public FormatPrompt(TextTemplate template, Optional<Class<? extends Format>> type) {
 			super(template, type);
 		}
 

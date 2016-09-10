@@ -32,13 +32,14 @@ import java.util.stream.Collectors;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.conversation.TypePrompt;
-import me.Wundero.ProjectRay.framework.RayPlayer;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -115,7 +116,13 @@ public class AnimatedFormat extends Format {
 			}
 			return frameWithDelay.get(template);
 		}, (template) -> {
-			return template != null;
+			if (inOrder.isEmpty()) {
+				return Tristate.FALSE;
+			}
+			if (template == null) {
+				return Tristate.UNDEFINED;
+			}
+			return Tristate.TRUE;
 		});
 		anim.start();
 		return true;
@@ -129,7 +136,13 @@ public class AnimatedFormat extends Format {
 			}
 			return frameWithDelay.get(template);
 		}, (template) -> {
-			return template != null;
+			if (inOrder.isEmpty()) {
+				return Tristate.FALSE;
+			}
+			if (template == null) {
+				return Tristate.UNDEFINED;
+			}
+			return Tristate.TRUE;
 		});
 		if (data.getObserver().isPresent()) {
 			RayPlayer.get(data.getObserver().get()).queueAnimation(this.getType(), anim);
@@ -233,7 +246,7 @@ public class AnimatedFormat extends Format {
 			this.p = p;
 		}
 
-		public StayPrompt(TextTemplate template, Optional<Class<Integer>> type) {
+		public StayPrompt(TextTemplate template, Optional<Class<? extends Integer>> type) {
 			super(template, type);
 		}
 

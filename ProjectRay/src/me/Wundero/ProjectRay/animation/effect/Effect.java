@@ -26,6 +26,8 @@ package me.Wundero.ProjectRay.animation.effect;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import org.spongepowered.api.util.Tristate;
+
 import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.utils.Utils;
 
@@ -97,7 +99,7 @@ public class Effect<T> {
 			}
 		}
 		setObjects(framez);
-		anim = new Animation<T>(framez, (f) -> delay, (f) -> true);
+		anim = new Animation<T>(framez, (f) -> delay, (f) -> Tristate.TRUE);
 	}
 
 	public T getObject() {

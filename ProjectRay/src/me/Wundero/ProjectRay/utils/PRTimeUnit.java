@@ -72,6 +72,10 @@ public enum PRTimeUnit {
 			return d / (C6 / C0);
 		}
 
+		public double toTicks(double d) {
+			return d / (C7 / C0);
+		}
+
 		public double convert(double d, PRTimeUnit u) {
 			return u.toNanos(d);
 		}
@@ -111,6 +115,10 @@ public enum PRTimeUnit {
 
 		public double toDays(double d) {
 			return d / (C6 / C1);
+		}
+
+		public double toTicks(double d) {
+			return d / (C7 / C1);
 		}
 
 		public double convert(double d, PRTimeUnit u) {
@@ -158,6 +166,52 @@ public enum PRTimeUnit {
 			return u.toMillis(d);
 		}
 
+		public double toTicks(double d) {
+			return d / (C7 / C2);
+		}
+
+		int excessNanos(double d, double m) {
+			return 0;
+		}
+	},
+
+	TICKS {
+		public double toNanos(double d) {
+			return x(d, C7 / C0, MAX / (C7 / C0));
+		}
+
+		public double toMicros(double d) {
+			return x(d, C7 / C1, MAX / (C7 / C1));
+		}
+
+		public double toMillis(double d) {
+			return x(d, C7 / C2, MAX / (C7 / C2));
+		}
+
+		public double toSeconds(double d) {
+			return x(d, C3 / C7, MAX / (C7 / C3));
+		}
+
+		public double toTicks(double d) {
+			return d;
+		}
+
+		public double toMinutes(double d) {
+			return d / (C4 / C7);
+		}
+
+		public double toHours(double d) {
+			return d / (C5 / C7);
+		}
+
+		public double toDays(double d) {
+			return d / (C6 / C7);
+		}
+
+		public double convert(double d, PRTimeUnit u) {
+			return u.toTicks(d);
+		}
+
 		int excessNanos(double d, double m) {
 			return 0;
 		}
@@ -177,6 +231,10 @@ public enum PRTimeUnit {
 
 		public double toMillis(double d) {
 			return x(d, C3 / C2, MAX / (C3 / C2));
+		}
+
+		public double toTicks(double d) {
+			return x(d, C3 / C7, MAX / (C3 / C7));
 		}
 
 		public double toSeconds(double d) {
@@ -220,6 +278,10 @@ public enum PRTimeUnit {
 			return x(d, C4 / C2, MAX / (C4 / C2));
 		}
 
+		public double toTicks(double d) {
+			return x(d, C4 / C7, MAX / (C4 / C7));
+		}
+
 		public double toSeconds(double d) {
 			return x(d, C4 / C3, MAX / (C4 / C3));
 		}
@@ -259,6 +321,10 @@ public enum PRTimeUnit {
 
 		public double toMillis(double d) {
 			return x(d, C5 / C2, MAX / (C5 / C2));
+		}
+
+		public double toTicks(double d) {
+			return x(d, C5 / C7, MAX / (C5 / C7));
 		}
 
 		public double toSeconds(double d) {
@@ -302,6 +368,10 @@ public enum PRTimeUnit {
 			return x(d, C6 / C2, MAX / (C6 / C2));
 		}
 
+		public double toTicks(double d) {
+			return x(d, C6 / C7, MAX / (C6 / C7));
+		}
+
 		public double toSeconds(double d) {
 			return x(d, C6 / C3, MAX / (C6 / C3));
 		}
@@ -328,13 +398,14 @@ public enum PRTimeUnit {
 	};
 
 	// Handy constants for conversion methods
-	static final double C0 = 1L;
-	static final double C1 = C0 * 1000L;
-	static final double C2 = C1 * 1000L;
-	static final double C3 = C2 * 1000L;
-	static final double C4 = C3 * 60L;
-	static final double C5 = C4 * 60L;
-	static final double C6 = C5 * 24L;
+	static final double C0 = 1L;// nano
+	static final double C1 = C0 * 1000L;// mico
+	static final double C2 = C1 * 1000L;// milli
+	static final double C3 = C2 * 1000L;// second
+	static final double C4 = C3 * 60L;// minute
+	static final double C5 = C4 * 60L;// hour
+	static final double C6 = C5 * 24L;// day
+	static final double C7 = C3 / 20L;// tick
 
 	static final double MAX = Double.MAX_VALUE;
 
@@ -344,9 +415,9 @@ public enum PRTimeUnit {
 	 */
 	static double x(double d, double m, double over) {
 		if (d > over)
-			return Long.MAX_VALUE;
+			return Double.MAX_VALUE;
 		if (d < -over)
-			return Long.MIN_VALUE;
+			return Double.MIN_VALUE;
 		return d * m;
 	}
 
@@ -478,6 +549,10 @@ public enum PRTimeUnit {
 		throw new AbstractMethodError();
 	}
 
+	public double toTicks(double duration) {
+		throw new AbstractMethodError();
+	}
+
 	/**
 	 * Utility to compute the excess-nanosecond argument to wait, sleep, join.
 	 * 
@@ -538,8 +613,7 @@ public enum PRTimeUnit {
 	 * @throws InterruptedException
 	 *             if interrupted while waiting
 	 */
-	public void timedJoin(Thread thread, long timeout)
-			throws InterruptedException {
+	public void timedJoin(Thread thread, long timeout) throws InterruptedException {
 		if (timeout > 0) {
 			long ms = (long) toMillis(timeout);
 			int ns = excessNanos(timeout, ms);

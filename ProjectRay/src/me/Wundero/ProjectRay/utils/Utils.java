@@ -2,7 +2,9 @@ package me.Wundero.ProjectRay.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,19 +39,24 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
+import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
@@ -110,6 +117,28 @@ public class Utils {
 		return b.submit(Ray.get().getPlugin());
 	}
 
+	public static boolean charge(Player p, double c) {
+		Optional<EconomyService> eco = Sponge.getServiceManager().provide(EconomyService.class);
+		if (!eco.isPresent()) {
+			return false;
+		}
+		EconomyService e = eco.get();
+		Optional<UniqueAccount> acc = e.getOrCreateAccount(p.getUniqueId());
+		if (!acc.isPresent()) {
+			return false;
+		}
+		UniqueAccount a = acc.get();
+		Currency cur = e.getDefaultCurrency();
+		TransactionResult r = a.withdraw(cur, new BigDecimal(c),
+				Cause.source(Ray.get().getPlugin()).named("Purchase", c).build());
+		switch (r.getResult()) {
+		case SUCCESS:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	public static <T> List<T> sl(Collection<T> objs) {
 		List<T> l = sl();
 		l.addAll(objs);
@@ -126,8 +155,8 @@ public class Utils {
 	}
 
 	public static <K, V> OptionalMap<K, V> om(Map<K, V> pre) {
-		OptionalMap<K, V> o = new OptionalMap<K, V>();
-
+		OptionalMap<K, V> o = om();
+		o.putAll(pre);
 		return o;
 	}
 
@@ -138,6 +167,10 @@ public class Utils {
 	public static <T> List<T> sl() {
 		// returns a new arraylist that copies itself for iteration (makes
 		// unsynchronized iter blocks safe)
+		// indexOf method coded such that the equals call supports either object
+		// equaling the other
+		// this allows support for ChannelMember; it's less strict but usefull
+		// to me.
 		return Collections.synchronizedList(new ArrayList<T>() {
 
 			private static final long serialVersionUID = -9083645937669914699L;
@@ -145,14 +178,17 @@ public class Utils {
 			@Override
 			public int indexOf(Object o) {
 				if (o == null) {
-					for (int i = 0; i < size(); i++)
-						if (get(i) == null)
+					for (int i = 0; i < size(); i++) {
+						if (get(i) == null) {
 							return i;
+						}
+					}
 				} else {
-					for (int i = 0; i < size(); i++)
-						if (get(i).equals(o))// switched equals operator:
-												// matters for channelmember
+					for (int i = 0; i < size(); i++) {
+						if (get(i).equals(o) || o.equals(get(i))) {
 							return i;
+						}
+					}
 				}
 				return -1;
 			}
@@ -176,7 +212,28 @@ public class Utils {
 		return new ConcurrentHashMap<K, V>();
 	}
 
+	public static Text apply(Text text, Optional<ClickAction<?>> click, Optional<HoverAction<?>> hover) {
+		if ((click.isPresent() || hover.isPresent()) && text != null) {
+			Text.Builder b = text.toBuilder();
+			List<Text> subs = b.getChildren();
+			b.removeAll();
+			if (click.isPresent()) {
+				b.onClick(click.get());
+			}
+			if (hover.isPresent()) {
+				b.onHover(hover.get());
+			}
+			for (Text t : subs) {
+				b.append(apply(t, click, hover));
+			}
+			return b.build();
+		} else {
+			return text;
+		}
+	}
+
 	public static boolean classinstanceof(String main, Class<?> sub) {
+		// recursive -- call with caution
 		boolean b = sub.getName().equalsIgnoreCase(main);
 		if (!b && sub.equals(Object.class)) {
 			return false;
@@ -363,33 +420,6 @@ public class Utils {
 		return new InternalHoverAction.ShowTemplate(t);
 	}
 
-	/*
-	 * private static String addProtocol(String url) { if
-	 * (!url.startsWith("http")) { url = "http://" + url; } return url; }
-	 * 
-	 * public static Text clickifyLinks(Text t, User u) { if (u != null &&
-	 * !u.hasPermission("ray.url")) { return t; } String text = t.toPlain(); if
-	 * (!URL_PATTERN.matcher(text).find()) { return t; } String textColored =
-	 * TextSerializers.FORMATTING_CODE.serialize(t); String[] colorParts =
-	 * textColored.split("[\\&][a-fmnolkr0-9]"); Map<String, String> colours =
-	 * sm(); for (String s : colorParts) { String s2 = Pattern.quote(s); s2 =
-	 * "([\\&][a-fmnolkr0-9])+(" + s2 + ")"; if
-	 * (Pattern.compile(s2).matcher(textColored).find()) { Matcher m =
-	 * Pattern.compile(s2).matcher(textColored); m.find(); String f = m.group();
-	 * f = f.replace(s, ""); colours.put(s, f); } else { colours.put(s, ""); } }
-	 * Map<String, List<Integer>> indices = sm(); Map<Integer, String>
-	 * reversedIndices = sm(); for (String s : colorParts) { int startIndex =
-	 * text.indexOf(s); int endIndex = startIndex + s.length() - 1;
-	 * List<Integer> in = sl(); for (int i = startIndex; i <= endIndex; i++) {
-	 * in.add(i); reversedIndices.put(i, s); } indices.put(s, in); } Map<String,
-	 * List<Integer>> urls = sm(); Map<Integer, String> rurls = sm(); Matcher m
-	 * = URL_PATTERN.matcher(text); int in = 0; while (m.find()) { int s =
-	 * m.start(); int e = m.end(); String st = m.group(); List<Integer> ur =
-	 * sl(); for (int i = s + in; i <= e + in; i++) { ur.add(i); rurls.put(i,
-	 * st); } in += e; urls.put(st, ur); m = m.reset(text.substring(e)); }
-	 * return t; }
-	 */
-
 	public static CommandSource getTrueSource(CommandSource src) {
 		CommandSource out = src;
 		while (out instanceof ProxySource) {
@@ -398,7 +428,6 @@ public class Utils {
 		return out;
 	}
 
-	// TODO URLS
 	public static Text transIf(String s, User u) {
 		LiteralText text = null;
 		if (u == null || u.hasPermission("ray.color")) {
@@ -449,7 +478,7 @@ public class Utils {
 		return true;
 	}
 
-	public static <T> List<T> scramble(List<T> list) {
+	public static <T> List<T> scramble(final List<T> list) {
 		List<T> out = sl();
 		List<T> in = sl(list);
 		Random r = new Random();
@@ -483,10 +512,6 @@ public class Utils {
 		}
 		return Pattern.compile(pattern, flag);
 	}
-
-	public static final UUID pregenUUID = UUID.randomUUID();
-
-	private static Map<UUID, Long> times = sm();
 
 	public static boolean isURL(String input) {
 		String s = input;
@@ -534,11 +559,6 @@ public class Utils {
 		return builder.toString();
 	}
 
-	public static boolean badEnding(String url) {
-		return url.endsWith(".") || url.endsWith("!") || url.endsWith("?") || url.endsWith("!") || url.endsWith(">")
-				|| url.endsWith("<");
-	}
-
 	public synchronized static String getAnsi(TextElement c) {
 		return replacements.get(c);
 	}
@@ -583,9 +603,10 @@ public class Utils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T[] toArray(Collection<T> collection) {
-		List<T> wrappedCollection = sl(collection);
-		return (T[]) wrappedCollection.toArray(new Object[wrappedCollection.size()]);
+	public static <T> T[] toArray(Collection<T> collection, Class<T> typeClass) {
+		return collection.stream().toArray((a) -> {
+			return (T[]) Array.newInstance(typeClass, a);
+		});
 	}
 
 	public static <T> List<String> toStringList(List<T> o, Optional<Method> toCall) {
@@ -611,10 +632,6 @@ public class Utils {
 			}
 		}
 		return out;
-	}
-
-	public static boolean isFormat(TextElement paramColor) {
-		return paramColor instanceof TextStyle;
 	}
 
 	public static Text trans(String s) {
@@ -712,38 +729,16 @@ public class Utils {
 		return !Sponge.getEventManager().post(e);
 	}
 
-	public static UUID time() {
-		UUID u = UUID.randomUUID();
-		times.put(u, System.nanoTime());
-		return u;
-	}
-
-	public static boolean containsProfanities(String s) {
+	public static Pattern profanityPattern() {
 		return compile("(" + "(f[ua4][c]?[k]([e3]r|[a4])?)|(b[i!1]?tch([e3]s|y)?)|(s(lut|h[i!1]t[3e]?))"
 				+ "|(n[i1!]g[g]?([a4]|[3e]r))|([4a][sz]{2})|(cunt)|(d[i!1][c]?k)|([kd][yi1!]ke)"
 				+ "|(f[a43e]g([g]?[0oi1!]t)?)|(cum|j[i1!]zz)|(p[e3]n[i1!u]s)|(qu[3e]{2}r)"
 				+ "|(pu[zs]{2}y)|(tw[4a]t)|(v[a4]g[i1!]n[a4])|(wh[o0]r[e3])"
-				+ "|([ck][o0][ck]?[k])|([d][o][ou][c][h][e])" + ")", Pattern.CASE_INSENSITIVE).matcher(s).find();
+				+ "|([ck][o0][ck]?[k])|([d][o][ou][c][h][e])" + ")", Pattern.CASE_INSENSITIVE);
 	}
 
-	public static void checkTime(long n, String m) {
-		if (!isSafeTime(n)) {
-			Ray.get().getPlugin().log("Warning: unsafe time for " + m);
-		}
-	}
-
-	public static long getTime(UUID u) {
-		if (times.containsKey(u)) {
-			long l = times.get(u);
-			times.remove(u);
-			return System.nanoTime() - l;
-		} else {
-			return 0;
-		}
-	}
-
-	public static boolean isSafeTime(long nanoseconds) {
-		return nanoseconds < 200000000l;
+	public static boolean containsProfanities(String s) {
+		return profanityPattern().matcher(s).find();
 	}
 
 	public static String capitalize(String s) {
@@ -797,17 +792,6 @@ public class Utils {
 
 	public static <T> List<T> toList(T[] array) {
 		return sl(array);
-	}
-
-	public static <T> T[] toArray(List<T> list) {
-		@SuppressWarnings("unchecked")
-		T[] o = (T[]) new Object[list.size()];
-		int i = 0;
-		for (T t : list) {
-			o[i] = t;
-			i++;
-		}
-		return o;
 	}
 
 	public static <T> List<T> alternate(List<T> one, List<T> two) {
@@ -950,8 +934,7 @@ public class Utils {
 	public static LiteralText parseForVariables(LiteralText text, ParsableData data) {
 		return replaceRegex(text, VAR_PATTERN, (match) -> {
 			String proper = match.replace("{", "").replace("}", "");
-			Object out = Ray.get().getVariables().get(proper, data.getSender(), data.getRecipient(), Optional.empty(),
-					Optional.empty(), data.getObserver());
+			Object out = Ray.get().getVariables().get(proper, data, Optional.empty(), Optional.empty());
 			if (data.getKnown().isPresent() && data.getKnown().get().containsKey(proper)) {
 				out = data.getKnown().get().get(proper);
 			}

@@ -50,6 +50,14 @@ public class ParsableData {
 		return setKnown(Optional.ofNullable(known));
 	}
 
+	public ParsableData withKnown(Map<String, Object> known) {
+		return setKnown(known);
+	}
+
+	public ParsableData withKnown(Optional<Map<String, Object>> known) {
+		return setKnown(known);
+	}
+
 	public ParsableData setKnown(Optional<Map<String, Object>> known) {
 		this.known = known;
 		return this;
@@ -64,6 +72,14 @@ public class ParsableData {
 
 	public ParsableData setSender(Player sender) {
 		return setSender(Optional.ofNullable(sender));
+	}
+
+	public ParsableData withSender(Player sender) {
+		return setSender(sender);
+	}
+
+	public ParsableData withSender(Optional<Player> sender) {
+		return setSender(sender);
 	}
 
 	/**
@@ -86,6 +102,14 @@ public class ParsableData {
 		return setRecipient(Optional.ofNullable(recipient));
 	}
 
+	public ParsableData withRecipient(Player recipient) {
+		return setRecipient(recipient);
+	}
+
+	public ParsableData withRecipient(Optional<Player> recipient) {
+		return setRecipient(recipient);
+	}
+
 	/**
 	 * @param recipient
 	 *            the recipient to set
@@ -100,6 +124,14 @@ public class ParsableData {
 	 */
 	public Optional<Player> getObserver() {
 		return observer;
+	}
+
+	public ParsableData withObserver(Player observer) {
+		return setObserver(observer);
+	}
+
+	public ParsableData withObserver(Optional<Player> observer) {
+		return setObserver(observer);
 	}
 
 	public ParsableData setObserver(Player observer) {
@@ -120,6 +152,10 @@ public class ParsableData {
 	 */
 	public boolean isClickHover() {
 		return clickHover;
+	}
+
+	public ParsableData withClickHover(boolean clickHover) {
+		return setClickHover(clickHover);
 	}
 
 	/**

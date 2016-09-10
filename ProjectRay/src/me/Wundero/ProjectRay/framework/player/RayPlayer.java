@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.ProjectRay.framework.player;
 /*
  The MIT License (MIT)
 
@@ -25,6 +25,7 @@ package me.Wundero.ProjectRay.framework;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +47,16 @@ import com.google.common.reflect.TypeToken;
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.animation.AnimationQueue;
+import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.tag.SelectableTag;
 import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
-public class RayPlayer {
+public class RayPlayer implements Socialable {
 
 	private boolean conversing = false;
 	private static Map<UUID, RayPlayer> cache = Utils.sm();
@@ -127,15 +130,19 @@ public class RayPlayer {
 	public boolean spy() {
 		return spy;
 	}
-	
+
 	public void setSpy(boolean spy) {
-		if(user.hasPermission("ray.spy") && spy) {
+		if (user.hasPermission("ray.spy") && spy) {
 			this.spy = spy;
 		} else {
 			this.spy = false;
 		}
 	}
-	
+
+	public void select(SelectableTag tag, String sub) {
+		this.selectedTags.put(tag, sub);
+	}
+
 	public String getSelected(SelectableTag tag) {
 		return selectedTags.get(tag);
 	}
@@ -338,8 +345,8 @@ public class RayPlayer {
 		if (!user.isOnline() || !user.getPlayer().isPresent()) {
 			return;
 		}
-		Object o = Ray.get().getVariables().get("displayname", Optional.of(this.getUser().getPlayer().get()),
-				Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+		Object o = Ray.get().getVariables().get("displayname",
+				new ParsableData().withSender(this.getUser().getPlayer().get()), Optional.empty(), Optional.empty());
 		displayname = o instanceof Text ? (Text) o : Text.of(o);
 	}
 
@@ -462,6 +469,20 @@ public class RayPlayer {
 
 	public void setListenChannels(List<String> listenChannels) {
 		this.listenChannels = listenChannels;
+	}
+
+	private Map<SocialMedia, String> mediums = Utils.sm();
+
+	@Override
+	public URL getMediaURL(SocialMedia medium) {
+		if (medium == null) {
+			return null;
+		}
+		String name = mediums.get(medium);
+		if (name != null) {
+			return medium.apply(name);
+		}
+		return null;
 	}
 
 }

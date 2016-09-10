@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -38,15 +39,21 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import me.Wundero.ProjectRay.framework.RayPlayer;
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.Format;
+import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.ProjectRay.tag.Tag;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class Variables {
 	// parse for provided data
-	public Object get(String key, Optional<Player> sender, Optional<Player> recipient, Optional<Format> format,
-			Optional<TextTemplate> template, Optional<Player> observer) {
+	public Text get(String key, ParsableData parsedat, Optional<Format> format, Optional<TextTemplate> template) {
+		Validate.notNull(parsedat);
+		Validate.notEmpty(key);
+		Optional<Player> sender = parsedat.getSender();
+		Optional<Player> recipient = parsedat.getRecipient();
+		Optional<Player> observer = parsedat.getObserver();
 		String data = null;
 		if (key.contains(":")) {
 			String[] ks = key.split(":");
@@ -105,11 +112,14 @@ public class Variables {
 					}
 					map.put(p, observer.get());
 					break;
+				case PARSABLE:
+					map.put(p, parsedat);
+					break;
 				}
 			}
 			return Utils.urlsIf(v.parse(map));
 		}
-		return "";
+		return Text.of();
 	}
 
 	public Variables() {
@@ -238,6 +248,19 @@ public class Variables {
 				return Text.of();
 			}
 			return Text.of(c.getName());
+		});
+		registerVariable("tag", (objects) -> {
+			if (!objects.containsKey(Param.PARSABLE) || !objects.containsKey(Param.DATA)) {
+				return Text.EMPTY;
+			}
+			String tagname = objects.get(Param.DATA).toString();
+			ParsableData d = (ParsableData) objects.get(Param.PARSABLE);
+			// Tag type dec irrelevant because abstract method
+			Optional<Tag<?>> t = Ray.get().getTags().get(tagname);
+			if (t.isPresent()) {
+				return t.get().get(Optional.of(d)).orElse(Text.of());
+			}
+			return Text.of();
 		});
 	}
 
