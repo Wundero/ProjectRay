@@ -33,7 +33,6 @@ public class ClearChatCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
