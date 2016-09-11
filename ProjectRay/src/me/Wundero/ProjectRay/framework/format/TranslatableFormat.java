@@ -103,4 +103,14 @@ public class TranslatableFormat extends Format {
 		};
 	}
 
+	@Override
+	public boolean hasInternal(Class<? extends Format> clazz) {
+		return false;
+	}
+
+	@Override
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
+		return Optional.empty();
+	}
+
 }

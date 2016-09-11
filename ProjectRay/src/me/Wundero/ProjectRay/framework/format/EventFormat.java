@@ -145,4 +145,21 @@ public class EventFormat extends Format {
 		};
 	}
 
+	@Override
+	public boolean hasInternal(Class<? extends Format> clazz) {
+		return internal.getClass().equals(clazz) ? true : internal.hasInternal(clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
+		if (!hasInternal(clazz)) {
+			return Optional.empty();
+		}
+		if (internal.getClass().equals(clazz)) {
+			return Optional.of((T) internal);
+		}
+		return internal.getInternal(clazz);
+	}
+
 }

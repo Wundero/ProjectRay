@@ -164,6 +164,9 @@ public class ProjectRay {
 	}
 
 	private void saveConfig() {
+		if (config == null) {
+			return;
+		}
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
 				.setPath(getConfigPath()).build();
 		try {
@@ -214,36 +217,43 @@ public class ProjectRay {
 						.arguments(GenericArguments.player(Text.of("player"))).description(Text.of("Ignore a player."))
 						.permission("ray.ignore").build(),
 				"ignore");
-		Sponge.getCommandManager().register(this,
-				CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
-						.executor(new ChannelCommand())
-						.child(CommandSpec.builder().executor(new ChannelQMCommand())
-								.arguments(GenericArguments.string(Text.of("channel")),
-										GenericArguments.remainingJoinedStrings(Text.of("message")))
-								.description(Text.of("Message a channel without joining it."))
-								.permission("ray.channel.quickmessage").build(), "quickmessage", "qm")
-						.child(CommandSpec.builder().executor(new ChannelRoleCommand())
-								.description(Text.of("View or set roles in a channel.")).permission("ray.channel.role")
-								.arguments(GenericArguments.optional(GenericArguments.player(Text.of("target"))),
-										GenericArguments.optional(
-												GenericArguments.seq(GenericArguments.literal(Text.of("set"), "set"),
-														GenericArguments.remainingJoinedStrings(Text.of("role")))))
-								.build(), "role", "r")
-						.child(CommandSpec.builder().executor(new ChannelJoinCommand())
-								.description(Text.of("Join a channel."))
-								.arguments(GenericArguments.string(Text.of("channel"))).build(), "join", "j")
-						.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
-								.description(Text.of("Leave a channel."))
-								.arguments(GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
-								.build(), "leave", "l")
-						.child(CommandSpec.builder().executor(new ChannelWhoCommand())
-								.description(Text.of("List the players in a channel."))
-								.arguments(GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
-								.build(), "who", "w")
-						.child(CommandSpec.builder().executor(new ChannelHelpCommand())
-								.description(Text.of("List channel commands.")).build(), "help", "h")
-						.build(),
-				"channel", "ch");
+		Sponge.getCommandManager()
+				.register(this,
+						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
+								.executor(
+										new ChannelCommand())
+								.child(CommandSpec.builder().executor(new ChannelQMCommand())
+										.arguments(GenericArguments.string(Text.of("channel")),
+												GenericArguments.remainingJoinedStrings(Text.of("message")))
+										.description(Text.of("Message a channel without joining it."))
+										.permission("ray.channel.quickmessage").build(), "quickmessage", "qm")
+								.child(CommandSpec.builder().executor(new ChannelRoleCommand())
+										.description(Text.of("View or set roles in a channel."))
+										.permission("ray.channel.role")
+										.arguments(
+												GenericArguments.optional(GenericArguments.player(Text.of("target"))),
+												GenericArguments.optional(GenericArguments
+														.seq(GenericArguments.literal(Text.of("set"), "set"),
+																GenericArguments
+																		.remainingJoinedStrings(Text.of("role")))))
+										.build(), "role", "r")
+								.child(CommandSpec.builder().executor(new ChannelJoinCommand())
+										.description(Text.of("Join a channel."))
+										.arguments(GenericArguments.string(Text.of("channel"))).build(), "join", "j")
+								.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
+										.description(Text.of("Leave a channel."))
+										.arguments(
+												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+										.build(), "leave", "l")
+								.child(CommandSpec.builder().executor(new ChannelWhoCommand())
+										.description(Text.of("List the players in a channel."))
+										.arguments(
+												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+										.build(), "who", "w")
+								.child(CommandSpec.builder().executor(new ChannelHelpCommand())
+										.description(Text.of("List channel commands.")).build(), "help", "h")
+								.build(),
+						"channel", "ch");
 	}
 
 	@Listener

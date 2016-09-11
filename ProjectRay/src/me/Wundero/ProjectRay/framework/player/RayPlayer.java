@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -287,7 +288,6 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void load() throws ObjectMappingException {
 		if (config == null) {
 			return;
@@ -296,14 +296,15 @@ public class RayPlayer implements Socialable {
 		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)));
 		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
 		this.spy = config.getNode("spy").getBoolean(false);
-		this.selectedTags = deconvert(config.getNode("tags")
-				.getValue(TypeToken.of((Class<Map<String, String>>) PARAMETERIZED_MAP.getClass())));
+		loadTags(config.getNode("tags"));
 	}
 
 	private static Map<SelectableTag, String> deconvert(Map<String, String> in) {
 		Map<SelectableTag, String> out = Utils.sm();
-		for (String t : in.keySet()) {
-			out.put(Ray.get().getTags().get(t, Utils.sm(), SelectableTag.class).get(), out.get(t));
+		if (in != null) {
+			for (String t : in.keySet()) {
+				out.put(Ray.get().getTags().get(t, Utils.sm(), SelectableTag.class).get(), out.get(t));
+			}
 		}
 		return out;
 	}
@@ -316,9 +317,6 @@ public class RayPlayer implements Socialable {
 		return out;
 	}
 
-	private static final Map<String, String> PARAMETERIZED_MAP = Utils.sm();
-
-	@SuppressWarnings("unchecked")
 	public void save() throws ObjectMappingException {
 		if (config == null) {
 			return;
@@ -326,13 +324,27 @@ public class RayPlayer implements Socialable {
 		config.getNode("ignoring").setValue(ignore);
 		config.getNode("channel")
 				.setValue(activeChannel == null ? config.getNode("channel").getString(null) : activeChannel.getName());
-		config.getNode("tags").setValue(TypeToken.of((Class<Map<String, String>>) PARAMETERIZED_MAP.getClass()),
-				convert(selectedTags));
+		saveTags(config.getNode("tags"));
 		config.getNode("lastname").setValue(user.getName());
 		if (getDisplayName().isPresent()) {
 			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
 		}
 		config.getNode("spy").setValue(spy);
+	}
+
+	private void saveTags(ConfigurationNode node) {
+		Map<String, String> con = convert(selectedTags);
+		for (Map.Entry<String, String> e : con.entrySet()) {
+			node.getNode(e.getKey()).setValue(e.getValue());
+		}
+	}
+
+	private void loadTags(ConfigurationNode node) {
+		Map<String, String> o = Utils.sm();
+		for (Entry<Object, ? extends ConfigurationNode> e : node.getChildrenMap().entrySet()) {
+			o.put(e.getKey().toString(), e.getValue().getString());
+		}
+		this.selectedTags = deconvert(o);
 	}
 
 	public Optional<Text> getDisplayName() {

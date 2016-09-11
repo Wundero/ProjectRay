@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +73,7 @@ import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.RayCombinedMessageChannel;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.ProjectRay.framework.format.ExecutingFormat;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
@@ -107,6 +109,9 @@ public class MainListener {
 			return false;
 		}
 		final Format f = fx;
+		final UUID exf = UUID.randomUUID();
+		final Optional<ExecutingFormat> ef = f instanceof ExecutingFormat ? Optional.of((ExecutingFormat) f)
+				: f.getInternal(ExecutingFormat.class);
 		final Map<String, Object> args = Utils.sm(v);
 		ChatChannel pc = r.getActiveChannel();
 		boolean obfuscate = pc != null && pc.isObfuscateRanged();
@@ -141,7 +146,9 @@ public class MainListener {
 						return Optional.empty();
 					}
 				}
-
+				ef.ifPresent((format) -> {
+					format.execConsoles(exf, 1000);
+				});
 				ValueHolder<Text> vv = new ValueHolder<Text>();
 				if (!f.send((text) -> {
 					if (vv.getValue() != null) {
@@ -151,8 +158,8 @@ public class MainListener {
 					return true;
 				}, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
 						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
-						.setClickHover(true)
-						.setObserver(observer.isPresent() ? observer : Optional.of((Player) recipient)))) {
+						.setClickHover(true).setObserver(observer.isPresent() ? observer
+								: recipient instanceof Player ? Optional.of((Player) recipient) : Optional.empty()))) {
 					return Optional.empty();
 				}
 				return Optional.of(vv.getValue());
@@ -313,7 +320,7 @@ public class MainListener {
 	}
 
 	// Logs ALL commands that are handled by the server
-	@Listener(order=Order.POST)
+	@Listener(order = Order.POST)
 	public void onCommand(SendCommandEvent event) {
 		String player = "";
 		CommandSource trs = null;

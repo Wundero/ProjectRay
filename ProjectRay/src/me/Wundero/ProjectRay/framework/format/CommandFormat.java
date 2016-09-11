@@ -169,4 +169,25 @@ public class CommandFormat extends Format {
 		return format.send(f, data);
 	}
 
+	@Override
+	public boolean hasInternal(Class<? extends Format> clazz) {
+		if (format.getClass().equals(clazz)) {
+			return true;
+		}
+		return format.hasInternal(clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
+		if (hasInternal(clazz)) {
+			if (format.getClass().equals(clazz)) {
+				return Optional.of((T) format);
+			} else {
+				return format.getInternal(clazz);
+			}
+		}
+		return Optional.empty();
+	}
+
 }

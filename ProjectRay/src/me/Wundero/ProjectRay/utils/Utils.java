@@ -2,6 +2,8 @@ package me.Wundero.ProjectRay.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -648,17 +650,25 @@ public class Utils {
 	}
 
 	public static void printError(Exception e) {
-		List<String> toPrint = sl(e.getMessage() == null ? "" : e.getMessage());
-		for (StackTraceElement element : e.getStackTrace()) {
-			toPrint.add("at " + element.toString());
-		}
-		for (String s : toPrint) {
-			if (Ray.get() != null && Ray.get().getPlugin() != null && Ray.get().getPlugin().getLogger() != null) {
-				Ray.get().getPlugin().getLogger().error(s);
-			} else {
-				e.printStackTrace();
+		e.printStackTrace(new PrintStream(new OutputStream() {
+
+			private String toprint = "";
+
+			@Override
+			public void write(int b) throws IOException {
+				toprint += Character.valueOf((char) b);
 			}
-		}
+
+			@Override
+			public void flush() {
+				toprint = toprint.trim().replaceAll("\n", "");
+				if (toprint.isEmpty()) {
+					return;
+				}
+				Ray.get().getLogger().error(toprint);
+				toprint = "";
+			}
+		}, true));
 	}
 
 	// before index i

@@ -69,6 +69,10 @@ public abstract class Format {
 		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
 	}
 
+	public abstract <T extends Format> Optional<T> getInternal(Class<T> clazz);
+
+	public abstract boolean hasInternal(Class<? extends Format> clazz);
+
 	private static class WrapperPrompt extends Prompt {
 
 		private Runnable r;
@@ -113,7 +117,8 @@ public abstract class Format {
 
 		public FormatPrompt(Prompt returnTo) {
 			this(TextTemplate.of("What type of format would you like to make (you can type \"done\" to exit)? ",
-					get("animated", "event", "multi", "translatable", "command", "static")), Optional.of(Format.class));
+					get("animated", "event", "multi", "translatable", "command", "static", "execute")),
+					Optional.of(Format.class));
 			this.returnTo = returnTo;
 		}
 
@@ -319,6 +324,11 @@ public abstract class Format {
 		case "event":
 		case "e":
 			return ef;
+		case "executing":
+		case "exec":
+		case "execute":
+		case "x":
+			return xf;
 		case "multi":
 		case "many":
 		case "m":
@@ -335,6 +345,7 @@ public abstract class Format {
 		return sf;
 	}
 
+	private static ExecutingFormat xf = new ExecutingFormat(null, null);
 	private static AnimatedFormat af = new AnimatedFormat(null);
 	private static StaticFormat sf = new StaticFormat(null);
 	private static EventFormat ef = new EventFormat(null, null);

@@ -50,14 +50,14 @@ public class MultiFormat extends Format {
 	private Random r = new Random();
 	private ArrayDeque<Format> unused;
 
-	private synchronized Format getNext() {
+	private synchronized Format getNext(boolean pop) {
 		switch (mode) {
 		case SHUFFLE:
 		case SEQUENCE:
 			if (unused.isEmpty()) {
 				populateDeque();
 			}
-			return unused.pop();
+			return pop ? unused.pop() : unused.peek();
 		default:
 			return formats.get(r.nextInt(formats.size()));
 		}
@@ -103,12 +103,12 @@ public class MultiFormat extends Format {
 
 	@Override
 	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
-		return getNext().send(f, args);
+		return getNext(true).send(f, args);
 	}
 
 	@Override
 	public boolean send(Function<Text, Boolean> f, ParsableData data) {
-		return getNext().send(f, data);
+		return getNext(true).send(f, data);
 	}
 
 	private static class NamePrompt extends Prompt {
@@ -222,5 +222,27 @@ public class MultiFormat extends Format {
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
 		return new OrderPrompt(returnTo);
+	}
+
+	@Override
+	public boolean hasInternal(Class<? extends Format> clazz) {
+		Format f = getNext(false);
+		if (f.getClass().equals(clazz)) {
+			return true;
+		}
+		return f.hasInternal(clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
+		if (!hasInternal(clazz)) {
+			return Optional.empty();
+		}
+		Format f = getNext(false);
+		if (f.getClass().equals(clazz)) {
+			return Optional.of((T) f);
+		}
+		return f.getInternal(clazz);
 	}
 }

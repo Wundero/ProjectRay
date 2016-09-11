@@ -279,4 +279,16 @@ public class AnimatedFormat extends Format {
 		context.sendMessage(Text.of("Creating first frame..."));
 		return Format.buildConversation(new StayPrompt(returnTo), context, context.getData("frame0"));
 	}
+
+	@Override
+	public boolean hasInternal(Class<? extends Format> clazz) {
+		// TODO make sure this is unneeded.
+		return false;
+	}
+
+	@Override
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
+		// TODO same as above
+		return Optional.empty();
+	}
 }
