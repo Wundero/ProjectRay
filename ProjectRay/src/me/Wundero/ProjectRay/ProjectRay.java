@@ -21,6 +21,7 @@ import org.spongepowered.api.text.Text;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
+import me.Wundero.ProjectRay.commands.ClearChatCommand;
 import me.Wundero.ProjectRay.commands.Commands;
 import me.Wundero.ProjectRay.commands.IgnoreCommand;
 import me.Wundero.ProjectRay.commands.MessageCommand;
@@ -217,6 +218,14 @@ public class ProjectRay {
 						.arguments(GenericArguments.player(Text.of("player"))).description(Text.of("Ignore a player."))
 						.permission("ray.ignore").build(),
 				"ignore");
+		Sponge.getCommandManager()
+				.register(this,
+						CommandSpec.builder().executor(new ClearChatCommand()).description(Text.of("Clear the chat."))
+								.permission("ray.clearchat")
+								.arguments(GenericArguments
+										.optional(GenericArguments.remainingJoinedStrings(Text.of("clear"))))
+								.build(),
+						"clearchat", "chatclear", "cc");
 		Sponge.getCommandManager()
 				.register(this,
 						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))

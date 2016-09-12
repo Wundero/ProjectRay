@@ -45,9 +45,11 @@ import me.Wundero.ProjectRay.framework.format.FormatType;
 
 public class FakeMessageCommand implements CommandExecutor {
 
+	// THIS DOESN'T WORK YET - NEED TO DIAGNOSE PARAMS
+
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!args.hasAny("type") || FormatType.fromString(args.<String>getOne("type").get()) == FormatType.DEFAULT) {
+		if (!args.hasAny("type") || FormatType.fromString(args.<String> getOne("type").get()) == FormatType.DEFAULT) {
 			src.sendMessage(Text.of(TextColors.RED, "You must specify a proper type!"));
 			return CommandResult.success();
 		}
@@ -57,7 +59,7 @@ public class FakeMessageCommand implements CommandExecutor {
 		}
 		Player target = null;
 		if (args.hasAny("p")) {
-			target = args.<Player>getOne("player").get();
+			target = args.<Player> getOne("player").get();
 		} else {
 			if (!(src instanceof Player)) {
 				src.sendMessage(Text.of(TextColors.RED, "You must be a player to send a fake message as yourself!"));
@@ -65,8 +67,8 @@ public class FakeMessageCommand implements CommandExecutor {
 			}
 			target = (Player) src;
 		}
-		String type = args.<String>getOne("type").get();
-		String message = args.<String>getOne("message").get();
+		String type = args.<String> getOne("type").get();
+		String message = args.<String> getOne("message").get();
 		MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 				Cause.source(Ray.get().getPlugin()).named("formattype", FormatType.fromString(type)).build(),
 				target.getMessageChannel(), Optional.of(target.getMessageChannel()),

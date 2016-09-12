@@ -58,24 +58,6 @@ public class Commands {
 						.arguments(GenericArguments.string(Text.of("key")),
 								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("args"))))
 						.description(Text.of("Test translations.")).build());
-		/*
-		 * children.put(Lists.newArrayList("m", "msg", "message", "t", "tell",
-		 * "w", "whisper"),
-		 * CommandSpec.builder().permission("ray.message").description(Text.of(
-		 * "Message a player."))
-		 * .arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of(
-		 * "player"))),
-		 * GenericArguments.remainingJoinedStrings(Text.of("message")))
-		 * .executor(new MessageCommand()).build());
-		 * 
-		 * Not useful here
-		 * 
-		 * children.put(Lists.newArrayList("r", "reply"),
-		 * CommandSpec.builder().permission("ray.message").description(Text.of(
-		 * "Reply to a player."))
-		 * .arguments(GenericArguments.remainingJoinedStrings(Text.of("message")
-		 * )) .executor(new ReplyCommand()).build());
-		 */
 	}
 
 	public static Map<List<String>, ? extends CommandCallable> getChildren() {

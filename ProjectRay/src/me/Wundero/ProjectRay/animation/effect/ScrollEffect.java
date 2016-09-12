@@ -86,6 +86,8 @@ public class ScrollEffect extends Effect<String> {
 		return out;
 	}
 
+	// scrolling text
+
 	private ScrollEffect(final String obj, int framelength, int spaces, int charchange, int delay) {
 		this(buildforspaces(obj, spaces), (s, i) -> {
 			if (i % charchange != 0) {

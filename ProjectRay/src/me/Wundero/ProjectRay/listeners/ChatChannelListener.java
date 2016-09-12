@@ -25,11 +25,13 @@ package me.Wundero.ProjectRay.listeners;
 
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.ProjectRay.utils.Utils;
 
 public class ChatChannelListener {
 
@@ -61,11 +63,20 @@ public class ChatChannelListener {
 
 	}
 
+	@Listener(order = Order.PRE, beforeModifications = true)
+	public void onChat(MessageEvent event) {
+		Ray.get().getLogger().info(Utils.getLineNumber(false) + event.getCause().toString());
+		Ray.get().getLogger().info(Utils.getLineNumber(false) + event.getOriginalMessage().toPlain());
+		Ray.get().getLogger().info(Utils.getLineNumber(false) + event.getMessage().toPlain());
+	}
+
 	@Listener(order = Order.LATE)
 	public void onLeave(ClientConnectionEvent.Disconnect event) {
 		for (ChatChannel c : Ray.get().getChannels().getAllChannels()) {
 			if (c.getMembersCollection().contains(event.getTargetEntity().getUniqueId())) {
-				c.removeMember(event.getTargetEntity().getUniqueId());//not removing properly?
+				c.removeMember(event.getTargetEntity().getUniqueId());// not
+																		// removing
+																		// properly?
 			}
 		}
 	}

@@ -3,13 +3,3 @@ jdk:
 - oraclejdk8
 script:
 - mvn clean verify -f /home/travis/build/Wundero/ProjectRay/ProjectRay/pom.xml
-env:
-  global:
-    GH_REF: "github.com/Wundero/ProjectRay/"
-    secure: Wc+8rl2SxgqqVGStYeUjuvbmtU3CYBkuBzQb5jLKAXbWORqE9vW6wLp+oZu4BowU7gpFg6qvXC0yNIu0Kh/KxHedThXEvuzcrM2BiZUTIIa63J4XNVMqy27qQETgFTN/sRUz4dAJslY11zc5MvhNiG89/wOxxyCnJdJis6wB5T8Qt6LLfmlK+sw3FJBot9LPBjH61wyKWmXt0zAAE0MRs6tj9x8avNh+4sJUcME9tlF5UICqhQsXnfEFwMpWoduxOmfxljRIYHQTn6PyNWNzNpuzqPl/Qh6ACUSQjtf+L6OaZraf83KzP80vFuDFmz4JByb2mdhETOHD0ZFYF/UiNTaB0EgtEvwPvK04abmjixVUUBJta4wSflpIM78oN+5wTOcacQhsnqRMRS7xyHpQGvkDgsQmpNsLslYObxOHyWW23e9lcxNHBmpeJ8TLjWuBq6PFhi2LjAJ0RTDe5bq6N3d0Z5jnJBtGaawiP21fsPYuqy6xizzO1PZR9gbumfxIz7NV7ZFoFY4EoI4DCfwwoGNojX2yBVSz0B8/CSUnROCX2E5GVx4/DZ0ju2tsksQIYTvLNvQk/gLNNuXScXBNxSNN0pgSDdG8Pwchk0P8ixXt0y9aFicmOIYnTDb2s5M52guAmBfVizwwD27nvwTzaWqx7iKGqoxrSOhrUStqkCo=
-deploy:
-  provider: releases
-  file: "Ray.jar"
-  skip_cleanup: true
-  on:
-    tags: true

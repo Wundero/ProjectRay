@@ -237,7 +237,9 @@ public class Ray {
 					// parse var into object
 					Object var = getVariables().get(k,
 							new ParsableData().withSender(s1).withRecipient(r1).withObserver(observer), formatUsed,
-							Optional.of(template));
+							Optional.of(template));// probably could replace
+													// this with just Text but
+													// meh
 					Object var2 = var;
 					if (args != null) {
 						// apply var parsing to args

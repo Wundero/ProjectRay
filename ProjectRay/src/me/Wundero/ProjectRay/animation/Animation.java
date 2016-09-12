@@ -77,8 +77,7 @@ public class Animation<T> {
 			}
 			// if we can proceed
 			if (iter.hasNext()) {
-				// execute next frame update with a delay set by the current
-				// frame
+				// execute next frame update with no delay (skipping this frame)
 				cancellable = Utils.schedule(Task.builder().execute(() -> update(curFrame = iter.next())), async);
 			} else {
 				stop();
@@ -111,8 +110,8 @@ public class Animation<T> {
 		}
 	}
 
-	private T curFrame;
-	private Task cancellable;
+	private T curFrame;// frame animation is about to display
+	private Task cancellable;// task to display curFrame
 
 	public void start() {// execute first frame update if possible
 		if (!running && iter.hasNext()) {
@@ -121,21 +120,22 @@ public class Animation<T> {
 		}
 	}
 
-	public void play() {
+	public void play() {// if we were paused, resume
 		if (!running) {
 			running = true;
 			update(curFrame);
 		}
 	}
 
-	public void pause() {
+	public void pause() {// if playing, we cancel the current task but can
+							// resume
 		if (running) {
 			running = false;
 			cancellable.cancel();
 		}
 	}
 
-	public void stop() {
+	public void stop() {// if playing, cancel task and also run onStop() method
 		if (running) {
 			running = false;
 			cancellable.cancel();

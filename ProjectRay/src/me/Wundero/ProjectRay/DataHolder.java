@@ -62,8 +62,7 @@ public abstract class DataHolder {
 		if (!hasData(key)) {
 			return def;
 		}
-		@SuppressWarnings("unchecked")
-		T out = (T) data.get(key);
+		T out = getData(key);
 		return out == null ? def : out;
 	}
 

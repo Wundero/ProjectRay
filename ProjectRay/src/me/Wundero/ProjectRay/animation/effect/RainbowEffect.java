@@ -31,6 +31,9 @@ import org.spongepowered.api.text.format.TextColor;
 
 public class RainbowEffect extends Effect<Text> {
 
+	// highlight part of text
+	// ex: 1: abc 2 Abc 3 aBc 4 abC
+
 	public static RainbowEffect create(String text, TextColor original, TextColor main, Optional<TextColor> second,
 			Optional<Integer> delay) {
 		RainbowEffect e = new RainbowEffect(Text.of(text), (t, i) -> {

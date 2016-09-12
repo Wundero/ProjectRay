@@ -31,15 +31,20 @@ import org.spongepowered.api.util.Tristate;
 import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.utils.Utils;
 
+/*
+ * Class for a specific animation (called effect)
+ * example: scrolling text
+ * UNTESTED 
+ */
 public class Effect<T> {
 
-	private final T object;
-	private final BiFunction<T, Integer, T> mod;
-	private final int frames;
-	private final int delay;
-	private List<T> objects = Utils.sl();
+	private final T object;// object to modify for each frame: ex substring
+	private final BiFunction<T, Integer, T> mod;// modifier
+	private final int frames;// number of frames
+	private final int delay;// time delay between each frame
+	private List<T> objects = Utils.sl();// final list of frames
 
-	private Animation<T> anim;
+	private Animation<T> anim;// animation for sending
 
 	public Effect(T obj, BiFunction<T, Integer, T> mod, int f, int d) {
 		this.object = obj;
@@ -48,6 +53,8 @@ public class Effect<T> {
 		this.delay = d;
 		setupAnimation();
 	}
+
+	// access methods for anim - this cannot impl anim so instead has this
 
 	public void loop(boolean l) {
 		anim.loop(l);
@@ -89,11 +96,15 @@ public class Effect<T> {
 		anim.play();
 	}
 
-	private void setupAnimation() {
+	// TODO animation effect that supports T as vars - gen vars and then setup?
+
+	private void setupAnimation() {// apply mods to objects on creation - saves
+									// performance but doesn't support vars
 		List<T> framez = Utils.sl();
 		for (int i = 0; i < frames; i++) {
 			try {
-				T n = mod.apply(object, i);
+				T n = mod.apply(object, i);// mod can throw exception if it
+											// wants to skip a frame
 				framez.add(n);
 			} catch (Exception e) {
 			}

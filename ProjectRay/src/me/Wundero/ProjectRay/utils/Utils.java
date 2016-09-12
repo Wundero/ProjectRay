@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -1080,6 +1081,24 @@ public class Utils {
 		return builder.build();
 	}
 
+	public static <T> List<T> fill(T original, BiFunction<T, Integer, T> mod, int times, boolean includeOriginal) {
+		List<T> out = sl();
+		if (includeOriginal) {
+			out.add(original);
+		}
+		int i = 0;
+		while (i < times) {
+			try {
+				T m = mod.apply(original, i);
+				out.add(m);
+			} catch (Exception e) {
+				times++;
+			}
+			i++;
+		}
+		return out;
+	}
+
 	private static List<Player> playersAlphabetical = sl();
 
 	private static List<Player> sort(List<Player> list) {
@@ -1100,6 +1119,12 @@ public class Utils {
 	public static List<Player> getPlayers() {
 		updatePlayersAlpha();
 		return sl(playersAlphabetical);
+	}
+
+	public static TextColor randomColor() {
+		int hex = new Random().nextInt(16);
+		String h = Integer.toHexString(hex);
+		return TextSerializers.FORMATTING_CODE.deserialize("&" + h).getColor();
 	}
 
 }
