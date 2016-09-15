@@ -86,6 +86,9 @@ public abstract class ConversationListener {
 		onNext(c);
 	}
 
+	// TODO when incoming/outgoing chat messages are event based, cancel all
+	// msgs going to player/queue them
+
 	// handles conversing chat inputs
 
 	@Listener

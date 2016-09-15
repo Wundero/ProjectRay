@@ -38,9 +38,11 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 public class ChatChannels {
 	private Map<String, ChatChannel> channels = Utils.sm();
 	private ConfigurationNode node;
+	private boolean useChannels = true;
 
 	public void load(ConfigurationNode node) throws ObjectMappingException {
 		if (node == null) {
+			setUseChannels(false);
 			return;
 		}
 		this.setNode(node);
@@ -113,5 +115,13 @@ public class ChatChannels {
 
 	public void setNode(ConfigurationNode node) {
 		this.node = node;
+	}
+
+	public boolean useChannels() {
+		return useChannels;
+	}
+
+	private void setUseChannels(boolean useChannels) {
+		this.useChannels = useChannels;
 	}
 }

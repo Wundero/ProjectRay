@@ -36,7 +36,7 @@ import me.Wundero.ProjectRay.conversation.ConversationContext;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.translation.TranslationFile;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -54,7 +54,7 @@ public class TranslatableFormat extends Format {
 
 	@Override
 	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
-		TextTemplate template = Utils.parse(TranslationFile.getTranslation(key).get(), true);
+		TextTemplate template = TextUtils.parse(TranslationFile.getTranslation(key).get(), true);
 		return this.s(f, args, template);
 	}
 
@@ -62,14 +62,16 @@ public class TranslatableFormat extends Format {
 	public boolean send(Function<Text, Boolean> f, ParsableData data) {
 		TextTemplate template = null;
 		if (data.getObserver().isPresent()) {
-			template = Utils.parse(TranslationFile.getTranslation(key).get(data.getObserver().get().getLocale()), true);
+			template = TextUtils.parse(TranslationFile.getTranslation(key).get(data.getObserver().get().getLocale()),
+					true);
 		} else if (data.getRecipient().isPresent()) {
-			template = Utils.parse(TranslationFile.getTranslation(key).get(data.getRecipient().get().getLocale()),
+			template = TextUtils.parse(TranslationFile.getTranslation(key).get(data.getRecipient().get().getLocale()),
 					true);
 		} else if (data.getSender().isPresent()) {
-			template = Utils.parse(TranslationFile.getTranslation(key).get(data.getSender().get().getLocale()), true);
+			template = TextUtils.parse(TranslationFile.getTranslation(key).get(data.getSender().get().getLocale()),
+					true);
 		} else {
-			template = Utils.parse(TranslationFile.getTranslation(key).get(), true);
+			template = TextUtils.parse(TranslationFile.getTranslation(key).get(), true);
 		}
 		return this.s(f, data, template);
 	}

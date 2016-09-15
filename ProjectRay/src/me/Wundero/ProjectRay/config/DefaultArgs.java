@@ -27,27 +27,27 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.utils.TextUtils;
 
 public class DefaultArgs {
 	// random default args
 	public static final DefaultArg DISPLAYNAME = new DefaultArg(TextTemplate.arg("displayname").color(TextColors.AQUA),
-			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
-			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
+			TextUtils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
+			TextUtils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
 					TextTemplate.arg("displayname").color(TextColors.AQUA).build(), "\n",
 					Text.builder("Say hello!").color(TextColors.GOLD).build())));
 	public static final DefaultArg RECIP_DISPLAYNAME = new DefaultArg(
 			TextTemplate.arg("recip_displayname").color(TextColors.AQUA),
-			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("recip_displayname").build(), " ")),
-			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
-					TextTemplate.arg("recip_displayname").color(TextColors.AQUA).build(), "\n",
-					Text.builder("Say hello!").color(TextColors.GOLD).build())));
+			TextUtils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("recip_displayname").build(), " ")),
+			TextUtils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
+					TextTemplate.arg("recip_displayname").color(TextColors.AQUA).build(), "\n", Text
+							.builder("Say hello!").color(TextColors.GOLD).build())));
 	public static final DefaultArg KILLER = new DefaultArg(TextTemplate.arg("killer").color(TextColors.AQUA),
-			Utils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("killer").build(), " ")),
-			Utils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
+			TextUtils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("killer").build(), " ")),
+			TextUtils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
 					TextTemplate.arg("killer").color(TextColors.AQUA).build(), "\n",
 					Text.builder("Say hello!").color(TextColors.GOLD).build()))).setOptional(true);
 	public static final DefaultArg CHANNEL = new DefaultArg("channel",
-			Utils.suggestTemplate(Utils.parse("/ch join {channelname}", false)),
-			Utils.showTemplate(Utils.parse("&7Channel: {channelname}\n&bClick to join!", true)));
+			TextUtils.suggestTemplate(TextUtils.parse("/ch join {channelname}", false)),
+			TextUtils.showTemplate(TextUtils.parse("&7Channel: {channelname}\n&bClick to join!", true)));
 }

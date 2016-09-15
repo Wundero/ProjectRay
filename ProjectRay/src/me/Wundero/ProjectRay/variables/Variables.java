@@ -44,6 +44,7 @@ import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.tag.Tag;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 
 public class Variables {
@@ -117,7 +118,7 @@ public class Variables {
 					break;
 				}
 			}
-			return Utils.urlsIf(v.parse(map));
+			return TextUtils.urls(v.parse(map));
 		}
 		return Text.of();
 	}

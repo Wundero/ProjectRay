@@ -77,6 +77,7 @@ import me.Wundero.ProjectRay.framework.format.ExecutingFormat;
 import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.FormatType;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.utils.ValueHolder;
 import me.Wundero.ProjectRay.variables.ParsableData;
@@ -140,7 +141,8 @@ public class MainListener {
 						// lim(delta->infinity) (func %dc) = 100
 						double percentDiscoloration = ((delta - (range / 1.1)) / delta) * 100;
 						double percentObfuscation = Math.sqrt(percentDiscoloration);
-						Text m = Utils.obfuscate((Text) mc.get("message"), percentObfuscation, percentDiscoloration);
+						Text m = TextUtils.obfuscate((Text) mc.get("message"), percentObfuscation,
+								percentDiscoloration);
 						mc.put("message", m);
 					} else if (!Utils.inRange(s.getLocation(), r.getLocation(), range)) {
 						return Optional.empty();
@@ -182,7 +184,7 @@ public class MainListener {
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
 		}
-		vars.put("message", Utils.transIf(event.getRawMessage().toPlain(), p));
+		vars.put("message", TextUtils.transIf(event.getRawMessage().toPlain(), p));
 		if (event.getCause().containsNamed("formattype")) {
 			Optional<Player> sf = Optional.empty();
 			Optional<Player> st = Optional.empty();

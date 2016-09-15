@@ -42,6 +42,7 @@ import me.Wundero.ProjectRay.conversation.Conversation;
 import me.Wundero.ProjectRay.conversation.ConversationContext;
 import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -67,7 +68,7 @@ public class StaticFormat extends Format {
 		} else {
 			String simple = node.getNode("simple").getString();
 			node.getNode("simple").setValue(null);
-			setTemplate(Utils.parse(simple, true));
+			setTemplate(TextUtils.parse(simple, true));
 			usable = template != null;
 			if (usable) {
 				try {
@@ -206,12 +207,13 @@ public class StaticFormat extends Format {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.sl();
-			options.add(new Option("key",
-					Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
-							.onHover(TextActions.showText(
-									Text.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
-							.build(),
-					"key"));
+			options.add(
+					new Option("key",
+							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
+									.onHover(TextActions.showText(Text
+											.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
+									.build(),
+							"key"));
 			Text t2 = Text.builder("click").color(TextColors.GOLD).onClick(TextActions.runCommand("click"))
 					.onHover(TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))).build();
 			Text t3 = Text.builder("hover").color(TextColors.GOLD).onClick(TextActions.runCommand("hover"))
@@ -321,10 +323,10 @@ public class StaticFormat extends Format {
 					clickType = InternalClickAction.UrlTemplate.class;
 					text = text.substring(4);
 				}
-				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
+				click = InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
 				return new ArgTypePrompt(this, r);
 			case "hover":
-				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))
+				hover = InternalHoverAction.builder().withResult(TextUtils.parse(text, true))
 						.build(InternalHoverAction.ShowTemplate.class);
 				return new ArgTypePrompt(this, r);
 			}
@@ -484,10 +486,10 @@ public class StaticFormat extends Format {
 					clickType = InternalClickAction.UrlTemplate.class;
 					text = text.substring(4);
 				}
-				click = InternalClickAction.builder().withResult(Utils.parse(text, true)).build(clickType);
+				click = InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
 				return new TextTypePrompt(this, r);
 			case "hover":
-				hover = InternalHoverAction.builder().withResult(Utils.parse(text, true))
+				hover = InternalHoverAction.builder().withResult(TextUtils.parse(text, true))
 						.build(InternalHoverAction.ShowTemplate.class);
 				return new TextTypePrompt(this, r);
 			}

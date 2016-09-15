@@ -46,6 +46,7 @@ import com.google.common.base.Objects;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.config.InternalHoverAction.ShowEntity.Ref;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -79,17 +80,17 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		public InternalHoverAction<R> build(Class<?> type) {
 			switch (type.getSimpleName()) {
 			case "ShowTemplate":
-				return (InternalHoverAction<R>) Utils.showTemplate((TextTemplate) result);
+				return (InternalHoverAction<R>) TextUtils.showTemplate((TextTemplate) result);
 			case "ShowText":
-				return (InternalHoverAction<R>) Utils.showText((Text) result);
+				return (InternalHoverAction<R>) TextUtils.showText((Text) result);
 			case "ShowItem":
-				return (InternalHoverAction<R>) Utils.showItem((ItemStack) result);
+				return (InternalHoverAction<R>) TextUtils.showItem((ItemStack) result);
 			case "ShowEntity":
-				return (InternalHoverAction<R>) Utils.showEntity((Ref) result);
+				return (InternalHoverAction<R>) TextUtils.showEntity((Ref) result);
 			case "ShowAchievement":
-				return (InternalHoverAction<R>) Utils.showAchievement((Achievement) result);
+				return (InternalHoverAction<R>) TextUtils.showAchievement((Achievement) result);
 			default:
-				return (InternalHoverAction<R>) Utils.showText(Text.of(((Object) result).toString()));
+				return (InternalHoverAction<R>) TextUtils.showText(Text.of(((Object) result).toString()));
 			}
 
 		}
@@ -113,21 +114,21 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 				final ConfigurationNode result = arg1.getNode("result");
 				switch (arg1.getNode("type").getString()) {
 				case icc + "ShowTemplate":
-					return Utils.showTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+					return TextUtils.showTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
 				case icc + "ShowText":
-					return Utils.showText(result.getValue(TypeToken.of(Text.class)));
+					return TextUtils.showText(result.getValue(TypeToken.of(Text.class)));
 				case icc + "ShowItem":
-					return Utils.showItem(result.getValue(TypeToken.of(ItemStack.class)));
+					return TextUtils.showItem(result.getValue(TypeToken.of(ItemStack.class)));
 				case icc + "ShowAchievement":
-					return Utils.showAchievement(result.getValue(TypeToken.of(Achievement.class)));
+					return TextUtils.showAchievement(result.getValue(TypeToken.of(Achievement.class)));
 				case icc + "ShowEntity":
 					UUID uuid = result.getNode("uuid").getValue(TypeToken.of(UUID.class));
 					String name = result.getNode("name").getString();
 					EntityType t = result.getNode("entity").getValue(TypeToken.of(EntityType.class));
 					if (t != null) {
-						return Utils.showEntity(uuid, name, t);
+						return TextUtils.showEntity(uuid, name, t);
 					}
-					return Utils.showEntity(uuid, name);
+					return TextUtils.showEntity(uuid, name);
 				}
 				return null;
 			}
@@ -306,7 +307,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			 *            The name of the entity
 			 */
 			public Ref(UUID uuid, String name) {
-				this(uuid, name, Optional.<EntityType>empty());
+				this(uuid, name, Optional.<EntityType> empty());
 			}
 
 			/**

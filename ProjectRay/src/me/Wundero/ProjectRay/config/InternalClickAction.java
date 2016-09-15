@@ -38,6 +38,7 @@ import org.spongepowered.api.text.action.TextActions;
 
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -71,21 +72,21 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		public InternalClickAction<R> build(Class<?> type) {
 			switch (type.getSimpleName()) {
 			case "RunTemplate":
-				return (InternalClickAction<R>) Utils.runTemplate((TextTemplate) result);
+				return (InternalClickAction<R>) TextUtils.runTemplate((TextTemplate) result);
 			case "UrlTemplate":
-				return (InternalClickAction<R>) Utils.urlTemplate((TextTemplate) result);
+				return (InternalClickAction<R>) TextUtils.urlTemplate((TextTemplate) result);
 			case "SuggestTemplate":
-				return (InternalClickAction<R>) Utils.suggestTemplate((TextTemplate) result);
+				return (InternalClickAction<R>) TextUtils.suggestTemplate((TextTemplate) result);
 			case "ExecuteCallback":
-				return (InternalClickAction<R>) Utils.executeCallback((Consumer<CommandSource>) result);
+				return (InternalClickAction<R>) TextUtils.executeCallback((Consumer<CommandSource>) result);
 			case "ChangePage":
-				return (InternalClickAction<R>) Utils.changePage((Integer) result);
+				return (InternalClickAction<R>) TextUtils.changePage((Integer) result);
 			case "RunCommand":
-				return (InternalClickAction<R>) Utils.runCommand((String) result);
+				return (InternalClickAction<R>) TextUtils.runCommand((String) result);
 			case "OpenUrl":
-				return (InternalClickAction<R>) Utils.openUrl((URL) result);
+				return (InternalClickAction<R>) TextUtils.openUrl((URL) result);
 			default:
-				return (InternalClickAction<R>) Utils.suggestCommand((String) result);
+				return (InternalClickAction<R>) TextUtils.suggestCommand((String) result);
 			}
 
 		}
@@ -113,19 +114,19 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 			final ConfigurationNode result = arg1.getNode("result");
 			switch (arg1.getNode("type").getString()) {
 			case icc + "RunCommand":
-				return Utils.runCommand(result.getString());
+				return TextUtils.runCommand(result.getString());
 			case icc + "SuggestCommand":
-				return Utils.suggestCommand(result.getString());
+				return TextUtils.suggestCommand(result.getString());
 			case icc + "ChangePage":
-				return Utils.changePage(result.getInt());
+				return TextUtils.changePage(result.getInt());
 			case icc + "OpenUrl":
-				return Utils.openUrl(result.getValue(TypeToken.of(URL.class)));
+				return TextUtils.openUrl(result.getValue(TypeToken.of(URL.class)));
 			case icc + "RunTemplate":
-				return Utils.runTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+				return TextUtils.runTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
 			case icc + "SuggestTemplate":
-				return Utils.suggestTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+				return TextUtils.suggestTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
 			case icc + "UrlTemplate":
-				return Utils.urlTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
+				return TextUtils.urlTemplate(result.getValue(TypeToken.of(TextTemplate.class)));
 			}
 			return null;
 		}

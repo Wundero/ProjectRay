@@ -11,7 +11,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.ProjectRay.utils.TextUtils;
 
 /*
  The MIT License (MIT)
@@ -95,7 +95,9 @@ public enum SocialMedia {
 	}
 
 	public Text formatTag(URL u) {
-		return Utils.apply(getTag(), Optional.of(TextActions.openUrl(u)), Optional.empty());
+		return TextUtils
+				.apply(getTag().toBuilder(), Optional.of(TextActions.openUrl(u)), Optional.empty(), Optional.empty())
+				.build();
 	}
 
 	public URL apply(UUID u) {

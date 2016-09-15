@@ -3,8 +3,8 @@ package me.Wundero.ProjectRay.conversation;
 import java.util.Optional;
 
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.impl.AbstractEvent;
 
 /*
  The MIT License (MIT)
@@ -31,7 +31,7 @@ import org.spongepowered.api.event.cause.Cause;
  */
 
 //event called when things happen in conversations
-public abstract class ConversationEvent implements Event, Cancellable {
+public abstract class ConversationEvent extends AbstractEvent implements Cancellable {
 
 	private Cause cause;
 	private ConversationContext context;

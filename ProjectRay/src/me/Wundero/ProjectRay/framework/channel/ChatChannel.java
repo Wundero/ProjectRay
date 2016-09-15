@@ -40,6 +40,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -55,7 +56,6 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private boolean hidden = false;
 	private boolean autojoin = true;
 	private boolean obfuscateRanged = false;
-	private double priceJoin, priceChat;
 	private ConfigurationNode node;
 
 	public static TypeSerializer<ChatChannel> serializer() {
@@ -114,7 +114,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				&& (!members.contains((MessageReceiver) sender) || !members.get((MessageReceiver) sender).canSpeak())) {
 			return Optional.empty();
 		}
-		if (range > 0 && sender instanceof Player && recipient instanceof Player) {
+		if (range > 0 && range < Double.MAX_VALUE && sender instanceof Player && recipient instanceof Player) {
 			Player p = (Player) sender;
 			Player r = (Player) recipient;
 			boolean ir = Utils.inRange(p.getLocation(), r.getLocation(), range);
@@ -124,7 +124,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 			} else if (!ir) {
 				double percentObfuscation = ((delta - range) / (delta * (2 * (range / delta)))) * 100;
 				double percentDiscoloration = ((delta - range) / delta) * 100;
-				return Optional.of(Utils.obfuscate(original, percentObfuscation, percentDiscoloration));
+				return Optional.of(TextUtils.obfuscate(original, percentObfuscation, percentDiscoloration));
 			}
 		}
 		return Optional.of(original);
@@ -257,7 +257,23 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 
 	@Override
 	public int compareTo(ChatChannel o) {
-		return members.size() - o.members.size();
+		int i = members.size() - o.members.size();
+		if (i == 0) {
+			if (range <= 0) {
+				if (o.range > 0) {
+					return (int) o.range;
+				} else {
+					return 0;
+				}
+			} else {
+				if (o.range <= 0) {
+					return (int) -range;
+				} else {
+					return (int) (range - o.range);
+				}
+			}
+		}
+		return i;
 	}
 
 	/**

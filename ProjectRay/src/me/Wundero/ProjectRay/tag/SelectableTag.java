@@ -32,10 +32,10 @@ import org.spongepowered.api.text.Text;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.variables.ParsableData;
 
-public class SelectableTag extends PurchasableTag<Map<String, Text>> {
+public class SelectableTag extends Tag<Map<String, Text>> {
 
-	public SelectableTag(String name, Map<String, Text> object, double price) {
-		super(name, object, price);
+	public SelectableTag(String name, Map<String, Text> object) {
+		super(name, object);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,18 +68,5 @@ public class SelectableTag extends PurchasableTag<Map<String, Text>> {
 			return Optional.empty();
 		}
 		return Optional.ofNullable(this.object.get(v));
-	}
-
-	@Override
-	public boolean finishpurchase(Player purchaser, Object... args) {
-		if (RayPlayer.get(purchaser) == null) {
-			return false;
-		}
-		if (args.length == 0) {
-			return false;
-		}
-		String sel = args[0].toString();
-		RayPlayer.get(purchaser).select(this, sel);
-		return true;
 	}
 }
