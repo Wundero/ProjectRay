@@ -91,6 +91,10 @@ public class Utils {
 		return load(config.toPath());
 	}
 
+	public static <T> Optional<T> wrap(T t) {
+		return Optional.ofNullable(t);
+	}
+
 	public static Task schedule(Task.Builder b, boolean async) {
 		if (async) {
 			b.async();

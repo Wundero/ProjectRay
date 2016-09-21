@@ -8,8 +8,10 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
@@ -23,6 +25,7 @@ import me.Wundero.ProjectRay.framework.format.Format;
 import me.Wundero.ProjectRay.framework.format.StaticFormat;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.tag.TagStore;
+import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 import me.Wundero.ProjectRay.variables.Variables;
@@ -95,6 +98,16 @@ public class Ray {
 	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
 	// tag store
 	private TagStore tags;
+	// econ
+	private EconomyService econ;
+
+	public Optional<EconomyService> getEcon() {
+		return Utils.wrap(econ);
+	}
+
+	public void setEcon(EconomyService econ) {
+		this.econ = econ;
+	}
 
 	// registers config for saving on termination
 	public void registerLoader(ConfigurationLoader<CommentedConfigurationNode> loader, ConfigurationNode node) {
@@ -120,6 +133,12 @@ public class Ray {
 			channels.load(Utils.load(f));
 		} catch (Exception e) {
 			Utils.printError(e);
+		}
+		try {
+			this.setEcon(Sponge.getServiceManager().provide(EconomyService.class)
+					.orElseThrow(() -> new NullPointerException("Escape")));
+		} catch (Exception e) {
+			this.setEcon(null);
 		}
 	}
 
@@ -172,6 +191,26 @@ public class Ray {
 
 	public void setGroups(Groups groups) {
 		this.groups = groups;
+	}
+
+	public Text applyVars(TextTemplate t, ParsableData data) {
+		return applyVars(t, data, Optional.empty(), true);
+	}
+
+	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format, boolean clickhover) {
+		Map<String, Object> v = setVars(data, t, format, clickhover);
+		Text tx = t.apply(v).build();
+		return TextUtils.vars(tx, data);
+	}
+
+	public Map<String, Object> setVars(ParsableData data, TextTemplate template) {
+		return setVars(data, template, Optional.empty(), true);
+	}
+
+	public Map<String, Object> setVars(ParsableData data, TextTemplate template, Optional<Format> formatUsed,
+			boolean ch) {
+		return setVars(data.getKnown().orElse(Utils.sm()), template, data.getSender(), data.getRecipient(),
+				data.getObserver(), formatUsed, ch);
 	}
 
 	// create map for args in a template to apply - is recursive if

@@ -23,7 +23,6 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -31,19 +30,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.Validate;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
-import me.Wundero.ProjectRay.tag.Tag;
 import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
 
@@ -118,7 +109,11 @@ public class Variables {
 					break;
 				}
 			}
-			return TextUtils.urls(v.parse(map));
+			try {
+				return TextUtils.urls(v.parse(map));
+			} catch (Exception e) {
+				return Text.of();
+			}
 		}
 		return Text.of();
 	}
@@ -126,143 +121,7 @@ public class Variables {
 	public Variables() {
 		store = new Store();
 		// register some default variables
-		registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
-		registerVariable("player", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
-			if (player == null) {
-				return Text.of();
-			}
-			return Text.of(player.getName());
-		});
-		registerVariable("displayname", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
-			if (player == null) {
-				return Text.of();
-			}
-			return player.get(Keys.DISPLAY_NAME).isPresent() ? player.get(Keys.DISPLAY_NAME).get()
-					: Text.of(player.getName());
-		});
-		registerVariable("sound", (objects) -> {
-			if (!objects.containsKey(Param.RECIPIENT) || !objects.containsKey(Param.DATA)) {
-				return;
-			}
-			Player sender = (Player) objects.get(Param.RECIPIENT);
-			String soundname = (String) objects.get(Param.DATA);
-			soundname = soundname.replace(" ", "_").toUpperCase();
-			Class<?> sts = SoundTypes.class;
-			SoundType type = null;
-			for (Field f : sts.getDeclaredFields()) {
-				if (f.getName().equals(soundname)) {
-					try {
-						boolean a = f.isAccessible();
-						f.setAccessible(true);
-						type = (SoundType) f.get(null);
-						f.setAccessible(a);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			sender.playSound(type, sender.getLocation().getPosition(), 1.0);
-		});
-		registerVariable("channel", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
-				return Text.of();
-			}
-			Player pl = (Player) objects.get(Param.SENDER);
-			RayPlayer p = RayPlayer.get(pl);
-			ChatChannel c = p.getActiveChannel();
-			if (c == null) {
-				return Text.of();
-			}
-			if (c.getTag() == null) {
-				return Text.of(c.getName());
-			}
-			return c.getTag();
-		});
-		registerVariable("channelname", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
-				return Text.of();
-			}
-			Player pl = (Player) objects.get(Param.SENDER);
-			RayPlayer p = RayPlayer.get(pl);
-			ChatChannel c = p.getActiveChannel();
-			if (c == null) {
-				return Text.of();
-			}
-			return Text.of(c.getName());
-		});
-		registerVariable("tag", (objects) -> {
-			if (!objects.containsKey(Param.PARSABLE) || !objects.containsKey(Param.DATA)) {
-				return Text.EMPTY;
-			}
-			String tagname = objects.get(Param.DATA).toString();
-			ParsableData d = (ParsableData) objects.get(Param.PARSABLE);
-			// Tag type dec irrelevant because abstract method
-			Optional<Tag<?>> t = Ray.get().getTags().get(tagname);
-			if (t.isPresent()) {
-				return t.get().get(Optional.of(d)).orElse(Text.of());
-			}
-			return Text.of();
-		});
+		DefaultVariables.register(this);
 	}
 
 	private Store store;
@@ -273,6 +132,10 @@ public class Variables {
 
 	// these methods allow you to register with lamdas
 
+	public boolean registerVariable(String key, Runnable task) {
+		return registerVariable(key.toLowerCase().trim(), (objects) -> task.run());
+	}
+	
 	// just acts on data
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {

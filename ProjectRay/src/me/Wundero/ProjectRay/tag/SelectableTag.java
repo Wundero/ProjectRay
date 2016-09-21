@@ -28,13 +28,16 @@ import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 
+import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;
 
-public class SelectableTag extends Tag<Map<String, Text>> {
+public class SelectableTag extends Tag<Map<String, TextTemplate>> {
 
-	public SelectableTag(String name, Map<String, Text> object) {
+	public SelectableTag(String name, Map<String, TextTemplate> object) {
 		super(name, object);
 	}
 
@@ -44,8 +47,10 @@ public class SelectableTag extends Tag<Map<String, Text>> {
 			return false;
 		}
 		try {
-			Map<String, Text> m = (Map<String, Text>) o;// possible class cast
-			m.put("", Text.of());// more likely class cast
+			Map<String, TextTemplate> m = (Map<String, TextTemplate>) o;// possible
+																		// class
+																		// cast
+			m.put("", TextTemplate.of());// more likely class cast
 		} catch (Exception e) {
 			return false;
 		}
@@ -67,6 +72,12 @@ public class SelectableTag extends Tag<Map<String, Text>> {
 		if (v == null) {
 			return Optional.empty();
 		}
-		return Optional.ofNullable(this.object.get(v));
+		TextTemplate t = this.object.get(v);
+		Map<String, Object> dat = d.get().getKnown().orElse(Utils.sm());
+		dat.put("tag:" + v, "");// non recursive variable parse
+		ParsableData d2 = d.get();
+		d2.setKnown(dat);
+		Text t2 = Ray.get().applyVars(t, d2);
+		return Optional.ofNullable(t2);
 	}
 }

@@ -15,7 +15,9 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 
 import com.google.common.reflect.TypeToken;
@@ -195,6 +197,13 @@ public class ProjectRay {
 		Ray.get().load(this);
 		Ray.get().setGroups(new Groups(config.getNode("worlds")));
 		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
+	}
+
+	@Listener
+	public void onEconUpdate(ChangeServiceProviderEvent event) {
+		if (event.getService().equals(EconomyService.class)) {
+			Ray.get().setEcon((EconomyService) event.getNewProviderRegistration().getProvider());
+		}
 	}
 
 	@Listener
