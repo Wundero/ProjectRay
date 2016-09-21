@@ -202,20 +202,48 @@ public class Utils {
 		return b ? b : classinstanceof(main, sub.getSuperclass());
 	}
 
+	private static double calcdelta(double... coord) {
+		double cx = coord[0];
+		for (int i = 1; i < coord.length; i++) {
+			cx = Math.sqrt(Math.pow(cx, 2) + Math.pow(coord[i], 2));
+		}
+		return cx;
+	}
+
+	public static double pythrange(double[] coord1, double[] coord2) {
+		if (coord1.length < 2 || coord1.length != coord2.length) {
+			return -1.0d;
+		}
+		double[] dists = new double[coord1.length];
+		for (int i = 0; i < coord1.length; i++) {
+			dists[i] = coord1[i] - coord2[i];
+		}
+		return Math.abs(calcdelta(dists));
+	}
+
+	public static boolean inrange(double range, double[] coord1, double[] coord2) {
+		if (range == Double.MAX_VALUE || range < 0) {
+			return true;
+		}
+		if (range == 0) {
+			return false;
+		}
+		return pythrange(coord1, coord2) <= range;
+	}
+
 	public static double difference(Location<World> loc1, Location<World> loc2) {
 		Validate.isTrue(loc1.getExtent().equals(loc2.getExtent()), "different worlds");
 		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
 				z2 = loc2.getZ();
-		double l1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2) + Math.pow(z1, 2)),
-				l2 = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2) + Math.pow(z2, 2));
-		return Math.abs(l1 - l2);
+		double[] c1 = { x1, y1, z1 };
+		double[] c2 = { x2, y2, z2 };
+		return pythrange(c1, c2);
 	}
 
 	public static boolean inRange(Location<World> loc1, Location<World> loc2, double range) {
 		if (range == Double.MAX_VALUE) {
 			return true;
 		}
-		// pythagorean range calc
 		if (range < 0) {
 			return true;
 		}
@@ -595,7 +623,12 @@ public class Utils {
 		return out;
 	}
 
-	public static <T> List<T> toList(T[] array) {
+	public static <T> List<T> toList(Collection<T> t) {
+		return sl(t);
+	}
+
+	@SafeVarargs
+	public static <T> List<T> toList(T... array) {
 		return sl(array);
 	}
 

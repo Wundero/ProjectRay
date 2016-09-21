@@ -193,8 +193,10 @@ public class FormatConversation {
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.sl();
 			for (String g : Ray.get().getGroups().getGroups(context.getData("world").toString()).keySet()) {
-				options.add(new Option(g, Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
-						.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!"))).build(),
+				options.add(new Option(g,
+						Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
+								.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!")))
+								.build(),
 						Ray.get().getGroups().getGroup(g, context.getData("world").toString())));
 			}
 			return Optional.of(options);

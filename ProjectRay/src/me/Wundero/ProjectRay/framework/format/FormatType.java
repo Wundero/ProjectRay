@@ -28,10 +28,9 @@ import java.util.regex.Pattern;
 public enum FormatType {
 
 	CHAT("chat", new String[] { "c" }), // --------------------------------------------
-	MESSAGE_SEND("send_message", new String[] { "sm", "smsg", "sendmsg" }), // --------
-	MESSAGE_RECEIVE("receive_message", new String[] { "rm", "rmsg", "receivemsg" }), //
+	MESSAGE_SEND("send message", new String[] { "sm", "smsg", "sendmsg" }), // --------
+	MESSAGE_RECEIVE("receive message", new String[] { "rm", "rmsg", "receivemsg" }), //
 	MESSAGE_SPY("spy", new String[] { "message spy" }), // ----------------------------
-	DEATH("death", new String[] { "d" }), // ------------------------------------------
 	JOIN("join", new String[] { "j" }), // --------------------------------------------
 	LEAVE("leave", new String[] { "l" }), // ------------------------------------------
 	CUSTOM("custom"), // --------------------------------------------------------------
@@ -87,7 +86,7 @@ public enum FormatType {
 		if (s == null) {
 			return DEFAULT;
 		}
-		s = s.trim().toUpperCase().replace(" ", "_");
+		s = s.trim().toUpperCase().replace("_", " ");
 		if (namepat.matcher(s).matches()) {
 			s = altpat.matcher(s).replaceAll("");
 		}

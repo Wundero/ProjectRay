@@ -32,6 +32,7 @@ import me.Wundero.ProjectRay.commands.channel.ChannelJoinCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelLeaveCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelQMCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelRoleCommand;
+import me.Wundero.ProjectRay.commands.channel.ChannelSetupCommand;
 import me.Wundero.ProjectRay.commands.channel.ChannelWhoCommand;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
@@ -261,6 +262,11 @@ public class ProjectRay {
 										.build(), "who", "w")
 								.child(CommandSpec.builder().executor(new ChannelHelpCommand())
 										.description(Text.of("List channel commands.")).build(), "help", "h")
+								.child(CommandSpec.builder().executor(new ChannelSetupCommand())
+										.permission("ray.channel.setup")
+										.arguments(GenericArguments
+												.optional(GenericArguments.remainingJoinedStrings(Text.of("type"))))
+										.build(), "setup")
 								.build(),
 						"channel", "ch");
 	}

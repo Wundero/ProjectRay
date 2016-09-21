@@ -29,34 +29,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.achievement.GrantAchievementEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.command.SendCommandEvent;
-import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.KickPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
@@ -66,8 +54,6 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.Group;
@@ -366,104 +352,6 @@ public class MainListener {
 		event.setMessageCancelled(
 				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 		RayPlayer.updateTabs();
-	}
-
-	// TODO figure out way to customize messages - locale is retrivable so use
-	// translations?
-
-	/*
-	 * For now, I'm going to skip working on this. I cannot figure out a simple
-	 * way to properly handle this; it will take a lot of config (either
-	 * translations *ugh* or a terrible .conf file) and will likely be
-	 * bug-ridden. If I can think of a simple, consistent method of handling
-	 * this that works with what I have completed to this point, I will
-	 * implement that. For now, I will just leave this as dead code.
-	 */
-	@Listener
-	public void onDeath(DestructEntityEvent.Death event) {
-		// for now, not handling deaths. This weird check is so that I don't get
-		// dead code errors.
-		if (!(event.getTargetEntity() instanceof Player) || event instanceof Event) {
-			return;
-		}
-		Map<String, Object> vars = Utils.sm();
-		String text = event.getOriginalMessage().toString();
-		String firstpart = "Text\\{children\\=\\[Text\\{children\\=\\[Text\\{children\\=\\[Text\\{children\\=\\[Text\\{SpongeTranslation\\{id\\=[A-Za-z0-9\\.]+\\}\\,";
-		Matcher m = Pattern.compile(firstpart).matcher(text);
-		m.find();
-		text = m.group();
-		text = text.substring(
-				"Text{children=[Text{children=[Text{children=[Text{children=[Text{SpongeTranslation{id=".length(),
-				text.length() - 2);
-		System.out.println(text);
-		// text is what client sees as translatable
-		// TODO translate this and figure out how to parse variables n stuff
-		String json = "{\"translate\":\"" + text + "\",\"with\":[\"DEAD\",\"KILLER\",\"ITEM\"]}";
-		Optional<DamageSource> s = event.getCause().first(DamageSource.class);
-		Optional<Player> killer = Optional.empty();
-		Optional<ItemStack> used = Optional.empty();
-		if (s.isPresent()) {
-			DamageSource source = s.get();
-			if (source instanceof IndirectEntityDamageSource) {
-				IndirectEntityDamageSource ieds = (IndirectEntityDamageSource) source;
-				Entity k = ieds.getSource();
-				if (!(k instanceof Living)) {
-					k = ieds.getIndirectSource();
-				}
-				if (k instanceof Player) {
-					Player p = (Player) k;
-					used = p.getItemInHand(HandTypes.MAIN_HAND);
-					if (used.isPresent()) {
-						Optional<Text> t = used.get().get(Keys.DISPLAY_NAME);
-						if (t.isPresent()) {
-							vars.put("item",
-									Text.of("using ")
-											.concat(Text.builder("[").append(t.get()).append(Text.of("]"))
-													.color(TextColors.AQUA).style(TextStyles.ITALIC)
-													.onHover(TextActions.showItem(used.get())).build()));
-						}
-					}
-					killer = Optional.of(p);
-				} else {
-					String name = k.getType().getName();
-					Text.Builder b = Text.builder(name);
-					if (k.get(Keys.DISPLAY_NAME).isPresent()) {
-						b = k.get(Keys.DISPLAY_NAME).get().toBuilder();
-						name = k.get(Keys.DISPLAY_NAME).get().toPlain();
-					}
-					vars.put("killer", b.onHover(TextActions.showEntity(k, name)));
-				}
-			} else if (source instanceof EntityDamageSource) {
-				Entity k = ((EntityDamageSource) source).getSource();
-				if (k instanceof Player) {
-					Player p = (Player) k;
-					used = p.getItemInHand(HandTypes.MAIN_HAND);
-					if (used.isPresent()) {
-						Optional<Text> t = used.get().get(Keys.DISPLAY_NAME);
-						if (t.isPresent()) {
-							vars.put("item",
-									Text.of("using ")
-											.concat(Text.builder("[").append(t.get()).append(Text.of("]"))
-													.color(TextColors.AQUA).style(TextStyles.ITALIC)
-													.onHover(TextActions.showItem(used.get())).build()));
-						}
-					}
-					killer = Optional.of(p);
-				} else {
-					String name = k.getType().getName();
-					Text.Builder b = Text.builder(name);
-					if (k.get(Keys.DISPLAY_NAME).isPresent()) {
-						b = k.get(Keys.DISPLAY_NAME).get().toBuilder();
-						name = k.get(Keys.DISPLAY_NAME).get().toPlain();
-					}
-					vars.put("killer", b.onHover(TextActions.showEntity(k, name)));
-				}
-			}
-		}
-		((Player) event.getTargetEntity()).sendMessage(TextSerializers.JSON.deserialize(json));
-		event.setMessageCancelled(handle(FormatType.DEATH, event, vars, (Player) event.getTargetEntity(),
-				event.getChannel().orElse(event.getOriginalChannel()), Optional.empty(), Optional.empty(),
-				Optional.empty(), killer));
 	}
 
 	@Listener
