@@ -41,7 +41,8 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
 
 public class FakeMessageCommand implements CommandExecutor {
 
@@ -49,7 +50,7 @@ public class FakeMessageCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!args.hasAny("type") || FormatType.fromString(args.<String> getOne("type").get()) == FormatType.DEFAULT) {
+		if (!args.hasAny("type") || FormatType.fromString(args.<String> getOne("type").get()) == FormatTypes.DEFAULT) {
 			src.sendMessage(Text.of(TextColors.RED, "You must specify a proper type!"));
 			return CommandResult.success();
 		}

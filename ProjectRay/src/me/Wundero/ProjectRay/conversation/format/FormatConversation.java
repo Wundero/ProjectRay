@@ -49,7 +49,8 @@ import me.Wundero.ProjectRay.conversation.Option;
 import me.Wundero.ProjectRay.conversation.Prompt;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
 import me.Wundero.ProjectRay.translation.M;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -366,8 +367,8 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.sl();
-			for (FormatType type : FormatType.values()) {
-				if (type == FormatType.DEFAULT) {
+			for (FormatType type : FormatTypes.values()) {
+				if (type == FormatTypes.DEFAULT) {
 					continue;
 				}
 				options.add(new Option(

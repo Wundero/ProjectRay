@@ -50,7 +50,7 @@ import me.Wundero.ProjectRay.animation.Animation;
 import me.Wundero.ProjectRay.animation.AnimationQueue;
 import me.Wundero.ProjectRay.framework.Group;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
 import me.Wundero.ProjectRay.tag.SelectableTag;
 import me.Wundero.ProjectRay.utils.Utils;
 import me.Wundero.ProjectRay.variables.ParsableData;

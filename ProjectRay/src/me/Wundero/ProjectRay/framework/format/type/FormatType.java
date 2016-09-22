@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.format;
+package me.Wundero.ProjectRay.framework.format.type;
 
 import java.util.regex.Pattern;
 
@@ -25,24 +25,7 @@ import java.util.regex.Pattern;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public enum FormatType {
-
-	CHAT("chat", new String[] { "c" }), // --------------------------------------------
-	MESSAGE_SEND("send message", new String[] { "sm", "smsg", "sendmsg" }), // --------
-	MESSAGE_RECEIVE("receive message", new String[] { "rm", "rmsg", "receivemsg" }), //
-	MESSAGE_SPY("spy", new String[] { "message spy" }), // ----------------------------
-	JOIN("join", new String[] { "j" }), // --------------------------------------------
-	LEAVE("leave", new String[] { "l" }), // ------------------------------------------
-	CUSTOM("custom"), // --------------------------------------------------------------
-	WELCOME("welcome", new String[] { "w" }), // --------------------------------------
-	MOTD("motd"), // ------------------------------------------------------------------
-	TABLIST_ENTRY("tablist", new String[] { "list", "t", "tab" }, true), // -----------
-	DEFAULT("default"), // ------------------------------------------------------------
-	ACHIEVEMENT("achievement", new String[] { "ach" }), // ---------------------------
-	KICK("kick", new String[] { "k" }), // --------------------------------------------
-	TABLIST_HEADER("header", new String[] { "h" }, true), // --------------------------
-	TABLIST_FOOTER("footer", new String[] { "f" }, true), // --------------------------
-	ANNOUNCEMENT("announcement", new String[] { "a" }); // ----------------------------
+public class FormatType {
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
@@ -84,25 +67,25 @@ public enum FormatType {
 
 	public static FormatType fromString(String s) {
 		if (s == null) {
-			return DEFAULT;
+			return FormatTypes.DEFAULT;
 		}
 		s = s.trim().toUpperCase().replace("_", " ");
 		if (namepat.matcher(s).matches()) {
 			s = altpat.matcher(s).replaceAll("");
 		}
-		for (FormatType type : values()) {
+		for (FormatType type : FormatTypes.values()) {
 			if (type.name.equalsIgnoreCase(s) || type.getName().equalsIgnoreCase(s)) {
 				return type;
 			}
 		}
-		for (FormatType type : values()) {
+		for (FormatType type : FormatTypes.values()) {
 			for (String st : type.aliases) {
 				if (st.equalsIgnoreCase(s)) {
 					return type;
 				}
 			}
 		}
-		return DEFAULT;
+		return FormatTypes.DEFAULT;
 	}
 
 	public boolean isAnimated() {

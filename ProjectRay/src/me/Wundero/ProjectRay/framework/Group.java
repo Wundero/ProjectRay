@@ -10,7 +10,7 @@ import com.google.common.reflect.TypeToken;
 
 import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;

@@ -61,7 +61,8 @@ import me.Wundero.ProjectRay.framework.RayCombinedMessageChannel;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.format.ExecutingFormat;
 import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.utils.TextUtils;
 import me.Wundero.ProjectRay.utils.Utils;
@@ -192,7 +193,7 @@ public class MainListener {
 			event.setCancelled(handle(event.getCause().get("formattype", FormatType.class).get(), event, vars, p,
 					event.getChannel().get(), sf, st, fn, o));
 		} else {
-			event.setCancelled(handle(FormatType.CHAT, event, vars, p, event.getChannel().get()));
+			event.setCancelled(handle(FormatTypes.CHAT, event, vars, p, event.getChannel().get()));
 		}
 	}
 
@@ -215,7 +216,7 @@ public class MainListener {
 				if (g == null) {
 					continue;
 				}
-				Format f = g.getFormat(FormatType.TABLIST_ENTRY);
+				Format f = g.getFormat(FormatTypes.TABLIST_ENTRY);
 				if (f == null) {
 					continue;
 				}
@@ -236,8 +237,8 @@ public class MainListener {
 		final Group g = p.getActiveGroup();
 		if (g != null) {
 			Task.builder().delayTicks(20).execute(() -> {
-				Format h = g.getFormat(FormatType.TABLIST_HEADER);
-				Format f = g.getFormat(FormatType.TABLIST_FOOTER);
+				Format h = g.getFormat(FormatTypes.TABLIST_HEADER);
+				Format f = g.getFormat(FormatTypes.TABLIST_FOOTER);
 				if (h != null) {
 					h.send(text -> {
 						p.queueHeader(text);
@@ -259,7 +260,7 @@ public class MainListener {
 			event.setMessageCancelled(true);
 			Task.builder().delayTicks(10).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formattype", FormatType.JOIN).build(),
+						Cause.builder().from(event.getCause()).named("formattype", FormatTypes.JOIN).build(),
 						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
@@ -267,7 +268,7 @@ public class MainListener {
 			}).submit(Ray.get().getPlugin());
 			Task.builder().delayTicks(20).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formattype", FormatType.JOIN).build(),
+						Cause.builder().from(event.getCause()).named("formattype", FormatTypes.JOIN).build(),
 						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
@@ -278,7 +279,7 @@ public class MainListener {
 		if (welcome) {
 			Task.builder().delayTicks(15).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formattype", FormatType.WELCOME).build(),
+						Cause.builder().from(event.getCause()).named("formattype", FormatTypes.WELCOME).build(),
 						MessageChannel.TO_ALL, Optional.of(MessageChannel.TO_ALL),
 						new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE,
 								"Welcome " + event.getTargetEntity().getName() + " to the server!")),
@@ -291,7 +292,7 @@ public class MainListener {
 		}
 		Task.builder().delayTicks(15).execute(() -> {
 			MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-					Cause.builder().from(event.getCause()).named("formattype", FormatType.MOTD).build(),
+					Cause.builder().from(event.getCause()).named("formattype", FormatTypes.MOTD).build(),
 					MessageChannel.fixed(event.getTargetEntity()),
 					Optional.of(MessageChannel.fixed(event.getTargetEntity())),
 					new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE, "Welcome to the server!")),
@@ -337,7 +338,7 @@ public class MainListener {
 			}
 		}
 		MessageChannelEvent.Chat spyevent = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SPY).named("sendfrom", sendto).build(),
+				Cause.source(Ray.get()).named("formattype", FormatTypes.MESSAGE_SPY).named("sendfrom", sendto).build(),
 				sendto.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),
 				new MessageEvent.MessageFormatter(Text.of(msg)), Text.of(msg), false);
@@ -350,7 +351,7 @@ public class MainListener {
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
 		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
-				handle(FormatType.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
+				handle(FormatTypes.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 		RayPlayer.updateTabs();
 	}
 
@@ -358,7 +359,7 @@ public class MainListener {
 	public void onKick(KickPlayerEvent event) {
 		Map<String, Object> vars = Utils.sm();
 		event.setMessageCancelled(
-				handle(FormatType.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
+				handle(FormatTypes.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
 		RayPlayer.updateTabs();
 	}
 
@@ -369,7 +370,7 @@ public class MainListener {
 		vars.put("achievement",
 				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());
 		event.setMessageCancelled(
-				handle(FormatType.ACHIEVEMENT, event, vars, event.getTargetEntity(), event.getChannel().get()));
+				handle(FormatTypes.ACHIEVEMENT, event, vars, event.getTargetEntity(), event.getChannel().get()));
 
 	}
 

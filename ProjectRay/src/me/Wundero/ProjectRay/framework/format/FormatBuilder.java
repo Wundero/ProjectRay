@@ -36,6 +36,8 @@ import me.Wundero.ProjectRay.config.DefaultArg;
 import me.Wundero.ProjectRay.config.InternalClickAction;
 import me.Wundero.ProjectRay.config.InternalHoverAction;
 import me.Wundero.ProjectRay.framework.Group;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
 import me.Wundero.ProjectRay.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -78,7 +80,7 @@ public class FormatBuilder {
 	}
 
 	public FormatBuilder withType(FormatType type) {
-		if (type == FormatType.DEFAULT) {
+		if (type == FormatTypes.DEFAULT) {
 			return this;
 		}
 		this.type = Optional.ofNullable(type);

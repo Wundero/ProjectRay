@@ -5,7 +5,7 @@ import java.util.List;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatType;
 import me.Wundero.ProjectRay.utils.Utils;
 
 /*

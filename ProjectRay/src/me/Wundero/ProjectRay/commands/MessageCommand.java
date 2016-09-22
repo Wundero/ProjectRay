@@ -43,7 +43,7 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.format.FormatType;
+import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.utils.Utils;
 
@@ -63,13 +63,13 @@ public class MessageCommand implements CommandExecutor {
 		}
 		String message = (String) args.getOne("message").get();
 		MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SEND).named("sendfrom", sendfrom)
+				Cause.source(Ray.get()).named("formattype", FormatTypes.MESSAGE_SEND).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
 				sendfrom.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendfrom))),
 				new MessageEvent.MessageFormatter(Text.of("You to ", sendto.getName()), Text.of(message)),
 				Text.of(message), false);
 		MessageChannelEvent.Chat event2 = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_RECEIVE).named("sendfrom", sendfrom)
+				Cause.source(Ray.get()).named("formattype", FormatTypes.MESSAGE_RECEIVE).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
 				sendto.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto))),
 				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"), Text.of(message)),
@@ -85,7 +85,7 @@ public class MessageCommand implements CommandExecutor {
 			spies.add(p);
 		}
 		MessageChannelEvent.Chat spyevent = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatType.MESSAGE_SPY).named("sendfrom", sendfrom)
+				Cause.source(Ray.get()).named("formattype", FormatTypes.MESSAGE_SPY).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
 				sendto.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),
