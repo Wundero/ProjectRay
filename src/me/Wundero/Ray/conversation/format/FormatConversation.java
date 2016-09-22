@@ -49,8 +49,8 @@ import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.format.Format;
-import me.Wundero.Ray.framework.format.type.FormatType;
-import me.Wundero.Ray.framework.format.type.FormatTypes;
+import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.translation.M;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -275,7 +275,7 @@ public class FormatConversation {
 	private static class ShouldDoTypePrompt extends Prompt {
 
 		public ShouldDoTypePrompt() {
-			this(TextTemplate.of(Text.of(TextColors.GRAY, "Would you like to specify a type? "),
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Would you like to specify a context? "),
 					Text.builder("[" + '\u2713' + "]").color(TextColors.GREEN).onClick(TextActions.runCommand("y"))
 							.build(),
 					Text.of(TextColors.GRAY, " | "), Text.builder("[" + '\u2715' + "]").color(TextColors.RED)
@@ -338,10 +338,10 @@ public class FormatConversation {
 			if (parseInput(text)) {
 				return new TypePrompt();
 			} else {
-				context.putData("formattype", FormatType.fromString(context.getData("name")));
+				context.putData("formattype", FormatContext.fromString(context.getData("name")));
 				ConfigurationNode node = context.getData("node");
-				String type = ((FormatType) context.getData("formattype")).getName();
-				node.getNode("type").setValue(type);
+				String type = ((FormatContext) context.getData("formattype")).getName();
+				node.getNode("context").setValue(type);
 				return Format.buildConversation(null, context, node);
 			}
 		}
@@ -351,7 +351,7 @@ public class FormatConversation {
 	private static class TypePrompt extends Prompt {
 
 		public TypePrompt() {
-			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please select a type: "),
+			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please select a context: "),
 					TextTemplate.arg("options").color(TextColors.GOLD).build()));
 		}
 
@@ -367,8 +367,8 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.sl();
-			for (FormatType type : FormatTypes.values()) {
-				if (type == FormatTypes.DEFAULT) {
+			for (FormatContext type : FormatContexts.values()) {
+				if (type == FormatContexts.DEFAULT) {
 					continue;
 				}
 				options.add(new Option(
@@ -393,8 +393,8 @@ public class FormatConversation {
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			context.putData("formattype", selected.get().getValue());
 			ConfigurationNode node = context.getData("node");
-			String type = ((FormatType) context.getData("formattype")).getName();
-			node.getNode("type").setValue(type);
+			String type = ((FormatContext) context.getData("formattype")).getName();
+			node.getNode("context").setValue(type);
 			return Format.buildConversation(null, context, node);
 		}
 

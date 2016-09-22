@@ -5,7 +5,7 @@ import java.util.List;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
-import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.utils.Utils;
 
 /*
@@ -36,16 +36,16 @@ public class DefaultFormat {
 
 	private String name;
 	private List<Object> parts;
-	private FormatType type;
+	private FormatContext type;
 
-	public DefaultFormat(String name, FormatType type) {
+	public DefaultFormat(String name, FormatContext type) {
 		this.name = name;
 		this.parts = Utils.sl();
 		this.type = type;
 	}
 
 	public DefaultFormat(String name) {
-		this(name, FormatType.fromString(name));
+		this(name, FormatContext.fromString(name));
 	}
 
 	public DefaultFormat with(Object o) {

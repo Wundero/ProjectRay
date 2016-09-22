@@ -145,11 +145,11 @@ public class AnimatedFormat extends Format {
 			return Tristate.TRUE;
 		});
 		if (data.getObserver().isPresent()) {
-			RayPlayer.get(data.getObserver().get()).queueAnimation(this.getType(), anim);
+			RayPlayer.get(data.getObserver().get()).queueAnimation(this.getContext(), anim);
 		} else if (data.getRecipient().isPresent()) {
-			RayPlayer.get(data.getRecipient().get()).queueAnimation(this.getType(), anim);
+			RayPlayer.get(data.getRecipient().get()).queueAnimation(this.getContext(), anim);
 		} else if (data.getSender().isPresent()) {
-			RayPlayer.get(data.getSender().get()).queueAnimation(this.getType(), anim);
+			RayPlayer.get(data.getSender().get()).queueAnimation(this.getContext(), anim);
 		} else {
 			anim.start();
 		}

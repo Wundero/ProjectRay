@@ -10,7 +10,7 @@ import com.google.common.reflect.TypeToken;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.Format;
-import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -41,7 +41,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 //stores a bunch of formats and is chosen based on permission
 public class Group {
-	private Map<FormatType, List<Format>> formats = Utils.sm();
+	private Map<FormatContext, List<Format>> formats = Utils.sm();
 	private List<String> parents = Utils.sl();
 	private String world;
 	private int priority;
@@ -58,7 +58,7 @@ public class Group {
 	}
 
 	public void addFormat(Format format) {
-		FormatType type = format.getType();
+		FormatContext type = format.getContext();
 		List<Format> f = formats.get(type);
 		if (f == null) {
 			f = Utils.sl();
@@ -88,7 +88,7 @@ public class Group {
 		}
 		for (ConfigurationNode node : nod2.getChildrenMap().values()) {
 			Format f = Format.create(node);
-			FormatType type = f.getType();
+			FormatContext type = f.getContext();
 			if (!formats.containsKey(type)) {
 				formats.put(type, Utils.sl(f));
 			} else {
@@ -103,7 +103,7 @@ public class Group {
 		lf(config);
 	}
 
-	public Format getFormat(FormatType type, int index) {
+	public Format getFormat(FormatContext type, int index) {
 		if (getFormats(type) == null || getFormats(type).isEmpty()) {
 			return null;
 		}
@@ -113,23 +113,23 @@ public class Group {
 		return getFormats(type).get(index);
 	}
 
-	public Format getFormat(FormatType type) {
+	public Format getFormat(FormatContext type) {
 		return getFormat(type, 0);
 	}
 
-	public Format getFormat(FormatType type, boolean random) {
+	public Format getFormat(FormatContext type, boolean random) {
 		if (random) {
 			return getRandomFormat(type);
 		}
 		return getFormat(type, 0);
 	}
 
-	public Format getRandomFormat(FormatType type) {
+	public Format getRandomFormat(FormatContext type) {
 		List<Format> fmats = getFormats(type);
 		return fmats.get(new Random().nextInt(fmats.size()));
 	}
 
-	public Format getFormat(FormatType type, String name) {
+	public Format getFormat(FormatContext type, String name) {
 		for (Format f : getFormats(type)) {
 			if (f.getName().equalsIgnoreCase(name)) {
 				return f;
@@ -176,7 +176,7 @@ public class Group {
 		return groups;
 	}
 
-	public List<Format> getFormats(FormatType type) {
+	public List<Format> getFormats(FormatContext type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
 			List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
 			List<Group> torem = Utils.sl();

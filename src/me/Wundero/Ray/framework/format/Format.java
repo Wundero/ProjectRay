@@ -39,14 +39,14 @@ import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.conversation.TypePrompt;
-import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public abstract class Format {
-	private FormatType type;
+	private FormatContext context;
 	private String name;
 	protected boolean usable = false;
 	private Optional<ConfigurationNode> node;
@@ -55,8 +55,8 @@ public abstract class Format {
 
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode) {
 		ConfigurationNode oldNode = c.getData("node");
-		oldNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
-		newNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
+		oldNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
+		newNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
 		c.putData("node", newNode);
 		return new FormatPrompt(p == null ? null : new WrapperPrompt(p, oldNode, c));
 	}
@@ -64,8 +64,8 @@ public abstract class Format {
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode,
 			final Format chosen) {
 		ConfigurationNode oldNode = c.getData("node");
-		oldNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
-		newNode.getNode("type").setValue(((FormatType) c.getData("formattype")).getName());
+		oldNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
+		newNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
 		c.putData("node", newNode);
 		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
 	}
@@ -278,9 +278,9 @@ public abstract class Format {
 			return;
 		}
 		name = node.getKey().toString();
-		setType(node.getNode("type").isVirtual() ? FormatType.fromString(name)
-				: FormatType.fromString(node.getNode("type").getString()));
-		node.getNode("type").setValue(type.getName());
+		setContext(node.getNode("context").isVirtual() ? FormatContext.fromString(name)
+				: FormatContext.fromString(node.getNode("context").getString()));
+		node.getNode("context").setValue(context.getName());
 		// forces type to be present
 	}
 
@@ -288,12 +288,12 @@ public abstract class Format {
 		return usable;
 	}
 
-	public FormatType getType() {
-		return type;
+	public FormatContext getContext() {
+		return context;
 	}
 
-	public Format setType(FormatType type) {
-		this.type = type;
+	public Format setContext(FormatContext context) {
+		this.context = context;
 		return this;
 	}
 

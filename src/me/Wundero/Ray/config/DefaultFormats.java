@@ -27,22 +27,22 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.Ray.framework.format.type.FormatTypes;
+import me.Wundero.Ray.framework.format.context.FormatContexts;
 
 public class DefaultFormats {
 
-	public static final DefaultFormat BASIC_CHAT = new DefaultFormat("chat", FormatTypes.CHAT)
+	public static final DefaultFormat BASIC_CHAT = new DefaultFormat("chat", FormatContexts.CHAT)
 			.with(TextTemplate.arg("player")).with(" ").with(TextTemplate.arg("message"));
-	public static final DefaultFormat CHAT = new DefaultFormat("chat", FormatTypes.CHAT).with(DefaultArgs.CHANNEL)
+	public static final DefaultFormat CHAT = new DefaultFormat("chat", FormatContexts.CHAT).with(DefaultArgs.CHANNEL)
 			.with(" ").with(DefaultArgs.DISPLAYNAME).with(" ").with(TextTemplate.arg("message").color(TextColors.GRAY));
-	public static final DefaultFormat JOIN = new DefaultFormat("join", FormatTypes.JOIN).with(DefaultArgs.DISPLAYNAME)
+	public static final DefaultFormat JOIN = new DefaultFormat("join", FormatContexts.JOIN).with(DefaultArgs.DISPLAYNAME)
 			.with(" ").with(Text.of(TextColors.AQUA, "has joined!"));
-	public static final DefaultFormat LEAVE = new DefaultFormat("leave", FormatTypes.LEAVE)
+	public static final DefaultFormat LEAVE = new DefaultFormat("leave", FormatContexts.LEAVE)
 			.with(DefaultArgs.DISPLAYNAME).with(" ").with(Text.of(TextColors.RED, "has left!"));
-	public static final DefaultFormat MSG_RECEIVE = new DefaultFormat("receive", FormatTypes.MESSAGE_RECEIVE)
+	public static final DefaultFormat MSG_RECEIVE = new DefaultFormat("receive", FormatContexts.MESSAGE_RECEIVE)
 			.with(DefaultArgs.DISPLAYNAME).with(Text.of(TextColors.AQUA, " to you")).with(Text.of(TextColors.GRAY, ":"))
 			.with(TextTemplate.arg("message").color(TextColors.GRAY));
-	public static final DefaultFormat MSG_SEND = new DefaultFormat("send", FormatTypes.MESSAGE_SEND)
+	public static final DefaultFormat MSG_SEND = new DefaultFormat("send", FormatContexts.MESSAGE_SEND)
 			.with(Text.of(TextColors.AQUA, "You to ")).with(DefaultArgs.RECIP_DISPLAYNAME)
 			.with(Text.of(TextColors.GRAY, ":")).with(TextTemplate.arg("message").color(TextColors.GRAY));
 

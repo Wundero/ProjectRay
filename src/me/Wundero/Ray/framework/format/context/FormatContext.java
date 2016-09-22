@@ -1,4 +1,4 @@
-package me.Wundero.Ray.framework.format.type;
+package me.Wundero.Ray.framework.format.context;
 
 import java.util.regex.Pattern;
 
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-public class FormatType {
+public class FormatContext {
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
@@ -34,17 +34,17 @@ public class FormatType {
 	private String name;
 	private boolean animated;
 
-	FormatType(String name) {
+	FormatContext(String name) {
 		this.setName(name);
 		this.setAliases(new String[] {});
 	}
 
-	FormatType(String name, String[] aliases) {
+	FormatContext(String name, String[] aliases) {
 		this.setName(name);
 		this.setAliases(aliases);
 	}
 
-	FormatType(String name, String[] aliases, boolean animatable) {
+	FormatContext(String name, String[] aliases, boolean animatable) {
 		this(name, aliases);
 		this.setAnimated(animatable);
 	}
@@ -65,27 +65,27 @@ public class FormatType {
 		this.name = name.trim();
 	}
 
-	public static FormatType fromString(String s) {
+	public static FormatContext fromString(String s) {
 		if (s == null) {
-			return FormatTypes.DEFAULT;
+			return FormatContexts.DEFAULT;
 		}
 		s = s.trim().toUpperCase().replace("_", " ");
 		if (namepat.matcher(s).matches()) {
 			s = altpat.matcher(s).replaceAll("");
 		}
-		for (FormatType type : FormatTypes.values()) {
+		for (FormatContext type : FormatContexts.values()) {
 			if (type.name.equalsIgnoreCase(s) || type.getName().equalsIgnoreCase(s)) {
 				return type;
 			}
 		}
-		for (FormatType type : FormatTypes.values()) {
+		for (FormatContext type : FormatContexts.values()) {
 			for (String st : type.aliases) {
 				if (st.equalsIgnoreCase(s)) {
 					return type;
 				}
 			}
 		}
-		return FormatTypes.DEFAULT;
+		return FormatContexts.DEFAULT;
 	}
 
 	public boolean isAnimated() {

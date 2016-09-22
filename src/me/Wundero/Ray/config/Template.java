@@ -33,7 +33,7 @@ import org.spongepowered.api.text.TextTemplate.Arg;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -131,7 +131,7 @@ public class Template {
 				private ConfigurationNode node;
 				@SuppressWarnings("unused")
 				private String name;
-				private Optional<FormatType> type = Optional.empty();
+				private Optional<FormatContext> type = Optional.empty();
 				private GroupBuilder parent;
 				private TextTemplate template;
 				private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
@@ -165,7 +165,7 @@ public class Template {
 					return parent;
 				}
 
-				public FormatBuilder withType(FormatType type) {
+				public FormatBuilder withType(FormatContext type) {
 					this.type = Optional.ofNullable(type);
 					return this;
 				}

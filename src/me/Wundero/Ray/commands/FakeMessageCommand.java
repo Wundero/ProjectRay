@@ -41,8 +41,8 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
-import me.Wundero.Ray.framework.format.type.FormatType;
-import me.Wundero.Ray.framework.format.type.FormatTypes;
+import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.context.FormatContexts;
 
 public class FakeMessageCommand implements CommandExecutor {
 
@@ -50,7 +50,8 @@ public class FakeMessageCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!args.hasAny("type") || FormatType.fromString(args.<String> getOne("type").get()) == FormatTypes.DEFAULT) {
+		if (!args.hasAny("type")
+				|| FormatContext.fromString(args.<String> getOne("type").get()) == FormatContexts.DEFAULT) {
 			src.sendMessage(Text.of(TextColors.RED, "You must specify a proper type!"));
 			return CommandResult.success();
 		}
@@ -71,7 +72,7 @@ public class FakeMessageCommand implements CommandExecutor {
 		String type = args.<String> getOne("type").get();
 		String message = args.<String> getOne("message").get();
 		MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get().getPlugin()).named("formattype", FormatType.fromString(type)).build(),
+				Cause.source(Ray.get().getPlugin()).named("formattype", FormatContext.fromString(type)).build(),
 				target.getMessageChannel(), Optional.of(target.getMessageChannel()),
 				new MessageEvent.MessageFormatter(Text.of(message)), Text.of(message), false);
 		Sponge.getEventManager().post(ev2);

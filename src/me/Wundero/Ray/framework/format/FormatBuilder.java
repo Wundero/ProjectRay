@@ -36,8 +36,8 @@ import me.Wundero.Ray.config.DefaultArg;
 import me.Wundero.Ray.config.InternalClickAction;
 import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.framework.Group;
-import me.Wundero.Ray.framework.format.type.FormatType;
-import me.Wundero.Ray.framework.format.type.FormatTypes;
+import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -50,7 +50,7 @@ public class FormatBuilder {
 	private TextTemplate template;
 	private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
 	private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
-	private Optional<FormatType> type;
+	private Optional<FormatContext> type;
 
 	public FormatBuilder(ConfigurationNode node, String name) {
 		this.node = node;
@@ -68,7 +68,7 @@ public class FormatBuilder {
 			for (Arg a : hovers.keySet()) {
 				args.getNode(a.getName(), "hover").setValue(TypeToken.of(InternalHoverAction.class), hovers.get(a));
 			}
-			type.ifPresent(type -> node.getNode("type").setValue(type.getName()));
+			type.ifPresent(type -> node.getNode("context").setValue(type.getName()));
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
@@ -79,8 +79,8 @@ public class FormatBuilder {
 		return new FormatBuilder(group.getConfig().getNode("format", name), name);
 	}
 
-	public FormatBuilder withType(FormatType type) {
-		if (type == FormatTypes.DEFAULT) {
+	public FormatBuilder withType(FormatContext type) {
+		if (type == FormatContexts.DEFAULT) {
 			return this;
 		}
 		this.type = Optional.ofNullable(type);
