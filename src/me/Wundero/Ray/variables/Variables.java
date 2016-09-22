@@ -199,9 +199,8 @@ public class Variables {
 	// these methods allow you to register with lamdas
 
 	public boolean registerWrapper(String key, Runnable r) {
-		return registerWrapper(key, (v, t) -> {
+		return registerWrapper(key, (BiConsumer<Variable, Text>) (v, t) -> {
 			r.run();
-			return t;
 		});
 	}
 
@@ -210,7 +209,7 @@ public class Variables {
 	}
 
 	public boolean registerWrapper(String key, BiConsumer<Variable, Text> c) {
-		return registerWrapper(key, (v, t) -> {
+		return registerWrapper(key, (BiFunction<Variable, Text, Text>) (v, t) -> {
 			c.accept(v, t);
 			return t;
 		});
@@ -227,32 +226,20 @@ public class Variables {
 	}
 
 	public boolean registerVariable(String key, Runnable task) {
-		return registerVariable(key.toLowerCase().trim(), (objects) -> task.run());
+		return registerVariable(key.toLowerCase().trim(), (Consumer<Map<Param, Object>>) (objects) -> task.run());
 	}
 
 	// just acts on data
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
-		return registerVariable(new Variable(key.toLowerCase().trim()) {
-
-			@Override
-			public Text parse(Map<Param, Object> objects) {
-				task.accept(objects);
-				return Text.of();
-			}
-
+		return registerVariable(key, (Function<Map<Param, Object>, Text>) (o) -> {
+			task.accept(o);
+			return Text.EMPTY;
 		});
 	}
 
 	// just returns static info
 	public boolean registerVariable(String key, Supplier<Text> replacer) {
-		return registerVariable(new Variable(key.toLowerCase().trim()) {
-
-			@Override
-			public Text parse(Map<Param, Object> objects) {
-				return replacer.get();
-			}
-
-		});
+		return registerVariable(key, (Function<Map<Param, Object>, Text>) (o) -> replacer.get());
 	}
 
 	// returns info based on data
