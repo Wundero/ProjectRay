@@ -23,42 +23,21 @@ package me.Wundero.ProjectRay.variables;
  SOFTWARE.
  */
 
-import java.util.Map;
-import java.util.Optional;
+import org.spongepowered.api.text.Text;
 
-import me.Wundero.ProjectRay.utils.Utils;
+public abstract class VariableWrapper {
 
-public class Store {
-	private Map<String, Variable> vars = Utils.sm();
-	private Map<String, VariableWrapper> wrappers = Utils.sm();
+	// TODO unsure about how to handle this
 
-	public Optional<VariableWrapper> getWrapper(String key) {
-		if (!wrappers.containsKey(key)) {
-			return Optional.empty();
-		}
-		return Optional.ofNullable(wrappers.get(key));
+	private final String key;
+
+	public VariableWrapper(String key) {
+		this.key = key.toLowerCase().trim();
 	}
 
-	public boolean registerWrapper(VariableWrapper v) {
-		if (wrappers.containsKey(v.getKey())) {
-			return false;
-		}
-		wrappers.put(v.getKey(), v);
-		return true;
+	public final String getKey() {
+		return key;
 	}
 
-	public Optional<Variable> getVariable(String key) {
-		if (!vars.containsKey(key)) {
-			return Optional.empty();
-		}
-		return Optional.ofNullable(vars.get(key));
-	}
-
-	public boolean registerVariable(Variable v) {
-		if (vars.containsKey(v.getKey())) {
-			return false;
-		}
-		vars.put(v.getKey(), v);
-		return true;
-	}
+	public abstract Text parse(Variable v, Text returned);
 }

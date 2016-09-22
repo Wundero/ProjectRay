@@ -51,6 +51,7 @@ import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
@@ -62,7 +63,14 @@ import me.Wundero.ProjectRay.variables.ParsableData;
 public class TextUtils {
 
 	public static Text strip(Text t) {
-		return strip(TextSerializers.FORMATTING_CODE.serialize(t), true);
+		Text.Builder b = t.toBuilder();
+		List<Text> ch = b.getChildren();
+		b.removeAll();
+		b.format(TextFormat.NONE);
+		for (Text f : ch) {
+			b.append(strip(f));
+		}
+		return b.build();
 	}
 
 	public static Text transIf(String s, User u) {
@@ -462,11 +470,21 @@ public class TextUtils {
 		return makeURLClickable((LiteralText) t);
 	}
 
-	public static Text urlsIf(Text t) {
-		if (t instanceof LiteralText) {
-			return makeURLClickable((LiteralText) t);
+	public static Text noUrls(Text t) {
+		if (!(t instanceof LiteralText)) {
+			return t;
 		}
-		return t;
+		return makeURLUnclickable((LiteralText) t);
+	}
+
+	private static LiteralText makeURLUnclickable(LiteralText text) {
+		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (match) -> {
+			return Optional.of(Text.of(match.replace(".", " ")));
+		}, true);
+	}
+
+	public static Text urlsIf(Text t) {
+		return urls(t);
 	}
 
 	public static LiteralText makeURLClickable(LiteralText text) {

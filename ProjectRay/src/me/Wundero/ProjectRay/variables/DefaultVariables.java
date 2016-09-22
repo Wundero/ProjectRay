@@ -41,10 +41,17 @@ import me.Wundero.ProjectRay.Ray;
 import me.Wundero.ProjectRay.framework.channel.ChatChannel;
 import me.Wundero.ProjectRay.framework.player.RayPlayer;
 import me.Wundero.ProjectRay.tag.Tag;
+import me.Wundero.ProjectRay.utils.TextUtils;
 
 public class DefaultVariables {
 
 	public static void register(Variables v) {
+		v.registerWrapper("stripped", (va, t) -> {
+			return TextUtils.strip(t);
+		});
+		v.registerWrapper("nourls", (va, t) -> {
+			return TextUtils.noUrls(t);
+		});
 		v.registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		v.registerVariable("player", (objects) -> {
 			Param playerToUse = Param.SENDER;

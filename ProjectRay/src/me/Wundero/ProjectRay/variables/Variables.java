@@ -25,6 +25,8 @@ package me.Wundero.ProjectRay.variables;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -47,17 +49,21 @@ public class Variables {
 		Optional<Player> recipient = parsedat.getRecipient();
 		Optional<Player> observer = parsedat.getObserver();
 		String data = null;
+		String[] decdata = null;
 		if (key.contains(":")) {
 			String[] ks = key.split(":");
+			decdata = key.split(":"); // avoiding same pointer - safer
 			key = ks[0];
 			String s = "";
+			String fgx = "";
 			boolean b = true;
 			for (String a : ks) {
 				if (b) {
 					b = false;
 					continue;
 				}
-				s += a;
+				s += fgx + a;
+				fgx = " ";
 			}
 			data = s;
 		}
@@ -114,6 +120,62 @@ public class Variables {
 			} catch (Exception e) {
 				return Text.of();
 			}
+		} else if (store.getWrapper(key).isPresent() && data != null) {
+			VariableWrapper v = store.getWrapper(key).get();
+			Optional<Variable> vx = store.getVariable(decdata[1]);
+			if (vx.isPresent()) {
+				data = data.substring(data.indexOf(":"));
+				Map<Param, Object> map = Utils.sm();
+				for (Param p : Param.values()) {
+					// add all params that are available to map
+					switch (p) {
+					case SENDER:
+						if (!sender.isPresent()) {
+							break;
+						}
+						map.put(p, sender.get());
+						break;
+					case RECIPIENT:
+						if (!recipient.isPresent()) {
+							break;
+						}
+						map.put(p, recipient.get());
+						break;
+					case FORMAT:
+						if (!format.isPresent()) {
+							break;
+						}
+						map.put(p, format.get());
+						break;
+					case TEMPLATE:
+						if (!template.isPresent()) {
+							break;
+						}
+						map.put(p, template.get());
+						break;
+					case DATA:
+						if (data == null) {
+							break;
+						}
+						map.put(p, data);
+						break;
+					case OBSERVER:
+						if (!observer.isPresent()) {
+							break;
+						}
+						map.put(p, observer.get());
+						break;
+					case PARSABLE:
+						map.put(p, parsedat);
+						break;
+					}
+				}
+				try {
+					return TextUtils.urls(v.parse(vx.get(), vx.get().parse(map)));
+				} catch (Exception e) {
+					return Text.of();
+				}
+			}
 		}
 		return Text.of();
 	}
@@ -126,16 +188,48 @@ public class Variables {
 
 	private Store store;
 
+	public boolean registerWrapper(VariableWrapper w) {
+		return store.registerWrapper(w);
+	}
+
 	public boolean registerVariable(Variable v) {
 		return store.registerVariable(v);
 	}
 
 	// these methods allow you to register with lamdas
 
+	public boolean registerWrapper(String key, Runnable r) {
+		return registerWrapper(key, (v, t) -> {
+			r.run();
+			return t;
+		});
+	}
+
+	public boolean registerWrapper(String key, Supplier<Text> s) {
+		return registerWrapper(key, (BiFunction<Variable, Text, Text>) (v, t) -> s.get());
+	}
+
+	public boolean registerWrapper(String key, BiConsumer<Variable, Text> c) {
+		return registerWrapper(key, (v, t) -> {
+			c.accept(v, t);
+			return t;
+		});
+	}
+
+	public boolean registerWrapper(String key, BiFunction<Variable, Text, Text> funct) {
+		return registerWrapper(new VariableWrapper(key) {
+
+			@Override
+			public Text parse(Variable v, Text returned) {
+				return funct.apply(v, returned);
+			}
+		});
+	}
+
 	public boolean registerVariable(String key, Runnable task) {
 		return registerVariable(key.toLowerCase().trim(), (objects) -> task.run());
 	}
-	
+
 	// just acts on data
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
