@@ -2,4 +2,4 @@ language: java
 jdk:
 - oraclejdk8
 script:
-- mvn clean verify -f /home/travis/build/Wundero/ProjectRay/ProjectRay/pom.xml
+- mvn clean verify -f /home/travis/build/Wundero/Ray/pom.xml
