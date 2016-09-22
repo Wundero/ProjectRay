@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.Ray.variables;
 /*
  The MIT License (MIT)
 
@@ -37,11 +37,11 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
-import me.Wundero.ProjectRay.tag.Tag;
-import me.Wundero.ProjectRay.utils.TextUtils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.channel.ChatChannel;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.tag.Tag;
+import me.Wundero.Ray.utils.TextUtils;
 
 public class DefaultVariables {
 

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.Ray.commands;
 /*
  The MIT License (MIT)
 
@@ -42,10 +42,10 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.format.type.FormatTypes;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.Utils;
 
 public class MessageCommand implements CommandExecutor {
 

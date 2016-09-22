@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.tag;
+package me.Wundero.Ray.tag;
 /*
  The MIT License (MIT)
 
@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.Validate;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 public class TagStore {
 

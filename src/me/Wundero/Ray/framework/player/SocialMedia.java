@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.player;
+package me.Wundero.Ray.framework.player;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,7 +11,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.utils.TextUtils;
+import me.Wundero.Ray.utils.TextUtils;
 
 /*
  The MIT License (MIT)

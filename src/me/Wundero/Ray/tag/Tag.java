@@ -1,11 +1,11 @@
-package me.Wundero.ProjectRay.tag;
+package me.Wundero.Ray.tag;
 
 import java.util.Optional;
 
 import org.spongepowered.api.text.Text;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.variables.ParsableData;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.variables.ParsableData;
 
 /*
  The MIT License (MIT)

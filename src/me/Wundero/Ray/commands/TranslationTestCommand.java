@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.Ray.commands;
 /*
  The MIT License (MIT)
 
@@ -30,7 +30,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.text.Text;
 
-import me.Wundero.ProjectRay.translation.M;
+import me.Wundero.Ray.translation.M;
 
 public class TranslationTestCommand implements CommandExecutor {
 

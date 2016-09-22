@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.format;
+package me.Wundero.Ray.framework.format;
 /*
  The MIT License (MIT)
 
@@ -36,13 +36,13 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.conversation.BooleanPrompt;
-import me.Wundero.ProjectRay.conversation.ConversationContext;
-import me.Wundero.ProjectRay.conversation.Option;
-import me.Wundero.ProjectRay.conversation.Prompt;
-import me.Wundero.ProjectRay.utils.Utils;
-import me.Wundero.ProjectRay.variables.ParsableData;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.conversation.BooleanPrompt;
+import me.Wundero.Ray.conversation.ConversationContext;
+import me.Wundero.Ray.conversation.Option;
+import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.utils.Utils;
+import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class CommandFormat extends Format {

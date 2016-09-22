@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.utils;
+package me.Wundero.Ray.utils;
 
 /*
  * Copyright (C) 2009 the original author(s).
@@ -18,8 +18,8 @@ package me.Wundero.ProjectRay.utils;
 
 import java.util.Locale;
 
-import me.Wundero.ProjectRay.utils.Ansi.Attribute;
-import me.Wundero.ProjectRay.utils.Ansi.AnsiColor;
+import me.Wundero.Ray.utils.Ansi.Attribute;
+import me.Wundero.Ray.utils.Ansi.AnsiColor;
 
 /**
  * Renders ANSI color escape-codes in strings by parsing out some special syntax

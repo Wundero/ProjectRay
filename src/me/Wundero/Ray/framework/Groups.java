@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.Ray.framework;
 /*
  The MIT License (MIT)
 
@@ -29,8 +29,8 @@ import java.util.Map;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.World;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class Groups {

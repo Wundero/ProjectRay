@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.Ray.commands;
 /*
  The MIT License (MIT)
 
@@ -32,7 +32,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.conversation.announcement.AnnouncementConversation;
+import me.Wundero.Ray.conversation.announcement.AnnouncementConversation;
 
 public class AnnouncementConversationCommand implements CommandExecutor {
 

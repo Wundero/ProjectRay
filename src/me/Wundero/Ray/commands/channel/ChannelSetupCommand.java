@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands.channel;
+package me.Wundero.Ray.commands.channel;
 /*
  The MIT License (MIT)
 
@@ -31,9 +31,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.channel.DefaultChannels;
-import me.Wundero.ProjectRay.framework.channel.DefaultChannels.DefaultChannel;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.channel.DefaultChannels;
+import me.Wundero.Ray.framework.channel.DefaultChannels.DefaultChannel;
 
 public class ChannelSetupCommand implements CommandExecutor {
 

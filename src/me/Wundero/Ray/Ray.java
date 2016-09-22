@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay;
+package me.Wundero.Ray;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,18 +17,18 @@ import org.spongepowered.api.text.TextTemplate;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.config.InternalClickAction;
-import me.Wundero.ProjectRay.config.InternalHoverAction;
-import me.Wundero.ProjectRay.framework.Groups;
-import me.Wundero.ProjectRay.framework.channel.ChatChannels;
-import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.format.StaticFormat;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
-import me.Wundero.ProjectRay.tag.TagStore;
-import me.Wundero.ProjectRay.utils.TextUtils;
-import me.Wundero.ProjectRay.utils.Utils;
-import me.Wundero.ProjectRay.variables.ParsableData;
-import me.Wundero.ProjectRay.variables.Variables;
+import me.Wundero.Ray.config.InternalClickAction;
+import me.Wundero.Ray.config.InternalHoverAction;
+import me.Wundero.Ray.framework.Groups;
+import me.Wundero.Ray.framework.channel.ChatChannels;
+import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.framework.format.StaticFormat;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.tag.TagStore;
+import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
+import me.Wundero.Ray.variables.ParsableData;
+import me.Wundero.Ray.variables.Variables;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;

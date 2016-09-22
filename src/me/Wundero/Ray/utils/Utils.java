@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.utils;
+package me.Wundero.Ray.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +49,8 @@ import org.spongepowered.api.world.World;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-import me.Wundero.ProjectRay.ProjectRay;
-import me.Wundero.ProjectRay.Ray;
+import me.Wundero.Ray.ProjectRay;
+import me.Wundero.Ray.Ray;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;

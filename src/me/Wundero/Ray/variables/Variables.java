@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.Ray.variables;
 /*
  The MIT License (MIT)
 
@@ -36,9 +36,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.utils.TextUtils;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 
 public class Variables {
 	// parse for provided data

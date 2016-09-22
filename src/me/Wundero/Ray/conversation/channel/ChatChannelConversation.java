@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation.channel;
+package me.Wundero.Ray.conversation.channel;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,21 +9,21 @@ import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.conversation.Conversation;
-import me.Wundero.ProjectRay.conversation.ConversationCanceller;
-import me.Wundero.ProjectRay.conversation.ConversationContext;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Cancel;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Chat;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Finish;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Next;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Start;
-import me.Wundero.ProjectRay.conversation.ConversationFactory;
-import me.Wundero.ProjectRay.conversation.ConversationListener;
-import me.Wundero.ProjectRay.conversation.Option;
-import me.Wundero.ProjectRay.conversation.Prompt;
-import me.Wundero.ProjectRay.conversation.TypePrompt;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.conversation.Conversation;
+import me.Wundero.Ray.conversation.ConversationCanceller;
+import me.Wundero.Ray.conversation.ConversationContext;
+import me.Wundero.Ray.conversation.ConversationEvent.Cancel;
+import me.Wundero.Ray.conversation.ConversationEvent.Chat;
+import me.Wundero.Ray.conversation.ConversationEvent.Finish;
+import me.Wundero.Ray.conversation.ConversationEvent.Next;
+import me.Wundero.Ray.conversation.ConversationEvent.Start;
+import me.Wundero.Ray.conversation.ConversationFactory;
+import me.Wundero.Ray.conversation.ConversationListener;
+import me.Wundero.Ray.conversation.Option;
+import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.conversation.TypePrompt;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 

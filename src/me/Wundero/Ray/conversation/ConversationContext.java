@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.Ray.conversation;
 /*
  The MIT License (MIT)
 
@@ -27,7 +27,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
-import me.Wundero.ProjectRay.DataHolder;
+import me.Wundero.Ray.DataHolder;
 
 public class ConversationContext extends DataHolder {
 	// data for conversation

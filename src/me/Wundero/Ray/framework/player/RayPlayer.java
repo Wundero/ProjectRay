@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.player;
+package me.Wundero.Ray.framework.player;
 /*
  The MIT License (MIT)
 
@@ -45,15 +45,15 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.animation.Animation;
-import me.Wundero.ProjectRay.animation.AnimationQueue;
-import me.Wundero.ProjectRay.framework.Group;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
-import me.Wundero.ProjectRay.framework.format.type.FormatType;
-import me.Wundero.ProjectRay.tag.SelectableTag;
-import me.Wundero.ProjectRay.utils.Utils;
-import me.Wundero.ProjectRay.variables.ParsableData;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.animation.Animation;
+import me.Wundero.Ray.animation.AnimationQueue;
+import me.Wundero.Ray.framework.Group;
+import me.Wundero.Ray.framework.channel.ChatChannel;
+import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.tag.SelectableTag;
+import me.Wundero.Ray.utils.Utils;
+import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 

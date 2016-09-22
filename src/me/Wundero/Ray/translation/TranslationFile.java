@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.translation;
+package me.Wundero.Ray.translation;
 /*
  The MIT License (MIT)
 
@@ -36,8 +36,8 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.text.translation.locale.Locales;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.utils.Utils;
 
 public class TranslationFile {
 	private File file;

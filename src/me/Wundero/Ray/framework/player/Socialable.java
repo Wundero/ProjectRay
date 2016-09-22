@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.player;
+package me.Wundero.Ray.framework.player;
 
 import java.net.URL;
 

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.config;
+package me.Wundero.Ray.config;
 /*
  The MIT License (MIT)
 
@@ -33,8 +33,8 @@ import org.spongepowered.api.text.TextTemplate.Arg;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.framework.format.type.FormatType;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 

@@ -1,9 +1,9 @@
-package me.Wundero.ProjectRay;
+package me.Wundero.Ray;
 
 import java.util.Map;
 import java.util.UUID;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)

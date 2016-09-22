@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation.format;
+package me.Wundero.Ray.conversation.format;
 /*
  The MIT License (MIT)
 
@@ -34,25 +34,25 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.conversation.Conversation;
-import me.Wundero.ProjectRay.conversation.ConversationCanceller;
-import me.Wundero.ProjectRay.conversation.ConversationContext;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Cancel;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Chat;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Finish;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Next;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Start;
-import me.Wundero.ProjectRay.conversation.ConversationFactory;
-import me.Wundero.ProjectRay.conversation.ConversationListener;
-import me.Wundero.ProjectRay.conversation.Option;
-import me.Wundero.ProjectRay.conversation.Prompt;
-import me.Wundero.ProjectRay.framework.Group;
-import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.format.type.FormatType;
-import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
-import me.Wundero.ProjectRay.translation.M;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.conversation.Conversation;
+import me.Wundero.Ray.conversation.ConversationCanceller;
+import me.Wundero.Ray.conversation.ConversationContext;
+import me.Wundero.Ray.conversation.ConversationEvent.Cancel;
+import me.Wundero.Ray.conversation.ConversationEvent.Chat;
+import me.Wundero.Ray.conversation.ConversationEvent.Finish;
+import me.Wundero.Ray.conversation.ConversationEvent.Next;
+import me.Wundero.Ray.conversation.ConversationEvent.Start;
+import me.Wundero.Ray.conversation.ConversationFactory;
+import me.Wundero.Ray.conversation.ConversationListener;
+import me.Wundero.Ray.conversation.Option;
+import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.framework.Group;
+import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.framework.format.type.FormatTypes;
+import me.Wundero.Ray.translation.M;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class FormatConversation {

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands.channel;
+package me.Wundero.Ray.commands.channel;
 /*
  The MIT License (MIT)
 
@@ -40,8 +40,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.channel.ChatChannel;
 
 public class ChannelQMCommand implements CommandExecutor {
 

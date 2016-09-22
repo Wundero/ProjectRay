@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.translation;
+package me.Wundero.Ray.translation;
 /*
  The MIT License (MIT)
 

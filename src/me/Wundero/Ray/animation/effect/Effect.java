@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.animation.effect;
+package me.Wundero.Ray.animation.effect;
 /*
  The MIT License (MIT)
 
@@ -28,8 +28,8 @@ import java.util.function.BiFunction;
 
 import org.spongepowered.api.util.Tristate;
 
-import me.Wundero.ProjectRay.animation.Animation;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.animation.Animation;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  * Class for a specific animation (called effect)

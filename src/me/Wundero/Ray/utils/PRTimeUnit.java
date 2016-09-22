@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.utils;
+package me.Wundero.Ray.utils;
 
 /**
  * A {@code TimeUnit} represents time durations at a given unit of granularity

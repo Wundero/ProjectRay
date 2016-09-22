@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.Ray.conversation;
 
 import java.util.Optional;
 

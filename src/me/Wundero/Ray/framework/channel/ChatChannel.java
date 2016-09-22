@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.channel;
+package me.Wundero.Ray.framework.channel;
 /*
  The MIT License (MIT)
 
@@ -39,9 +39,9 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.utils.TextUtils;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;

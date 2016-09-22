@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.Ray.commands;
 /*
  The MIT License (MIT)
 
@@ -40,7 +40,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 public class RayCommand implements CommandExecutor {
 

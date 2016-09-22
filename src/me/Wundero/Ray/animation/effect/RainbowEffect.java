@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.animation.effect;
+package me.Wundero.Ray.animation.effect;
 /*
  The MIT License (MIT)
 

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.tag;
+package me.Wundero.Ray.tag;
 /*
  The MIT License (MIT)
 
@@ -30,10 +30,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
-import me.Wundero.ProjectRay.utils.Utils;
-import me.Wundero.ProjectRay.variables.ParsableData;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.Utils;
+import me.Wundero.Ray.variables.ParsableData;
 
 public class SelectableTag extends Tag<Map<String, TextTemplate>> {
 

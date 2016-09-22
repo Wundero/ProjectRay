@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.format.type;
+package me.Wundero.Ray.framework.format.type;
 
 import java.util.regex.Pattern;
 

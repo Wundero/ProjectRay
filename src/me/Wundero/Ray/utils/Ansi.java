@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.utils;
+package me.Wundero.Ray.utils;
 
 /**
  * Copyright (C) 2009, Progress Software Corporation and/or its 

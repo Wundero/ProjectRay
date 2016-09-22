@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands;
+package me.Wundero.Ray.commands;
 /*
  The MIT License (MIT)
 
@@ -40,9 +40,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.format.type.FormatType;
-import me.Wundero.ProjectRay.framework.format.type.FormatTypes;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.framework.format.type.FormatTypes;
 
 public class FakeMessageCommand implements CommandExecutor {
 

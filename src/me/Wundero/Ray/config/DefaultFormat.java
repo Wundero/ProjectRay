@@ -1,12 +1,12 @@
-package me.Wundero.ProjectRay.config;
+package me.Wundero.Ray.config;
 
 import java.util.List;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
-import me.Wundero.ProjectRay.framework.format.type.FormatType;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)

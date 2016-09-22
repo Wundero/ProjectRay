@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.utils;
+package me.Wundero.Ray.utils;
 /*
  The MIT License (MIT)
 
@@ -55,10 +55,10 @@ import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.config.InternalClickAction;
-import me.Wundero.ProjectRay.config.InternalHoverAction;
-import me.Wundero.ProjectRay.variables.ParsableData;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.config.InternalClickAction;
+import me.Wundero.Ray.config.InternalHoverAction;
+import me.Wundero.Ray.variables.ParsableData;
 
 public class TextUtils {
 

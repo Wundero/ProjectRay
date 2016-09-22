@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.config;
+package me.Wundero.Ray.config;
 /*
  The MIT License (MIT)
 

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.commands.channel;
+package me.Wundero.Ray.commands.channel;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.command.CommandException;
@@ -10,8 +10,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.framework.channel.Role;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.Ray.framework.channel.Role;
+import me.Wundero.Ray.framework.player.RayPlayer;
 
 /*
  The MIT License (MIT)

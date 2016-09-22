@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.Ray.conversation;
 /*
  The MIT License (MIT)
 
@@ -30,12 +30,12 @@ import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Cancel;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Chat;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Finish;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Next;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Start;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.conversation.ConversationEvent.Cancel;
+import me.Wundero.Ray.conversation.ConversationEvent.Chat;
+import me.Wundero.Ray.conversation.ConversationEvent.Finish;
+import me.Wundero.Ray.conversation.ConversationEvent.Next;
+import me.Wundero.Ray.conversation.ConversationEvent.Start;
+import me.Wundero.Ray.utils.Utils;
 
 public class ConversationFactory {
 

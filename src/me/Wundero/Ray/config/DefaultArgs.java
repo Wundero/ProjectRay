@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.config;
+package me.Wundero.Ray.config;
 /*
  The MIT License (MIT)
 
@@ -27,7 +27,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.utils.TextUtils;
+import me.Wundero.Ray.utils.TextUtils;
 
 public class DefaultArgs {
 	// random default args

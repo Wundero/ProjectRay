@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.listeners;
+package me.Wundero.Ray.listeners;
 /*
  The MIT License (MIT)
 
@@ -27,9 +27,9 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.channel.ChatChannel;
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.channel.ChatChannel;
+import me.Wundero.Ray.framework.player.RayPlayer;
 
 public class ChatChannelListener {
 

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.Ray.variables;
 /*
  The MIT License (MIT)
 

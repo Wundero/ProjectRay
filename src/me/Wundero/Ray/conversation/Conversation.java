@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation;
+package me.Wundero.Ray.conversation;
 /*
  The MIT License (MIT)
 
@@ -32,8 +32,8 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.utils.Utils;
 
 //bukkit conversation api but not built in and slightly simpler
 public abstract class Conversation {

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.format.type;
+package me.Wundero.Ray.framework.format.type;
 /*
  The MIT License (MIT)
 
@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 public class FormatTypes {
 

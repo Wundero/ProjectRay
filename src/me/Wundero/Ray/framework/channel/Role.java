@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.channel;
+package me.Wundero.Ray.framework.channel;
 /*
  The MIT License (MIT)
 

@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.Ray.framework;
 
 import java.util.Comparator;
 import java.util.List;
@@ -8,10 +8,10 @@ import java.util.Random;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.framework.format.type.FormatType;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.framework.format.type.FormatType;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 

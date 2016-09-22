@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.variables;
+package me.Wundero.Ray.variables;
 /*
  The MIT License (MIT)
 
@@ -26,7 +26,7 @@ package me.Wundero.ProjectRay.variables;
 import java.util.Map;
 import java.util.Optional;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 public class Store {
 	private Map<String, Variable> vars = Utils.sm();

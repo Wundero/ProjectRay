@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.conversation.announcement;
+package me.Wundero.Ray.conversation.announcement;
 
 import java.util.List;
 import java.util.Map;
@@ -11,21 +11,21 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.ProjectRay.Ray;
-import me.Wundero.ProjectRay.conversation.Conversation;
-import me.Wundero.ProjectRay.conversation.ConversationContext;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Cancel;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Chat;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Finish;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Next;
-import me.Wundero.ProjectRay.conversation.ConversationEvent.Start;
-import me.Wundero.ProjectRay.framework.format.Format;
-import me.Wundero.ProjectRay.conversation.ConversationFactory;
-import me.Wundero.ProjectRay.conversation.ConversationListener;
-import me.Wundero.ProjectRay.conversation.Option;
-import me.Wundero.ProjectRay.conversation.Prompt;
-import me.Wundero.ProjectRay.conversation.TypePrompt;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.conversation.Conversation;
+import me.Wundero.Ray.conversation.ConversationContext;
+import me.Wundero.Ray.conversation.ConversationEvent.Cancel;
+import me.Wundero.Ray.conversation.ConversationEvent.Chat;
+import me.Wundero.Ray.conversation.ConversationEvent.Finish;
+import me.Wundero.Ray.conversation.ConversationEvent.Next;
+import me.Wundero.Ray.conversation.ConversationEvent.Start;
+import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.conversation.ConversationFactory;
+import me.Wundero.Ray.conversation.ConversationListener;
+import me.Wundero.Ray.conversation.Option;
+import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.conversation.TypePrompt;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 /*

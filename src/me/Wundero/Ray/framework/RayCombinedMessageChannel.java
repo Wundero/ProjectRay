@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.Ray.framework;
 
 import java.util.Arrays;
 import java.util.Collection;

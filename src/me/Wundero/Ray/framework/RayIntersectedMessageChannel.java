@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework;
+package me.Wundero.Ray.framework;
 /*
  The MIT License (MIT)
 
@@ -35,7 +35,7 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.util.GuavaCollectors;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 public class RayIntersectedMessageChannel implements MessageChannel {
 	protected final List<MessageChannel> channels;

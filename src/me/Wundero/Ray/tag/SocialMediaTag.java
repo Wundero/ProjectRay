@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.tag;
+package me.Wundero.Ray.tag;
 /*
  The MIT License (MIT)
 
@@ -29,9 +29,9 @@ import java.util.Optional;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import me.Wundero.ProjectRay.framework.player.RayPlayer;
-import me.Wundero.ProjectRay.framework.player.SocialMedia;
-import me.Wundero.ProjectRay.variables.ParsableData;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.framework.player.SocialMedia;
+import me.Wundero.Ray.variables.ParsableData;
 
 public class SocialMediaTag extends Tag<SocialMedia> {
 

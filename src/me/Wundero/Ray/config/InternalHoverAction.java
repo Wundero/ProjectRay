@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.config;
+package me.Wundero.Ray.config;
 
 /*
  * This file is part of SpongeAPI, licensed under the MIT License (MIT).
@@ -45,9 +45,9 @@ import org.spongepowered.api.util.Identifiable;
 import com.google.common.base.Objects;
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.config.InternalHoverAction.ShowEntity.Ref;
-import me.Wundero.ProjectRay.utils.TextUtils;
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.config.InternalHoverAction.ShowEntity.Ref;
+import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;

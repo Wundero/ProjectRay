@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.framework.channel;
+package me.Wundero.Ray.framework.channel;
 /*
  The MIT License (MIT)
 
@@ -31,7 +31,7 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 

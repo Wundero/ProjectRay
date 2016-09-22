@@ -1,4 +1,4 @@
-package me.Wundero.ProjectRay.animation;
+package me.Wundero.Ray.animation;
 
 import java.util.Iterator;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.function.Function;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tristate;
 
-import me.Wundero.ProjectRay.utils.Utils;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)
