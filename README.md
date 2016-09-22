@@ -13,7 +13,7 @@ This plugin uses "groups" to section users off into separate, permission based f
 Each group contains "formats", which are what handle text replacement in messages. Each format is backed by json based text, which replaces variables and parses json.
 
 To create formats, it is __highly__ recommended to use the in-game format builder rather than editing the config, as it will prevent errors and other problems.
->! [config]
+> [config]
 
 Formats are split in two ways: Types and Contexts.
 #### Format Types
