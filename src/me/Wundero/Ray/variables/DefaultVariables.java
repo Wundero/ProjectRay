@@ -193,6 +193,13 @@ public class DefaultVariables {
 			Date date = new Date();
 			return Text.of(date.toString());
 		});
+		v.registerVariable("world", (o) -> {
+			if (!o.containsKey(Param.SENDER)) {
+				return Text.EMPTY;
+			}
+			Player p = (Player) o.get(Param.SENDER);
+			return Text.of(p.getWorld().getName());
+		});
 		v.registerVariable("balance", (objects) -> {
 			if (!objects.containsKey(Param.SENDER)) {
 				return Text.EMPTY;
