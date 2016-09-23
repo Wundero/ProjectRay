@@ -38,16 +38,13 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
-import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 import me.Wundero.Ray.ProjectRay;
 import me.Wundero.Ray.Ray;
@@ -150,6 +147,10 @@ public class Utils {
 	}
 
 	public static <T> List<T> sl() {
+		return sl(Tristate.FALSE);
+	}
+
+	public static <T> List<T> sl(final Tristate strict) {
 		// returns a new arraylist that copies itself for iteration (makes
 		// unsynchronized iter blocks safe)
 		// indexOf method coded such that the equals call supports either object
@@ -170,8 +171,18 @@ public class Utils {
 					}
 				} else {
 					for (int i = 0; i < size(); i++) {
-						if (get(i).equals(o) || o.equals(get(i))) {
-							return i;
+						if (strict == Tristate.TRUE) {
+							if (get(i).equals(o) && o.equals(get(i))) {
+								return i;
+							}
+						} else if (strict == Tristate.FALSE) {
+							if (get(i).equals(o) || o.equals(get(i))) {
+								return i;
+							}
+						} else {
+							if (get(i).equals(o)) {
+								return i;
+							}
 						}
 					}
 				}
@@ -207,11 +218,11 @@ public class Utils {
 	}
 
 	private static double calcdelta(double... coord) {
-		double cx = coord[0];
-		for (int i = 1; i < coord.length; i++) {
-			cx = Math.sqrt(Math.pow(cx, 2) + Math.pow(coord[i], 2));
+		double cx = 0;
+		for (int i = 0; i < coord.length; i++) {
+			cx += Math.pow(coord[i], 2);
 		}
-		return cx;
+		return Math.sqrt(cx);
 	}
 
 	public static double pythrange(double[] coord1, double[] coord2) {
@@ -408,36 +419,6 @@ public class Utils {
 		return builder.toString();
 	}
 
-	public synchronized static String getAnsi(TextElement c) {
-		return replacements.get(c);
-	}
-
-	private static final Map<TextElement, String> replacements = Maps.newHashMap();
-	static {
-		replacements.put(TextColors.BLACK, Ansi.ansi().reset().fg(Ansi.AnsiColor.BLACK).boldOff().toString());
-		replacements.put(TextColors.DARK_BLUE, Ansi.ansi().reset().fg(Ansi.AnsiColor.BLUE).boldOff().toString());
-		replacements.put(TextColors.DARK_GREEN, Ansi.ansi().reset().fg(Ansi.AnsiColor.GREEN).boldOff().toString());
-		replacements.put(TextColors.DARK_AQUA, Ansi.ansi().reset().fg(Ansi.AnsiColor.CYAN).boldOff().toString());
-		replacements.put(TextColors.DARK_RED, Ansi.ansi().reset().fg(Ansi.AnsiColor.RED).boldOff().toString());
-		replacements.put(TextColors.DARK_PURPLE, Ansi.ansi().reset().fg(Ansi.AnsiColor.MAGENTA).boldOff().toString());
-		replacements.put(TextColors.GOLD, Ansi.ansi().reset().fg(Ansi.AnsiColor.YELLOW).boldOff().toString());
-		replacements.put(TextColors.GRAY, Ansi.ansi().reset().fg(Ansi.AnsiColor.WHITE).boldOff().toString());
-		replacements.put(TextColors.DARK_GRAY, Ansi.ansi().reset().fg(Ansi.AnsiColor.BLACK).bold().toString());
-		replacements.put(TextColors.BLUE, Ansi.ansi().reset().fg(Ansi.AnsiColor.BLUE).bold().toString());
-		replacements.put(TextColors.GREEN, Ansi.ansi().reset().fg(Ansi.AnsiColor.GREEN).bold().toString());
-		replacements.put(TextColors.AQUA, Ansi.ansi().reset().fg(Ansi.AnsiColor.CYAN).bold().toString());
-		replacements.put(TextColors.RED, Ansi.ansi().reset().fg(Ansi.AnsiColor.RED).bold().toString());
-		replacements.put(TextColors.LIGHT_PURPLE, Ansi.ansi().reset().fg(Ansi.AnsiColor.MAGENTA).bold().toString());
-		replacements.put(TextColors.YELLOW, Ansi.ansi().reset().fg(Ansi.AnsiColor.YELLOW).bold().toString());
-		replacements.put(TextColors.WHITE, Ansi.ansi().reset().fg(Ansi.AnsiColor.WHITE).bold().toString());
-		replacements.put(TextStyles.OBFUSCATED, Ansi.ansi().a(Ansi.Attribute.BLINK_SLOW).toString());
-		replacements.put(TextStyles.BOLD, Ansi.ansi().a(Ansi.Attribute.UNDERLINE_DOUBLE).toString());
-		replacements.put(TextStyles.STRIKETHROUGH, Ansi.ansi().a(Ansi.Attribute.STRIKETHROUGH_ON).toString());
-		replacements.put(TextStyles.UNDERLINE, Ansi.ansi().a(Ansi.Attribute.UNDERLINE).toString());
-		replacements.put(TextStyles.ITALIC, Ansi.ansi().a(Ansi.Attribute.ITALIC).toString());
-		replacements.put(TextColors.RESET, Ansi.ansi().reset().toString());
-	}
-
 	public static void force(File f, boolean file) throws IOException {
 		if (f.exists() && f.isFile() != file) {
 			f.delete();
@@ -559,7 +540,8 @@ public class Utils {
 	}
 
 	public static <T> T pop(Deque<T> deque, T def) {
-		return deque.isEmpty() ? def : deque.pop();
+		T o = def;
+		return deque.isEmpty() ? def : (o = deque.pop()) == null ? def : o;
 	}
 
 	public static boolean call(Event e) {
@@ -571,7 +553,7 @@ public class Utils {
 				+ "|(n[i1!]g[g]?([a4]|[3e]r))|([4a][sz]{2})|(cunt)|(d[i!1][c]?k)|([kd][yi1!]ke)"
 				+ "|(f[a43e]g([g]?[0oi1!]t)?)|(cum|j[i1!]zz)|(p[e3]n[i1!u]s)|(qu[3e]{2}r)"
 				+ "|(pu[zs]{2}y)|(tw[4a]t)|(v[a4]g[i1!]n[a4])|(wh[o0]r[e3])"
-				+ "|([ck][o0][ck]?[k])|([d][o][ou][c][h][e])" + ")", Pattern.CASE_INSENSITIVE);
+				+ "|([ck][o0][ck]?[k])|([d][o][ou][c][h][e]?)" + ")", Pattern.CASE_INSENSITIVE);
 	}
 
 	public static boolean containsProfanities(String s) {

@@ -40,7 +40,7 @@ public abstract class Tag<T> {
 		this.name = name;
 		Ray.get().getTags().register(this);
 	}
-
+	
 	public abstract boolean verify(Object o);
 
 	public abstract Optional<Text> get(Optional<ParsableData> data);

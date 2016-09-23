@@ -32,21 +32,15 @@ public class FormatContext {
 
 	private String[] aliases;
 	private String name;
-	private boolean animated;
 
-	FormatContext(String name) {
+	public FormatContext(String name) {
 		this.setName(name);
 		this.setAliases(new String[] {});
 	}
 
-	FormatContext(String name, String[] aliases) {
+	public FormatContext(String name, String[] aliases) {
 		this.setName(name);
 		this.setAliases(aliases);
-	}
-
-	FormatContext(String name, String[] aliases, boolean animatable) {
-		this(name, aliases);
-		this.setAnimated(animatable);
 	}
 
 	public String[] getAliases() {
@@ -86,13 +80,5 @@ public class FormatContext {
 			}
 		}
 		return FormatContexts.DEFAULT;
-	}
-
-	public boolean isAnimated() {
-		return animated;
-	}
-
-	public void setAnimated(boolean animated) {
-		this.animated = animated;
 	}
 }

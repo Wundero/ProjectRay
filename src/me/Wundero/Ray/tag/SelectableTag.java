@@ -30,12 +30,17 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
+import com.google.common.reflect.TypeToken;
+
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.config.RaySerializable;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
-public class SelectableTag extends Tag<Map<String, TextTemplate>> {
+public class SelectableTag extends Tag<Map<String, TextTemplate>> implements RaySerializable {
 
 	public SelectableTag(String name, Map<String, TextTemplate> object) {
 		super(name, object);
@@ -79,5 +84,24 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> {
 		d2.setKnown(dat);
 		Text t2 = Ray.get().applyVars(t, d2);
 		return Optional.ofNullable(t2);
+	}
+
+	@Override
+	public void serialize(ConfigurationNode onto) throws ObjectMappingException {
+		TextTemplate.of();
+		for (Map.Entry<String, TextTemplate> e : this.getObject().entrySet()) {
+			onto.getNode(e.getKey()).setValue(TypeToken.of(TextTemplate.class), e.getValue());
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends RaySerializable> T deserialize(ConfigurationNode from) throws ObjectMappingException {
+		TextTemplate.of();
+		this.object = Utils.sm();
+		for (Map.Entry<Object, ? extends ConfigurationNode> e : from.getChildrenMap().entrySet()) {
+			this.object.put(e.getKey().toString(), e.getValue().getValue(TypeToken.of(TextTemplate.class)));
+		}
+		return (T) this;
 	}
 }

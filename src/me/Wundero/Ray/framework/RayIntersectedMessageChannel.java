@@ -54,7 +54,7 @@ public class RayIntersectedMessageChannel implements MessageChannel {
 		Text text = original;
 		for (MessageChannel channel : this.channels) {
 			text = channel.transformMessage(sender, recipient, text, type).orElse(null);
-			if(text==null) {
+			if (text == null) {
 				break;
 			}
 		}
@@ -64,7 +64,7 @@ public class RayIntersectedMessageChannel implements MessageChannel {
 
 	@Override
 	public Collection<MessageReceiver> getMembers() {
-		if (channels == null || channels.isEmpty()) {// prevents IOORE and NPE
+		if (channels == null || channels.isEmpty()) {// prevents IOOBE and NPE
 			return Utils.sl();
 		}
 		Collection<MessageReceiver> out = channels.get(0).getMembers();

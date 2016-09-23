@@ -42,12 +42,12 @@ public class FormatContexts {
 	public static FormatContext CUSTOM = new FormatContext("custom");
 	public static FormatContext WELCOME = new FormatContext("welcome", new String[] { "w" });
 	public static FormatContext MOTD = new FormatContext("motd");
-	public static FormatContext TABLIST_ENTRY = new FormatContext("tablist", new String[] { "list", "t", "tab" }, true);
+	public static FormatContext TABLIST_ENTRY = new FormatContext("tablist", new String[] { "list", "t", "tab" });
 	public static FormatContext DEFAULT = new FormatContext("default");
 	public static FormatContext ACHIEVEMENT = new FormatContext("achievement", new String[] { "ach" });
 	public static FormatContext KICK = new FormatContext("kick", new String[] { "k" });
-	public static FormatContext TABLIST_HEADER = new FormatContext("header", new String[] { "h" }, true);
-	public static FormatContext TABLIST_FOOTER = new FormatContext("footer", new String[] { "f" }, true);
+	public static FormatContext TABLIST_HEADER = new FormatContext("header", new String[] { "h" });
+	public static FormatContext TABLIST_FOOTER = new FormatContext("footer", new String[] { "f" });
 	public static FormatContext ANNOUNCEMENT = new FormatContext("announcement", new String[] { "a" });
 
 	private static Map<String, FormatContext> lookup = Utils.sm();

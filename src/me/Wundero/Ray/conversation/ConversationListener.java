@@ -33,6 +33,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
 public abstract class ConversationListener {
@@ -100,6 +101,14 @@ public abstract class ConversationListener {
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
 		} else {
+			if (!conversation.isSuppressMessages()) {
+				return;
+			}
+			event.getChannel().ifPresent(channel -> {
+				MutableMessageChannel cj = channel.asMutable();
+				cj.removeMember(conversation.getContext().getHolder());
+				event.setChannel(cj);
+			});
 			return;
 		}
 		if (conversation.getContext().getHolder().getUniqueId().equals(p.getUniqueId())) {
@@ -121,6 +130,16 @@ public abstract class ConversationListener {
 				Prompt pr = conversation.getCurrentPrompt().input(context, input);
 				conversation.next(pr);
 			}
+		} else {
+			if (!conversation.isSuppressMessages()) {
+				return;
+			}
+			event.getChannel().ifPresent(channel -> {
+				MutableMessageChannel cj = channel.asMutable();
+				cj.removeMember(conversation.getContext().getHolder());
+				event.setChannel(cj);
+			});
+			return;
 		}
 	}
 

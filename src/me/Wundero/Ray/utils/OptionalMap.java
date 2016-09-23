@@ -46,21 +46,20 @@ public class OptionalMap<K, V> {
 		}
 	}
 
-	public V put(K key, V value) {
+	public Optional<V> put(K key, V value) {
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
-		return m.put(key, value);
+		return Utils.wrap(m.put(key, value));
 	}
 
 	public boolean has(K key) {
+		Objects.requireNonNull(key);
 		return m.containsKey(key);
 	}
 
 	public Optional<V> get(K key) {
-		if (!has(key)) {
-			return Optional.empty();
-		}
-		return Optional.of(m.get(key));
+		Objects.requireNonNull(key);
+		return Utils.wrap(m.get(key));
 	}
 
 	public int size() {
@@ -89,7 +88,7 @@ public class OptionalMap<K, V> {
 		if (!has(key)) {
 			return Optional.empty();
 		}
-		return Optional.of(m.remove(key));
+		return Utils.wrap(m.remove(key));
 	}
 
 	public void clear() {
