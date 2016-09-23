@@ -708,15 +708,15 @@ public class Utils {
 		if (includeOriginal) {
 			out.add(original);
 		}
-		int i = 0;
-		while (i < times) {
+		int x = 0;
+		while (x < times) {
 			try {
-				T m = mod.apply(original, i);
+				T m = mod.apply(original, x);
 				out.add(m);
 			} catch (Exception e) {
 				times++;
 			}
-			i++;
+			x++;
 		}
 		return out;
 	}
