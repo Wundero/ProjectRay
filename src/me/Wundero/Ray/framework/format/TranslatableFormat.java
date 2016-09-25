@@ -26,10 +26,10 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.conversation.ConversationContext;
@@ -53,13 +53,13 @@ public class TranslatableFormat extends Format {
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o) {
 		TextTemplate template = TextUtils.parse(TranslationFile.getTranslation(key).get(), true);
-		return this.s(f, args, template);
+		return this.s(f, args, template, o);
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, ParsableData data) {
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o) {
 		TextTemplate template = null;
 		if (data.getObserver().isPresent()) {
 			template = TextUtils.parse(TranslationFile.getTranslation(key).get(data.getObserver().get().getLocale()),
@@ -73,7 +73,7 @@ public class TranslatableFormat extends Format {
 		} else {
 			template = TextUtils.parse(TranslationFile.getTranslation(key).get(), true);
 		}
-		return this.s(f, data, template);
+		return this.s(f, data, template, o);
 	}
 
 	@Override

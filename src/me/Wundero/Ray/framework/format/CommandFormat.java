@@ -26,7 +26,6 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -35,6 +34,7 @@ import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.conversation.BooleanPrompt;
@@ -100,19 +100,13 @@ public class CommandFormat extends Format {
 					if (cancel) {
 						event.setCancelled(true);
 					}
-					send(t -> {
-						s.sendMessage(t);
-						return true;
-					}, d);
+					send(s, d, Optional.of(s));
 				}
 			} else {
 				if (cancel) {
 					event.setCancelled(true);
 				}
-				send(t -> {
-					s.sendMessage(t);
-					return true;
-				}, d);
+				send(s, d, Optional.of(s));
 			}
 		}
 	}
@@ -160,13 +154,13 @@ public class CommandFormat extends Format {
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
-		return format.send(f, args);
+	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> opt) {
+		return format.send(target, args, opt);
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, ParsableData data) {
-		return format.send(f, data);
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> opt) {
+		return format.send(target, data, opt);
 	}
 
 	@Override

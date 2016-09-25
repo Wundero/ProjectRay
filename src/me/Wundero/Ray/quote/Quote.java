@@ -1,4 +1,14 @@
-package me.Wundero.Ray.config;
+package me.Wundero.Ray.quote;
+
+import java.util.UUID;
+
+import org.spongepowered.api.entity.living.player.User;
+
+import me.Wundero.Ray.config.RaySerializable;
+import me.Wundero.Ray.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
 /*
  The MIT License (MIT)
 
@@ -23,13 +33,21 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+public class Quote implements RaySerializable {
 
-public interface RaySerializable {
+	private String value;
+	private User owner;
 
-	public void serialize(ConfigurationNode onto) throws ObjectMappingException;
+	@Override
+	public void serialize(ConfigurationNode onto) throws ObjectMappingException {
+		onto.getNode("quote").setValue(value);
+		onto.getNode("owner").setValue(owner.getUniqueId().toString());
+	}
 
-	public void deserialize(ConfigurationNode from) throws ObjectMappingException;
+	@Override
+	public void deserialize(ConfigurationNode from) throws ObjectMappingException {
+		this.value = from.getNode("quote").getString();
+		this.owner = Utils.getUser(UUID.fromString(from.getNode("owner").getString()));
+	}
 
 }

@@ -26,7 +26,6 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -35,6 +34,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.conversation.ConversationContext;
@@ -99,21 +99,24 @@ public class EventFormat extends Format {
 				}
 			}
 			data.setKnown(map);
-			send((text) -> {
-				Sponge.getServer().getBroadcastChannel().send(text);
-				return true;
-			}, data);
+			if (data.getRecipient().isPresent()) {
+				send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)));
+			} else {
+				for (Player p : Sponge.getServer().getOnlinePlayers()) {
+					send(p, data, Utils.wrap(data.getSender().orElse(null)));
+				}
+			}
 		}
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
-		return internal.send(f, args);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o) {
+		return internal.send(f, args, o);
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, ParsableData data) {
-		return internal.send(f, data);
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o) {
+		return internal.send(f, data, o);
 	}
 
 	@Override

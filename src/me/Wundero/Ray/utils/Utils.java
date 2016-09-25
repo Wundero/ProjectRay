@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
@@ -31,6 +32,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ProxySource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.scheduler.Task;
@@ -38,6 +40,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
@@ -741,6 +744,21 @@ public class Utils {
 	public static List<Player> getPlayers() {
 		updatePlayersAlpha();
 		return sl(playersAlphabetical);
+	}
+
+	public static User getUser(UUID uuid) {
+		Optional<Player> p = Sponge.getServer().getPlayer(uuid);
+		if (!p.isPresent()) {
+			UserStorageService storage = Ray.get().getPlugin().getGame().getServiceManager()
+					.provide(UserStorageService.class).get();
+			Optional<User> opt = storage.get(uuid);
+			if (opt.isPresent()) {
+				return opt.get();
+			}
+			return null;
+		}
+		Player u2 = p.get();
+		return u2;
 	}
 
 	public static TextColor randomColor() {

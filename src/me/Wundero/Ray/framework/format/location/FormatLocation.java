@@ -1,4 +1,12 @@
-package me.Wundero.Ray.config;
+package me.Wundero.Ray.framework.format.location;
+
+import java.util.Optional;
+
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
+
+import me.Wundero.Ray.framework.format.Format;
+
 /*
  The MIT License (MIT)
 
@@ -23,13 +31,18 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+public abstract class FormatLocation {
 
-public interface RaySerializable {
+	private final String name;
 
-	public void serialize(ConfigurationNode onto) throws ObjectMappingException;
+	public FormatLocation(String name) {
+		this.name = name;
+	}
 
-	public void deserialize(ConfigurationNode from) throws ObjectMappingException;
+	public String getName() {
+		return name;
+	}
+
+	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender);
 
 }

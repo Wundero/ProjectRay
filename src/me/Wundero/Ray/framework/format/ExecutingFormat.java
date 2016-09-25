@@ -28,12 +28,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
@@ -52,7 +53,7 @@ public class ExecutingFormat extends Format {
 
 	public ExecutingFormat(ConfigurationNode node, Format internal) {
 		super(node);
-		if(node==null) {
+		if (node == null) {
 			return;
 		}
 		this.wrapped = internal;
@@ -171,6 +172,9 @@ public class ExecutingFormat extends Format {
 		if (senders.contains(from)) {
 			return false;
 		}
+		if (timeoutMillis <= 0) {
+			timeoutMillis = 1;
+		}
 		senders.add(from);
 		for (Map.Entry<String, Boolean> entry : cmds.entrySet()) {
 			if (entry.getValue()) {
@@ -184,23 +188,27 @@ public class ExecutingFormat extends Format {
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
-		return wrapped.send(f, args);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt) {
+		if (f instanceof CommandSource) {
+			for (Map.Entry<String, Boolean> entry : cmds.entrySet()) {
+				if (!entry.getValue()) {
+					Sponge.getCommandManager().process((CommandSource) f, entry.getKey());
+				}
+			}
+		}
+		return wrapped.send(f, args, opt);
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, ParsableData data) {
-		Function<Text, Boolean> f2 = (text) -> {
-			if (data.getRecipient().isPresent()) {
-				for (Map.Entry<String, Boolean> entry : cmds.entrySet()) {
-					if (!entry.getValue()) {
-						Sponge.getCommandManager().process(data.getRecipient().get(), entry.getKey());
-					}
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt) {
+		if (f instanceof CommandSource) {
+			for (Map.Entry<String, Boolean> entry : cmds.entrySet()) {
+				if (!entry.getValue()) {
+					Sponge.getCommandManager().process((CommandSource) f, entry.getKey());
 				}
 			}
-			return f.apply(text);
-		};
-		return wrapped.send(f2, data);
+		}
+		return wrapped.send(f, data, opt);
 	}
 
 	@SuppressWarnings("unchecked")

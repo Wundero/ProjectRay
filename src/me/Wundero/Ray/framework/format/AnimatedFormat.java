@@ -26,11 +26,12 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
@@ -109,10 +110,16 @@ public class AnimatedFormat extends Format {
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
-			if (!template.send(f, args)) {
+			if (!template.send(f, args, opt)) {
 				return -1;
+			} else {
+				if (template instanceof ExecutingFormat || template.hasInternal(ExecutingFormat.class)) {
+					Format ft = template instanceof ExecutingFormat ? template
+							: template.getInternal(ExecutingFormat.class).get();
+					((ExecutingFormat) ft).execConsoles(uuid, Math.min(1000, frameWithDelay.get(template) - 1));
+				}
 			}
 			return frameWithDelay.get(template);
 		}, (template) -> {
@@ -129,10 +136,16 @@ public class AnimatedFormat extends Format {
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, ParsableData data) {
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
-			if (!template.send(f, data)) {
+			if (!template.send(f, data, opt)) {
 				return -1;
+			} else {
+				if (template instanceof ExecutingFormat || template.hasInternal(ExecutingFormat.class)) {
+					Format ft = template instanceof ExecutingFormat ? template
+							: template.getInternal(ExecutingFormat.class).get();
+					((ExecutingFormat) ft).execConsoles(uuid, Math.min(1000, frameWithDelay.get(template) - 1));
+				}
 			}
 			return frameWithDelay.get(template);
 		}, (template) -> {
@@ -268,6 +281,8 @@ public class AnimatedFormat extends Format {
 		}
 
 	}
+
+	private static UUID uuid = UUID.randomUUID();
 
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {

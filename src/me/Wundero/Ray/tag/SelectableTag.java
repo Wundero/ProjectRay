@@ -94,14 +94,12 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends RaySerializable> T deserialize(ConfigurationNode from) throws ObjectMappingException {
+	public void deserialize(ConfigurationNode from) throws ObjectMappingException {
 		TextTemplate.of();
 		this.object = Utils.sm();
 		for (Map.Entry<Object, ? extends ConfigurationNode> e : from.getChildrenMap().entrySet()) {
 			this.object.put(e.getKey().toString(), e.getValue().getValue(TypeToken.of(TextTemplate.class)));
 		}
-		return (T) this;
 	}
 }

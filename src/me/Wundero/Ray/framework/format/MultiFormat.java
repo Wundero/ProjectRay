@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.conversation.BooleanPrompt;
@@ -102,13 +102,13 @@ public class MultiFormat extends Format {
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, Map<String, Object> args) {
-		return getNext(true).send(f, args);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o) {
+		return getNext(true).send(f, args, o);
 	}
 
 	@Override
-	public boolean send(Function<Text, Boolean> f, ParsableData data) {
-		return getNext(true).send(f, data);
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o) {
+		return getNext(true).send(f, data, o);
 	}
 
 	private static class NamePrompt extends Prompt {

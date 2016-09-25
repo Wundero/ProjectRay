@@ -63,10 +63,10 @@ import me.Wundero.Ray.framework.format.ExecutingFormat;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
+import me.Wundero.Ray.framework.format.location.FormatLocations;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
-import me.Wundero.Ray.utils.ValueHolder;
 import me.Wundero.Ray.variables.ParsableData;
 
 public class MainListener {
@@ -127,7 +127,10 @@ public class MainListener {
 						// normal)
 						// lim(delta->infinity) (func %dc) = 100
 						double percentDiscoloration = ((delta - (range / 1.1)) / delta) * 100;
-						double percentObfuscation = Math.sqrt(percentDiscoloration);
+						double percentObfuscation = percentDiscoloration - percentDiscoloration * .2;
+						if (percentObfuscation > 70) {
+							return Optional.empty();
+						}
 						Text m = TextUtils.obfuscate((Text) mc.get("message"), percentObfuscation,
 								percentDiscoloration);
 						mc.put("message", m);
@@ -138,20 +141,15 @@ public class MainListener {
 				ef.ifPresent((format) -> {
 					format.execConsoles(exf, 1000);
 				});
-				ValueHolder<Text> vv = new ValueHolder<Text>();
-				if (!f.send((text) -> {
-					if (vv.getValue() != null) {
-						return false;
-					}
-					vv.setValue(text);
-					return true;
-				}, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
+				if (!f.send(recipient, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
 						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
-						.setClickHover(true).setObserver(observer.isPresent() ? observer
-								: recipient instanceof Player ? Optional.of((Player) recipient) : Optional.empty()))) {
-					return Optional.empty();
+						.setClickHover(true)
+						.setObserver(observer.isPresent() ? observer
+								: recipient instanceof Player ? Optional.of((Player) recipient) : Optional.empty()),
+						Optional.of(msgsender.orElse(p).getUniqueId()))) {
+					return Optional.of(original);
 				}
-				return Optional.of(vv.getValue());
+				return Optional.empty();
 			}
 
 			@Override
@@ -217,20 +215,11 @@ public class MainListener {
 					continue;
 				}
 				Format f = g.getFormat(FormatContexts.TABLIST_ENTRY);
-				if (f == null) {
+				if (f == null || f.getLocation() != FormatLocations.TAB_ENTRY) {
 					continue;
 				}
-				f.send((text) -> {
-					TabListEntry e2 = e;
-					if (!list.getEntry(e.getProfile().getUniqueId()).isPresent()) {
-						return false;
-					}
-					if (!(list.getEntry(e.getProfile().getUniqueId()).get().equals(e))) {
-						e2 = list.getEntry(e.getProfile().getUniqueId()).get();
-					}
-					e2.setDisplayName(text);
-					return true;
-				}, new ParsableData().setClickHover(false).setSender(pla).setRecipient(player));
+				f.send(player, new ParsableData().setClickHover(false).setSender(pla).setRecipient(player),
+						Optional.of(pla.getUniqueId()));
 			}
 		});
 		p.startTabHFTask();
@@ -240,18 +229,14 @@ public class MainListener {
 				Format h = g.getFormat(FormatContexts.TABLIST_HEADER);
 				Format f = g.getFormat(FormatContexts.TABLIST_FOOTER);
 				if (h != null) {
-					h.send(text -> {
-						p.queueHeader(text);
-						return true;
-					}, new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
-							.setRecipient(event.getTargetEntity()));
+					h.send(event.getTargetEntity(), new ParsableData().setClickHover(false)
+							.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
+							Optional.of(event.getTargetEntity()));
 				}
 				if (f != null) {
-					f.send(text -> {
-						p.queueHeader(text);
-						return true;
-					}, new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
-							.setRecipient(event.getTargetEntity()));
+					f.send(event.getTargetEntity(), new ParsableData().setClickHover(false)
+							.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
+							Optional.of(event.getTargetEntity()));
 				}
 			}).submit(Ray.get().getPlugin());
 		}

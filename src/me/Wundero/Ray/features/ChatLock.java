@@ -1,4 +1,4 @@
-package me.Wundero.Ray.config;
+package me.Wundero.Ray.features;
 /*
  The MIT License (MIT)
 
@@ -23,13 +23,10 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+public class ChatLock {
 
-public interface RaySerializable {
-
-	public void serialize(ConfigurationNode onto) throws ObjectMappingException;
-
-	public void deserialize(ConfigurationNode from) throws ObjectMappingException;
+	public ChatLock() {
+		// TODO Auto-generated constructor stub
+	}
 
 }

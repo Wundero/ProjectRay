@@ -75,7 +75,7 @@ public class DefaultChannels {
 		whisper.getNode("name").setValue("whisper");
 		whisper.getNode("autojoin").setValue(true);
 		whisper.getNode("tag").setValue("&0[&7W&0]");
-		talk.getNode("range").setValue(50.0D);
+		whisper.getNode("range").setValue(50.0D);
 		talk.getNode("name").setValue("talk");
 		talk.getNode("autojoin").setValue(true);
 		talk.getNode("tag").setValue("&0[&fT&0]");

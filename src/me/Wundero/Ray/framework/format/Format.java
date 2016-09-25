@@ -26,11 +26,11 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -40,6 +40,8 @@ import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.conversation.TypePrompt;
 import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.location.FormatLocation;
+import me.Wundero.Ray.framework.format.location.FormatLocations;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -49,6 +51,7 @@ public abstract class Format {
 	private FormatContext context;
 	private String name;
 	protected boolean usable = false;
+	protected FormatLocation loc = FormatLocations.CHAT;
 	private Optional<ConfigurationNode> node;
 
 	public abstract Prompt getConversationBuilder(Prompt returnTo, ConversationContext context);
@@ -165,57 +168,32 @@ public abstract class Format {
 
 	}
 
-	public abstract boolean send(Function<Text, Boolean> f, Map<String, Object> args);
+	// irrelevant boolean to prevent method signature conflicts
 
-	public abstract boolean send(Function<Text, Boolean> f, ParsableData data);
-
-	protected boolean s(Function<Text, Boolean> f, Map<String, Object> a, TextTemplate t) {
-		Function<Text, Boolean> f2 = (text) -> {
-			Text t2 = text;
-			try {
-				t2 = TextUtils.vars(text, new ParsableData().setKnown(a));
-				if (t2 == null) {
-					return f.apply(text);
-				}
-			} catch (Exception e) {
-				return f.apply(text);
-			}
-			return f.apply(t2);
-		};
-		boolean b = false;
-		Text te = get(t, a);
-		te = TextUtils.urls(te);
-		try {
-			b = f2.apply(te);
-		} catch (Exception e) {
-			b = false;
-		}
-		return b;
+	public boolean send(MessageReceiver target, Map<String, Object> args, Object o, boolean irrelevant) {
+		return send(target, args, Optional.ofNullable(o));
 	}
 
-	protected boolean s(Function<Text, Boolean> f, ParsableData d, TextTemplate t) {
-		Function<Text, Boolean> f2 = (text) -> {
-			Text t2 = text;
-			try {
-				t2 = TextUtils.vars(text, d);
-				if (t2 == null) {
-					return f.apply(text);
-				}
-			} catch (Exception e) {
-				return f.apply(text);
-			}
-			return f.apply(t2);
-		};
-		boolean b = false;
-		Text te = get(t, d);
+	public boolean send(MessageReceiver target, ParsableData data, Object o, boolean irrelevant) {
+		return send(target, data, Optional.ofNullable(o));
+	}
+
+	public abstract boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender);
+
+	public abstract boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender);
+
+	protected boolean s(MessageReceiver target, Map<String, Object> a, TextTemplate t, Optional<Object> sender) {
+		Text te = get(t, a);
+		te = TextUtils.vars(te, new ParsableData().setKnown(a));
 		te = TextUtils.urls(te);
-		try {
-			b = f2.apply(te);
-		} catch (Exception e) {
-			e.printStackTrace();
-			b = false;
-		}
-		return b;
+		return loc.send(te, target, this, sender);
+	}
+
+	protected boolean s(MessageReceiver target, ParsableData d, TextTemplate t, Optional<Object> sender) {
+		Text te = get(t, d);
+		te = TextUtils.vars(te, d);
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender);
 	}
 
 	protected Text get(TextTemplate t, Map<String, Object> data) {
@@ -281,7 +259,21 @@ public abstract class Format {
 		setContext(node.getNode("context").isVirtual() ? FormatContext.fromString(name)
 				: FormatContext.fromString(node.getNode("context").getString()));
 		node.getNode("context").setValue(context.getName());
+		setLocation(node.getNode("location").getString("chat"));
+		node.getNode("location").setValue(getLocation().getName());
 		// forces type to be present
+	}
+
+	public void setLocation(FormatLocation loc) {
+		this.loc = loc;
+	}
+
+	public void setLocation(String name) {
+		this.loc = FormatLocations.fromString(name);
+	}
+
+	public FormatLocation getLocation() {
+		return loc;
 	}
 
 	public boolean usable() {
