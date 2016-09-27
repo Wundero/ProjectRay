@@ -170,7 +170,7 @@ public class MainListener {
 			p = (Player) event.getCause().first(Player.class).get();
 		}
 		vars.put("message", TextUtils.transIf(event.getRawMessage().toPlain(), p));
-		if (event.getCause().containsNamed("formattype")) {
+		if (event.getCause().containsNamed("formatcontext")) {
 			Optional<Player> sf = Optional.empty();
 			Optional<Player> st = Optional.empty();
 			Optional<String> fn = Optional.empty();
@@ -188,7 +188,7 @@ public class MainListener {
 			if (event.getCause().contains("observer")) {
 				o = event.getCause().get("observer", Player.class);
 			}
-			event.setCancelled(handle(event.getCause().get("formattype", FormatContext.class).get(), event, vars, p,
+			event.setCancelled(handle(event.getCause().get("formatcontext", FormatContext.class).get(), event, vars, p,
 					event.getChannel().get(), sf, st, fn, o));
 		} else {
 			event.setCancelled(handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get()));
@@ -245,7 +245,7 @@ public class MainListener {
 			event.setMessageCancelled(true);
 			Task.builder().delayTicks(10).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formattype", FormatContexts.JOIN).build(),
+						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.JOIN).build(),
 						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
@@ -253,7 +253,7 @@ public class MainListener {
 			}).submit(Ray.get().getPlugin());
 			Task.builder().delayTicks(20).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formattype", FormatContexts.JOIN).build(),
+						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.JOIN).build(),
 						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
@@ -264,7 +264,7 @@ public class MainListener {
 		if (welcome) {
 			Task.builder().delayTicks(15).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formattype", FormatContexts.WELCOME).build(),
+						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.WELCOME).build(),
 						MessageChannel.TO_ALL, Optional.of(MessageChannel.TO_ALL),
 						new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE,
 								"Welcome " + event.getTargetEntity().getName() + " to the server!")),
@@ -277,7 +277,7 @@ public class MainListener {
 		}
 		Task.builder().delayTicks(15).execute(() -> {
 			MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-					Cause.builder().from(event.getCause()).named("formattype", FormatContexts.MOTD).build(),
+					Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.MOTD).build(),
 					MessageChannel.fixed(event.getTargetEntity()),
 					Optional.of(MessageChannel.fixed(event.getTargetEntity())),
 					new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE, "Welcome to the server!")),
@@ -323,7 +323,7 @@ public class MainListener {
 			}
 		}
 		MessageChannelEvent.Chat spyevent = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatContexts.MESSAGE_SPY).named("sendfrom", sendto)
+				Cause.source(Ray.get()).named("formatcontext", FormatContexts.MESSAGE_SPY).named("sendfrom", sendto)
 						.build(),
 				sendto.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),

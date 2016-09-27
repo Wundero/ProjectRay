@@ -66,14 +66,14 @@ public class ReplyCommand implements CommandExecutor {
 		String message = (String) args.getOne("message").get();
 		Player sendto = sender.getLastMessaged().get().getUser().getPlayer().get();
 		MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatContexts.MESSAGE_SEND).named("sendfrom", sendfrom)
+				Cause.source(Ray.get()).named("formatcontext", FormatContexts.MESSAGE_SEND).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
 				sendfrom.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendfrom))),
 				new MessageEvent.MessageFormatter(Text.of("You to ", sendto.getName()), Text.of(message)),
 				Text.of(message), false);
 		MessageChannelEvent.Chat event2 = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatContexts.MESSAGE_RECEIVE).named("sendfrom", sendfrom)
-						.named("sendto", sendto).build(),
+				Cause.source(Ray.get()).named("formatcontext", FormatContexts.MESSAGE_RECEIVE)
+						.named("sendfrom", sendfrom).named("sendto", sendto).build(),
 				sendto.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto))),
 				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"), Text.of(message)),
 				Text.of(message), false);
@@ -88,7 +88,7 @@ public class ReplyCommand implements CommandExecutor {
 			spies.add(p);
 		}
 		MessageChannelEvent.Chat spyevent = SpongeEventFactory.createMessageChannelEventChat(
-				Cause.source(Ray.get()).named("formattype", FormatContexts.MESSAGE_SPY).named("sendfrom", sendfrom)
+				Cause.source(Ray.get()).named("formatcontext", FormatContexts.MESSAGE_SPY).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
 				sendto.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),
