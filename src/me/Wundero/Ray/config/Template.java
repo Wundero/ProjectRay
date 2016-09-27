@@ -283,6 +283,14 @@ public class Template {
 					this.loc = Utils.wrap(loc);
 					return this;
 				}
+
+				public void setNode(ConfigurationNode node) {
+					this.node = node;
+				}
+
+				public ConfigurationNode getNode() {
+					return node;
+				}
 			}
 		}
 	}

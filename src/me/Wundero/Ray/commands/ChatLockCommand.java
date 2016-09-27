@@ -23,10 +23,40 @@ package me.Wundero.Ray.commands;
  SOFTWARE.
  */
 
-public class ChatLockCommand {
+import java.util.Optional;
 
-	public ChatLockCommand() {
-		// TODO Auto-generated constructor stub
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.features.ChatLock;
+
+public class ChatLockCommand implements CommandExecutor {
+
+	@Override
+	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+		if (!src.hasPermission("ray.chatlock")) {
+			throw new CommandException(Text.of(TextColors.RED, "You are not allowed to do that!"));
+		}
+		ChatLock f = Ray.get().getLock();
+		if (args.getOne("value").isPresent()) {
+			Optional<Boolean> b = args.getOne("value");
+			if (b.isPresent()) {
+				if (b.get()) {
+					f.lock();
+				} else {
+					f.unlock();
+				}
+			}
+		} else {
+			f.toggle();
+		}
+		src.sendMessage(Text.of(TextColors.AQUA, "Chat is no" + (f.isLocked() ? "w" : " longer") + " locked!"));
+		return CommandResult.success();
 	}
-
 }

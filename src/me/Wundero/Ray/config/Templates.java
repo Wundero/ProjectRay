@@ -43,6 +43,16 @@ public class Templates {
 				.withFormat(DefaultFormats.MSG_SEND).build().build();
 	}
 
+	public static Template TESTING(Template.Builder t) {
+		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)
+				.withFormat(DefaultFormats.LEAVE).withFormat(DefaultFormats.MSG_RECEIVE)
+				.withFormat(DefaultFormats.MSG_SEND).withFormat(DefaultFormats.ACHIEVEMENT)
+				.withFormat(DefaultFormats.ANNOUNCEMENT).withFormat(DefaultFormats.KICK).withFormat(DefaultFormats.MOTD)
+				.withFormat(DefaultFormats.MSG_SPY).withFormat(DefaultFormats.TABLIST_ENTRY)
+				.withFormat(DefaultFormats.TABLIST_FOOTER).withFormat(DefaultFormats.TABLIST_HEADER)
+				.withFormat(DefaultFormats.WELCOME).build().build();
+	}
+
 	public static Template MULTI_GROUP(Template.Builder t) {
 		// chat join and leave for two groups - not gonna use def formats
 		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)

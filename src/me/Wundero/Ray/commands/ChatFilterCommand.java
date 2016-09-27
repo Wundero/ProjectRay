@@ -1,4 +1,18 @@
 package me.Wundero.Ray.commands;
+
+import java.util.Optional;
+
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.features.ChatFilter;
+
 /*
  The MIT License (MIT)
 
@@ -23,10 +37,28 @@ package me.Wundero.Ray.commands;
  SOFTWARE.
  */
 
-public class ChatFilterCommand {
+public class ChatFilterCommand implements CommandExecutor {
 
-	public ChatFilterCommand() {
-		// TODO Auto-generated constructor stub
+	@Override
+	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+		if (!src.hasPermission("ray.chatfilter")) {
+			throw new CommandException(Text.of(TextColors.RED, "You are not allowed to do that!"));
+		}
+		ChatFilter f = Ray.get().getFilter();
+		if (args.getOne("value").isPresent()) {
+			Optional<Boolean> b = args.getOne("value");
+			if (b.isPresent()) {
+				if (b.get()) {
+					f.filter();
+				} else {
+					f.ignore();
+				}
+			}
+		} else {
+			f.toggle();
+		}
+		src.sendMessage(Text.of(TextColors.AQUA, "Chat is no" + (f.isFilter() ? "w" : " longer") + " being filtered!"));
+		return CommandResult.success();
 	}
 
 }

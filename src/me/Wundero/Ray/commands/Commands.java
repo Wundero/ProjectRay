@@ -58,6 +58,14 @@ public class Commands {
 						.arguments(GenericArguments.string(Text.of("key")),
 								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("args"))))
 						.description(Text.of("Test translations.")).build());
+		children.put(Utils.sl("lock"),
+				CommandSpec.builder().permission("ray.chatlock").executor(new ChatLockCommand())
+						.description(Text.of("Lock chat messages"))
+						.arguments(GenericArguments.optional(GenericArguments.bool(Text.of("value")))).build());
+		children.put(Utils.sl("filter"),
+				CommandSpec.builder().arguments(GenericArguments.optional(GenericArguments.bool(Text.of("value"))))
+						.executor(new ChatFilterCommand()).permission("ray.chatfilter")
+						.description(Text.of("Filter chat messages")).build());
 	}
 
 	public static Map<List<String>, ? extends CommandCallable> getChildren() {

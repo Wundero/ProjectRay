@@ -64,8 +64,10 @@ public class DefaultFormat {
 		return this;
 	}
 
-	public DefaultFormat with(Object o) {
-		parts.add(o);
+	public DefaultFormat with(Object... o) {
+		for (Object a : o) {
+			parts.add(a);
+		}
 		return this;
 	}
 

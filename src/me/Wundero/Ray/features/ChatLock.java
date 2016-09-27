@@ -60,4 +60,8 @@ public class ChatLock {
 		l = true;
 	}
 
+	public boolean isLocked() {
+		return l;
+	}
+
 }

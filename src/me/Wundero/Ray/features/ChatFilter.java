@@ -60,6 +60,10 @@ public class ChatFilter {
 	public void filter() {
 		filter = true;
 	}
+	
+	public boolean isFilter() {
+		return filter;
+	}
 
 	public ChatFilter() {
 		this(Optional.empty());

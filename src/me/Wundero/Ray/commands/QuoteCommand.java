@@ -23,10 +23,35 @@ package me.Wundero.Ray.commands;
  SOFTWARE.
  */
 
-public class QuoteCommand {
+import java.util.Optional;
 
-	public QuoteCommand() {
-		// TODO Auto-generated constructor stub
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
+
+import me.Wundero.Ray.framework.player.RayPlayer;
+
+public class QuoteCommand implements CommandExecutor {
+
+	@Override
+	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+		if (!src.hasPermission("ray.quote")) {
+			throw new CommandException(Text.of(TextColors.RED, "You are not allowed to do that!"));
+		}
+		if (!(src instanceof Player)) {
+			throw new CommandException(Text.of(TextColors.RED, "You must be a player to do this!"));
+		}
+		Optional<String> q = args.getOne("quote");
+		RayPlayer.get(((Player) src).getUniqueId()).setQuote(q);
+		src.sendMessage(Text.of(TextColors.AQUA, "Your quote has been " + (q.isPresent() ? "set to " : "reset!"),
+				q.isPresent() ? TextSerializers.FORMATTING_CODE.deserialize(q.get()) : ""));
+		return CommandResult.success();
 	}
 
 }

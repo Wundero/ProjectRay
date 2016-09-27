@@ -27,6 +27,7 @@ import me.Wundero.Ray.commands.ClearChatCommand;
 import me.Wundero.Ray.commands.Commands;
 import me.Wundero.Ray.commands.IgnoreCommand;
 import me.Wundero.Ray.commands.MessageCommand;
+import me.Wundero.Ray.commands.QuoteCommand;
 import me.Wundero.Ray.commands.ReplyCommand;
 import me.Wundero.Ray.commands.channel.ChannelCommand;
 import me.Wundero.Ray.commands.channel.ChannelHelpCommand;
@@ -162,7 +163,7 @@ public class ProjectRay {
 		// template here, but in the future I will add more templates, and allow
 		// for users to specify which to load either via cmd or config params
 		if (config.getNode("worlds").isVirtual()) {
-			Templates.ADVANCED(Template.builder(config));
+			Templates.TESTING(Template.builder(config));
 			saveConfig();
 		}
 	}
@@ -236,6 +237,13 @@ public class ProjectRay {
 										.optional(GenericArguments.remainingJoinedStrings(Text.of("clear"))))
 								.build(),
 						"clearchat", "chatclear", "cc");
+		Sponge.getCommandManager()
+				.register(this,
+						CommandSpec.builder().executor(new QuoteCommand())
+								.arguments(GenericArguments
+										.optional(GenericArguments.remainingJoinedStrings(Text.of("quote"))))
+								.permission("ray.quote").description(Text.of("Set your quote.")).build(),
+						"quote");
 		Sponge.getCommandManager()
 				.register(this,
 						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
