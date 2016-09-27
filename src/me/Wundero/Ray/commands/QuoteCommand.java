@@ -1,4 +1,4 @@
-package me.Wundero.Ray.features;
+package me.Wundero.Ray.commands;
 /*
  The MIT License (MIT)
 
@@ -23,41 +23,10 @@ package me.Wundero.Ray.features;
  SOFTWARE.
  */
 
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.message.MessageChannelEvent;
+public class QuoteCommand {
 
-import me.Wundero.Ray.Ray;
-
-public class ChatLock {
-
-	public ChatLock() {
-		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
-	}
-
-	private boolean l = false;
-
-	@Listener
-	public void onChat(MessageChannelEvent.Chat chat, @First Player s) {
-		if (l) {
-			if (!s.hasPermission("ray.chatlock.bypass")) {
-				chat.setCancelled(true);
-			}
-		}
-	}
-
-	public void toggle() {
-		l = !l;
-	}
-
-	public void unlock() {
-		l = false;
-	}
-
-	public void lock() {
-		l = true;
+	public QuoteCommand() {
+		// TODO Auto-generated constructor stub
 	}
 
 }

@@ -1,12 +1,16 @@
 package me.Wundero.Ray.config;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
 import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -37,6 +41,8 @@ public class DefaultFormat {
 	private String name;
 	private List<Object> parts;
 	private FormatContext type;
+	private Optional<FormatLocation> loc = Optional.empty();
+	private Optional<Consumer<ConfigurationNode>> ld = Optional.empty();
 
 	public DefaultFormat(String name, FormatContext type) {
 		this.name = name;
@@ -46,6 +52,16 @@ public class DefaultFormat {
 
 	public DefaultFormat(String name) {
 		this(name, FormatContext.fromString(name));
+	}
+
+	public DefaultFormat withLoc(FormatLocation loc) {
+		this.loc = Utils.wrap(loc);
+		return this;
+	}
+
+	public DefaultFormat withLocData(Consumer<ConfigurationNode> ld) {
+		this.ld = Utils.wrap(ld);
+		return this;
 	}
 
 	public DefaultFormat with(Object o) {
@@ -67,6 +83,10 @@ public class DefaultFormat {
 			}
 		}
 		bb.withType(type);
+		loc.ifPresent(l -> {
+			bb.withLoc(l);
+			ld.ifPresent(ldd -> bb.withLocData(ldd));
+		});
 		return bb.build();
 	}
 

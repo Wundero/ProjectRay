@@ -36,6 +36,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
@@ -51,6 +52,16 @@ public class DefaultVariables {
 		});
 		v.registerWrapper("nourls", (va, t) -> {
 			return TextUtils.noUrls(t);
+		});
+		v.registerVariable("quote", (objects) -> {
+			if (!objects.containsKey(Param.SENDER)) {
+				return Text.of();
+			}
+			Optional<String> quote = RayPlayer.get((Player) objects.get(Param.SENDER)).getQuote();
+			if (!quote.isPresent()) {
+				return Text.of();
+			}
+			return TextSerializers.FORMATTING_CODE.deserialize(quote.get());
 		});
 		v.registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		v.registerVariable("player", (objects) -> {

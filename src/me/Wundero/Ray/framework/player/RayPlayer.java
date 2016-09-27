@@ -127,6 +127,19 @@ public class RayPlayer implements Socialable {
 	private Map<FormatContext, AnimationQueue> animations = Utils.sm();
 	private Map<SelectableTag, String> selectedTags = Utils.sm();
 	private boolean spy = false;
+	private Optional<String> quote;
+
+	public void setQuote(String quote) {
+		setQuote(Utils.wrap(quote, !quote.trim().isEmpty()));
+	}
+
+	public void setQuote(Optional<String> quote) {
+		this.quote = quote;
+	}
+
+	public Optional<String> getQuote() {
+		return quote;
+	}
 
 	public boolean spy() {
 		return spy;
@@ -297,6 +310,7 @@ public class RayPlayer implements Socialable {
 		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
 		this.spy = config.getNode("spy").getBoolean(false);
 		loadTags(config.getNode("tags"));
+		this.quote = Utils.wrap(config.getNode("quote").getString());
 	}
 
 	private static Map<SelectableTag, String> deconvert(Map<String, String> in) {
@@ -330,6 +344,7 @@ public class RayPlayer implements Socialable {
 			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
 		}
 		config.getNode("spy").setValue(spy);
+		quote.ifPresent(q -> config.getNode("quote").setValue(q));
 	}
 
 	private void saveTags(ConfigurationNode node) {

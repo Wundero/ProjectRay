@@ -26,6 +26,7 @@ package me.Wundero.Ray.config;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -34,6 +35,7 @@ import org.spongepowered.api.text.TextTemplate.Arg;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -132,6 +134,8 @@ public class Template {
 				@SuppressWarnings("unused")
 				private String name;
 				private Optional<FormatContext> type = Optional.empty();
+				private Optional<FormatLocation> loc = Optional.empty();
+				private Optional<Consumer<ConfigurationNode>> locdataset = Optional.empty();
 				private GroupBuilder parent;
 				private TextTemplate template;
 				private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
@@ -158,6 +162,12 @@ public class Template {
 						}
 						if (type.isPresent()) {
 							node.getNode("type").setValue(type.get().getName());
+						}
+						if (loc.isPresent()) {
+							node.getNode("location").setValue(loc.get().getName());
+							if (locdataset.isPresent()) {
+								locdataset.get().accept(node.getNode("location-data"));
+							}
 						}
 					} catch (ObjectMappingException e) {
 						Utils.printError(e);
@@ -261,6 +271,16 @@ public class Template {
 					for (Text t : texts) {
 						template = template.concat(TextTemplate.of(t));
 					}
+					return this;
+				}
+
+				public FormatBuilder withLocData(Consumer<ConfigurationNode> task) {
+					this.locdataset = Utils.wrap(task);
+					return this;
+				}
+
+				public FormatBuilder withLoc(FormatLocation loc) {
+					this.loc = Utils.wrap(loc);
 					return this;
 				}
 			}

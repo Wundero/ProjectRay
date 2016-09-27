@@ -23,10 +23,57 @@ package me.Wundero.Ray.features;
  SOFTWARE.
  */
 
+import java.util.Optional;
+import java.util.regex.Pattern;
+
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+
+import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.utils.Utils;
+
 public class ChatFilter {
 
+	private Pattern p = Utils.profanityPattern();
+	private boolean filter = false;
+
+	@Listener
+	public void chat(MessageChannelEvent.Chat chat, @First Player sender) {
+		if (p.matcher(chat.getRawMessage().toPlain()).find()) {
+			if (!sender.hasPermission("ray.chatfilter.bypass")) {
+				chat.setCancelled(true);
+			}
+		}
+	}
+
+	public void toggle() {
+		filter = !filter;
+	}
+
+	public void ignore() {
+		filter = false;
+	}
+
+	public void filter() {
+		filter = true;
+	}
+
 	public ChatFilter() {
-		// TODO Auto-generated constructor stub
+		this(Optional.empty());
+	}
+
+	public ChatFilter(Pattern p) {
+		this(Utils.wrap(p));
+	}
+
+	public ChatFilter(Optional<Pattern> opt) {
+		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
+		if (opt.isPresent()) {
+			p = opt.get();
+		}
 	}
 
 }

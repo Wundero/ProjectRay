@@ -91,7 +91,12 @@ public class Utils {
 		return load(config.toPath());
 	}
 
-	public static <T> Optional<T> wrap(T t) {
+	public static <T> Optional<T> wrap(T t, boolean... checks) {
+		for (boolean b : checks) {
+			if (!b) {
+				return Optional.empty();
+			}
+		}
 		return Optional.ofNullable(t);
 	}
 
