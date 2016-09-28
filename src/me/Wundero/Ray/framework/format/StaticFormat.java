@@ -504,12 +504,12 @@ public class StaticFormat extends Format {
 	}
 
 	@Override
-	public boolean hasInternal(Class<? extends Format> clazz) {
+	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
 		return false;
 	}
 
 	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
 		return Optional.empty();
 	}
 

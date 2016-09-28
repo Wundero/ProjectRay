@@ -67,11 +67,11 @@ public class ExecutingFormat extends Format {
 		}
 	}
 
-	public boolean hasInternal(Class<? extends Format> clazz) {
+	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
 		if (wrapped.getClass().equals(clazz)) {
 			return true;
 		}
-		return wrapped.hasInternal(clazz);
+		return wrapped.hasInternal(clazz, index);
 	}
 
 	@Override
@@ -213,14 +213,14 @@ public class ExecutingFormat extends Format {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
-		if (!hasInternal(clazz)) {
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
+		if (!hasInternal(clazz, index)) {
 			return Optional.empty();
 		}
 		if (wrapped.getClass().equals(clazz)) {
 			return Optional.of((T) wrapped);
 		}
-		return wrapped.getInternal(clazz);
+		return wrapped.getInternal(clazz, index);
 	}
 
 }

@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
 
+import me.Wundero.Ray.utils.Utils;
+
 /*
  The MIT License (MIT)
 
@@ -34,6 +36,7 @@ public class ParsableData {
 	private Optional<Player> sender = Optional.empty();
 	private Optional<Player> recipient = Optional.empty();
 	private Optional<Player> observer = Optional.empty();
+	private Optional<Integer> page = Optional.empty();
 	private boolean clickHover = false;
 
 	public ParsableData() {
@@ -164,6 +167,19 @@ public class ParsableData {
 	 */
 	public ParsableData setClickHover(boolean clickHover) {
 		this.clickHover = clickHover;
+		return this;
+	}
+
+	public Optional<Integer> getPage() {
+		return page;
+	}
+
+	public ParsableData setPage(int i) {
+		return withPage(i);
+	}
+
+	public ParsableData withPage(int i) {
+		this.page = Utils.wrap(i, i >= 0);
 		return this;
 	}
 }

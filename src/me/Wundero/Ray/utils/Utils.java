@@ -91,6 +91,24 @@ public class Utils {
 		return load(config.toPath());
 	}
 
+	public boolean in(int num, int b1, int b2, boolean el, boolean eg) {
+		int bx = Math.min(b1, b2);
+		int by = Math.max(b1, b2);
+		if (el) {
+			if (eg) {
+				return num >= bx && num <= by;
+			} else {
+				return num >= bx && num < by;
+			}
+		} else {
+			if (eg) {
+				return num > bx && num <= by;
+			} else {
+				return num > bx && num < by;
+			}
+		}
+	}
+
 	public static <T> Optional<T> wrap(T t, boolean... checks) {
 		for (boolean b : checks) {
 			if (!b) {

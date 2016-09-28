@@ -76,6 +76,37 @@ public enum SocialMedia {
 		}
 	}, s -> s.replace(" ", "."));
 
+	public static SocialMedia fromString(String s) {
+		if (s == null) {
+			return null;
+		}
+		switch (s.trim().toLowerCase()) {
+		case "pinterest":
+		case "p":
+			return PINTEREST;
+		case "tumblr":
+		case "tumbler":
+		case "tu":
+			return TUMBLR;
+		case "instagram":
+		case "ig":
+		case "i":
+			return INSTAGRAM;
+		case "youtube":
+		case "yt":
+		case "y":
+			return YOUTUBE;
+		case "twitter":
+		case "t":
+			return TWITTER;
+		case "vine":
+		case "v":
+			return VINE;
+		default:
+			return null;
+		}
+	}
+
 	private Function<String, URL> userApplier;
 	private Function<String, String> sanitizer;
 	private Text tag;

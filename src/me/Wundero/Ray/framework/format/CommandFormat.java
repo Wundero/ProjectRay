@@ -164,21 +164,21 @@ public class CommandFormat extends Format {
 	}
 
 	@Override
-	public boolean hasInternal(Class<? extends Format> clazz) {
+	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
 		if (format.getClass().equals(clazz)) {
 			return true;
 		}
-		return format.hasInternal(clazz);
+		return format.hasInternal(clazz, index);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
-		if (hasInternal(clazz)) {
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
+		if (hasInternal(clazz, index)) {
 			if (format.getClass().equals(clazz)) {
 				return Optional.of((T) format);
 			} else {
-				return format.getInternal(clazz);
+				return format.getInternal(clazz, index);
 			}
 		}
 		return Optional.empty();

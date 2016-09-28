@@ -225,24 +225,25 @@ public class MultiFormat extends Format {
 	}
 
 	@Override
-	public boolean hasInternal(Class<? extends Format> clazz) {
+	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
 		Format f = getNext(false);
 		if (f.getClass().equals(clazz)) {
 			return true;
 		}
-		return f.hasInternal(clazz);
+		return f.hasInternal(clazz, index);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
-		if (!hasInternal(clazz)) {
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
+		if (!hasInternal(clazz, index)) {
 			return Optional.empty();
 		}
-		Format f = getNext(false);
+		Format f = index.isPresent() && index.get() >= 0 && index.get() < this.formats.size()
+				? this.formats.get(index.get()) : getNext(false);
 		if (f.getClass().equals(clazz)) {
 			return Optional.of((T) f);
 		}
-		return f.getInternal(clazz);
+		return f.getInternal(clazz, index);
 	}
 }

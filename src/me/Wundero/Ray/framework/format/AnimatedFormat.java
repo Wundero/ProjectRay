@@ -115,9 +115,10 @@ public class AnimatedFormat extends Format {
 			if (!template.send(f, args, opt)) {
 				return -1;
 			} else {
-				if (template instanceof ExecutingFormat || template.hasInternal(ExecutingFormat.class)) {
+				if (template instanceof ExecutingFormat
+						|| template.hasInternal(ExecutingFormat.class, Optional.empty())) {
 					Format ft = template instanceof ExecutingFormat ? template
-							: template.getInternal(ExecutingFormat.class).get();
+							: template.getInternal(ExecutingFormat.class, Optional.empty()).get();
 					((ExecutingFormat) ft).execConsoles(uuid, Math.min(1000, frameWithDelay.get(template) - 1));
 				}
 			}
@@ -141,9 +142,10 @@ public class AnimatedFormat extends Format {
 			if (!template.send(f, data, opt)) {
 				return -1;
 			} else {
-				if (template instanceof ExecutingFormat || template.hasInternal(ExecutingFormat.class)) {
+				if (template instanceof ExecutingFormat
+						|| template.hasInternal(ExecutingFormat.class, Optional.empty())) {
 					Format ft = template instanceof ExecutingFormat ? template
-							: template.getInternal(ExecutingFormat.class).get();
+							: template.getInternal(ExecutingFormat.class, Optional.empty()).get();
 					((ExecutingFormat) ft).execConsoles(uuid, Math.min(1000, frameWithDelay.get(template) - 1));
 				}
 			}
@@ -296,14 +298,24 @@ public class AnimatedFormat extends Format {
 	}
 
 	@Override
-	public boolean hasInternal(Class<? extends Format> clazz) {
-		// TODO make sure this is unneeded.
-		return false;
+	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
+		return getInternal(clazz, index).isPresent();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz) {
-		// TODO same as above
+	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
+		if (index.isPresent() && index.get() >= 0 && index.get() < inOrder.size()) {
+			Format f = this.inOrder.get(index.get());
+			if (!f.getClass().equals(clazz)) {
+				if (!f.getInternal(clazz, index).isPresent()) {
+					return Optional.empty();
+				} else {
+					return f.getInternal(clazz, index);
+				}
+			}
+			return (Optional<T>) Utils.wrap(f);
+		}
 		return Optional.empty();
 	}
-}
+};

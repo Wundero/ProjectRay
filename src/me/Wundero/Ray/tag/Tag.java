@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.config.RaySerializable;
 import me.Wundero.Ray.variables.ParsableData;
 
 /*
@@ -31,7 +32,7 @@ import me.Wundero.Ray.variables.ParsableData;
  SOFTWARE.
  */
 
-public abstract class Tag<T> {
+public abstract class Tag<T> implements RaySerializable {
 	private final String name;
 	protected T object;
 
@@ -40,7 +41,7 @@ public abstract class Tag<T> {
 		this.name = name;
 		Ray.get().getTags().register(this);
 	}
-	
+
 	public abstract boolean verify(Object o);
 
 	public abstract Optional<Text> get(Optional<ParsableData> data);

@@ -32,6 +32,8 @@ import org.spongepowered.api.text.Text;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.framework.player.SocialMedia;
 import me.Wundero.Ray.variables.ParsableData;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class SocialMediaTag extends Tag<SocialMedia> {
 
@@ -46,6 +48,9 @@ public class SocialMediaTag extends Tag<SocialMedia> {
 
 	@Override
 	public Optional<Text> get(Optional<ParsableData> data) {
+		if (object == null) {
+			return Optional.empty();
+		}
 		if (data.isPresent()) {
 			ParsableData d = data.get();
 			if (d.getSender().isPresent()) {
@@ -63,6 +68,16 @@ public class SocialMediaTag extends Tag<SocialMedia> {
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	@Override
+	public void serialize(ConfigurationNode onto) throws ObjectMappingException {
+		onto.getNode("medium").setValue(this.object.name().toLowerCase());
+	}
+
+	@Override
+	public void deserialize(ConfigurationNode from) throws ObjectMappingException {
+		this.object = SocialMedia.fromString(from.getNode("medium").getValue().toString());
 	}
 
 }

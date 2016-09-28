@@ -99,7 +99,7 @@ public class MainListener {
 		final Format f = fx;
 		final UUID exf = UUID.randomUUID();
 		final Optional<ExecutingFormat> ef = f instanceof ExecutingFormat ? Optional.of((ExecutingFormat) f)
-				: f.getInternal(ExecutingFormat.class);
+				: f.getInternal(ExecutingFormat.class, Optional.empty());
 		final Map<String, Object> args = Utils.sm(v);
 		ChatChannel pc = r.getActiveChannel();
 		boolean obfuscate = pc != null && pc.isObfuscateRanged();

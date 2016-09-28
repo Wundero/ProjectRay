@@ -73,9 +73,9 @@ public abstract class Format {
 		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
 	}
 
-	public abstract <T extends Format> Optional<T> getInternal(Class<T> clazz);
+	public abstract <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index);
 
-	public abstract boolean hasInternal(Class<? extends Format> clazz);
+	public abstract boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index);
 
 	private static class WrapperPrompt extends Prompt {
 
