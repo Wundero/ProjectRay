@@ -50,7 +50,7 @@ import me.Wundero.Ray.animation.Animation;
 import me.Wundero.Ray.animation.AnimationQueue;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.channel.ChatChannel;
-import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.tag.SelectableTag;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -124,7 +124,7 @@ public class RayPlayer implements Socialable {
 	private Task tabHFTask = null;
 	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
-	private Map<FormatContext, AnimationQueue> animations = Utils.sm();
+	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
 	private Map<SelectableTag, String> selectedTags = Utils.sm();
 	private boolean spy = false;
 	private Optional<String> quote;
@@ -169,7 +169,7 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
-	public void queueAnimation(FormatContext type, Animation<?> anim) {
+	public void queueAnimation(FormatLocation type, Animation<?> anim) {
 		if (!animations.containsKey(type)) {
 			animations.put(type, new AnimationQueue());
 		}

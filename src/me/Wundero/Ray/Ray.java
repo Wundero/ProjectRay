@@ -206,6 +206,11 @@ public class Ray {
 
 	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format, boolean clickhover) {
 		Map<String, Object> v = setVars(data, t, format, clickhover);
+		for (String a : t.getArguments().keySet()) {
+			if (!v.containsKey(a)) {
+				v.put(a, "");
+			}
+		}
 		Text tx = t.apply(v).build();
 		return TextUtils.vars(tx, data);
 	}
