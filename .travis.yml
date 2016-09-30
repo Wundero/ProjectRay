@@ -5,7 +5,7 @@ script:
 - mvn clean verify -f /home/travis/build/Wundero/Ray/pom.xml
 deploy:
   provider: releases
-  file: Ray.jar
+  file: /home/travis/build/Wundero/Ray/target/Ray.jar
   skip_cleanup: true
   on:
     tags: true
