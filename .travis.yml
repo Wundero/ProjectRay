@@ -3,3 +3,11 @@ jdk:
 - oraclejdk8
 script:
 - mvn clean verify -f /home/travis/build/Wundero/Ray/pom.xml
+deploy:
+  provider: releases
+  file: Ray.jar
+  skip_cleanup: true
+  on:
+    tags: true
+  api-key:
+    secure: PZ1rMiOkqOGe0pWGoGP4w2WK6ix9ii2JeF3ieDOVuAIZkbhHDQ7nglyr1dY49TNj6c5c1JxtJS3DirR3WbNn5YCWm/yhyvuzjTThsZfw1vHeVbnmK6833AZECAXtaPBZyR+uLA9MfEfa+ToIrWgwr1QiHnemmg0CmxDmimIeko6EuJNJ1ZbArFSNo1VJEo7GK+vTxCN7jVAF9okad939A3to/9l8HMg2pElfNILUXnll4fMxcoascGWvLDiF8OOzDgm4R1bxtFQAECga73GuTxhxv+jQaPIklpi7X/zlWChswOf8b85mKagd3ZYd0wQJIh7e+b0fJZAU8AiNDD7/wJG+1g95vwkTBBI57/ouBppne7Of4vnTDSqoQyhUN2zO/VrFkbqbsRiqrwWGZCU5u//KE/SG4EpP60I4uIKEViQ+hmdW73FmvtRxlOOM3DrWrCkbGzrB1RXCldTgiFvcuaOBZycTYllcshoTMbSSIYdwh0QKqnh4Yrd7c4XNb1xBZtE3yDUplTPtEgHg2QNYWtwznsIRib5S566fEz/T7FYFabd0dzeTYmJlJzHK1FCwqjBZdB/q1rYjW3jCwbko2iOaTJD/ES/llm3KGtR+ZBIb6IrvFPqUHMafoWymAcMMc073q9A7pbTLy+ILICorcRbaOnxfyQUM0f1Id7DUzKo=
