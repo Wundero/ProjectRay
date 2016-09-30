@@ -227,25 +227,30 @@ public abstract class Format {
 		}
 		boolean event = !node.getNode("event").isVirtual();
 		boolean cmd = !node.getNode("command").isVirtual();
+		boolean ex = !node.getNode("commands").isVirtual();
 		if (!node.getNode("frames").isVirtual()) {
-			return buildFormat(node, new AnimatedFormat(node), event, cmd);
+			return buildFormat(node, new AnimatedFormat(node), event, cmd, ex);
 		}
 		if (!node.getNode("formats").isVirtual()) {
-			return buildFormat(node, new MultiFormat(node), event, cmd);
+			return buildFormat(node, new MultiFormat(node), event, cmd, ex);
 		}
 		if (!node.getNode("key").isVirtual()) {
-			return buildFormat(node, new TranslatableFormat(node), event, cmd);
+			return buildFormat(node, new TranslatableFormat(node), event, cmd, ex);
 		}
-		return buildFormat(node, new StaticFormat(node), event, cmd);
+		return buildFormat(node, new StaticFormat(node), event, cmd, ex);
 	}
 
-	private static Format buildFormat(ConfigurationNode node, Format towrap, boolean event, boolean command) {
+	private static Format buildFormat(ConfigurationNode node, Format towrap, boolean event, boolean command,
+			boolean ex) {
 		Format out = towrap;
 		if (event) {
-			out = new EventFormat(node, out);
+			return buildFormat(node, new EventFormat(node, towrap), false, command, ex);
 		}
 		if (command) {
-			out = new CommandFormat(node, out);
+			return buildFormat(node, new CommandFormat(node, towrap), event, false, ex);
+		}
+		if (ex) {
+			return buildFormat(node, new ExecutingFormat(node, towrap), event, command, false);
 		}
 		return out;
 	}
