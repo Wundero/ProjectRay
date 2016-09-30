@@ -40,6 +40,8 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
 public class TranslationFile {
+
+	//TODO test this
 	private File file;
 	private Map<String, String> lines = Utils.sm();
 	private boolean usable = false;
