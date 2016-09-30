@@ -46,13 +46,7 @@ public class Commands {
 						.executor(new AnnouncementConversationCommand()).build());
 		children.put(Utils.sl("channel"), CommandSpec.builder().permission("ray.channelbuilder")
 				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
-		children.put(Utils.sl("fake"),
-				CommandSpec.builder().permission("ray.fake").description(Text.of("Send a fake message."))
-						.executor(new FakeMessageCommand())
-						.arguments(GenericArguments.flags().valueFlag(GenericArguments.player(Text.of("player")), "p")
-								.buildWith(GenericArguments.seq(GenericArguments.string(Text.of("type")),
-										GenericArguments.remainingJoinedStrings(Text.of("message")))))
-						.build());
+		
 		children.put(Utils.sl("test-translate"),
 				CommandSpec.builder().permission("ray.translate.test").executor(new TranslationTestCommand())
 						.arguments(GenericArguments.string(Text.of("key")),
