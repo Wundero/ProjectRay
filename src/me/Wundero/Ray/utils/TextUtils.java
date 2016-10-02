@@ -42,6 +42,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.LiteralText;
+import org.spongepowered.api.text.LiteralText.Builder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.ClickAction;
@@ -456,6 +457,87 @@ public class TextUtils {
 		return split(t, '\n', false);
 	}
 
+	private static Text s(List<Text> tx, int start, int finish) {
+		if (start < 0) {
+			throw new IllegalArgumentException("Cannot start below 0!");
+		}
+		if (finish < start) {
+			throw new IllegalArgumentException("End must be after start!");
+		}
+		if (finish == start) {
+			return Text.of();
+		}
+		Text t = tx.get(0);
+		if (!(t instanceof LiteralText)) {
+			return t;
+		}
+		String c = getContent(t, true);
+		if (finish > c.length()) {
+			if (tx.isEmpty()) {
+				throw new IllegalArgumentException("Finish must be less than or equal to the length of the content!");
+			}
+			LiteralText.Builder b = (Builder) LiteralText.builder();
+			b.format(t.getFormat());
+			t.getClickAction().ifPresent((a) -> b.onClick(a));
+			t.getHoverAction().ifPresent((a) -> b.onHover(a));
+			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
+			int offset = c.substring(start).length();
+			b.content(c.substring(start));
+			b.append(s(tx.stream().skip(1).collect(RayCollectors.rayList()), 0, finish - offset));
+			return b.build();
+		} else {
+			Text.Builder b = Text.of(c.substring(start, finish)).toBuilder().format(t.getFormat());
+			t.getClickAction().ifPresent((a) -> b.onClick(a));
+			t.getHoverAction().ifPresent((a) -> b.onHover(a));
+			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
+			return b.build();
+		}
+	}
+
+	public static Text substring(Text t, int start, int finish) {
+		if (start < 0) {
+			throw new IllegalArgumentException("Cannot start below 0!");
+		}
+		if (finish < start) {
+			throw new IllegalArgumentException("End must be after start!");
+		}
+		if (finish == start) {
+			return Text.of();
+		}
+		if (!(t instanceof LiteralText)) {
+			return t;
+		}
+		String c = getContent(t, true);
+		if (finish > c.length()) {
+			if (t.getChildren().isEmpty()) {
+				throw new IllegalArgumentException("Finish must be less than or equal to the length of the content!");
+			}
+			LiteralText.Builder b = (Builder) LiteralText.builder();
+			b.format(t.getFormat());
+			t.getClickAction().ifPresent((a) -> b.onClick(a));
+			t.getHoverAction().ifPresent((a) -> b.onHover(a));
+			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
+			int offset = c.substring(start).length();
+			b.content(c.substring(start));
+			b.append(s(b.getChildren(), 0, finish - offset));
+			return b.build();
+		} else {
+			Text.Builder b = Text.of(c.substring(start, finish)).toBuilder().format(t.getFormat());
+			t.getClickAction().ifPresent((a) -> b.onClick(a));
+			t.getHoverAction().ifPresent((a) -> b.onHover(a));
+			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
+			return b.build();
+		}
+	}
+
+	public static String getContent(Text t, boolean strict) {
+		if (t instanceof LiteralText) {
+			return ((LiteralText) t).getContent();
+		} else {
+			return strict ? "" : t.toPlain();
+		}
+	}
+
 	public static Text vars(Text t, ParsableData data) {
 		if (!(t instanceof LiteralText)) {
 			return t;
@@ -548,6 +630,19 @@ public class TextUtils {
 			f = m.replaceFirst("");
 		}
 		return o.toArray(new String[o.size()]);
+	}
+
+	public static int length(Text t) {
+		if (!(t instanceof LiteralText)) {
+			return 0;
+		}
+		List<Text> children = t.getChildren();
+		LiteralText lt = (LiteralText) t;
+		int l = lt.getContent().length();
+		for (Text f : children) {
+			l += length(f);
+		}
+		return l;
 	}
 
 }
