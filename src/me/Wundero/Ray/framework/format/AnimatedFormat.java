@@ -48,6 +48,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 public class AnimatedFormat extends Format {
 	private Map<Format, Integer> frameWithDelay = Utils.sm();
 	private List<Format> inOrder = Utils.sl();
+	private Optional<Integer> initialDelay = Optional.empty();
 
 	private static class Frame {
 		private Format v;
@@ -82,6 +83,7 @@ public class AnimatedFormat extends Format {
 			return;
 		}
 		ConfigurationNode frames = node.getNode("frames");
+		this.initialDelay = Utils.wrap(node.getNode("initial-delay").getInt());
 		Map<Format, Integer> t = Utils.sm();
 		List<Frame> framez = Utils.sl();
 		for (ConfigurationNode frame : frames.getChildrenMap().values()) {
@@ -106,6 +108,42 @@ public class AnimatedFormat extends Format {
 			return frame1.getO() - frame2.getO();
 		});
 		inOrder = Utils.sl(framez.stream().map(frame -> frame.getV()).collect(Collectors.toList()));
+		initialDelay.ifPresent((delay) -> {
+			Format f = new Format(null) {
+
+				@Override
+				public boolean equals(Object o) {
+					return false;
+				}
+
+				@Override
+				public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
+					return returnTo;
+				}
+
+				@Override
+				public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
+					return Optional.empty();
+				}
+
+				@Override
+				public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
+					return false;
+				}
+
+				@Override
+				public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender) {
+					return true;
+				}
+
+				@Override
+				public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender) {
+					return true;
+				}
+			};
+			inOrder.add(0, f);
+			frameWithDelay.put(f, delay);
+		});
 		frameWithDelay = t;
 	}
 

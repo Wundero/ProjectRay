@@ -54,6 +54,11 @@ public abstract class Format {
 	protected FormatLocation loc = FormatLocations.CHAT;
 	private Optional<ConfigurationNode> node;
 
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Format && ((Format) o).name.equals(this.name);
+	}
+
 	public abstract Prompt getConversationBuilder(Prompt returnTo, ConversationContext context);
 
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode) {

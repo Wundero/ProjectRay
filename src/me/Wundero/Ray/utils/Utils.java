@@ -109,6 +109,18 @@ public class Utils {
 		}
 	}
 
+	public static <T, R> Optional<R> cast(T object, Class<R> to) {
+		try {
+			return wrap(to.cast(object));
+		} catch (Exception e) {
+			return Optional.empty();
+		}
+	}
+
+	public static <T, R> R castNull(T object, Class<R> to) {
+		return cast(object, to).orElse(null);
+	}
+
 	public static <T> Optional<T> wrap(T t, boolean... checks) {
 		for (boolean b : checks) {
 			if (!b) {
@@ -769,7 +781,11 @@ public class Utils {
 		return sl(playersAlphabetical);
 	}
 
-	public static User getUser(UUID uuid) {
+	public static Optional<User> getUser(UUID uuid) {
+		return wrap(getUser(uuid, true));
+	}
+
+	private static User getUser(UUID uuid, boolean k) {
 		Optional<Player> p = Sponge.getServer().getPlayer(uuid);
 		if (!p.isPresent()) {
 			UserStorageService storage = Ray.get().getPlugin().getGame().getServiceManager()
