@@ -110,6 +110,18 @@ public class Utils {
 		}
 	}
 
+	public static <T, R> Optional<R> cast(T object, Class<R> to) {
+		try {
+			return wrap(to.cast(object));
+		} catch (Exception e) {
+			return Optional.empty();
+		}
+	}
+
+	public static <T, R> R castNull(T object, Class<R> to) {
+		return cast(object, to).orElse(null);
+	}
+
 	@SafeVarargs
 	public static <T> Optional<T> wrap2(T t, Function<Optional<T>, Boolean>... checks) {
 		Optional<T> o = Optional.ofNullable(t);
