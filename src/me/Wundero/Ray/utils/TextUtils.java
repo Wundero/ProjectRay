@@ -645,4 +645,77 @@ public class TextUtils {
 		return l;
 	}
 
+	public static TextColor colorFrom(String s) {
+		if (s == null || s.isEmpty()) {
+			return TextColors.NONE;
+		}
+		TextColor c = fromName(s);
+		if (c == TextColors.NONE && s.length() < 3) {
+			c = fromString(s);
+		}
+		return c;
+	}
+
+	public static TextColor fromString(String s) {
+		return TextSerializers.FORMATTING_CODE.deserialize(s).getColor();
+	}
+
+	public static TextColor fromChar(char c) {
+		return fromString(c + "");
+	}
+
+	public static TextColor fromName(String color) {
+		switch (color.toLowerCase().trim()) {
+		case "aqua":
+			return TextColors.AQUA;
+		case "black":
+			return TextColors.BLACK;
+		case "blue":
+			return TextColors.BLUE;
+		case "dark_aqua":
+		case "dark aqua":
+		case "dark cyan":
+		case "dark_cyan":
+			return TextColors.DARK_AQUA;
+		case "dark_blue":
+		case "navy":
+		case "dark blue":
+			return TextColors.DARK_BLUE;
+		case "dark_gray":
+		case "dark gray":
+			return TextColors.DARK_GRAY;
+		case "dark_green":
+		case "dark green":
+			return TextColors.DARK_GREEN;
+		case "dark_purple":
+		case "dark purple":
+			return TextColors.DARK_PURPLE;
+		case "dark red":
+		case "dark_red":
+			return TextColors.DARK_RED;
+		case "gold":
+		case "orange":
+			return TextColors.GOLD;
+		case "gray":
+			return TextColors.GRAY;
+		case "green":
+		case "lime":
+			return TextColors.GREEN;
+		case "purple":
+		case "light purple":
+		case "light_purple":
+			return TextColors.LIGHT_PURPLE;
+		case "red":
+			return TextColors.RED;
+		case "reset":
+			return TextColors.RESET;
+		case "white":
+			return TextColors.WHITE;
+		case "yellow":
+			return TextColors.YELLOW;
+		default:
+			return TextColors.NONE;
+		}
+	}
+
 }

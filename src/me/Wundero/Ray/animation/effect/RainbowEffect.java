@@ -29,6 +29,8 @@ import java.util.function.BiFunction;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
+import me.Wundero.Ray.utils.TextUtils;
+
 public class RainbowEffect extends Effect<Text> {
 
 	// highlight part of text
@@ -84,6 +86,10 @@ public class RainbowEffect extends Effect<Text> {
 			}
 		}, text.length() + (second.isPresent() ? 2 : 0), delay.orElse(0));
 		return e;
+	}
+
+	public static RainbowEffect create(Text t, TextColor main, Optional<TextColor> secondary, Optional<Integer> delay) {
+		return create(TextUtils.getContent(t, false), t.getColor(), main, secondary, delay);
 	}
 
 	private RainbowEffect(Text obj, BiFunction<Text, Integer, Text> mod, int f, int d) {

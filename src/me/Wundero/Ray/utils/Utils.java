@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -107,6 +108,17 @@ public class Utils {
 				return num > bx && num < by;
 			}
 		}
+	}
+
+	@SafeVarargs
+	public static <T> Optional<T> wrap2(T t, Function<Optional<T>, Boolean>... checks) {
+		Optional<T> o = Optional.ofNullable(t);
+		for (Function<Optional<T>, Boolean> b : checks) {
+			if (!b.apply(o)) {
+				return Optional.empty();
+			}
+		}
+		return o;
 	}
 
 	public static <T> Optional<T> wrap(T t, boolean... checks) {
