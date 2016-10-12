@@ -42,6 +42,8 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class SelectableTag extends Tag<Map<String, TextTemplate>> implements RaySerializable {
 
+	// TODO gui & cmd for selecting this
+
 	public SelectableTag(String name, Map<String, TextTemplate> object) {
 		super(name, object);
 	}
@@ -55,11 +57,11 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 			Map<String, TextTemplate> m = (Map<String, TextTemplate>) o;// possible
 																		// class
 																		// cast
-			m.put("", TextTemplate.of());// more likely class cast
+			m.put("a", TextTemplate.of());// more likely class cast
+			return m.containsKey("a");
 		} catch (Exception e) {
 			return false;
 		}
-		return true;
 	}
 
 	@Override
@@ -69,6 +71,9 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		}
 		ParsableData data = d.get();
 		if (!data.getSender().isPresent()) {
+			return Optional.empty();
+		}
+		if (!hasPermission(data)) {
 			return Optional.empty();
 		}
 		Player s = data.getSender().get();

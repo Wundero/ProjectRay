@@ -34,6 +34,7 @@ import me.Wundero.Ray.variables.ParsableData;
 
 public abstract class Tag<T> implements RaySerializable {
 	private final String name;
+	private String permissionView, permissionUse;
 	protected T object;
 
 	public Tag(String name, T object) {
@@ -46,6 +47,14 @@ public abstract class Tag<T> implements RaySerializable {
 
 	public abstract Optional<Text> get(Optional<ParsableData> data);
 
+	public boolean hasPermission(ParsableData d) {
+		boolean s = (permissionUse == null || permissionUse.isEmpty())
+				|| d.getSender().isPresent() && d.getSender().get().hasPermission(permissionUse);
+		boolean r = (permissionView == null || permissionView.isEmpty())
+				|| d.getRecipient().isPresent() && d.getRecipient().get().hasPermission(permissionView);
+		return s && r;
+	}
+
 	public final String getName() {
 		return name;
 	}
@@ -56,6 +65,24 @@ public abstract class Tag<T> implements RaySerializable {
 
 	public final void setObject(T object) {
 		this.object = object;
+	}
+
+	public String getPermissionView() {
+		return permissionView;
+	}
+
+	public Tag<T> setPermissionView(String permissionView) {
+		this.permissionView = permissionView;
+		return this;
+	}
+
+	public String getPermissionUse() {
+		return permissionUse;
+	}
+
+	public Tag<T> setPermissionUse(String permissionUse) {
+		this.permissionUse = permissionUse;
+		return this;
 	}
 
 }

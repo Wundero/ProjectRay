@@ -53,6 +53,9 @@ public class SocialMediaTag extends Tag<SocialMedia> {
 		}
 		if (data.isPresent()) {
 			ParsableData d = data.get();
+			if (!hasPermission(d)) {
+				return Optional.empty();
+			}
 			if (d.getSender().isPresent()) {
 				Player s = d.getSender().get();
 				RayPlayer rp = RayPlayer.get(s);
