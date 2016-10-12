@@ -49,11 +49,13 @@ public class DefaultFormats {
 	// TODO fill these in:
 	public static final DefaultFormat MSG_SPY = new DefaultFormat("spy", FormatContexts.MESSAGE_SPY)
 			.with(DefaultArgs.DISPLAYNAME).with(Text.of(TextColors.AQUA, " to ")).with(DefaultArgs.RECIP_DISPLAYNAME)
-			.with(Text.of(TextColors.GRAY, ": ")).with(TextTemplate.arg("message").color(TextColors.GRAY));
+			.with(Text.of(TextColors.GRAY, ": ")).with(TextTemplate.arg("message").color(TextColors.GRAY))
+			.withLoc(FormatLocations.ACTIONBAR);
 	public static final DefaultFormat WELCOME = new DefaultFormat("welcome", FormatContexts.WELCOME)
 			.with(Text.of(TextColors.LIGHT_PURPLE, "Welcome ")).with(DefaultArgs.DISPLAYNAME)
-			.with(Text.of(TextColors.LIGHT_PURPLE, " to the server!"));
-	public static final DefaultFormat MOTD = new DefaultFormat("motd", FormatContexts.MOTD);
+			.with(Text.of(TextColors.LIGHT_PURPLE, " to the server!")).withLoc(FormatLocations.BOSSBAR);
+	public static final DefaultFormat MOTD = new DefaultFormat("motd", FormatContexts.MOTD)
+			.with("Welcome to the server!").withLoc(FormatLocations.BOSSBAR);
 	public static final DefaultFormat TABLIST_ENTRY = new DefaultFormat("tablist", FormatContexts.TABLIST_ENTRY)
 			.withLoc(FormatLocations.TAB_ENTRY).with(DefaultArgs.DISPLAYNAME, " ", Text.of(TextColors.AQUA, "Hi"));
 	public static final DefaultFormat TABLIST_HEADER = new DefaultFormat("header", FormatContexts.TABLIST_HEADER)
