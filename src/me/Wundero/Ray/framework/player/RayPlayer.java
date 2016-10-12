@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -121,6 +122,9 @@ public class RayPlayer implements Socialable {
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
+	private Task afkTask = null;
+	private boolean afk = false;
+	private long lastMove = System.currentTimeMillis();
 	private Task tabHFTask = null;
 	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
@@ -128,6 +132,26 @@ public class RayPlayer implements Socialable {
 	private Map<SelectableTag, String> selectedTags = Utils.sm();
 	private boolean spy = false;
 	private Optional<String> quote;
+
+	public Task getAFKTask() {
+		return afkTask;
+	}
+
+	public Task startAFKTask() {
+		afkTask = Task.builder().async().execute(() -> {
+			// TODO list
+			// Configure AFK timeout
+			// Configure AFK kick timer
+			// Permissions handling (timer & kick)
+			if (System.currentTimeMillis() - lastMove > TimeUnit.MINUTES.toMillis(5)) {
+				afk = true;
+			} else {
+				afk = false;
+			}
+		}).interval(15, TimeUnit.SECONDS).submit(Ray.get().getPlugin());
+		Ray.get().registerTask(afkTask);
+		return afkTask;
+	}
 
 	public void setQuote(String quote) {
 		setQuote(Utils.wrap(quote, !quote.trim().isEmpty()));
