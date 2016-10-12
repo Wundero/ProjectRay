@@ -33,6 +33,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.Ray.animation.effect.EffectType.Setting;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
@@ -57,7 +58,8 @@ public class EffectTypes {
 			String text = TextUtils.strip(s.getNode("text").getString(""));
 			return RainbowEffect.create(text, orig, get, sec, del);
 		}
-	});
+	}, Utils.sl(new Setting("text", String.class, false), new Setting("color", String.class, false),
+			new Setting("second-color", String.class, true), new Setting("delay", Integer.class, true)));
 	public static final EffectType SCROLL_TEXT = new EffectType("scroll", s -> {
 		Text obj;
 		try {
@@ -72,7 +74,28 @@ public class EffectTypes {
 				x -> x.isPresent() && x.get() > 0);
 		Optional<Integer> del = Utils.wrap2(s.getNode("delay").getInt(10), null, x -> x.isPresent() && x.get() > 0);
 		return TextScrollEffect.create(obj, len, spa, cha, del);
-	});
+	}, Utils.sl(new Setting("text", String.class, false), new Setting("delay", Integer.class, true),
+			new Setting("character-skip", Integer.class, true), new Setting("spaces", Integer.class, true),
+			new Setting("framelength", Integer.class, true)));
+
+	public static List<EffectType> values() {
+		return Utils.sl(types);
+	}
+
+	public static EffectType from(String s) {
+		s = s.toLowerCase().trim();
+		for (EffectType t : types) {
+			if (t.getName().equals(s)) {
+				return t;
+			}
+		}
+		for (EffectType t : types) {
+			if (t.getName().startsWith(s)) {
+				return t;
+			}
+		}
+		return null;
+	}
 
 	static {
 		types.add(RAINBOW_TEXT);

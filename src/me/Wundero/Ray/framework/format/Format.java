@@ -201,6 +201,18 @@ public abstract class Format {
 		return loc.send(te, target, this, sender);
 	}
 
+	protected boolean s(MessageReceiver target, Map<String, Object> a, Text te, Optional<Object> sender) {
+		te = TextUtils.vars(te, new ParsableData().setKnown(a));
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender);
+	}
+
+	protected boolean s(MessageReceiver target, ParsableData d, Text te, Optional<Object> sender) {
+		te = TextUtils.vars(te, d);
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender);
+	}
+
 	protected Text get(TextTemplate t, Map<String, Object> data) {
 		return t.apply(data).build();
 	}
@@ -317,6 +329,12 @@ public abstract class Format {
 		case "event":
 		case "e":
 			return ef;
+		case "effect":
+		case "animated effect":
+		case "animatedeffect":
+		case "animated-effect":
+		case "eff":
+			return aef;
 		case "executing":
 		case "exec":
 		case "execute":
@@ -340,6 +358,7 @@ public abstract class Format {
 
 	private static ExecutingFormat xf = new ExecutingFormat(null, null);
 	private static AnimatedFormat af = new AnimatedFormat(null);
+	private static EffectFormat aef = new EffectFormat(null);
 	private static StaticFormat sf = new StaticFormat(null);
 	private static EventFormat ef = new EventFormat(null, null);
 	private static MultiFormat mf = new MultiFormat(null);

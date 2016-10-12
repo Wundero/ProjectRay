@@ -26,6 +26,7 @@ package me.Wundero.Ray.animation.effect;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.utils.TextUtils;
@@ -33,7 +34,7 @@ import me.Wundero.Ray.utils.TextUtils;
 public class TextScrollEffect extends Effect<Text> {
 
 	private TextScrollEffect(Text obj, BiFunction<Text, Integer, Text> mod, int f, int d) {
-		super(obj, mod, f, d);
+		super(obj, mod, (t, p) -> t, f, d);// again, text parsing?
 	}
 
 	private static String bs(int i) {
@@ -74,6 +75,11 @@ public class TextScrollEffect extends Effect<Text> {
 			return TextUtils.substring(text, frame, frame + f);
 		};
 		return new TextScrollEffect(officialObject, mod, TextUtils.length(officialObject) + s, d);
+	}
+
+	@Override
+	public boolean send(BiFunction<Text, Player, Boolean> sender, Text obj, Player p) {
+		return sender.apply(obj, p);
 	}
 
 }

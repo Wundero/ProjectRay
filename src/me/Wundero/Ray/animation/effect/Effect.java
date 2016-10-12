@@ -24,35 +24,42 @@ package me.Wundero.Ray.animation.effect;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
 
 import me.Wundero.Ray.animation.Animation;
 import me.Wundero.Ray.utils.Utils;
+import me.Wundero.Ray.variables.ParsableData;
 
 /*
  * Class for a specific animation (called effect)
  * example: scrolling text
  * UNTESTED 
  */
-public class Effect<T> {
+public abstract class Effect<T> {
 
 	private final T object;// object to modify for each frame: ex substring
 	private final BiFunction<T, Integer, T> mod;// modifier
+	private BiFunction<T, ParsableData, T> parser;
 	private final int frames;// number of frames
 	private final int delay;// time delay between each frame
 	private List<T> objects = Utils.sl();// final list of frames
 
 	private Animation<T> anim;// animation for sending
 
-	public Effect(T obj, BiFunction<T, Integer, T> mod, int f, int d) {
+	public Effect(T obj, BiFunction<T, Integer, T> mod, BiFunction<T, ParsableData, T> parser, int f, int d) {
 		this.object = obj;
 		this.mod = mod;
 		this.frames = f;
 		this.delay = d;
-		setupAnimation();
+		this.parser = parser;
 	}
+
+	public abstract boolean send(BiFunction<Text, Player, Boolean> sender, T obj, Player p);
 
 	// access methods for anim - this cannot impl anim so instead has this
 
@@ -98,19 +105,29 @@ public class Effect<T> {
 
 	// TODO animation effect that supports T as vars - gen vars and then setup?
 
-	private void setupAnimation() {// apply mods to objects on creation - saves
-									// performance but doesn't support vars
+	public void setupAnimation(Player p, Map<String, Object> d, BiFunction<Text, Player, Boolean> sender) {
+		setupAnimation(p, new ParsableData().setKnown(d), sender);
+	}
+
+	public void setupAnimation(Player p, ParsableData d, BiFunction<Text, Player, Boolean> sender) {
 		List<T> framez = Utils.sl();
 		for (int i = 0; i < frames; i++) {
 			try {
 				T n = mod.apply(object, i);// mod can throw exception if it
 											// wants to skip a frame
+				n = parser.apply(n, d);
 				framez.add(n);
 			} catch (Exception e) {
 			}
 		}
 		setObjects(framez);
-		anim = new Animation<T>(framez, (f) -> delay, (f) -> Tristate.TRUE);
+		anim = new Animation<T>(framez, (f) -> {
+			if (send(sender, f, p)) {
+				return delay;
+			} else {
+				return -1;
+			}
+		}, (f) -> Tristate.TRUE);
 	}
 
 	public T getObject() {
@@ -127,6 +144,13 @@ public class Effect<T> {
 
 	public BiFunction<T, Integer, T> getMod() {
 		return mod;
+	}
+
+	public void setParser(BiFunction<T, ParsableData, T> parser) {
+		if (anim != null) {
+			return;
+		}
+		this.parser = parser;
 	}
 
 	public List<T> getObjects() {

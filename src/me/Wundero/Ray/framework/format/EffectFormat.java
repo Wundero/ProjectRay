@@ -23,51 +23,125 @@ package me.Wundero.Ray.framework.format;
  SOFTWARE.
  */
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.format.TextColors;
 
+import me.Wundero.Ray.animation.effect.Effect;
+import me.Wundero.Ray.animation.effect.EffectType;
+import me.Wundero.Ray.animation.effect.EffectTypes;
+import me.Wundero.Ray.conversation.BooleanPrompt;
 import me.Wundero.Ray.conversation.ConversationContext;
+import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
 public class EffectFormat extends Format {
 
+	private Effect<?> effect;
+	private String type;
+	private EffectType etype;
+
 	public EffectFormat(ConfigurationNode node) {
 		super(node);
-		// TODO Auto-generated constructor stub
+		if (node == null || node.isVirtual()) {
+			return;
+		}
+		this.type = node.getNode("type").getString();
+		if (type == null) {
+			throw new NullPointerException("Type cannot be null!");
+		}
+		this.etype = EffectTypes.from(type);
+		this.effect = etype.load(node);
 	}
 
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		// TODO Auto-generated method stub
-		return null;
+		return new Prompt(TextTemplate.of(TextColors.AQUA, "What type of effect would you like to use? ",
+				TextTemplate.arg("options"))) {
+
+			@Override
+			public Text getQuestion(ConversationContext context) {
+				return formatTemplate(context);
+			}
+
+			@Override
+			public Optional<List<Option>> options(ConversationContext context) {
+				List<Option> opts = Utils.sl();
+				for (EffectType et : EffectTypes.values()) {
+					opts.add(Option.build(et.getName(), et.getName()));
+				}
+				return Optional.of(opts);
+			}
+
+			@Override
+			public Text getFailedText(ConversationContext context, String failedInput) {
+				return Text.of(TextColors.RED, "That is not a valid option!");
+			}
+
+			@Override
+			public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+				ConfigurationNode node = context.getData("node");
+				node.getNode("type").setValue(text);
+				return new BooleanPrompt(TextTemplate.of(TextColors.AQUA,
+						"Would you like to include optional settings? ", TextTemplate.arg("options")), true) {
+
+					@Override
+					public Prompt onBooleanInput(boolean value, String text, ConversationContext context) {
+						return EffectTypes.from(text).iteratePrompts(returnTo, node, value);
+					}
+
+					@Override
+					public Text getQuestion(ConversationContext context) {
+						return formatTemplate(context);
+					}
+
+				};
+			}
+
+		};
 	}
 
 	@Override
 	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.empty();
 	}
 
 	@Override
 	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean send(MessageReceiver target, Map<String, Object> data, Optional<Object> sender) {
+		if (!(target instanceof Player)) {
+			return false;
+		}
+		effect.setupAnimation((Player) target, data, (text, player) -> {
+			return s(target, data, text, sender);
+		});
+		effect.start();
+		return true;
 	}
 
 	@Override
 	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!(target instanceof Player)) {
+			return false;
+		}
+		effect.setupAnimation((Player) target, data, (text, player) -> {
+			return s(target, data, text, sender);
+		});
+		effect.start();
+		return true;
 	}
 
 }

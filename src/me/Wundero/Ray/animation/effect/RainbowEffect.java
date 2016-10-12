@@ -26,6 +26,7 @@ package me.Wundero.Ray.animation.effect;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
@@ -93,7 +94,14 @@ public class RainbowEffect extends Effect<Text> {
 	}
 
 	private RainbowEffect(Text obj, BiFunction<Text, Integer, Text> mod, int f, int d) {
-		super(obj, mod, f, d);
+		super(obj, mod, (t, p) -> {
+			return t;// TODO support for var parsing?
+		}, f, d);
+	}
+
+	@Override
+	public boolean send(BiFunction<Text, Player, Boolean> sender, Text obj, Player p) {
+		return sender.apply(obj, p);
 	}
 
 }
