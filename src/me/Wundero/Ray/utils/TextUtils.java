@@ -467,14 +467,17 @@ public class TextUtils {
 		if (finish == start) {
 			return Text.of();
 		}
+		if (tx.isEmpty()) {
+			throw new IllegalArgumentException("Text must be present!");
+		}
 		Text t = tx.get(0);
 		if (!(t instanceof LiteralText)) {
 			return t;
 		}
 		String c = getContent(t, true);
 		if (finish > c.length()) {
-			if (tx.isEmpty()) {
-				throw new IllegalArgumentException("Finish must be less than or equal to the length of the content!");
+			if (tx.size() == 1) {
+				return t;
 			}
 			LiteralText.Builder b = (Builder) LiteralText.builder();
 			b.format(t.getFormat());
@@ -494,6 +497,24 @@ public class TextUtils {
 		}
 	}
 
+	public static Text[] splitAfterCharCount(Text t, int charCount, boolean arr) {
+		return splitAfterCharCount(t, charCount).stream().toArray(i -> new Text[i]);
+	}
+
+	public static List<Text> splitAfterCharCount(Text t, int charCount) {
+		if (!(t instanceof LiteralText)) {
+			return Utils.sl(t);
+		}
+		List<Text> out = Utils.sl();
+		int times = length(t) % charCount;
+		for (int i = 0; i < times; i++) {
+			int start = i * charCount;
+			int fin = (i + 1) * charCount;
+			out.add(substring(t, start, fin));
+		}
+		return out;
+	}
+
 	public static Text substring(Text t, int start, int finish) {
 		if (start < 0) {
 			throw new IllegalArgumentException("Cannot start below 0!");
@@ -510,7 +531,7 @@ public class TextUtils {
 		String c = getContent(t, true);
 		if (finish > c.length()) {
 			if (t.getChildren().isEmpty()) {
-				throw new IllegalArgumentException("Finish must be less than or equal to the length of the content!");
+				return t;
 			}
 			LiteralText.Builder b = (Builder) LiteralText.builder();
 			b.format(t.getFormat());
