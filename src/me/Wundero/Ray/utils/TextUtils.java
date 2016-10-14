@@ -497,17 +497,20 @@ public class TextUtils {
 		}
 	}
 
-	public static Text[] splitAfterCharCount(Text t, int charCount, boolean arr) {
-		return splitAfterCharCount(t, charCount).stream().toArray(i -> new Text[i]);
+	public static Text[] splitAfterCharCount(Text t, int charCount, boolean repeat, boolean arr) {
+		return splitAfterCharCount(t, charCount, repeat).stream().toArray(i -> new Text[i]);
 	}
 
-	public static List<Text> splitAfterCharCount(Text t, int charCount) {
+	public static List<Text> splitAfterCharCount(Text t, int charCount, boolean repeat) {
 		if (!(t instanceof LiteralText)) {
 			return Utils.sl(t);
 		}
 		List<Text> out = Utils.sl();
 		int times = length(t) % charCount;
-		for (int i = 0; i < times; i++) {
+		if (!repeat) {
+			times = 1;
+		}
+		for (int i = 0; i <= times; i++) {
 			int start = i * charCount;
 			int fin = (i + 1) * charCount;
 			out.add(substring(t, start, fin));
@@ -529,7 +532,16 @@ public class TextUtils {
 			return t;
 		}
 		String c = getContent(t, true);
-		if (finish > c.length()) {
+		if (start > c.length()) {
+			if (t.getChildren().isEmpty()) {
+				throw new IllegalArgumentException("Cannot start after text ends!");
+			} else {
+				LiteralText.Builder b = (Builder) LiteralText.builder();
+				int offset = start - c.length();
+				b.append(s(t.getChildren(), 0, finish - offset));
+				return b.build();
+			}
+		} else if (finish > c.length()) {
 			if (t.getChildren().isEmpty()) {
 				return t;
 			}
@@ -540,7 +552,7 @@ public class TextUtils {
 			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
 			int offset = c.substring(start).length();
 			b.content(c.substring(start));
-			b.append(s(b.getChildren(), 0, finish - offset));
+			b.append(s(t.getChildren(), 0, finish - offset));
 			return b.build();
 		} else {
 			Text.Builder b = Text.of(c.substring(start, finish)).toBuilder().format(t.getFormat());
@@ -549,6 +561,54 @@ public class TextUtils {
 			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
 			return b.build();
 		}
+	}
+
+	public static char charAt(Text t, int i) {
+		return getContent(t, false).charAt(i);
+	}
+
+	public static boolean formatsEqual(Text one, Text two) {
+		return one.getFormat().equals(two.getFormat());
+	}
+
+	public static boolean extrasEqual(Text one, Text two) {
+		return one.getClickAction().equals(two.getClickAction()) && one.getHoverAction().equals(two.getHoverAction())
+				&& one.getShiftClickAction().equals(two.getShiftClickAction());
+	}
+
+	public static int indexOf(Text in, String val) {
+		if (!(in instanceof LiteralText)) {
+			return -1;
+		}
+		return ((LiteralText) in).getContent().indexOf(val);
+	}
+
+	public static int indexOf(Text in, Text val) {
+		if (!(in instanceof LiteralText) && !(val instanceof LiteralText)) {
+			return in.equals(val) ? 0 : -1;
+		} else if (!(in instanceof LiteralText) && !(val instanceof LiteralText)) {
+			return -1;
+		}
+		LiteralText t1 = (LiteralText) in;
+		LiteralText t2 = (LiteralText) val;
+		int c = t1.getContent().indexOf(t2.getContent());
+		return extrasEqual(t1, t2) && formatsEqual(t1, t2) ? c : -1;
+	}
+
+	public static int indexOf(Text in, char val) {
+		if (!(in instanceof LiteralText)) {
+			return -1;
+		}
+		return ((LiteralText) in).getContent().indexOf(val);
+	}
+
+	public static Text capitalize(Text t) {
+		if (!(t instanceof LiteralText)) {
+			return t;
+		}
+		LiteralText t1 = (LiteralText) t;
+		String content = t1.getContent();
+		return t1.toBuilder().content(Utils.capitalize(content)).build();
 	}
 
 	public static String getContent(Text t, boolean strict) {
