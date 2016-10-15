@@ -35,11 +35,17 @@ import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Singleton instance containing chat channels in memory.
+ */
 public class ChatChannels {
 	private Map<String, ChatChannel> channels = Utils.sm();
 	private ConfigurationNode node;
 	private boolean useChannels = true;
 
+	/**
+	 * Load channels from a node.
+	 */
 	public void load(ConfigurationNode node) throws ObjectMappingException {
 		if (node == null) {
 			setUseChannels(false);
@@ -53,6 +59,9 @@ public class ChatChannels {
 		}
 	}
 
+	/**
+	 * Get channels matching names.
+	 */
 	public List<ChatChannel> getChannels(Collection<String> names, boolean startWith) {
 		List<ChatChannel> out = Utils.sl();
 		for (String s : names) {
@@ -64,25 +73,35 @@ public class ChatChannels {
 		return out;
 	}
 
+	/**
+	 * Load a channel from a config node.
+	 */
 	public void addChannel(ConfigurationNode node) throws ObjectMappingException {
 		String name = node.getKey().toString();
 		ChatChannel channel = node.getValue(TypeToken.of(ChatChannel.class));
 		channels.put(name, channel);
 	}
 
+	/**
+	 * Get the channel mapped to the name. If startWith is true, it will be a
+	 * more lenient check.
+	 */
 	public ChatChannel getChannel(String name, boolean startWith) {
 		ChatChannel out = getChannel(name);
 		if (out != null || !startWith) {
 			return out;
 		}
 		for (ChatChannel c : channels.values()) {
-			if (c.getName().startsWith(name)) {
+			if (c.getName().toLowerCase().trim().startsWith(name.toLowerCase().trim())) {
 				return c;
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * Return the channel based off of the name. Strict equals name comparison.
+	 */
 	public ChatChannel getChannel(String name) {
 		if (name == null || name.isEmpty()) {
 			return null;
@@ -90,6 +109,9 @@ public class ChatChannels {
 		return channels.get(name);
 	}
 
+	/**
+	 * Return all the channels a player can join.
+	 */
 	public List<ChatChannel> getJoinableChannels(Player player, boolean showHidden) {
 		List<ChatChannel> l = getAllChannels();
 		List<ChatChannel> o = Utils.sl();
@@ -105,18 +127,31 @@ public class ChatChannels {
 		return o;
 	}
 
+	/**
+	 * Return all the channels.
+	 */
 	public List<ChatChannel> getAllChannels() {
 		return Utils.sl(channels.values());
 	}
 
+	/**
+	 * Return the overall channel node.
+	 */
 	public ConfigurationNode getNode() {
 		return node;
 	}
 
+	/**
+	 * Set the overall channel node. NODE: This will NOT refresh channel memory
+	 * representations.
+	 */
 	public void setNode(ConfigurationNode node) {
 		this.node = node;
 	}
 
+	/**
+	 * Whether channels are enabled.
+	 */
 	public boolean useChannels() {
 		return useChannels;
 	}

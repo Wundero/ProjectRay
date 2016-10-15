@@ -51,9 +51,15 @@ import ninja.leaping.configurate.ConfigurationNode;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+/**
+ * A singleton class that creates a conversation for a player to create an
+ * announcement format.
+ */
 public class AnnouncementConversation {
 
+	/**
+	 * Start the conversation.
+	 */
 	public static void start(Player player) {
 		if (!player.hasPermission("ray.announcementbuilder")) {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));

@@ -72,6 +72,9 @@ public class Ray {
 	// registering async tasks so they can be cancelled on termination
 	private List<Task> asyncTasks = Utils.sl();
 
+	/**
+	 * Register an asynchronous task to the list - cancels on stop.
+	 */
 	public void registerTask(Task t) {
 		if (t.isAsynchronous()) {
 			asyncTasks.add(t);
@@ -81,6 +84,9 @@ public class Ray {
 	private Ray() {
 	}
 
+	/**
+	 * Return the Ray singleton
+	 */
 	public static Ray get() {
 		return singleton;
 	}
@@ -106,19 +112,31 @@ public class Ray {
 	private ChatFilter filter;
 	private ChatLock lock;
 
+	/**
+	 * Return the economy service, if available
+	 */
 	public Optional<EconomyService> getEcon() {
 		return Utils.wrap(econ);
 	}
 
+	/**
+	 * Update economy service.
+	 */
 	public void setEcon(EconomyService econ) {
 		this.econ = econ;
 	}
 
-	// registers config for saving on termination
+	/**
+	 * Register configuration node - loader map to save on termination - any
+	 * configs loaded should do this
+	 */
 	public void registerLoader(ConfigurationLoader<CommentedConfigurationNode> loader, ConfigurationNode node) {
 		toSave.put(loader, node);
 	}
 
+	/**
+	 * Load singleton instances from the main plugin class
+	 */
 	public void load(ProjectRay plugin) {
 		// instantiates all singletons contained within this class
 		this.setPlugin(plugin);
@@ -149,14 +167,23 @@ public class Ray {
 		this.setFilter(new ChatFilter());
 	}
 
+	/**
+	 * Get main plugin object
+	 */
 	public ProjectRay getPlugin() {
 		return plugin;
 	}
 
+	/**
+	 * Get plugin logger
+	 */
 	public Logger getLogger() {
 		return getPlugin().getLogger();
 	}
 
+	/**
+	 * Save configs and cancel async tasks
+	 */
 	public void terminate() {// end async tasks and save configs and players
 		for (Task t : asyncTasks) {
 			t.cancel();
@@ -176,6 +203,9 @@ public class Ray {
 		}
 	}
 
+	/**
+	 * Return the current game instance
+	 */
 	public Game getGame() {
 		return plugin.getGame();
 	}
@@ -184,26 +214,46 @@ public class Ray {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Return the plugin's main config file
+	 */
 	public ConfigurationNode getConfig() {
 		return config;
 	}
 
+	/**
+	 * Update singleton config file
+	 */
 	public void setConfig(ConfigurationNode config) {
 		this.config = config;
 	}
 
+	/**
+	 * Get Groups singleton
+	 */
 	public Groups getGroups() {
 		return groups;
 	}
 
+	/**
+	 * Update Groups singleton
+	 */
 	public void setGroups(Groups groups) {
 		this.groups = groups;
 	}
 
+	/**
+	 * Parse a template for variables and return the template's applied text
+	 * vars
+	 */
 	public Text applyVars(TextTemplate t, ParsableData data) {
 		return applyVars(t, data, Optional.empty(), true);
 	}
 
+	/**
+	 * Parse a template for variables and return the template's applied text
+	 * vars
+	 */
 	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format, boolean clickhover) {
 		Map<String, Object> v = setVars(data, t, format, clickhover);
 		for (String a : t.getArguments().keySet()) {
@@ -215,19 +265,28 @@ public class Ray {
 		return TextUtils.vars(tx, data);
 	}
 
+	/**
+	 * Return a map with the String-Object map that can be applied to the given
+	 * template
+	 */
 	public Map<String, Object> setVars(ParsableData data, TextTemplate template) {
 		return setVars(data, template, Optional.empty(), true);
 	}
 
+	/**
+	 * Return a map with the String-Object map that can be applied to the given
+	 * template
+	 */
 	public Map<String, Object> setVars(ParsableData data, TextTemplate template, Optional<Format> formatUsed,
 			boolean ch) {
 		return setVars(data.getKnown().orElse(Utils.sm()), template, data.getSender(), data.getRecipient(),
 				data.getObserver(), formatUsed, ch);
 	}
 
-	// create map for args in a template to apply - is recursive if
-	// useClickHover is true
-	// TODO add support for vars in non-arg clickhover
+	/**
+	 * Return a map with the String-Object map that can be applied to the given
+	 * template
+	 */
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Optional<Player> sender,
 			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
 		if (known == null) {
@@ -333,18 +392,30 @@ public class Ray {
 		return out;
 	}
 
+	/**
+	 * Get variable parser singleton
+	 */
 	public Variables getVariables() {
 		return vars;
 	}
 
+	/**
+	 * Set variable parser singleton
+	 */
 	public void setVariables(Variables vars) {
 		this.vars = vars;
 	}
 
+	/**
+	 * Get chat channels singleton
+	 */
 	public ChatChannels getChannels() {
 		return channels;
 	}
 
+	/**
+	 * Set chat channels singelton
+	 */
 	public void setChannels(ChatChannels channels) {
 		this.channels = channels;
 	}

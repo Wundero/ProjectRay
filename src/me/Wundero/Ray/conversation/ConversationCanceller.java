@@ -25,14 +25,25 @@ package me.Wundero.Ray.conversation;
 
 import java.util.Optional;
 
-//a class that is called to check if the conversation should cancel on input, and calls when it is cancelled.
+/**
+ * An object called when the conversation parses input. If the input check
+ * returns true for shouldCancel, this cancels the conversation
+ */
 public abstract class ConversationCanceller {
 
+	/**
+	 * Whether the conversation should be cancelled.
+	 */
 	public abstract boolean shouldCancel(ConversationContext context, String input);
 
+	/**
+	 * Cleanup the conversation needs to handle
+	 */
 	public abstract void onCancel(ConversationContext context);
 
-	// internal method called
+	/**
+	 * Whether the conversation should cancel based on input
+	 */
 	public final boolean checkCancel(Conversation convo, String input) {
 		if (shouldCancel(convo.getContext(), input)) {
 			onCancel(convo.getContext());
@@ -42,7 +53,9 @@ public abstract class ConversationCanceller {
 		return false;
 	}
 
-	// standard canceller included
+	/**
+	 * Default canceller
+	 */
 	public static final ConversationCanceller DEFAULT = new ConversationCanceller() {
 
 		@Override

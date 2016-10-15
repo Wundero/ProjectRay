@@ -42,7 +42,6 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
@@ -81,17 +80,36 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
  SOFTWARE.
  */
 
+/**
+ * This class contains various utility methods and fields for use throughout the
+ * plugin.
+ */
 public class Utils {
 
+	/**
+	 * Emptry string constant.
+	 */
 	public static final String S = "";
+	/**
+	 * Pattern for matching any URL.
+	 */
 	public static final Pattern URL_PATTERN = Pattern
 			.compile("((?:(?:https?)://)?[\\w-_\\.]{2,})\\.([a-zA-Z]{2,}(?:/\\S+)?)");
+	/**
+	 * Pattern for matching variables.
+	 */
 	public static final Pattern VAR_PATTERN = Pattern.compile("[{][^{}]+[}]");
 
+	/**
+	 * Load a config from a path.
+	 */
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
 	}
 
+	/**
+	 * Check to see if num is within bounds b1 and b2, with defined exclusivity.
+	 */
 	public boolean in(int num, int b1, int b2, boolean el, boolean eg) {
 		int bx = Math.min(b1, b2);
 		int by = Math.max(b1, b2);
@@ -110,6 +128,10 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Cast an object to another type. If the cast does not work or is null,
+	 * returns empty.
+	 */
 	public static <T, R> Optional<R> cast(T object, Class<R> to) {
 		try {
 			return wrap(to.cast(object));
@@ -118,10 +140,20 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Cast an object to another type. If the cast fails or is null, returns
+	 * null.
+	 */
 	public static <T, R> R castNull(T object, Class<R> to) {
 		return cast(object, to).orElse(null);
 	}
 
+	/**
+	 * Wrap an object into an Optional object using ofNullable. Checks against
+	 * the object will be made by the functions. The functions return true if
+	 * the checks are passed. If any function returns false, the returned
+	 * optional is empty.
+	 */
 	@SafeVarargs
 	public static <T> Optional<T> wrap2(T t, Function<Optional<T>, Boolean>... checks) {
 		Optional<T> o = Optional.ofNullable(t);
@@ -133,6 +165,10 @@ public class Utils {
 		return o;
 	}
 
+	/**
+	 * Wrap an object into an Optional using ofNullable. If any of the booleans
+	 * in checks are false, empty is returned.
+	 */
 	public static <T> Optional<T> wrap(T t, boolean... checks) {
 		for (boolean b : checks) {
 			if (!b) {
@@ -142,6 +178,9 @@ public class Utils {
 		return Optional.ofNullable(t);
 	}
 
+	/**
+	 * Schedule a task
+	 */
 	public static Task schedule(Task.Builder b, boolean async) {
 		if (async) {
 			b.async();
@@ -149,6 +188,9 @@ public class Utils {
 		return b.submit(Ray.get().getPlugin());
 	}
 
+	/**
+	 * Remove money from a balance of a player.
+	 */
 	public static boolean charge(Player p, double c) {
 		Optional<EconomyService> eco = Sponge.getServiceManager().provide(EconomyService.class);
 		if (!eco.isPresent()) {
@@ -161,22 +203,41 @@ public class Utils {
 		}
 		UniqueAccount a = acc.get();
 		Currency cur = e.getDefaultCurrency();
-		TransactionResult r = a.withdraw(cur, new BigDecimal(c),
-				Cause.source(Ray.get().getPlugin()).named("Purchase", c).build());
-		switch (r.getResult()) {
-		case SUCCESS:
-			return true;
-		default:
+		if (c > 0) {
+			TransactionResult r = a.withdraw(cur, new BigDecimal(c),
+					Cause.source(Ray.get().getPlugin()).named("Purchase", c).build());
+			switch (r.getResult()) {
+			case SUCCESS:
+				return true;
+			default:
+				return false;
+			}
+		} else if (c == 0) {
 			return false;
+		} else {
+			TransactionResult r = a.deposit(cur, new BigDecimal(c),
+					Cause.source(Ray.get().getPlugin()).named("Purchase", c).build());
+			switch (r.getResult()) {
+			case SUCCESS:
+				return true;
+			default:
+				return false;
+			}
 		}
 	}
 
+	/**
+	 * Create a synchronized list containing all objects in the collection.
+	 */
 	public static <T> List<T> sl(Collection<T> objs) {
 		List<T> l = sl();
 		l.addAll(objs);
 		return l;
 	}
 
+	/**
+	 * Create a synchronized list containing all objects in the parameters.
+	 */
 	@SafeVarargs
 	public static <T> List<T> sl(T... objs) {
 		List<T> l = sl();
@@ -186,20 +247,37 @@ public class Utils {
 		return l;
 	}
 
+	/**
+	 * Create an OptionalMap and fill it with the pre-existing map.
+	 */
 	public static <K, V> OptionalMap<K, V> om(Map<K, V> pre) {
 		OptionalMap<K, V> o = om();
 		o.putAll(pre);
 		return o;
 	}
 
+	/**
+	 * Create an empty OptionalMap.
+	 */
 	public static <K, V> OptionalMap<K, V> om() {
 		return new OptionalMap<K, V>();
 	}
 
+	/**
+	 * Create an empty synchronized list.
+	 */
 	public static <T> List<T> sl() {
 		return sl(Tristate.FALSE);
 	}
 
+	/**
+	 * Create an empty synchronized list with indexOf strictness based off of
+	 * the tristate. TRUE means both o and get(i) equals methods must be true,
+	 * FALSE means one of them must be true, and NONE means that the default
+	 * list impl will be used. The iterator of this list is immutable as well,
+	 * meaning that no modifications can be made through the iterator. This list
+	 * is completely thread safe and itrable without synchrnous blocks.
+	 */
 	public static <T> List<T> sl(final Tristate strict) {
 		// returns a new arraylist that copies itself for iteration (makes
 		// unsynchronized iter blocks safe)
@@ -248,16 +326,26 @@ public class Utils {
 		});
 	}
 
+	/**
+	 * Return a synchronous map containing the pre-existing map of values.
+	 */
 	public static <K, V> Map<K, V> sm(Map<? extends K, ? extends V> m) {
 		Map<K, V> m1 = sm();
 		m1.putAll(m);
 		return m1;
 	}
 
+	/**
+	 * Create an empty ConcurrentHashMap.
+	 */
 	public static <K, V> Map<K, V> sm() {
 		return new ConcurrentHashMap<K, V>();
 	}
 
+	/**
+	 * Check to see if the class is an instanceof the main (as a string). This
+	 * method is recursive, and will recurse until it reaches Object.java.
+	 */
 	public static boolean classinstanceof(String main, Class<?> sub) {
 		// recursive -- call with caution
 		boolean b = sub.getName().equalsIgnoreCase(main);
@@ -275,6 +363,12 @@ public class Utils {
 		return Math.sqrt(cx);
 	}
 
+	/**
+	 * Get the pythagorean difference between two sets of coordinates. This
+	 * gives you a scalar value for the distance between coordinates such that,
+	 * in any dimension, it follows Pythagorean theorum. Both coordinate arrays
+	 * must have the same number of dimensions.
+	 */
 	public static double pythrange(double[] coord1, double[] coord2) {
 		if (coord1.length < 2 || coord1.length != coord2.length) {
 			return -1.0d;
@@ -286,6 +380,9 @@ public class Utils {
 		return Math.abs(calcdelta(dists));
 	}
 
+	/**
+	 * Check to see if two coordinate values have a difference within a range.
+	 */
 	public static boolean inrange(double range, double[] coord1, double[] coord2) {
 		if (range == Double.MAX_VALUE || range < 0) {
 			return true;
@@ -296,6 +393,9 @@ public class Utils {
 		return pythrange(coord1, coord2) <= range;
 	}
 
+	/**
+	 * Pythagorean difference using a 3d location.
+	 */
 	public static double difference(Location<World> loc1, Location<World> loc2) {
 		Validate.isTrue(loc1.getExtent().equals(loc2.getExtent()), "different worlds");
 		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
@@ -305,6 +405,9 @@ public class Utils {
 		return pythrange(c1, c2);
 	}
 
+	/**
+	 * Pythagorean range checker for 3d locations.
+	 */
 	public static boolean inRange(Location<World> loc1, Location<World> loc2, double range) {
 		if (range == Double.MAX_VALUE) {
 			return true;
@@ -318,6 +421,10 @@ public class Utils {
 		return difference(loc1, loc2) <= range;
 	}
 
+	/**
+	 * Get the line number of the class calling this method and the class
+	 * itself. Useful for STDOUT calls.
+	 */
 	public static String getLineNumber(boolean includeClass) {
 		StackTraceElement[] arr = Thread.currentThread().getStackTrace();
 		if (arr.length < 3) {
@@ -332,6 +439,10 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Get the line number of the stack object specified by the index. Useful
+	 * for STDOUT calls.
+	 */
 	public static String getLineNumber(boolean includeClass, int index) {
 		StackTraceElement[] arr = Thread.currentThread().getStackTrace();
 		if (arr.length < index + 1) {
@@ -346,6 +457,10 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Get the true source of a CommandSource; scales through ProxySource cmd
+	 * srcs to get the original. Non-recursive.
+	 */
 	public static CommandSource getTrueSource(CommandSource src) {
 		CommandSource out = src;
 		while (out instanceof ProxySource) {
@@ -354,6 +469,10 @@ public class Utils {
 		return out;
 	}
 
+	/**
+	 * Load a configuration node from a path. Automatically registered for
+	 * saving on termination of the server.
+	 */
 	public static ConfigurationNode load(Path config) {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(config)
 				.build();
@@ -367,10 +486,16 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Save the config to a file.
+	 */
 	public static void save(File file, ConfigurationNode root) {
 		save(file.toPath(), root);
 	}
 
+	/**
+	 * Save the config to a path.
+	 */
 	public static void save(Path file, ConfigurationNode root) {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(file)
 				.build();
@@ -381,6 +506,10 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Check to see if the config value contains subsections specified in the
+	 * varargs parameter.
+	 */
 	public static boolean hasSections(ConfigurationNode config, String... toValidate) {
 		for (String s : toValidate) {
 			if (!config.getChildrenMap().containsKey(s)) {
@@ -390,6 +519,9 @@ public class Utils {
 		return true;
 	}
 
+	/**
+	 * Randomly arrange a List.
+	 */
 	public static <T> List<T> scramble(final List<T> list) {
 		List<T> out = sl();
 		List<T> in = sl(list);
@@ -400,6 +532,9 @@ public class Utils {
 		return out;
 	}
 
+	/**
+	 * Checks to see if arr contains any of the objects from comp.
+	 */
 	public static <T> boolean containsOf(List<T> arr, List<T> comp) {
 		for (T o : comp) {
 			if (arr.contains(o)) {
@@ -409,6 +544,10 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * Compile patterns with a list of flags. Same as Pattern.compile(p, flag1 |
+	 * flag2 | ...).
+	 */
 	public static Pattern compile(String pattern, int... flags) {
 		int flag = Integer.MIN_VALUE;
 		for (int i : flags) {
@@ -425,6 +564,9 @@ public class Utils {
 		return Pattern.compile(pattern, flag);
 	}
 
+	/**
+	 * Check to see if a string is matched by the URL pattern.
+	 */
 	public static boolean isURL(String input) {
 		String s = input;
 		while (s.endsWith("/")) {
@@ -434,27 +576,45 @@ public class Utils {
 				.matches();
 	}
 
+	/**
+	 * Checks to see if the input contains a url.
+	 */
 	public static boolean containsURL(String input) {
 		return URL_PATTERN.matcher(TextUtils.strip(TextSerializers.FORMATTING_CODE.serialize(TextUtils.trans(input))))
 				.find();
 	}
 
+	/**
+	 * Convert a double to a different time unit.
+	 */
 	public static double convert(double val, PRTimeUnit from, PRTimeUnit to) {
 		return to.convert(val, from);
 	}
 
+	/**
+	 * Join a group of strings into one with a separator.
+	 */
 	public static String join(Iterable<String> k) {
 		return join(", ", k);
 	}
 
+	/**
+	 * Join a group of strings into one with a separator.
+	 */
 	public static String join(String... k) {
 		return join(", ", k);
 	}
 
+	/**
+	 * Join a group of strings into one with a separator.
+	 */
 	public static String join(String sep, String... k) {
 		return join(sep, sl(k));
 	}
 
+	/**
+	 * Join a group of strings into one with a separator.
+	 */
 	public static String join(String sep, Iterable<String> k) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
@@ -469,6 +629,10 @@ public class Utils {
 		return builder.toString();
 	}
 
+	/**
+	 * Force a file to exist. If it does and doesn't match what it needs to be,
+	 * it is recreated.
+	 */
 	public static void force(File f, boolean file) throws IOException {
 		if (f.exists() && f.isFile() != file) {
 			f.delete();
@@ -482,6 +646,10 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Turn a list of objects into a list of strings. Optionally provide a
+	 * method to call which takes no parameters and returns a string.
+	 */
 	public static <T> List<String> toStringList(List<T> o, Optional<Method> toCall) {
 		List<String> out = sl();
 		if (!toCall.isPresent() || toCall.get().getReturnType() != String.class
@@ -507,6 +675,9 @@ public class Utils {
 		return out;
 	}
 
+	/**
+	 * Print an error to the sponge console.
+	 */
 	public static void printError(Exception e) {
 		e.printStackTrace(new PrintStream(new OutputStream() {
 
@@ -529,7 +700,9 @@ public class Utils {
 		}, true));
 	}
 
-	// before index i
+	/**
+	 * Return a list that takes all of the parts in J before index i.
+	 */
 	public static <T> List<T> sub(int i, Iterable<T> j) {
 		List<T> o = sl();
 		int k = 0;
@@ -543,6 +716,9 @@ public class Utils {
 		return o;
 	}
 
+	/**
+	 * Return a list that takes all of the parts in J before index i.
+	 */
 	@SafeVarargs
 	public static <T> List<T> sub(int i, T... j) {
 		List<T> o = sl();
@@ -557,7 +733,10 @@ public class Utils {
 		return o;
 	}
 
-	// after and including index i
+	/**
+	 * Return a list that takes all of the parts in J after and including index
+	 * i.
+	 */
 	public static <T> List<T> post(int i, Iterable<T> j) {
 		List<T> o = sl();
 		int k = 0;
@@ -571,6 +750,10 @@ public class Utils {
 		return o;
 	}
 
+	/**
+	 * Return a list that takes all of the parts in J after and including index
+	 * i.
+	 */
 	@SafeVarargs
 	public static <T> List<T> post(int i, T... j) {
 		List<T> o = sl();
@@ -585,19 +768,32 @@ public class Utils {
 		return o;
 	}
 
+	/**
+	 * Remove duplicate items from a list.
+	 */
 	public static <T> List<T> removeDuplicates(List<T> list) {
 		return sl(list.stream().distinct().collect(Collectors.toList()));
 	}
 
+	/**
+	 * Pop the first object from a deque, if it exists. If it does not exist,
+	 * the default value is returned.
+	 */
 	public static <T> T pop(Deque<T> deque, T def) {
 		T o = def;
 		return deque.isEmpty() ? def : (o = deque.pop()) == null ? def : o;
 	}
 
+	/**
+	 * Call an event. @return whether the event was successful.
+	 */
 	public static boolean call(Event e) {
 		return !Sponge.getEventManager().post(e);
 	}
 
+	/**
+	 * Return the pattern that matches against profanities.
+	 */
 	public static Pattern profanityPattern() {
 		return compile("(" + "(f[ua4][c]?[k]([e3]r|[a4])?)|(b[i!1]?tch([e3]s|y)?)|(s(lut|h[i!1]t[3e]?))"
 				+ "|(n[i1!]g[g]?([a4]|[3e]r))|([4a][sz]{2})|(cunt)|(d[i!1][c]?k)|([kd][yi1!]ke)"
@@ -606,10 +802,16 @@ public class Utils {
 				+ "|([ck][o0][ck]?[k])|([d][o][ou][c][h][e]?)" + ")", Pattern.CASE_INSENSITIVE);
 	}
 
+	/**
+	 * Check to see if a string contains profanities.
+	 */
 	public static boolean containsProfanities(String s) {
 		return profanityPattern().matcher(s).find();
 	}
 
+	/**
+	 * Capitalize a string.
+	 */
 	public static String capitalize(String s) {
 		int i = 0;
 		for (Character c : s.toCharArray()) {
@@ -628,6 +830,11 @@ public class Utils {
 		return s;
 	}
 
+	/**
+	 * Create a list that alternates in picking values from one and two, in that
+	 * order. i.e. one two one two one one one. [one, one, one, one, one] and
+	 * [two, two].
+	 */
 	public static <T> List<T> alternate(T[] one, T[] two) {
 		int dif = one.length - two.length;
 		List<T> out = sl();
@@ -659,15 +866,11 @@ public class Utils {
 		return out;
 	}
 
-	public static <T> List<T> toList(Collection<T> t) {
-		return sl(t);
-	}
-
-	@SafeVarargs
-	public static <T> List<T> toList(T... array) {
-		return sl(array);
-	}
-
+	/**
+	 * Create a list that alternates in picking values from one and two, in that
+	 * order. i.e. one two one two one one one. [one, one, one, one, one] and
+	 * [two, two].
+	 */
 	public static <T> List<T> alternate(List<T> one, List<T> two) {
 		int dif = one.size() - two.size();
 		List<T> out = sl();
@@ -699,20 +902,29 @@ public class Utils {
 		return out;
 	}
 
+	/**
+	 * Get the first object in a list, if it exists.
+	 */
 	public static <T> Optional<T> getFirst(List<T> list) {
-		if (list.isEmpty()) {
+		if (list == null || list.isEmpty()) {
 			return Optional.empty();
 		}
 		return Optional.ofNullable(list.get(0));
 	}
 
+	/**
+	 * Get the last object in a list, if it exists.
+	 */
 	public static <T> Optional<T> getLast(List<T> list) {
-		if (list.isEmpty()) {
+		if (list == null || list.isEmpty()) {
 			return Optional.empty();
 		}
 		return Optional.ofNullable(list.get(list.size() - 1));
 	}
 
+	/**
+	 * Convert an ASCII english character into a UTF-8 Latin character.
+	 */
 	public static Character makeUnicode(Character c) {
 		int v = c.charValue();
 		if (v < 33 || v > 126) {
@@ -721,6 +933,9 @@ public class Utils {
 		return Character.valueOf((char) (v + 65248));// magic number lol
 	}
 
+	/**
+	 * Convert ASCII english characters into UTF-8 Latin characters.
+	 */
 	public static String makeUnicode(String n) {
 		String s = "";
 		boolean skipNext = true;
@@ -738,6 +953,10 @@ public class Utils {
 		return s;
 	}
 
+	/**
+	 * Creates a url from a string. If the string does not have a proper prefix,
+	 * it is inserted. If creation still fails, empty is returned.
+	 */
 	public static Optional<URL> toUrlSafe(final String a) {
 		if (!URL_PATTERN.matcher(a).matches()) {
 			return Optional.empty();
@@ -753,6 +972,10 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Populate a list with an object, modified for each index used, over a
+	 * certain number of times.
+	 */
 	public static <T> List<T> fill(T original, BiFunction<T, Integer, T> mod, int times, boolean includeOriginal) {
 		List<T> out = sl();
 		if (includeOriginal) {
@@ -783,16 +1006,25 @@ public class Utils {
 		return list;
 	}
 
+	/**
+	 * Update the list of players stored alphabetically.
+	 */
 	public static void updatePlayersAlpha() {
 		playersAlphabetical = sort(sl(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers()));
 
 	}
 
+	/**
+	 * Return the list of players in alphabetical order.
+	 */
 	public static List<Player> getPlayers() {
 		updatePlayersAlpha();
 		return sl(playersAlphabetical);
 	}
 
+	/**
+	 * Return a user, if it exists, based off of the uuid.
+	 */
 	public static Optional<User> getUser(UUID uuid) {
 		return wrap(getUser(uuid, true));
 	}
@@ -810,12 +1042,6 @@ public class Utils {
 		}
 		Player u2 = p.get();
 		return u2;
-	}
-
-	public static TextColor randomColor() {
-		int hex = new Random().nextInt(16);
-		String h = Integer.toHexString(hex);
-		return TextSerializers.FORMATTING_CODE.deserialize("&" + h).getColor();
 	}
 
 }

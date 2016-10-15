@@ -55,8 +55,16 @@ import me.Wundero.Ray.translation.M;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * A class that creates a format from a conversation. This method is far better
+ * to use than to directly edit the configuration file, as formats use
+ * serialized text template objects, which are incredibly complicated in config.
+ */
 public class FormatConversation {
 
+	/**
+	 * Start the format creation conversation.
+	 */
 	public static void start(Player player) {
 		if (!player.hasPermission("ray.formatbuilder")) {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));

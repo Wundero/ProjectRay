@@ -61,8 +61,14 @@ import me.Wundero.Ray.config.InternalClickAction;
 import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.variables.ParsableData;
 
+/**
+ * A class containing methods that help parse Text objects.
+ */
 public class TextUtils {
 
+	/**
+	 * Wipe the color from a text object.
+	 */
 	public static Text strip(Text t) {
 		Text.Builder b = t.toBuilder();
 		List<Text> ch = b.getChildren();
@@ -74,6 +80,11 @@ public class TextUtils {
 		return b.build();
 	}
 
+	/**
+	 * If the player has permission, translate the string into a colored text,
+	 * else a plain text with formatting codes. ALso parses URLS if they have
+	 * permission.
+	 */
 	public static Text transIf(String s, User u) {
 		LiteralText text = null;
 		if (u == null || u.hasPermission("ray.color")) {
@@ -88,6 +99,10 @@ public class TextUtils {
 		}
 	}
 
+	/**
+	 * Darken or replace characters from the original text based off of the
+	 * percentages provided.
+	 */
 	public static Text obfuscate(Text original, Double percentObfuscation, Double percentDiscoloration) {
 		if (original == null) {
 			return Text.of();
@@ -123,6 +138,9 @@ public class TextUtils {
 		return out.build();
 	}
 
+	/**
+	 * Find all variables in a string and parse it into a text template.
+	 */
 	public static TextTemplate parse(final String i, boolean allowColors) {
 		if (i == null) {
 			return null;
@@ -155,80 +173,131 @@ public class TextUtils {
 		return out;
 	}
 
+	/**
+	 * Create an internalclickaction with a url template.
+	 */
 	public static InternalClickAction<?> urlTemplate(TextTemplate t) {
 		return new InternalClickAction.UrlTemplate(t);
 	}
 
+	/**
+	 * Create an internalclickaction with a suggest template.
+	 */
 	public static InternalClickAction<?> suggestTemplate(TextTemplate t) {
 		return new InternalClickAction.SuggestTemplate(t);
 	}
 
+	/**
+	 * Create an internalclickaction with a run template.
+	 */
 	public static InternalClickAction<?> runTemplate(TextTemplate t) {
 		return new InternalClickAction.RunTemplate(t);
 	}
 
+	/**
+	 * Create an internalclickaction with a callback.
+	 */
 	public static InternalClickAction<?> executeCallback(Consumer<CommandSource> c) {
 		return new InternalClickAction.ExecuteCallback(c);
 	}
 
+	/**
+	 * Create an internalclickaction with a page change.
+	 */
 	public static InternalClickAction<?> changePage(int i) {
 		return new InternalClickAction.ChangePage(i);
 	}
 
+	/**
+	 * Create an internalclickaction with a url.
+	 */
 	public static InternalClickAction<?> openUrl(URL u) {
 		return new InternalClickAction.OpenUrl(u);
 	}
 
+	/**
+	 * Create an internalclickaction with a suggest command.
+	 */
 	public static InternalClickAction<?> suggestCommand(String s) {
 		return new InternalClickAction.SuggestCommand(s);
 	}
 
+	/**
+	 * Create an internalclickaction with a run command.
+	 */
 	public static InternalClickAction<?> runCommand(String s) {
 		return new InternalClickAction.RunCommand(s);
 	}
 
+	/**
+	 * Create an internalhoveraction with an entity
+	 */
 	public static InternalHoverAction.ShowEntity showEntity(InternalHoverAction.ShowEntity.Ref entity) {
 		return new InternalHoverAction.ShowEntity(entity);
 	}
 
+	/**
+	 * Create an internalhoveraction with an entity
+	 */
 	public static InternalHoverAction.ShowEntity showEntity(UUID uuid, String name, @Nullable EntityType type) {
 		return showEntity(new InternalHoverAction.ShowEntity.Ref(uuid, name, type));
 	}
 
+	/**
+	 * Create an internalhoveraction with an entity
+	 */
 	public static InternalHoverAction.ShowEntity showEntity(UUID uuid, String name) {
 		return showEntity(new InternalHoverAction.ShowEntity.Ref(uuid, name));
 	}
 
+	/**
+	 * Create an internalhoveraction with an entity
+	 */
 	public static InternalHoverAction.ShowEntity showEntity(Entity entity, String name) {
 		return showEntity(new InternalHoverAction.ShowEntity.Ref(entity, name));
 	}
 
+	/**
+	 * Create an internalhoveraction with an item
+	 */
 	public static InternalHoverAction<?> showItem(ItemStack i) {
 		return new InternalHoverAction.ShowItem(i);
 	}
 
+	/**
+	 * Create an internalhoveraction with an achievement
+	 */
 	public static InternalHoverAction<?> showAchievement(Achievement a) {
 		return new InternalHoverAction.ShowAchievement(a);
 	}
 
+	/**
+	 * Create an internalhoveraction with a text.
+	 */
 	public static InternalHoverAction<?> showText(Text t) {
 		return new InternalHoverAction.ShowText(t);
 	}
 
+	/**
+	 * Create an internalhoveraction with a template.
+	 */
 	public static InternalHoverAction<?> showTemplate(TextTemplate t) {
 		return new InternalHoverAction.ShowTemplate(t);
 	}
 
+	/**
+	 * Remove colors from a string. text boolean has no value check; just
+	 * ensures method signatures are proper.
+	 * 
+	 * @return a text object which has been stripped of color.
+	 */
 	public static Text strip(String s, boolean text) {
-		if (s == null) {
-			return Text.of();
-		}
-		if (s.contains("\\u00a7")) {
-			s = s.replace("\\u00a7", "&");
-		}
 		return Text.of(strip(s));
 	}
 
+	/**
+	 * Return a String which has been stripped of formatting code colors.
+	 */
 	public static String strip(String s) {
 		if (s == null) {
 			return "";
@@ -239,6 +308,9 @@ public class TextUtils {
 		return TextSerializers.FORMATTING_CODE.stripCodes(s);
 	}
 
+	/**
+	 * Parse colors from a String into a text object.
+	 */
 	public static Text trans(String s) {
 		if (s == null) {
 			return Text.of();
@@ -252,6 +324,22 @@ public class TextUtils {
 		return TextSerializers.FORMATTING_CODE.deserialize(s);
 	}
 
+	/**
+	 * Replace regular expression in a LiteralText object's content.
+	 * 
+	 * Note: this method does NOT check between object nodes. So if there is a
+	 * match between the original and one of it's children, it is not parsed.
+	 * 
+	 * @param original
+	 *            The original text.
+	 * @param matcher
+	 *            The pattern to search for in the content.
+	 * @param replacer
+	 *            The function to call when a match is found in order to supply
+	 *            a textual replacement.
+	 * @param useClickHover
+	 *            Whether or not to parse click and hover actions as well.
+	 */
 	public static LiteralText replaceRegex(LiteralText original, Pattern matcher,
 			Function<String, Optional<LiteralText>> replacer, boolean useClickHover) {
 		if (original == null) {
@@ -372,10 +460,16 @@ public class TextUtils {
 		return builder.build();
 	}
 
+	/**
+	 * Apply the actions from one builder onto another.
+	 */
 	public static Text.Builder apply(Text.Builder onto, Text.Builder from) {
 		return apply(onto, from.getClickAction(), from.getHoverAction(), from.getShiftClickAction());
 	}
 
+	/**
+	 * Apply the actions provided onto a builder.
+	 */
 	public static Text.Builder apply(Text.Builder b, Optional<ClickAction<?>> c, Optional<HoverAction<?>> h,
 			Optional<ShiftClickAction<?>> s) {
 		c.ifPresent(x -> b.onClick(x));
@@ -384,10 +478,16 @@ public class TextUtils {
 		return b;
 	}
 
+	/**
+	 * Split the text object at a character reference.
+	 */
 	public static List<Text> split(Text t, char c, boolean skip) {
 		return split(t, String.valueOf(c), skip);
 	}
 
+	/**
+	 * Split the text object at a string reference.
+	 */
 	public static List<Text> split(Text t, String c, boolean skip) {
 		if (!(t instanceof LiteralText)) {
 			return Utils.sl(t);
@@ -445,14 +545,23 @@ public class TextUtils {
 		return out;
 	}
 
+	/**
+	 * Split the text at a string reference
+	 */
 	public static Text[] split(Text t, String c, boolean skip, boolean arr) {
 		return split(t, c, skip).stream().toArray(in -> new Text[in]);
 	}
 
+	/**
+	 * Split the text at a character reference
+	 */
 	public static Text[] split(Text t, char c, boolean skip, boolean arr) {
-		return split(t, c, skip).stream().toArray(in -> new Text[in]);
+		return split(t, c + "", skip, arr);
 	}
 
+	/**
+	 * Split the text at all newline characters.
+	 */
 	public static List<Text> newlines(Text t) {
 		return split(t, '\n', false);
 	}
@@ -497,10 +606,24 @@ public class TextUtils {
 		}
 	}
 
+	/**
+	 * Split the text after a certain number of content characters has been
+	 * passed. Good for preventing packet overflow of texts with more than
+	 * 32,767 characters. [Though it should be noted that you should split at a
+	 * number less than or equal to 15,000, to both save on performance and
+	 * account for extra characters included in the object]
+	 */
 	public static Text[] splitAfterCharCount(Text t, int charCount, boolean repeat, boolean arr) {
 		return splitAfterCharCount(t, charCount, repeat).stream().toArray(i -> new Text[i]);
 	}
 
+	/**
+	 * Split the text after a certain number of content characters has been
+	 * passed. Good for preventing packet overflow of texts with more than
+	 * 32,767 characters. [Though it should be noted that you should split at a
+	 * number less than or equal to 15,000, to both save on performance and
+	 * account for extra characters included in the object]
+	 */
 	public static List<Text> splitAfterCharCount(Text t, int charCount, boolean repeat) {
 		if (!(t instanceof LiteralText)) {
 			return Utils.sl(t);
@@ -518,6 +641,10 @@ public class TextUtils {
 		return out;
 	}
 
+	/**
+	 * Substring a text from one index to another. Follows the same rules as
+	 * "".substring(a,b);
+	 */
 	public static Text substring(Text t, int start, int finish) {
 		if (start < 0) {
 			throw new IllegalArgumentException("Cannot start below 0!");
@@ -563,19 +690,31 @@ public class TextUtils {
 		}
 	}
 
+	/**
+	 * Return the character at a certain point in the text.
+	 */
 	public static char charAt(Text t, int i) {
 		return getContent(t, false).charAt(i);
 	}
 
+	/**
+	 * Compare the formats of two texts.
+	 */
 	public static boolean formatsEqual(Text one, Text two) {
 		return one.getFormat().equals(two.getFormat());
 	}
 
+	/**
+	 * Compare the actions of two texts.
+	 */
 	public static boolean extrasEqual(Text one, Text two) {
 		return one.getClickAction().equals(two.getClickAction()) && one.getHoverAction().equals(two.getHoverAction())
 				&& one.getShiftClickAction().equals(two.getShiftClickAction());
 	}
 
+	/**
+	 * Find the index of the val in the text.
+	 */
 	public static int indexOf(Text in, String val) {
 		if (!(in instanceof LiteralText)) {
 			return -1;
@@ -583,6 +722,10 @@ public class TextUtils {
 		return ((LiteralText) in).getContent().indexOf(val);
 	}
 
+	/**
+	 * Find the index of the val in the text. All of the following must match
+	 * for the index to be chosen: Content, format and actions.
+	 */
 	public static int indexOf(Text in, Text val) {
 		if (!(in instanceof LiteralText) && !(val instanceof LiteralText)) {
 			return in.equals(val) ? 0 : -1;
@@ -595,6 +738,9 @@ public class TextUtils {
 		return extrasEqual(t1, t2) && formatsEqual(t1, t2) ? c : -1;
 	}
 
+	/**
+	 * Return the index of the val in the text.
+	 */
 	public static int indexOf(Text in, char val) {
 		if (!(in instanceof LiteralText)) {
 			return -1;
@@ -602,15 +748,68 @@ public class TextUtils {
 		return ((LiteralText) in).getContent().indexOf(val);
 	}
 
+	/**
+	 * Capitalize the first letter of the text object.
+	 */
 	public static Text capitalize(Text t) {
 		if (!(t instanceof LiteralText)) {
 			return t;
 		}
 		LiteralText t1 = (LiteralText) t;
 		String content = t1.getContent();
-		return t1.toBuilder().content(Utils.capitalize(content)).build();
+		String capped = Utils.capitalize(content);
+		if (capped.equals(content)) {
+			List<Text> txs = t1.getChildren();
+			int i = 0;
+			boolean found = false;
+			for (; i < txs.size(); i++) {
+				if (!capequalsnorm(txs.get(i))) {
+					found = true;
+					break;
+				}
+			}
+			List<Text> ot = Utils.sl();
+			if (found) {
+				for (int x = 0; x < txs.size(); x++) {
+					if (x == i) {
+						ot.add(capitalize(txs.get(x)));
+					} else {
+						ot.add(txs.get(x));
+					}
+				}
+				return t1.toBuilder().removeAll().append(ot).build();
+			} else {
+				return t;
+			}
+		}
+		return t1.toBuilder().content(capped).build();
 	}
 
+	private static boolean capequalsnorm(Text t) {
+		if (!(t instanceof LiteralText)) {
+			return true;
+		}
+		LiteralText t1 = (LiteralText) t;
+		String content = t1.getContent();
+		String capped = Utils.capitalize(content);
+		if (t1.getChildren().isEmpty()) {
+			return content.equals(capped);
+		} else {
+			if (content.equals(capped)) {
+				return true;
+			}
+			boolean b = false;
+			for (Text c : t1.getChildren()) {
+				b = b || capequalsnorm(c);
+			}
+			return b;
+		}
+	}
+
+	/**
+	 * Return the string content of a text. If it's a LiteralText, just
+	 * content(). If not, it will return toPlain().
+	 */
 	public static String getContent(Text t, boolean strict) {
 		if (t instanceof LiteralText) {
 			return ((LiteralText) t).getContent();
@@ -619,6 +818,9 @@ public class TextUtils {
 		}
 	}
 
+	/**
+	 * Parse a text for variables, and replace them.
+	 */
 	public static Text vars(Text t, ParsableData data) {
 		if (!(t instanceof LiteralText)) {
 			return t;
@@ -626,6 +828,9 @@ public class TextUtils {
 		return parseForVariables((LiteralText) t, data);
 	}
 
+	/**
+	 * Parse a text for urls and replace them.
+	 */
 	public static Text urls(Text t) {
 		if (!(t instanceof LiteralText)) {
 			return t;
@@ -633,6 +838,9 @@ public class TextUtils {
 		return makeURLClickable((LiteralText) t);
 	}
 
+	/**
+	 * Clear urls from a text.
+	 */
 	public static Text noUrls(Text t) {
 		if (!(t instanceof LiteralText)) {
 			return t;
@@ -646,10 +854,16 @@ public class TextUtils {
 		}, true);
 	}
 
+	/**
+	 * Parse a text for urls and replace them.
+	 */
 	public static Text urlsIf(Text t) {
 		return urls(t);
 	}
 
+	/**
+	 * Parse a text for urls and replace them.
+	 */
 	public static LiteralText makeURLClickable(LiteralText text) {
 		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (match) -> {
 			if (!Utils.toUrlSafe(match).isPresent()) {
@@ -662,6 +876,9 @@ public class TextUtils {
 		}, true);
 	}
 
+	/**
+	 * Parse a text for variables and replace them.
+	 */
 	public static LiteralText parseForVariables(LiteralText text, ParsableData data) {
 		return TextUtils.replaceRegex(text, Utils.VAR_PATTERN, (match) -> {
 			String proper = match.replace("{", "").replace("}", "");
@@ -713,6 +930,9 @@ public class TextUtils {
 		return o.toArray(new String[o.size()]);
 	}
 
+	/**
+	 * Return the length of the content of the text object.
+	 */
 	public static int length(Text t) {
 		if (!(t instanceof LiteralText)) {
 			return 0;
@@ -726,6 +946,9 @@ public class TextUtils {
 		return l;
 	}
 
+	/**
+	 * Parse text colors from a string.
+	 */
 	public static TextColor colorFrom(String s) {
 		if (s == null || s.isEmpty()) {
 			return TextColors.NONE;
@@ -737,14 +960,23 @@ public class TextUtils {
 		return c;
 	}
 
+	/**
+	 * Parse a text color from a string with formatting codes.
+	 */
 	public static TextColor fromString(String s) {
 		return TextSerializers.FORMATTING_CODE.deserialize(s).getColor();
 	}
 
+	/**
+	 * Parse a text color from a formatting code.
+	 */
 	public static TextColor fromChar(char c) {
-		return fromString(c + "");
+		return fromString("&" + c + "");
 	}
 
+	/**
+	 * Parse a text color from a name.
+	 */
 	public static TextColor fromName(String color) {
 		switch (color.toLowerCase().trim()) {
 		case "aqua":
@@ -797,6 +1029,15 @@ public class TextUtils {
 		default:
 			return TextColors.NONE;
 		}
+	}
+
+	/**
+	 * Get a random text color.
+	 */
+	public static TextColor randomColor() {
+		int hex = new Random().nextInt(16);
+		String h = Integer.toHexString(hex);
+		return TextSerializers.FORMATTING_CODE.deserialize("&" + h).getColor();
 	}
 
 }

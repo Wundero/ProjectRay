@@ -23,6 +23,20 @@ package me.Wundero.Ray.framework.channel;
  SOFTWARE.
  */
 
+/**
+ * Represents the permissibility of a user in a chat channel.
+ */
 public enum Role {
-	GUEST, MEMBER, MOD;
+	/**
+	 * A guest can only listen to the channel.
+	 */
+	GUEST,
+	/**
+	 * A member can listen to and talk to the channel.
+	 */
+	MEMBER,
+	/**
+	 * A mod can listen to, talk to and modify the settings of the channel.
+	 */
+	MOD;
 }

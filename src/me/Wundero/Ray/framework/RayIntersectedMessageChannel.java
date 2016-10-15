@@ -37,6 +37,10 @@ import org.spongepowered.api.util.GuavaCollectors;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Message channel that only sends messages to members present on all channels.
+ * If the text is null, the parsing stops and the message is cancelled.
+ */
 public class RayIntersectedMessageChannel implements MessageChannel {
 	protected final List<MessageChannel> channels;
 

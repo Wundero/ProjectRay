@@ -27,8 +27,14 @@ import java.util.function.Consumer;
 
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Default channel configurations
+ */
 public class DefaultChannels {
 
+	/**
+	 * Loader enum
+	 */
 	public static enum DefaultChannel {
 		SIMPLE(c -> simple(c)), ADVANCED(c -> advanced(c)), LEVELED(c -> leveled(c));
 
@@ -44,6 +50,9 @@ public class DefaultChannels {
 
 	}
 
+	/**
+	 * Load channels into a configuration file.
+	 */
 	public static void applyChannels(ConfigurationNode node, DefaultChannel setup) {
 		setup.a(node);
 	}

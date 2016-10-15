@@ -27,39 +27,61 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-//allows you to have choosable options - like a fixed set stuff
+/**
+ * Options to be chosen from in a conversation
+ */
 public class Option {
 	private final Text display;
 	private final String key;
 	private final Object value;
 
+	/**
+	 * Create an option
+	 */
 	public Option(String key, Text display, Object value) {
 		this.display = display;
 		this.key = key;
 		this.value = value;
 	}
 
+	/**
+	 * Check to see if the option is what matches the input
+	 */
 	public boolean works(String input) {
 		String k2 = key.toLowerCase().trim();
 		String i2 = input.toLowerCase().trim();
 		return k2.equals(i2);
 	}
 
+	/**
+	 * Get the text to be sent to the player
+	 */
 	public Text getDisplay() {
 		return display;
 	}
 
+	/**
+	 * Get the name of the option
+	 */
 	public String getKey() {
 		return key;
 	}
 
+	/**
+	 * Get the value stored by the option
+	 */
 	public Object getValue() {
 		return value;
 	}
 
+	/**
+	 * Create an option with a default Text object around a key value entry.
+	 */
 	public static Option build(String name, Object value) {
-		return new Option(name, Text.builder(name).color(TextColors.GOLD).onClick(TextActions.runCommand(name))
-				.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + name + "!"))).build(),
+		return new Option(name,
+				Text.builder(name).color(TextColors.GOLD).onClick(TextActions.runCommand(name))
+						.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + name + "!")))
+						.build(),
 				value);
 	}
 }

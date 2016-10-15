@@ -33,9 +33,15 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Singleton instance containing all groups in memory.
+ */
 public class Groups {
 	private Map<String, Map<String, Group>> groups = Utils.sm();
 
+	/**
+	 * Loads groups into memory from file.
+	 */
 	public Groups(ConfigurationNode node) {
 		for (ConfigurationNode child : node.getChildrenMap().values()) {
 			boolean global = false;
@@ -59,6 +65,9 @@ public class Groups {
 		}
 	}
 
+	/**
+	 * Loads groups into memory from file.
+	 */
 	public Group load(ConfigurationNode groupNode) {
 		String worldname = groupNode.getParent().getParent().getKey().toString();
 		Group group = new Group(worldname, groupNode, worldname.equalsIgnoreCase("all"));
@@ -68,6 +77,9 @@ public class Groups {
 		return group;
 	}
 
+	/**
+	 * Return all groups from all worlds.
+	 */
 	public List<Group> getAllGroups() {
 		List<Group> groups = Utils.sl();
 		for (Map<String, Group> g1 : this.groups.values()) {
@@ -78,6 +90,9 @@ public class Groups {
 		return groups;
 	}
 
+	/**
+	 * Get the primary group for a player.
+	 */
 	public Group getMainGroup(User p) {
 		if (!p.isOnline()) {
 			return getMainGroup(p, "all");
@@ -88,6 +103,9 @@ public class Groups {
 		}
 	}
 
+	/**
+	 * Get the primary group for a player on a world.
+	 */
 	public Group getMainGroup(User p, String world) {
 		Group cg = null;
 		for (Group g : getGroups(world).values()) {
@@ -103,10 +121,16 @@ public class Groups {
 		return cg;
 	}
 
+	/**
+	 * Get a group from a name and a world.
+	 */
 	public Group getGroup(String name, String world) {
 		return getGroups(world).get(name);
 	}
 
+	/**
+	 * Get the groups a player can use.
+	 */
 	public Map<String, Group> getGroups(User user) {
 		Map<String, Group> out = Utils.sm();
 		for (String world : groups.keySet()) {
@@ -121,6 +145,9 @@ public class Groups {
 		return out;
 	}
 
+	/**
+	 * Get the groups on a world; as well as all global groups.
+	 */
 	public Map<String, Group> getGroups(String world) {
 		Map<String, Group> out = groups.get(world) == null ? Utils.sm() : groups.get(world);
 		if (!world.equalsIgnoreCase("all")) {

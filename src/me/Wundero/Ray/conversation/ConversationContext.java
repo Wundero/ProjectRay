@@ -29,23 +29,36 @@ import org.spongepowered.api.text.channel.MessageChannel;
 
 import me.Wundero.Ray.DataHolder;
 
+/**
+ * Context represents the data the conversation knows, and is persistent through
+ * prompts.
+ */
 public class ConversationContext extends DataHolder {
 	// data for conversation
 	private Player holder;
 	private Object plugin;
 	private MessageChannel original;
 
+	/**
+	 * Create a new context for a conversation
+	 */
 	ConversationContext(Object plugin, Player holder) {
 		this.setPlugin(plugin);
 		this.setHolder(holder);
 	}
 
+	/**
+	 * Send a message (with prefix) to the holder
+	 */
 	public void sendMessage(Text message) {
 		Conversation convo = getData("conversation");
 		Text prefix = convo.getPrefix();
 		holder.sendMessage(prefix.concat(message));
 	}
 
+	/**
+	 * @return the conversation holder
+	 */
 	public Player getHolder() {
 		return holder;
 	}
@@ -54,6 +67,9 @@ public class ConversationContext extends DataHolder {
 		this.holder = holder;
 	}
 
+	/**
+	 * @return the plugin that started the conversation
+	 */
 	public Object getPlugin() {
 		return plugin;
 	}
@@ -62,10 +78,17 @@ public class ConversationContext extends DataHolder {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * @return the original message channel
+	 */
 	public MessageChannel getOriginal() {
 		return original;
 	}
 
+	/**
+	 * Set the original message channel - the holder's channel will be set to
+	 * this on finish
+	 */
 	public void setOriginal(MessageChannel original) {
 		this.original = original;
 	}

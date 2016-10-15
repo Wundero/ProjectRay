@@ -33,24 +33,40 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Prompt that will return a boolean value based on parsed input.
+ */
 public abstract class BooleanPrompt extends Prompt {
 
 	private boolean useunicode = true;
 
+	/**
+	 * Create a new boolean prompt. unicode boolean is for the yes/no buttons
+	 * options
+	 */
 	public BooleanPrompt(TextTemplate template, boolean unicode) {
 		super(template);
 		this.useunicode = unicode;
 	}
 
+	/**
+	 * Create a new boolean prompt. Unicode is set to true.
+	 */
 	public BooleanPrompt(TextTemplate template) {
 		this(template, true);
 	}
 
+	/**
+	 * Return text when the input fails validation
+	 */
 	@Override
 	public Text getFailedText(ConversationContext context, String failedInput) {
 		return Text.of(TextColors.RED, "That is not a valid input! Try yes or no.");
 	}
 
+	/**
+	 * Check to see if input matches valid booleans
+	 */
 	@Override
 	public boolean isInputValid(ConversationContext context, String input) {
 		switch (input.toLowerCase().trim()) {
@@ -70,6 +86,9 @@ public abstract class BooleanPrompt extends Prompt {
 		}
 	}
 
+	/**
+	 * Return a boolean value for the input
+	 */
 	private boolean parseInput(String input) {
 		switch (input.toLowerCase().trim()) {
 		case "y":
@@ -83,6 +102,9 @@ public abstract class BooleanPrompt extends Prompt {
 		}
 	}
 
+	/**
+	 * Return yes/no options
+	 */
 	@Override
 	public Optional<List<Option>> options(ConversationContext context) {
 		List<Option> list = Utils.sl();
@@ -93,8 +115,14 @@ public abstract class BooleanPrompt extends Prompt {
 		return Optional.of(list);
 	}
 
+	/**
+	 * Return the next prompt based on the input
+	 */
 	public abstract Prompt onBooleanInput(boolean value, String text, ConversationContext context);
 
+	/**
+	 * Handle input through extending classes
+	 */
 	@Override
 	public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 		return onBooleanInput(selected.isPresent() ? (boolean) selected.get().getValue() : parseInput(text), text,

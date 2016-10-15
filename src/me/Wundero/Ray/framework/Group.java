@@ -39,7 +39,13 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  SOFTWARE.
  */
 
-//stores a bunch of formats and is chosen based on permission
+/**
+ * Represents an object which holds formats and data in memory. Each group has a
+ * map that stores formats against contexts. It also holds a list of groups it
+ * inherits from, the world on which it is active, the priority (higher number
+ * means it is chosen over other groups), a permission, and additional info that
+ * determines internal functionality.
+ */
 public class Group {
 	private Map<FormatContext, List<Format>> formats = Utils.sm();
 	private List<String> parents = Utils.sl();
@@ -50,6 +56,9 @@ public class Group {
 	private String name;
 	private boolean global = false;
 
+	/**
+	 * Create a new group.
+	 */
 	public Group(String world, ConfigurationNode config, boolean global) {
 		this.setGlobal(global);
 		this.setWorld(world);
@@ -57,6 +66,9 @@ public class Group {
 		load();
 	}
 
+	/**
+	 * Add a format to the group.
+	 */
 	public void addFormat(Format format) {
 		FormatContext type = format.getContext();
 		List<Format> f = formats.get(type);
@@ -67,6 +79,9 @@ public class Group {
 		formats.put(type, f);
 	}
 
+	/**
+	 * Load the group from the config node.
+	 */
 	public synchronized void load() {
 		this.setName(config.getKey().toString());
 		this.setPermission(config.getNode("permission").getString());
@@ -103,6 +118,11 @@ public class Group {
 		lf(config);
 	}
 
+	/**
+	 * Return a format based off of a context. Index queries against the
+	 * internal list, and if the index is too large or the list is empty, null
+	 * is returned.
+	 */
 	public Format getFormat(FormatContext type, int index) {
 		if (getFormats(type) == null || getFormats(type).isEmpty()) {
 			return null;
@@ -113,10 +133,17 @@ public class Group {
 		return getFormats(type).get(index);
 	}
 
+	/**
+	 * Return the first format based off of the context.
+	 */
 	public Format getFormat(FormatContext type) {
 		return getFormat(type, 0);
 	}
 
+	/**
+	 * Return a format basec on the context. If random is true, it will be
+	 * random; if not, it will be the first one.
+	 */
 	public Format getFormat(FormatContext type, boolean random) {
 		if (random) {
 			return getRandomFormat(type);
@@ -124,11 +151,17 @@ public class Group {
 		return getFormat(type, 0);
 	}
 
+	/**
+	 * Return a random format from a context.
+	 */
 	public Format getRandomFormat(FormatContext type) {
 		List<Format> fmats = getFormats(type);
 		return fmats.get(new Random().nextInt(fmats.size()));
 	}
 
+	/**
+	 * Return a format that has a particular name.
+	 */
 	public Format getFormat(FormatContext type, String name) {
 		for (Format f : getFormats(type)) {
 			if (f.getName().equalsIgnoreCase(name)) {
@@ -138,6 +171,9 @@ public class Group {
 		return null;
 	}
 
+	/**
+	 * @return all formats on all worlds.
+	 */
 	public List<Format> getAllFormats() {
 		List<Format> out = Utils.sl();
 		for (List<Format> f : formats.values()) {
@@ -146,6 +182,10 @@ public class Group {
 		return out;
 	}
 
+	/**
+	 * @return all formats on all worlds, for this and parents. RecurseTimes is
+	 *         a safeguard against stack overflow.
+	 */
 	public List<Format> getAllFormats(boolean inherits, int recurseTimes) {
 		List<Format> out2 = Utils.sl();
 		out2.addAll(getAllFormats());
@@ -156,12 +196,19 @@ public class Group {
 		return out2;
 	}
 
+	/**
+	 * Return a list of the groups this group directly inherits from. Safeguards
+	 * against infinite parent loops are in place.
+	 */
 	public List<Group> getParentsGroups() {
 		List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
 		List<Group> torem = Utils.sl();
 		for (Group g : groups) {
 			if (!parents.contains(g.name)) {
 				torem.add(g);
+			}
+			if (g.parents.contains(this.name) && parents.contains(g.name)) {
+				g.parents.remove(this.name);
 			}
 		}
 		for (Group g : torem) {
@@ -176,6 +223,9 @@ public class Group {
 		return groups;
 	}
 
+	/**
+	 * Get all formats from a context. Checks against parents.
+	 */
 	public List<Format> getFormats(FormatContext type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
 			List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
@@ -206,58 +256,100 @@ public class Group {
 		return formats.get(type);
 	}
 
+	/**
+	 * Return the node for this group.
+	 */
 	public ConfigurationNode getConfig() {
 		return config;
 	}
 
+	/**
+	 * Set the node for this group.
+	 */
 	public void setConfig(ConfigurationNode config) {
 		this.config = config;
 	}
 
+	/**
+	 * Get the names of all parent groups.
+	 */
 	public List<String> getParents() {
 		return parents;
 	}
 
+	/**
+	 * Set the names of parents.
+	 */
 	public void setParents(List<String> parents) {
 		this.parents = parents;
 	}
 
+	/**
+	 * Get the world.
+	 */
 	public String getWorld() {
 		return world;
 	}
 
+	/**
+	 * Set the world.
+	 */
 	public void setWorld(String world) {
 		this.world = world;
 	}
 
+	/**
+	 * Get the priority of the group.
+	 */
 	public int getPriority() {
 		return priority;
 	}
 
+	/**
+	 * Set the priority.
+	 */
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
 
+	/**
+	 * Get the permission, if it exists, for this group.
+	 */
 	public Optional<String> getPermission() {
 		return permission;
 	}
 
+	/**
+	 * Set the permission for this group.
+	 */
 	public void setPermission(String permission) {
-		this.permission = Optional.ofNullable(permission);
+		this.permission = Utils.wrap(permission, !permission.isEmpty());
 	}
 
+	/**
+	 * Return the name of the group.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Set the name of the group.
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return whether the group is on all worlds.
+	 */
 	public boolean isGlobal() {
 		return global;
 	}
 
+	/**
+	 * set whether the group is on all worlds.
+	 */
 	public void setGlobal(boolean global) {
 		this.global = global;
 	}

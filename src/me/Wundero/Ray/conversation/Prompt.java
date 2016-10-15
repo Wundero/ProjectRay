@@ -34,6 +34,10 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * The class that represents a question or statement sent to the player in any
+ * part of the conversation
+ */
 public abstract class Prompt {
 
 	// prompt for information - gets a question and displays it, choose from
@@ -41,22 +45,46 @@ public abstract class Prompt {
 
 	protected TextTemplate template;
 
+	/**
+	 * Create a new prompt with a text template to send
+	 */
 	public Prompt(TextTemplate template) {
 		this.template = template;
 	}
 
+	/**
+	 * Get the internal template
+	 */
 	public final TextTemplate getTemplate() {
 		return template;
 	}
-	
+
+	/**
+	 * Get the question to send to the player
+	 */
 	public abstract Text getQuestion(ConversationContext context);
 
+	/**
+	 * Get the list of options the player can choose from. If Optional.empty()
+	 * is returned, no input validation will be considered by default.
+	 */
 	public abstract Optional<List<Option>> options(ConversationContext context);
 
+	/**
+	 * If input validation fails, the message to send to the player
+	 */
 	public abstract Text getFailedText(ConversationContext context, String failedInput);
 
+	/**
+	 * When input is validated, handle the input as the plugin
+	 * 
+	 * @return the next prompt to load. Return null to end the conversation.
+	 */
 	public abstract Prompt onInput(Optional<Option> selected, String text, ConversationContext context);
 
+	/**
+	 * Validate the input.
+	 */
 	public boolean isInputValid(ConversationContext context, String input) {
 		Optional<List<Option>> o = options(context);
 		if (o != null && o.isPresent()) {
@@ -71,6 +99,9 @@ public abstract class Prompt {
 		return true;
 	}
 
+	/**
+	 * Get the selected option, if available.
+	 */
 	public Optional<Option> getSelected(ConversationContext context, String input) {
 		Optional<List<Option>> o = options(context);
 		if (o != null && o.isPresent()) {
@@ -84,6 +115,9 @@ public abstract class Prompt {
 		return Optional.empty();
 	}
 
+	/**
+	 * Send input to the prompt.
+	 */
 	public final Prompt input(ConversationContext context, String input) {
 		if (isInputValid(context, input)) {
 			return onInput(getSelected(context, input), input, context);
@@ -94,6 +128,9 @@ public abstract class Prompt {
 		}
 	}
 
+	/**
+	 * Build a Text object from the list of options
+	 */
 	public Text buildList(Optional<List<Option>> opts) {
 		if (!opts.isPresent()) {
 			return Text.of();
@@ -111,6 +148,11 @@ public abstract class Prompt {
 		return builder.build();
 	}
 
+	/**
+	 * Use built in variable parsing for the template. Adds {options} variable
+	 * (use TextTemplate.arg("options")) which will list all of the options
+	 * available.
+	 */
 	public Text formatTemplate(ConversationContext context) {
 		Map<String, Object> args = Utils.sm();
 		args.put("options", buildList(options(context)));

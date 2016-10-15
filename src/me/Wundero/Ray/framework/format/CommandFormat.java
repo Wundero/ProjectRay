@@ -45,6 +45,10 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * This format type represents a type which will be called when a command is
+ * fired by a player.
+ */
 public class CommandFormat extends Format {
 
 	private String command;

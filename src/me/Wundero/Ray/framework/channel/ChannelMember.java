@@ -36,6 +36,9 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
+/**
+ * A class representing a member in a chat channel.
+ */
 public class ChannelMember {
 	private final MessageReceiver receiver;
 	private UUID uuid = UUID.randomUUID();
@@ -43,14 +46,23 @@ public class ChannelMember {
 	private Role role;
 	private boolean banned;
 
+	/**
+	 * @return internal UUID.
+	 */
 	public UUID getUUID() {
 		return uuid;
 	}
 
+	/**
+	 * @return internal UUID.
+	 */
 	public UUID getUniqueId() {
 		return getUUID();
 	}
 
+	/**
+	 * Set the interna uuid.
+	 */
 	public void setUUID(UUID uuid) {
 		this.uuid = uuid;
 	}
@@ -88,6 +100,10 @@ public class ChannelMember {
 		return false;
 	}
 
+	/**
+	 * Return the type serializer for this class that converts this into a
+	 * config file.
+	 */
 	public static TypeSerializer<ChannelMember> serializer() {
 		return new TypeSerializer<ChannelMember>() {
 
@@ -121,6 +137,9 @@ public class ChannelMember {
 		};
 	}
 
+	/**
+	 * Wrap a message receiver in channel member.
+	 */
 	public ChannelMember(MessageReceiver r, Role role) {
 		this.receiver = r;
 		if (r instanceof Player) {
@@ -131,38 +150,65 @@ public class ChannelMember {
 		this.setMuted(false);
 	}
 
+	/**
+	 * Wrap a message receiver in channel member.
+	 */
 	public ChannelMember(MessageReceiver r) {
 		this(r, Role.MEMBER);
 	}
 
+	/**
+	 * Return the receiver wrapped by this member.
+	 */
 	public MessageReceiver getReceiver() {
 		return receiver;
 	}
 
+	/**
+	 * @return whether the user can speak.
+	 */
 	public boolean isMuted() {
 		return muted;
 	}
 
+	/**
+	 * Set whether the user can speak.
+	 */
 	public void setMuted(boolean muted) {
 		this.muted = muted;
 	}
 
+	/**
+	 * Return the permissibility of the user.
+	 */
 	public Role getRole() {
 		return role;
 	}
 
+	/**
+	 * Set the permissibility of the user.
+	 */
 	public void setRole(Role role) {
 		this.role = role;
 	}
 
+	/**
+	 * @return whether the user is banned from the channel.
+	 */
 	public boolean isBanned() {
 		return banned;
 	}
 
+	/**
+	 * Set whether the user is banned from the channel.
+	 */
 	public void setBanned(boolean banned) {
 		this.banned = banned;
 	}
 
+	/**
+	 * @return whether the user is allowed to speak.
+	 */
 	public boolean canSpeak() {
 		return role != Role.GUEST && !muted && !banned;
 	}

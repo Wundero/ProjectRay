@@ -37,27 +37,40 @@ import me.Wundero.Ray.utils.Utils;
 
 public abstract class DataHolder {
 
-	// data
+	/**
+	 * Stores the data of the object as a key-value store.
+	 */
 	protected Map<String, Object> data = Utils.sm();
 
-	// a uuid for equals comparators
+	/**
+	 * Internal UUID for equals testing
+	 */
 	protected UUID uuid = UUID.randomUUID();
 
-	// uuid is only thing that really matters
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof DataHolder && ((DataHolder) o).uuid.equals(uuid);
 	}
 
+	/**
+	 * Push a map onto the data set.
+	 */
 	public synchronized void putAll(Map<String, Object> values) {
 		data.putAll(values);
 	}
 
+	/**
+	 * Get an object from a key.
+	 */
 	@SuppressWarnings("unchecked")
 	public synchronized <T> T getData(String key) {
 		return (T) data.get(key);
 	}
 
+	/**
+	 * Get an object from a key. If the returning object is null or the map does
+	 * not contain the key, the default value is returned.
+	 */
 	public synchronized <T> T getData(String key, T def) {
 		if (!hasData(key)) {
 			return def;
@@ -66,28 +79,46 @@ public abstract class DataHolder {
 		return out == null ? def : out;
 	}
 
+	/**
+	 * Returns whether the data exists.
+	 */
 	public synchronized boolean hasData(String key) {
 		return data.containsKey(key);
 	}
 
+	/**
+	 * Delete the value stored by a key. Returns the value removed.
+	 */
 	@SuppressWarnings("unchecked")
 	public synchronized <T> T removeData(String key) {
 		return (T) data.remove(key);
 	}
 
+	/**
+	 * Push datum onto the set under a key.
+	 */
 	@SuppressWarnings("unchecked")
 	public synchronized <T> T putData(String key, T value) {
 		return (T) data.put(key, value);
 	}
 
+	/**
+	 * Wipes all stored data
+	 */
 	public synchronized void clearData() {
 		data.clear();
 	}
 
+	/**
+	 * Return the internal UUID.
+	 */
 	public synchronized UUID getUUID() {
 		return uuid;
 	}
 
+	/**
+	 * Set the internal UUID.
+	 */
 	public synchronized void setUUID(UUID u) {
 		this.uuid = u;
 	}

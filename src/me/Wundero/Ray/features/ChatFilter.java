@@ -35,13 +35,24 @@ import org.spongepowered.api.event.message.MessageChannelEvent;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * A class that, when registered as a listener, will block chat messages with
+ * profanities.
+ */
 public class ChatFilter {
 
+	// TODO possible pattern customization?
 	private Pattern p = Utils.profanityPattern();
 	private boolean filter = false;
 
+	/**
+	 * Filter chat messages.
+	 */
 	@Listener
 	public void chat(MessageChannelEvent.Chat chat, @First Player sender) {
+		if (!filter) {
+			return;
+		}
 		if (p.matcher(chat.getRawMessage().toPlain()).find()) {
 			if (!sender.hasPermission("ray.chatfilter.bypass")) {
 				chat.setCancelled(true);
@@ -49,30 +60,51 @@ public class ChatFilter {
 		}
 	}
 
+	/**
+	 * Toggle the filter.
+	 */
 	public void toggle() {
 		filter = !filter;
 	}
 
+	/**
+	 * Turn off the filter.
+	 */
 	public void ignore() {
 		filter = false;
 	}
 
+	/**
+	 * Turn on the filter.
+	 */
 	public void filter() {
 		filter = true;
 	}
-	
+
+	/**
+	 * @return whether the filter is urunning.
+	 */
 	public boolean isFilter() {
 		return filter;
 	}
 
+	/**
+	 * Create a filter without a pattern to match against.
+	 */
 	public ChatFilter() {
 		this(Optional.empty());
 	}
 
+	/**
+	 * Create a filter with a pattern
+	 */
 	public ChatFilter(Pattern p) {
 		this(Utils.wrap(p));
 	}
 
+	/**
+	 * Create a filter.
+	 */
 	public ChatFilter(Optional<Pattern> opt) {
 		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
 		if (opt.isPresent()) {

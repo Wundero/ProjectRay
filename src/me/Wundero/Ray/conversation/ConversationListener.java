@@ -36,27 +36,52 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * Listener built around conversations - handles events
+ */
 public abstract class ConversationListener {
 
 	// allow custom handles on event calls
 
 	private Conversation conversation;
 
+	/**
+	 * Create a conversation listener for a builder - conversation will be
+	 * registered on build
+	 */
 	public ConversationListener() {
 	}
 
+	/**
+	 * Create a listener with a conversation in it
+	 */
 	public ConversationListener(Conversation convo) {
 		this.conversation = convo;
 	}
 
+	/**
+	 * Listen to chat messages
+	 */
 	public abstract void onChat(ConversationEvent.Chat chat);
 
+	/**
+	 * Listen to finishing the conversation
+	 */
 	public abstract void onFinish(ConversationEvent.Finish finish);
 
+	/**
+	 * Listen to conversation cancelling
+	 */
 	public abstract void onCancel(ConversationEvent.Cancel cancel);
 
+	/**
+	 * Listen to when the conversation changes prompts
+	 */
 	public abstract void onNext(ConversationEvent.Next next);
 
+	/**
+	 * Listen to when the conversation starts
+	 */
 	public abstract void onStart(ConversationEvent.Start start);
 
 	// private event calls to abstract - had to do this because annotations
@@ -92,6 +117,9 @@ public abstract class ConversationListener {
 
 	// handles conversing chat inputs
 
+	/**
+	 * Handle incoming chat messages
+	 */
 	@Listener
 	public final void internalchat(MessageChannelEvent.Chat event) {
 		if (!conversation.isStarted()) {
@@ -144,6 +172,9 @@ public abstract class ConversationListener {
 	}
 
 	// ends conversations safely
+	/**
+	 * Safe conversation cancel on quit
+	 */
 	@Listener
 	public final void internalquit(ClientConnectionEvent.Disconnect event) {
 		if (!conversation.isStarted()) {
@@ -164,6 +195,9 @@ public abstract class ConversationListener {
 		this.conversation = convo;
 	}
 
+	/**
+	 * Get the conversation
+	 */
 	public final Conversation getConversation() {
 		return conversation;
 	}

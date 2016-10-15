@@ -50,10 +50,17 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
+import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Represents a command that will clear the chat.
+ */
 public class ClearChatCommand implements CommandExecutor {
 
+	/**
+	 * Clear the chat.
+	 */
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (!src.hasPermission("ray.clearchat")) {
@@ -67,9 +74,12 @@ public class ClearChatCommand implements CommandExecutor {
 		return CommandResult.success();
 	}
 
+	/**
+	 * Get the characters to fill the chat with.
+	 */
 	private static List<Text> getClear(String type) {
 		if (type.equalsIgnoreCase("solid")) {
-			TextColor col = Utils.randomColor();
+			TextColor col = TextUtils.randomColor();
 			return Utils.fill(BLOCKS, (text, frame) -> text.toBuilder().color(col).build(), 100, false);
 		}
 		List<Text> out = clears.get(type);
@@ -81,8 +91,11 @@ public class ClearChatCommand implements CommandExecutor {
 
 	private static Map<String, List<Text>> clears = Utils.sm();
 	private static Map<Integer, TextColor> rainCols = Utils.sm();
-	private static final Text BLOCKS = Text.of("███████████████████████████████████");
+	private static final Text BLOCKS = Text.of(Utils.join(Utils.fill("" + '\u2588', (t, i) -> t, 16, true)));
 
+	/**
+	 * Create default clears.
+	 */
 	static {
 		clears.put("empty", Utils.fill(Text.of(" "), (t, i) -> t, 100, true));
 		rainCols.put(0, AQUA);

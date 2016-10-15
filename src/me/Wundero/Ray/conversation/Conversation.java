@@ -35,7 +35,10 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
-//bukkit conversation api but not built in and slightly simpler
+/**
+ * My version of the Bukkit conversation API. This is handled externally from
+ * Sponge but works just as well
+ */
 public abstract class Conversation {
 	private Prompt currentPrompt;
 	private ConversationListener listener;
@@ -44,6 +47,9 @@ public abstract class Conversation {
 	private List<ConversationCanceller> cancellers = Utils.sl();
 	private Text prefix = Text.of();
 
+	/**
+	 * Begin the conversation
+	 */
 	public boolean start() {
 		if (Sponge.getEventManager().post(new ConversationEvent.Start(
 				Cause.source(context.getPlugin()).named(NamedCause.of("conversation", this)).build(), context))) {
@@ -62,6 +68,9 @@ public abstract class Conversation {
 		return true;
 	}
 
+	/**
+	 * Send the next prompt
+	 */
 	public boolean next(Prompt next) {
 		if (next == null) {
 			return finish();
@@ -77,6 +86,9 @@ public abstract class Conversation {
 		return true;
 	}
 
+	/**
+	 * Cancel the conversation. Provide a canceller if available.
+	 */
 	public boolean cancel(Optional<ConversationCanceller> canceller) {
 		if (Sponge.getEventManager()
 				.post(new ConversationEvent.Cancel(
@@ -90,6 +102,9 @@ public abstract class Conversation {
 		return true;
 	}
 
+	/**
+	 * End the conversation.
+	 */
 	public boolean finish() {
 		if (Sponge.getEventManager().post(new ConversationEvent.Finish(
 				Cause.source(context.getPlugin()).named(NamedCause.of("conversation", this)).build(), context))) {
@@ -191,10 +206,16 @@ public abstract class Conversation {
 		this.cancellers = cancellers;
 	}
 
+	/**
+	 * Remove a canceller
+	 */
 	public void removeCanceller(ConversationCanceller canceller) {
 		this.cancellers.remove(canceller);
 	}
 
+	/**
+	 * Add a canceller
+	 */
 	public void addCanceller(ConversationCanceller canceller) {
 		this.cancellers.add(canceller);
 	}

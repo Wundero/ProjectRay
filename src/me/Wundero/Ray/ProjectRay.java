@@ -3,7 +3,6 @@ package me.Wundero.Ray;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -81,45 +80,74 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
 
 /**
  * Ray - A comprehensive and inclusive chat plugin. By Wundero.
+ * 
+ * This class is the main instance of the plugin, which stores much of Sponge's
+ * plugin requisite information.
  */
 @Plugin(id = "ray", name = "Ray", version = "1.0.0", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 
+	/**
+	 * The logger used by the plugin.
+	 */
 	@Inject
 	private Logger logger;
+	/**
+	 * The current sponge game instance.
+	 */
 	@Inject
 	private Game game;
+	/**
+	 * THe path to the config. Held in it's own folder.
+	 */
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	private Path configDir;
 
+	/**
+	 * The configuration itself, as loaded into memory.
+	 */
 	private ConfigurationNode config;
 
+	/**
+	 * Returns the logger.
+	 */
 	public Logger getLogger() {
 		return logger;
 	}
 
+	/**
+	 * Logs a string to the logger under the INFO level.
+	 */
 	public void log(String s) {
 		getLogger().info(s);
 	}
 
+	/**
+	 * Returns the game.
+	 */
 	public Game getGame() {
 		return game;
 	}
 
-	public String getVersion() {// not really sure if this is usefull but meh
-		Optional<String> opt = game.getPluginManager().getPlugin("ray").get().getVersion();
-		if (!opt.isPresent()) {
-			return "1.0.0";
-		}
-		return opt.get();
+	/**
+	 * Get the version of the plugin.
+	 */
+	public String getVersion() {
+		return "1.0.0";
 	}
 
+	/**
+	 * Returns the configuration folder
+	 */
 	public Path getConfigDir() {
 		return configDir;
 	}
 
+	/**
+	 * Return the file used for config.
+	 */
 	public Path getConfigPath() { // ensures config exists and returns path with
 									// file info
 		File f = new File(configDir.toFile(), "ray.conf");
@@ -136,6 +164,11 @@ public class ProjectRay {
 		return f.toPath();
 	}
 
+	/**
+	 * Register some of my serializers. I could have done this differently with
+	 * a static method, but this allows me to apply the serializers to specific
+	 * configuration loaders.
+	 */
 	public static ConfigurationOptions updateSerializers(ConfigurationOptions opts) {
 		// adding custom serializers - makes config read/write easier
 		TypeSerializerCollection t = opts.getSerializers();
@@ -186,10 +219,17 @@ public class ProjectRay {
 		}
 	}
 
+	/**
+	 * Save the config.
+	 */
 	public synchronized void save() {
 		saveConfig();
 	}
 
+	/**
+	 * Fired when the game is initialized. Loads singleton values and registers
+	 * important listeners.
+	 */
 	@Listener
 	public void onStart(GameInitializationEvent event) {
 		// registering listeners and loading singleton classes (safely-ish)
@@ -200,6 +240,9 @@ public class ProjectRay {
 		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
 	}
 
+	/**
+	 * Update singleton instance of economy for plugin reference.
+	 */
 	@Listener
 	public void onEconUpdate(ChangeServiceProviderEvent event) {
 		if (event.getService().equals(EconomyService.class)) {
@@ -207,6 +250,9 @@ public class ProjectRay {
 		}
 	}
 
+	/**
+	 * Register all commands
+	 */
 	@Listener
 	public void registerCommandEvent(GameStartingServerEvent event) {
 		// register all commands. Might make this neater in the future.
@@ -288,6 +334,9 @@ public class ProjectRay {
 						"channel", "ch");
 	}
 
+	/**
+	 * Stop all tasks, save the config, and clear singletons
+	 */
 	@Listener
 	public void onStop(GameStoppingServerEvent event) {
 		// run termination code

@@ -38,6 +38,10 @@ import com.google.common.collect.ImmutableSet;
  SOFTWARE.
  */
 
+/**
+ * Wrapper class for CombinedMessageChannels that allows any channel to cancel
+ * the message sending by returning Optional.empty().
+ */
 public class RayCombinedMessageChannel implements MessageChannel {
 
 	protected final Collection<MessageChannel> channels;

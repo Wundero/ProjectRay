@@ -51,10 +51,16 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  SOFTWARE.
  */
 
+/**
+ * A class that will allow a player to build a chat channel.
+ */
 public class ChatChannelConversation {
 
 	// builds chat channels
 
+	/**
+	 * Start the channel creation conversation.
+	 */
 	public static void start(Player player) {
 		if (!player.hasPermission("ray.channelbuilder")) {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));
@@ -183,20 +189,30 @@ public class ChatChannelConversation {
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select permission!")))
 							.build(),
 					"string"));
-			out.add(new Option("tag", Text.builder("tag").onClick(TextActions.runCommand("tag"))
-					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select tag!"))).build(),
+			out.add(new Option("tag",
+					Text.builder("tag").onClick(TextActions.runCommand("tag"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select tag!")))
+							.build(),
 					"string"));
-			out.add(new Option("range", Text.builder("range").onClick(TextActions.runCommand("range"))
-					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select range!"))).build(),
+			out.add(new Option("range",
+					Text.builder("range").onClick(TextActions.runCommand("range"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select range!")))
+							.build(),
 					"double"));
-			out.add(new Option("hidden", Text.builder("hidden").onClick(TextActions.runCommand("hidden"))
-					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select hidden!"))).build(),
+			out.add(new Option("hidden",
+					Text.builder("hidden").onClick(TextActions.runCommand("hidden"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select hidden!")))
+							.build(),
 					"boolean"));
-			out.add(new Option("autojoin", Text.builder("autojoin").onClick(TextActions.runCommand("autojoin"))
-					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select autojoin!"))).build(),
+			out.add(new Option("autojoin",
+					Text.builder("autojoin").onClick(TextActions.runCommand("autojoin"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select autojoin!")))
+							.build(),
 					"boolean"));
-			out.add(new Option("obfuscate", Text.builder("obfuscate").onClick(TextActions.runCommand("obfuscate"))
-					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select obfuscate!"))).build(),
+			out.add(new Option("obfuscate",
+					Text.builder("obfuscate").onClick(TextActions.runCommand("obfuscate"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select obfuscate!")))
+							.build(),
 					"boolean"));
 			return Optional.of(out);
 		}

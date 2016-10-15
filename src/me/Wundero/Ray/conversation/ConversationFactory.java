@@ -37,6 +37,9 @@ import me.Wundero.Ray.conversation.ConversationEvent.Next;
 import me.Wundero.Ray.conversation.ConversationEvent.Start;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Class for building conversations
+ */
 public class ConversationFactory {
 
 	// builds a conversation for you
@@ -53,6 +56,9 @@ public class ConversationFactory {
 	private ConversationFactory() {
 	}
 
+	/**
+	 * Build the conversation for a player
+	 */
 	public Conversation build(Player player) {
 		Validate.notNull(firstPrompt);
 		Validate.notNull(plugin);
@@ -97,6 +103,9 @@ public class ConversationFactory {
 		return convo;
 	}
 
+	/**
+	 * Add a prefix to be sent in front of all messages
+	 */
 	public ConversationFactory withPrefix(Text prefix) {
 		if (!prefix.toPlain().endsWith(" ")) {
 			prefix = prefix.concat(Text.of(" "));
@@ -105,16 +114,25 @@ public class ConversationFactory {
 		return this;
 	}
 
+	/**
+	 * Whether or not the game should send inputs back to the player
+	 */
 	public ConversationFactory withEcho(boolean echoInputs) {
 		this.echoInputs = echoInputs;
 		return this;
 	}
 
+	/**
+	 * Hide messages sent by the player from others
+	 */
 	public ConversationFactory withSuppression(boolean suppress) {
 		this.suppressMessages = suppress;
 		return this;
 	}
 
+	/**
+	 * Create a builder around a plugin
+	 */
 	public static ConversationFactory builder(Object plugin) {
 		return new ConversationFactory().withPlugin(plugin);
 	}
@@ -124,22 +142,34 @@ public class ConversationFactory {
 		return this;
 	}
 
+	/**
+	 * Use a prompt as the starting point
+	 */
 	public ConversationFactory withFirstPrompt(Prompt prompt) {
 		this.firstPrompt = prompt;
 		return this;
 	}
 
+	/**
+	 * Set the conversation listener
+	 */
 	public ConversationFactory withListener(ConversationListener listener) {
 		this.listener = listener;
 
 		return this;
 	}
 
+	/**
+	 * Start the conversation with context
+	 */
 	public ConversationFactory withInitialContext(Map<String, Object> data) {
 		this.initialContextdata = data;
 		return this;
 	}
 
+	/**
+	 * Add a canceller
+	 */
 	public ConversationFactory withCanceller(ConversationCanceller canceller) {
 		cancellers.add(canceller);
 		return this;

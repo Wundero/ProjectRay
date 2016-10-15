@@ -30,6 +30,9 @@ import java.util.Optional;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
+/**
+ * Represents a prompt that returns an object of a certain type.
+ */
 public abstract class TypePrompt<T> extends Prompt {
 
 	// prompt that tries to parse a value from a class - if it does not have the
@@ -37,11 +40,24 @@ public abstract class TypePrompt<T> extends Prompt {
 
 	protected Optional<Class<? extends T>> type = Optional.empty();
 
+	/**
+	 * Create a type prompt that will try to validate based on the type class.
+	 */
+	public TypePrompt(TextTemplate template, Class<? extends T> type) {
+		this(template, Optional.ofNullable(type));
+	}
+
+	/**
+	 * Create a type prompt that will try to validate based on the type class.
+	 */
 	public TypePrompt(TextTemplate template, Optional<Class<? extends T>> type) {
 		super(template);
 		this.type = type;
 	}
 
+	/**
+	 * Checks to see if the input is parsable to the type provided.
+	 */
 	@Override
 	public boolean isInputValid(ConversationContext context, String input) {
 		Optional<List<Option>> o = options(context);
@@ -88,6 +104,9 @@ public abstract class TypePrompt<T> extends Prompt {
 		return false;
 	}
 
+	/**
+	 * Return the parsed value from the integer
+	 */
 	@Override
 	public Optional<Option> getSelected(ConversationContext context, String input) {
 		// same as above except returns values and not booleans
@@ -131,14 +150,23 @@ public abstract class TypePrompt<T> extends Prompt {
 		return Optional.empty();
 	}
 
+	/**
+	 * Return an empty list of options; not necessary for type parsing.
+	 */
 	@Override
 	public Optional<List<Option>> options(ConversationContext context) {
 		return Optional.empty();
 	}
 
+	/**
+	 * Return the next prompt after handling the input.
+	 */
 	public abstract Prompt onTypeInput(T object, String text, ConversationContext context);
 
-	// parse and cast value
+	/**
+	 * Parse the input and have the extending classes handle the object based
+	 * input.
+	 */
 	@Override
 	public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 		return onTypeInput(type.isPresent() && selected.isPresent() ? type.get().cast(selected.get().getValue()) : null,

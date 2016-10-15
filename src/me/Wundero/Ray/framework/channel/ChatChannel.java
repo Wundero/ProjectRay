@@ -46,6 +46,9 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
+/**
+ * Represents a channel through which users communicate.
+ */
 public class ChatChannel implements MutableMessageChannel, Comparable<ChatChannel> {
 
 	private ChannelMemberCollection members = new ChannelMemberCollection();
@@ -58,6 +61,9 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private boolean obfuscateRanged = false;
 	private ConfigurationNode node;
 
+	/**
+	 * Type serializers for easy configuration saving.
+	 */
 	public static TypeSerializer<ChatChannel> serializer() {
 		return new TypeSerializer<ChatChannel>() {
 
@@ -94,6 +100,9 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		};
 	}
 
+	/**
+	 * Create a new chat channel that sends to console only.
+	 */
 	public ChatChannel() {
 		members.addAll(MessageChannel.TO_CONSOLE.getMembers());
 	}
@@ -105,6 +114,10 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		return members.contains(recipient);
 	}
 
+	/**
+	 * Make sure the message can be sent; obfuscates it as well (obfuscation is
+	 * overwritten by MainListener.handle() if that is called.
+	 */
 	@Override
 	public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original, ChatType type) {
 		if (!c(recipient) || members.get(recipient).isBanned()) {
@@ -130,10 +143,16 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		return Optional.of(original);
 	}
 
+	/**
+	 * @return the range.
+	 */
 	public double range() {
 		return range;
 	}
 
+	/**
+	 * @return whether the player can join the channel.
+	 */
 	public boolean canJoin(Player player) {
 		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
 			return false;
@@ -177,14 +196,23 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		return members.remove(member);
 	}
 
+	/**
+	 * Remove the member from the UUID.
+	 */
 	public boolean removeMember(UUID uuid) {
 		return members.remove(uuid);
 	}
 
+	/**
+	 * Ban a member.
+	 */
 	public void banMember(MessageReceiver member) {
 		members.get(member).setBanned(true);
 	}
 
+	/**
+	 * Change a member's role.
+	 */
 	public boolean setMemberRole(MessageReceiver member, Role role) {
 		if (!members.contains(member)) {
 			return false;
@@ -193,12 +221,18 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		return true;
 	}
 
+	/**
+	 * Mute a member.
+	 */
 	public boolean muteMember(MessageReceiver member) {
 		boolean r = !members.get(member).isMuted();
 		members.get(member).setMuted(true);
 		return r;
 	}
 
+	/**
+	 * Mute a member for a period of time.
+	 */
 	public boolean muteMember(MessageReceiver member, long time, TimeUnit unit) {
 		if (muteMember(member)) {
 			Ray.get().registerTask(Task.builder().async().delay(time, unit).execute(() -> {
@@ -208,6 +242,9 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		return false;
 	}
 
+	/**
+	 * Unmute a member.
+	 */
 	public boolean unmuteMember(MessageReceiver member) {
 		boolean r = members.get(member).isMuted();
 		members.get(member).setMuted(false);
@@ -219,38 +256,65 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		members.clear();
 	}
 
+	/**
+	 * @return the display tag of the channel.
+	 */
 	public Text getTag() {
 		return tag;
 	}
 
+	/**
+	 * @return the name of the channel.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @return the permission the channel uses.
+	 */
 	public String getPermission() {
 		return permission;
 	}
 
+	/**
+	 * @return whether the channel shows up when /ch is typed.
+	 */
 	public boolean isHidden() {
 		return hidden;
 	}
 
+	/**
+	 * set whether the channel is hidden.
+	 */
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
 	}
 
+	/**
+	 * @return the config node.
+	 */
 	public ConfigurationNode getNode() {
 		return node;
 	}
 
+	/**
+	 * @return whether players can automatically join the channel.
+	 */
 	public boolean isAutojoin() {
 		return autojoin;
 	}
 
+	/**
+	 * set whether players can autojoin.
+	 */
 	public void setAutojoin(boolean autojoin) {
 		this.autojoin = autojoin;
 	}
 
+	/**
+	 * Get the collection wrapper for the members.
+	 */
 	public ChannelMemberCollection getMembersCollection() {
 		return members;
 	}
