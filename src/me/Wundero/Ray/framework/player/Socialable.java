@@ -26,8 +26,14 @@ import java.net.URL;
  SOFTWARE.
  */
 
+/**
+ * Represents something that can use social media
+ */
 public interface Socialable {
 
+	/**
+	 * Load the url for a media
+	 */
 	public URL getMediaURL(SocialMedia medium);
 
 }

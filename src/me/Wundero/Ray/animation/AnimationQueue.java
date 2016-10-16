@@ -37,6 +37,9 @@ public class AnimationQueue {
 	public AnimationQueue() {
 	}
 
+	/**
+	 * Interrupt the currently running animation and start a new one.
+	 */
 	public void queueAnimation(Animation<?> animation) {
 		queueAnimation(animation, false);
 	}

@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -58,11 +59,17 @@ import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Player wrapper for the plugin. Holds information the plugin needs about the
+ * player in memory, and saves some to disk.
+ */
 public class RayPlayer implements Socialable {
 
-	private boolean conversing = false;
 	private static Map<UUID, RayPlayer> cache = Utils.sm();
 
+	/**
+	 * Get the RayPlayer representing the player with UUID @param u
+	 */
 	public static RayPlayer getRay(UUID u) {
 		if (!cache.containsKey(u)) {
 			Optional<Player> p = Sponge.getServer().getPlayer(u);
@@ -81,6 +88,9 @@ public class RayPlayer implements Socialable {
 			return cache.get(u);
 	}
 
+	/**
+	 * Get the RayPlayer representing the User @param u
+	 */
 	public static RayPlayer getRay(User u) {
 		if (!cache.containsKey(u.getUniqueId())) {
 			return new RayPlayer(u);
@@ -88,6 +98,9 @@ public class RayPlayer implements Socialable {
 		return cache.get(u.getUniqueId());
 	}
 
+	/**
+	 * Run a tablist update (names only)
+	 */
 	public static void updateTabs() {
 		for (RayPlayer p : cache.values()) {
 			if (p.user.isOnline() && p.user.getPlayer().isPresent()) {
@@ -96,20 +109,32 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Update player names in the tablist
+	 */
 	public void updateTab() {
 		Task.builder().execute(tabTask).submit(Ray.get().getPlugin());
 	}
 
+	/**
+	 * Save all player data to disk
+	 */
 	public static void saveAll() throws ObjectMappingException {
 		for (RayPlayer p : cache.values()) {
 			p.save();
 		}
 	}
 
+	/**
+	 * Get the RayPlayer representing the player with UUID @param u
+	 */
 	public static RayPlayer get(UUID u) {
 		return getRay(u);
 	}
 
+	/**
+	 * Get the RayPlayer representing the User @param u
+	 */
 	public static RayPlayer get(User u) {
 		return getRay(u);
 	}
@@ -133,10 +158,16 @@ public class RayPlayer implements Socialable {
 	private boolean spy = false;
 	private Optional<String> quote;
 
+	/**
+	 * Return the task for AFK checks
+	 */
 	public Task getAFKTask() {
 		return afkTask;
 	}
 
+	/**
+	 * Start the AFK check task
+	 */
 	public Task startAFKTask() {
 		afkTask = Task.builder().async().execute(() -> {
 			// TODO list
@@ -153,22 +184,38 @@ public class RayPlayer implements Socialable {
 		return afkTask;
 	}
 
+	/**
+	 * Set the player's quote
+	 */
 	public void setQuote(String quote) {
 		setQuote(Utils.wrap(quote, !quote.trim().isEmpty()));
 	}
 
+	/**
+	 * Set the player's quote
+	 */
 	public void setQuote(Optional<String> quote) {
-		this.quote = quote;
+		// Empty string safeguard
+		setQuote(quote.orElse(null));
 	}
 
+	/**
+	 * Get the player's quote
+	 */
 	public Optional<String> getQuote() {
 		return quote;
 	}
 
+	/**
+	 * @return whether the player is spying on messages
+	 */
 	public boolean spy() {
 		return spy;
 	}
 
+	/**
+	 * Set the player's spy toggle
+	 */
 	public void setSpy(boolean spy) {
 		if (user.hasPermission("ray.spy") && spy) {
 			this.spy = spy;
@@ -177,22 +224,40 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Choose a subtag for a tag
+	 */
 	public void select(SelectableTag tag, String sub) {
 		this.selectedTags.put(tag, sub);
 	}
 
-	public String getSelected(SelectableTag tag) {
-		return selectedTags.get(tag);
+	/**
+	 * Get the subtag chosen for a tag
+	 */
+	public Optional<String> getSelected(SelectableTag tag) {
+		if (tag == null) {
+			return Optional.empty();
+		}
+		return Utils.wrap(selectedTags.get(tag));
 	}
 
-	public String getSelected(String name) {
+	/**
+	 * Get the subtag chosen for a tag with the name specified.
+	 */
+	public Optional<String> getSelected(String name) {
+		if (name == null) {
+			return Optional.empty();
+		}
 		if (Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).isPresent()) {
-			return selectedTags.get(Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).get());
+			return Utils.wrap(selectedTags.get(Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).get()));
 		} else {
-			return null;
+			return Optional.empty();
 		}
 	}
 
+	/**
+	 * Queue an animation in a certain location
+	 */
 	public void queueAnimation(FormatLocation type, Animation<?> anim) {
 		if (!animations.containsKey(type)) {
 			animations.put(type, new AnimationQueue());
@@ -200,6 +265,9 @@ public class RayPlayer implements Socialable {
 		animations.get(type).queueAnimation(anim);
 	}
 
+	/**
+	 * Queue a footer text
+	 */
 	public synchronized void queueFooter(Text t) {
 		if (t != null) {
 			synchronized (footerQueue) {
@@ -208,6 +276,9 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Queue a header text
+	 */
 	public synchronized void queueHeader(Text t) {
 		if (t != null) {
 			synchronized (headerQueue) {
@@ -216,6 +287,9 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Stop the header footer update task
+	 */
 	public void stopTabHFTask() {
 		tabHFTask.cancel();
 	}
@@ -226,6 +300,9 @@ public class RayPlayer implements Socialable {
 
 	private static final Text EMPTY_TEXT_HEADER = TextSerializers.JSON.deserialize("{\"translate\":\"\"}");
 
+	/**
+	 * Start the header footer update task
+	 */
 	public void startTabHFTask() {
 		tabHFTask = Task.builder().execute(t -> {
 			if (!user.isOnline() || !user.getPlayer().isPresent()) {
@@ -257,18 +334,30 @@ public class RayPlayer implements Socialable {
 		}).intervalTicks(1).submit(Ray.get().getPlugin());
 	}
 
+	/**
+	 * Check to see if the player is reading messages from a channel
+	 */
 	public boolean listeningTo(ChatChannel c) {
 		return listeningTo(c.getName());
 	}
 
+	/**
+	 * Check to see if the player is reading messages from a channel
+	 */
 	public boolean listeningTo(String channel) {
 		return listenChannels.contains(channel);
 	}
 
+	/**
+	 * Stop reading messages from a channel
+	 */
 	public void removeListenChannel(ChatChannel c) {
 		removeListenChannel(c.getName());
 	}
 
+	/**
+	 * Stop reading messages from a channel
+	 */
 	public boolean removeListenChannel(String s) {
 		if (!listenChannels.contains(s)) {
 			return false;
@@ -276,14 +365,23 @@ public class RayPlayer implements Socialable {
 		return listenChannels.remove(s);
 	}
 
+	/**
+	 * Start reading messages from a channel
+	 */
 	public void addListenChannel(ChatChannel c) {
 		listenChannels.add(c.getName());
 	}
 
+	/**
+	 * @return whether the @param player is being ignored
+	 */
 	public boolean isIgnoring(RayPlayer player) {
 		return ignore.contains(player.uuid);
 	}
 
+	/**
+	 * Toggle whether the player is being ignored
+	 */
 	public boolean toggleIgnore(RayPlayer player) {
 		if (isIgnoring(player)) {
 			return unignore(player);
@@ -292,10 +390,16 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Stop ignoring the player
+	 */
 	public boolean unignore(RayPlayer player) {
 		return ignore.remove(player.uuid);
 	}
 
+	/**
+	 * Start ignoring the player
+	 */
 	public boolean ignore(RayPlayer player) {
 		if (ignore.contains(player.uuid)) {
 			return false;
@@ -303,10 +407,16 @@ public class RayPlayer implements Socialable {
 		return ignore.add(player.uuid);
 	}
 
+	/**
+	 * @return the channel this player speaks into
+	 */
 	public ChatChannel getActiveChannel() {
 		return activeChannel;
 	}
 
+	/**
+	 * Set the active chanel as the messagechannel of the player
+	 */
 	public void applyChannel() {
 		if (activeChannel != null) {
 			if (user.isOnline() && user.getPlayer().isPresent()) {
@@ -315,6 +425,9 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Set the channel this user speaks into
+	 */
 	public void setActiveChannel(ChatChannel channel) {
 		if (channel == null) {
 			return;
@@ -325,6 +438,9 @@ public class RayPlayer implements Socialable {
 		}
 	}
 
+	/**
+	 * Load player data from file
+	 */
 	public void load() throws ObjectMappingException {
 		if (config == null) {
 			return;
@@ -355,6 +471,9 @@ public class RayPlayer implements Socialable {
 		return out;
 	}
 
+	/**
+	 * Save player data to file
+	 */
 	public void save() throws ObjectMappingException {
 		if (config == null) {
 			return;
@@ -386,12 +505,18 @@ public class RayPlayer implements Socialable {
 		this.selectedTags = deconvert(o);
 	}
 
+	/**
+	 * Return the textual displayname of the player
+	 */
 	public Optional<Text> getDisplayName() {
 		return Optional.ofNullable(displayname);
 	}
 
 	private Text displayname = null;
 
+	/**
+	 * Set displayname if the player is online
+	 */
 	public void checkDisplayname() {
 		if (!user.isOnline() || !user.getPlayer().isPresent()) {
 			return;
@@ -401,6 +526,9 @@ public class RayPlayer implements Socialable {
 		displayname = o instanceof Text ? (Text) o : Text.of(o);
 	}
 
+	/**
+	 * Wrap the user in the RayPlayer data holder
+	 */
 	public RayPlayer(User u) {
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
@@ -429,26 +557,44 @@ public class RayPlayer implements Socialable {
 		cache.put(uuid, this);
 	}
 
+	/**
+	 * Get the user's UUID
+	 */
 	public UUID getUniqueId() {
 		return getUUID();
 	}
 
+	/**
+	 * Get the user's UUID
+	 */
 	private UUID getUUID() {
 		return uuid;
 	}
 
+	/**
+	 * @return the user
+	 */
 	public User getUser() {
 		return user;
 	}
 
+	/**
+	 * Set the user
+	 */
 	private void setUser(User user) {
 		this.user = user;
 	}
 
+	/**
+	 * @return the groups this user is in
+	 */
 	public Map<String, Group> getGroups() {
 		return groups;
 	}
 
+	/**
+	 * Return the group applied for the user's current world
+	 */
 	public Group getActiveGroup() {
 		if (!user.isOnline()) {
 			return gg("all");
@@ -461,33 +607,30 @@ public class RayPlayer implements Socialable {
 		return getGroups().get(world);
 	}
 
+	/**
+	 * Set the user's groups
+	 */
 	public void setGroups(Map<String, Group> groups) {
 		this.groups = groups;
 	}
 
-	public boolean isConversing() {
-		return conversing;
-	}
-
+	/**
+	 * Reload the player's active groups
+	 */
 	public void reloadGroups() {
 		this.setGroups(Ray.get().getGroups().getGroups(this.getUser()));
 	}
 
-	public void setConversing(boolean conversing) {
-		if (!user.isOnline()) {
-			conversing = false;
-			return;
-		}
-		this.conversing = conversing;
-		if (conversing) {
-			user.getPlayer().get().setMessageChannel(MessageChannel.TO_NONE);
-		}
-	}
-
+	/**
+	 * Get the player this user sent a private message to most recently.
+	 */
 	public Optional<RayPlayer> getLastMessaged() {
 		return lastMessaged;
 	}
 
+	/**
+	 * Set the player this user sent a private message to most recently.
+	 */
 	public void setLastMessaged(Optional<RayPlayer> lastMessaged, boolean recurse) {
 		if (!lastMessaged.isPresent()) {
 			return;
@@ -498,35 +641,62 @@ public class RayPlayer implements Socialable {
 		this.lastMessaged = lastMessaged;
 	}
 
+	/**
+	 * Get the player data file
+	 */
 	public ConfigurationNode getConfig() {
 		return config;
 	}
 
+	/**
+	 * Set the player data file
+	 */
 	public void setConfig(ConfigurationNode config) {
 		this.config = config;
 	}
 
+	/**
+	 * Get the task executed when tablist updates are called
+	 */
 	public Runnable getTabTask() {
 		return tabTask;
 	}
 
+	/**
+	 * Set the task executed when tablist updates are called
+	 */
 	public void setTabTask(Runnable tabTask) {
 		this.tabTask = tabTask;
 	}
 
+	/**
+	 * Get all channels this user receives messages from
+	 */
 	public List<String> getListenChannels() {
 		return listenChannels;
 	}
 
+	/**
+	 * Set all channels this user receives messages from
+	 */
 	public void setListenChannels(List<String> listenChannels) {
 		this.listenChannels = listenChannels;
 	}
 
 	private Map<SocialMedia, String> mediums = Utils.sm();
 
+	public void setMediaName(String name, SocialMedia medium) {
+		Validate.notNull(name);
+		Validate.isTrue(!name.isEmpty());
+		this.mediums.put(medium, name);
+	}
+
+	/**
+	 * Get the URL to link to this player's social media accounts
+	 */
 	@Override
 	public URL getMediaURL(SocialMedia medium) {
-		if (medium == null) {
+		if (medium == null || !mediums.containsKey(medium)) {
 			return null;
 		}
 		String name = mediums.get(medium);

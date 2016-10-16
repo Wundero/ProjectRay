@@ -36,6 +36,9 @@ import ninja.leaping.configurate.ConfigurationNode;
  SOFTWARE.
  */
 
+/**
+ * Default format for use in templates
+ */
 public class DefaultFormat {
 
 	private String name;
@@ -44,26 +47,41 @@ public class DefaultFormat {
 	private Optional<FormatLocation> loc = Optional.empty();
 	private Optional<Consumer<ConfigurationNode>> ld = Optional.empty();
 
+	/**
+	 * Create a new Default Format
+	 */
 	public DefaultFormat(String name, FormatContext type) {
 		this.name = name;
 		this.parts = Utils.sl();
 		this.type = type;
 	}
 
+	/**
+	 * Create a new DefaultFormat
+	 */
 	public DefaultFormat(String name) {
 		this(name, FormatContext.fromString(name));
 	}
 
+	/**
+	 * Set the location this format is sent to
+	 */
 	public DefaultFormat withLoc(FormatLocation loc) {
 		this.loc = Utils.wrap(loc);
 		return this;
 	}
 
+	/**
+	 * Set the data setter this format location uses
+	 */
 	public DefaultFormat withLocData(Consumer<ConfigurationNode> ld) {
 		this.ld = Utils.wrap(ld);
 		return this;
 	}
 
+	/**
+	 * Add an object to the format
+	 */
 	public DefaultFormat with(Object... o) {
 		for (Object a : o) {
 			parts.add(a);
@@ -71,6 +89,9 @@ public class DefaultFormat {
 		return this;
 	}
 
+	/**
+	 * Apply this format to a Template.
+	 */
 	public Template.Builder.GroupBuilder applyTo(Template.Builder.GroupBuilder b) {
 		Template.Builder.GroupBuilder.FormatBuilder bb = b.withFormat(name);
 		for (Object o : parts) {

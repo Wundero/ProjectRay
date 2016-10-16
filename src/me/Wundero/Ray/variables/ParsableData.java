@@ -31,6 +31,9 @@ import me.Wundero.Ray.utils.Utils;
  SOFTWARE.
  */
 
+/**
+ * Represents data that a variable may require for parsing.
+ */
 public class ParsableData {
 	private Optional<Map<String, Object>> known = Optional.empty();
 	private Optional<Player> sender = Optional.empty();
@@ -43,24 +46,36 @@ public class ParsableData {
 	}
 
 	/**
-	 * @return the known
+	 * @return the known data
 	 */
 	public Optional<Map<String, Object>> getKnown() {
 		return known;
 	}
 
+	/**
+	 * Set the known data
+	 */
 	public ParsableData setKnown(Map<String, Object> known) {
 		return setKnown(Optional.ofNullable(known));
 	}
 
+	/**
+	 * Set the known data
+	 */
 	public ParsableData withKnown(Map<String, Object> known) {
 		return setKnown(known);
 	}
 
+	/**
+	 * Set the known data
+	 */
 	public ParsableData withKnown(Optional<Map<String, Object>> known) {
 		return setKnown(known);
 	}
 
+	/**
+	 * Set the known data
+	 */
 	public ParsableData setKnown(Optional<Map<String, Object>> known) {
 		this.known = known;
 		return this;
@@ -73,14 +88,26 @@ public class ParsableData {
 		return sender;
 	}
 
+	/**
+	 * @param sender
+	 *            the sender to set
+	 */
 	public ParsableData setSender(Player sender) {
 		return setSender(Optional.ofNullable(sender));
 	}
 
+	/**
+	 * @param sender
+	 *            the sender to set
+	 */
 	public ParsableData withSender(Player sender) {
 		return setSender(sender);
 	}
 
+	/**
+	 * @param sender
+	 *            the sender to set
+	 */
 	public ParsableData withSender(Optional<Player> sender) {
 		return setSender(sender);
 	}
@@ -101,14 +128,26 @@ public class ParsableData {
 		return recipient;
 	}
 
+	/**
+	 * @param recipient
+	 *            the recipient to set
+	 */
 	public ParsableData setRecipient(Player recipient) {
 		return setRecipient(Optional.ofNullable(recipient));
 	}
 
+	/**
+	 * @param recipient
+	 *            the recipient to set
+	 */
 	public ParsableData withRecipient(Player recipient) {
 		return setRecipient(recipient);
 	}
 
+	/**
+	 * @param recipient
+	 *            the recipient to set
+	 */
 	public ParsableData withRecipient(Optional<Player> recipient) {
 		return setRecipient(recipient);
 	}
@@ -129,14 +168,26 @@ public class ParsableData {
 		return observer;
 	}
 
+	/**
+	 * @param observer
+	 *            the observer to set
+	 */
 	public ParsableData withObserver(Player observer) {
 		return setObserver(observer);
 	}
 
+	/**
+	 * @param observer
+	 *            the observer to set
+	 */
 	public ParsableData withObserver(Optional<Player> observer) {
 		return setObserver(observer);
 	}
 
+	/**
+	 * @param observer
+	 *            the observer to set
+	 */
 	public ParsableData setObserver(Player observer) {
 		return setObserver(Optional.ofNullable(observer));
 	}
@@ -151,12 +202,16 @@ public class ParsableData {
 	}
 
 	/**
-	 * @return the clickHover
+	 * @return whether click and hover is supported
 	 */
 	public boolean isClickHover() {
 		return clickHover;
 	}
 
+	/**
+	 * @param clickHover
+	 *            the clickHover to set
+	 */
 	public ParsableData withClickHover(boolean clickHover) {
 		return setClickHover(clickHover);
 	}
@@ -170,14 +225,23 @@ public class ParsableData {
 		return this;
 	}
 
+	/**
+	 * @return what page to use for pagination objects
+	 */
 	public Optional<Integer> getPage() {
 		return page;
 	}
 
+	/**
+	 * Set the page to use
+	 */
 	public ParsableData setPage(int i) {
 		return withPage(i);
 	}
 
+	/**
+	 * Set the page to use
+	 */
 	public ParsableData withPage(int i) {
 		this.page = Utils.wrap(i, i >= 0);
 		return this;

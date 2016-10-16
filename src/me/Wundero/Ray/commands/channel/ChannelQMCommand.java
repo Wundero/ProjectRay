@@ -43,6 +43,9 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 
+/**
+ * Message a channel without joining it.
+ */
 public class ChannelQMCommand implements CommandExecutor {
 
 	@Override

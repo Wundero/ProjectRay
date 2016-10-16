@@ -34,6 +34,9 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.conversation.announcement.AnnouncementConversation;
 
+/**
+ * Start the announcement creation conversation
+ */
 public class AnnouncementConversationCommand implements CommandExecutor {
 
 	@Override

@@ -47,6 +47,9 @@ import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Reply to a private message.
+ */
 public class ReplyCommand implements CommandExecutor {
 
 	@Override

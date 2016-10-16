@@ -25,6 +25,9 @@ package me.Wundero.Ray.tag;
 
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Pseudp-enum implementation for a tag that can be loaded
+ */
 public class DefaultTag {
 
 	private Tag<?> tag;
@@ -32,11 +35,17 @@ public class DefaultTag {
 	public DefaultTag() {
 	}
 
+	/**
+	 * Add a tag
+	 */
 	public DefaultTag withTag(Tag<?> t) {
 		this.tag = t;
 		return this;
 	}
 
+	/**
+	 * Serialize into a config file
+	 */
 	public void applyTo(ConfigurationNode node) {
 		try {
 			tag.serialize(node);

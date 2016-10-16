@@ -47,11 +47,14 @@ import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 
+/**
+ * Check to see who is in a channel.
+ */
 public class ChannelWhoCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		Optional<String> cn = args.<String>getOne("channel");
+		Optional<String> cn = args.<String> getOne("channel");
 		if (!cn.isPresent() && !(src instanceof Player)) {
 			src.sendMessage(Text.of(TextColors.RED, "You must specify a channel!"));
 			return CommandResult.success();

@@ -43,6 +43,9 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * List all channels
+ */
 public class ChannelCommand implements CommandExecutor {
 
 	@Override

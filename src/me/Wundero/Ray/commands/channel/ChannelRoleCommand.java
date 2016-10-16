@@ -37,6 +37,9 @@ import me.Wundero.Ray.framework.player.RayPlayer;
  SOFTWARE.
  */
 
+/**
+ * Change the permissibility of a player in a channel.
+ */
 public class ChannelRoleCommand implements CommandExecutor {
 
 	// /ch role [player] [set <role>]
@@ -72,7 +75,7 @@ public class ChannelRoleCommand implements CommandExecutor {
 		}
 		String role = (String) args.getOne("role").get();
 		Role r = Role.valueOf(role.toUpperCase());
-		if(r==null) {
+		if (r == null) {
 			src.sendMessage(Text.of(TextColors.RED, "That is not a valid role!"));
 			return CommandResult.success();
 		}

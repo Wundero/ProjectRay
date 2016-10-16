@@ -45,6 +45,10 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Represents an animated format. This type stores numerous formats, each with
+ * delays.
+ */
 public class AnimatedFormat extends Format {
 	private Map<Format, Integer> frameWithDelay = Utils.sm();
 	private List<Format> inOrder = Utils.sl();
@@ -77,6 +81,9 @@ public class AnimatedFormat extends Format {
 
 	}
 
+	/**
+	 * Create a new animated format.
+	 */
 	public AnimatedFormat(ConfigurationNode node) {
 		super(node);
 		if (node == null || node.isVirtual()) {
@@ -147,6 +154,9 @@ public class AnimatedFormat extends Format {
 		frameWithDelay = t;
 	}
 
+	/**
+	 * Start the animation.
+	 */
 	@Override
 	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
@@ -174,6 +184,9 @@ public class AnimatedFormat extends Format {
 		return true;
 	}
 
+	/**
+	 * Start the animation.
+	 */
 	@Override
 	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
@@ -324,6 +337,9 @@ public class AnimatedFormat extends Format {
 
 	private static UUID uuid = UUID.randomUUID();
 
+	/**
+	 * Creation prompt.
+	 */
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
 		ConfigurationNode node = context.getData("node");

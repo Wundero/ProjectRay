@@ -24,7 +24,8 @@ package me.Wundero.Ray.utils;
  */
 
 /**
- * Class used as a simpler supplier
+ * This class is a holder of values. Setting can be delayed, so it is different
+ * from the likes of a supplier.
  */
 public class ValueHolder<T> {
 	private T value;
@@ -36,10 +37,16 @@ public class ValueHolder<T> {
 	public ValueHolder() {
 	}
 
+	/**
+	 * Set the value
+	 */
 	public void setValue(T t) {
 		this.value = t;
 	}
 
+	/**
+	 * Get the value
+	 */
 	public T getValue() {
 		return value;
 	}

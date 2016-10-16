@@ -38,6 +38,9 @@ import ninja.leaping.configurate.ConfigurationNode;
  SOFTWARE.
  */
 
+/**
+ * Pseudo-enum for the Effect classes
+ */
 public class EffectType {
 
 	private String name;
@@ -45,12 +48,19 @@ public class EffectType {
 
 	private List<Setting> settings;
 
+	/**
+	 * Create a new effect type
+	 */
 	public EffectType(String name, Function<ConfigurationNode, Effect<?>> loader, List<Setting> settings) {
 		this.setName(name);
 		this.setSettings(settings);
 		this.loader = loader;
 	}
 
+	/**
+	 * Create a prompt that will allow settings of the loader to be created in
+	 * game
+	 */
 	public Prompt iteratePrompts(Prompt returnTo, ConfigurationNode applyTo, boolean useOpts) {
 		Prompt curPrompt = returnTo;
 		for (Setting s : settings) {
@@ -62,16 +72,25 @@ public class EffectType {
 		return curPrompt;
 	}
 
+	/**
+	 * Get the name of the effect
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Set the name of the effect
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Load an effect from config
+	 */
 	@SuppressWarnings("unchecked")
-	public <T> T load(ConfigurationNode s) {
+	public <T extends Effect<?>> T load(ConfigurationNode s) {
 		return (T) loader.apply(s);
 	}
 
@@ -90,11 +109,17 @@ public class EffectType {
 		this.settings = settings;
 	}
 
+	/**
+	 * Represents a setting for an effect, such as delay.
+	 */
 	public static class Setting {
 		private String key;
 		private Class<?> valueType;
 		private boolean optional;
 
+		/**
+		 * Get the setting prompt for the type
+		 */
 		public Prompt getPrompt(final Prompt returnTo, final ConfigurationNode toSet) {
 			return new TypePrompt<Object>(
 					TextTemplate.of(TextColors.AQUA, "What value do you want to give " + key + "?"),

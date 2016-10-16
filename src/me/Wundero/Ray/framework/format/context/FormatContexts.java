@@ -29,6 +29,10 @@ import java.util.Map;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * All default format contexts. Each context has proper descriptions on the
+ * Wiki.
+ */
 public class FormatContexts {
 
 	public static FormatContext CHAT = new FormatContext("chat", new String[] { "c" });
@@ -55,15 +59,18 @@ public class FormatContexts {
 	static {
 		for (Field f : FormatContexts.class.getDeclaredFields()) {
 			try {
-				FormatContext type = (FormatContext) f.get(null);// class cast
-																	// caught
-				// and ignored
+				FormatContext type = (FormatContext) f.get(null);
+				// Class cast exception is fired by line 62. This is a good
+				// thing; it means it won't use lookup as a format context.
 				rft(type);
 			} catch (Exception e) {
 			}
 		}
 	}
 
+	/**
+	 * Return a context parsed from a string.
+	 */
 	public static FormatContext fromString(String value) {
 		return FormatContext.fromString(value);
 	}
@@ -75,10 +82,16 @@ public class FormatContexts {
 		}
 	}
 
+	/**
+	 * Get all format contexts.
+	 */
 	public static List<FormatContext> values() {
 		return Utils.sl(lookup.values());
 	}
 
+	/**
+	 * Add a new format context.
+	 */
 	public static boolean put(FormatContext type) {
 		if (get(type.getName()) == null) {
 			for (String a : type.getAliases()) {
@@ -92,6 +105,9 @@ public class FormatContexts {
 		return false;
 	}
 
+	/**
+	 * Get the context from a name.
+	 */
 	public static FormatContext get(String name) {
 		return lookup.get(name.toLowerCase().trim());
 	}

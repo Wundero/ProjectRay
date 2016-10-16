@@ -32,6 +32,9 @@ import me.Wundero.Ray.variables.ParsableData;
  SOFTWARE.
  */
 
+/**
+ * Represents a dynamic clickable object.
+ */
 public abstract class Tag<T> implements RaySerializable {
 	private final String name;
 	private String permissionView, permissionUse;
@@ -43,10 +46,20 @@ public abstract class Tag<T> implements RaySerializable {
 		Ray.get().getTags().register(this);
 	}
 
+	/**
+	 * Verify that an object matches the generic type
+	 */
 	public abstract boolean verify(Object o);
 
+	/**
+	 * Get the textual representation of this tag as parsed with respect to the
+	 * data.
+	 */
 	public abstract Optional<Text> get(Optional<ParsableData> data);
 
+	/**
+	 * Whether the data has permission to use this tag.
+	 */
 	public boolean hasPermission(ParsableData d) {
 		boolean s = (permissionUse == null || permissionUse.isEmpty())
 				|| d.getSender().isPresent() && d.getSender().get().hasPermission(permissionUse);
@@ -55,31 +68,52 @@ public abstract class Tag<T> implements RaySerializable {
 		return s && r;
 	}
 
+	/**
+	 * Get the name of this tag.
+	 */
 	public final String getName() {
 		return name;
 	}
 
+	/**
+	 * Get the internal object this tag represents.
+	 */
 	public final T getObject() {
 		return object;
 	}
 
+	/**
+	 * Set the object for this tag.
+	 */
 	public final void setObject(T object) {
 		this.object = object;
 	}
 
+	/**
+	 * Get the permission required to view this tag
+	 */
 	public String getPermissionView() {
 		return permissionView;
 	}
 
+	/**
+	 * Set the permission required to view this tag
+	 */
 	public Tag<T> setPermissionView(String permissionView) {
 		this.permissionView = permissionView;
 		return this;
 	}
 
+	/**
+	 * Get the permission required to use this tag
+	 */
 	public String getPermissionUse() {
 		return permissionUse;
 	}
 
+	/**
+	 * Set the permission required to use this tag
+	 */
 	public Tag<T> setPermissionUse(String permissionUse) {
 		this.permissionUse = permissionUse;
 		return this;

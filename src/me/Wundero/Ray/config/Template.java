@@ -40,7 +40,9 @@ import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
-//config template class
+/**
+ * Configuration template. Applies to the config as it is built.
+ */
 public class Template {
 
 	private ConfigurationNode node = null;
@@ -49,6 +51,9 @@ public class Template {
 		this.node = node;
 	}
 
+	/**
+	 * Start building a new template.
+	 */
 	public static Template.Builder builder(ConfigurationNode node) {
 		return new Builder(node);
 	}
@@ -65,10 +70,16 @@ public class Template {
 			groupNode = template.node.getNode("worlds", "all", "groups");
 		}
 
+		/**
+		 * Build the template.
+		 */
 		public Template build() {
 			return template;
 		}
 
+		/**
+		 * Add a new group
+		 */
 		public GroupBuilder withGroup(String name) {
 			return new GroupBuilder(groupNode.getNode(name), name, this);
 		}
@@ -89,6 +100,9 @@ public class Template {
 				this.name = name;
 			}
 
+			/**
+			 * Build the group
+			 */
 			public Builder build() {
 				node.getNode("priority").setValue(priority);
 				if (!permission.isEmpty()) {
@@ -100,11 +114,17 @@ public class Template {
 				return parent;
 			}
 
+			/**
+			 * Set the priority of the group
+			 */
 			public GroupBuilder withPriority(int priority) {
 				this.priority = priority;
 				return this;
 			}
 
+			/**
+			 * Set the permission of the group
+			 */
 			public GroupBuilder withPermission(String permission) {
 				if (permission == null) {
 					return this;
@@ -113,6 +133,9 @@ public class Template {
 				return this;
 			}
 
+			/**
+			 * Add a parent group
+			 */
 			public GroupBuilder withParent(String... parent) {
 				for (String s : parent) {
 					parents.add(s);
@@ -120,10 +143,16 @@ public class Template {
 				return this;
 			}
 
+			/**
+			 * Add a default format
+			 */
 			public GroupBuilder withFormat(DefaultFormat f) {
 				return f.applyTo(this);
 			}
 
+			/**
+			 * Create a new format
+			 */
 			public FormatBuilder withFormat(String name) {
 				return new FormatBuilder(node.getNode("formats", name), name, this);
 			}
@@ -148,6 +177,9 @@ public class Template {
 					template = TextTemplate.of();
 				}
 
+				/**
+				 * Build the format
+				 */
 				public GroupBuilder build() {
 					try {
 						node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
@@ -175,77 +207,133 @@ public class Template {
 					return parent;
 				}
 
+				/**
+				 * Add a context
+				 */
 				public FormatBuilder withType(FormatContext type) {
 					this.type = Optional.ofNullable(type);
 					return this;
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(String key) {
 					return withArg(key, null, null);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(String key, InternalHoverAction<?> hover) {
 					return withArg(key, null, hover);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(String key, InternalClickAction<?> click) {
 					return withArg(key, click, null);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(String key, boolean optional) {
 					return withArg(key, null, null);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(String key, InternalHoverAction<?> hover, boolean optional) {
 					return withArg(key, null, hover);
 				}
+
+				/**
+				 * Add an argument
+				 */
 
 				public FormatBuilder withArg(String key, InternalClickAction<?> click, boolean optional) {
 					return withArg(key, click, null);
 				}
 
+				/**
+				 * Add an argument
+				 */
+
 				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover) {
 					return withArg(key, click, hover, false);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover,
 						boolean optional) {
 					return withArg(TextTemplate.arg(key), click, hover, optional);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(DefaultArg arg) {
 					return withArg(arg.getBuilder(), arg.getClick(), arg.getHover(), arg.isOptional());
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover) {
 					return withArg(builder, null, hover);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click) {
 					return withArg(builder, click, null);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder) {
 					return withArg(builder, null, null);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover, boolean optional) {
 					return withArg(builder, null, hover, optional);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click, boolean optional) {
 					return withArg(builder, click, null, optional);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, boolean optional) {
 					return withArg(builder, null, null, optional);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
 						InternalHoverAction<?> hover) {
 					return withArg(builder, click, hover, false);
 				}
 
+				/**
+				 * Add an argument
+				 */
 				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
 						InternalHoverAction<?> hover, boolean optional) {
 					builder.optional(optional);
@@ -260,6 +348,9 @@ public class Template {
 					return this;
 				}
 
+				/**
+				 * Add some text
+				 */
 				public FormatBuilder withText(String... texts) {
 					for (String s : texts) {
 						template = template.concat(TextTemplate.of(s));
@@ -267,6 +358,9 @@ public class Template {
 					return this;
 				}
 
+				/**
+				 * Add some text
+				 */
 				public FormatBuilder withText(Text... texts) {
 					for (Text t : texts) {
 						template = template.concat(TextTemplate.of(t));
@@ -274,20 +368,32 @@ public class Template {
 					return this;
 				}
 
+				/**
+				 * Set location data for the location
+				 */
 				public FormatBuilder withLocData(Consumer<ConfigurationNode> task) {
 					this.locdataset = Utils.wrap(task);
 					return this;
 				}
 
+				/**
+				 * Set the location for this format
+				 */
 				public FormatBuilder withLoc(FormatLocation loc) {
 					this.loc = Utils.wrap(loc);
 					return this;
 				}
 
+				/**
+				 * Set the node for this format
+				 */
 				public void setNode(ConfigurationNode node) {
 					this.node = node;
 				}
 
+				/**
+				 * Get the node for this format
+				 */
 				public ConfigurationNode getNode() {
 					return node;
 				}

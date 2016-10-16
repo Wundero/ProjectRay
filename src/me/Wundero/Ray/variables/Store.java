@@ -28,10 +28,16 @@ import java.util.Optional;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Object that stores all loaded variables and wrappers.
+ */
 public class Store {
 	private Map<String, Variable> vars = Utils.sm();
 	private Map<String, VariableWrapper> wrappers = Utils.sm();
 
+	/**
+	 * Get a wrapper if available
+	 */
 	public Optional<VariableWrapper> getWrapper(String key) {
 		if (!wrappers.containsKey(key)) {
 			return Optional.empty();
@@ -39,6 +45,9 @@ public class Store {
 		return Optional.ofNullable(wrappers.get(key));
 	}
 
+	/**
+	 * Add a new wrapper
+	 */
 	public boolean registerWrapper(VariableWrapper v) {
 		if (wrappers.containsKey(v.getKey())) {
 			return false;
@@ -47,6 +56,9 @@ public class Store {
 		return true;
 	}
 
+	/**
+	 * Get a variable if available
+	 */
 	public Optional<Variable> getVariable(String key) {
 		if (!vars.containsKey(key)) {
 			return Optional.empty();
@@ -54,6 +66,9 @@ public class Store {
 		return Optional.ofNullable(vars.get(key));
 	}
 
+	/**
+	 * Add a new variable
+	 */
 	public boolean registerVariable(Variable v) {
 		if (vars.containsKey(v.getKey())) {
 			return false;

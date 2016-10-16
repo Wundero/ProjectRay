@@ -36,12 +36,21 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
+import com.google.inject.Singleton;
+
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Variable parser and singleton storage
+ */
+@Singleton
 public class Variables {
 	// parse for provided data
+	/**
+	 * Parse a string as a key for a variable.
+	 */
 	public Text get(String key, ParsableData parsedat, Optional<Format> format, Optional<TextTemplate> template) {
 		Validate.notNull(parsedat);
 		Validate.notEmpty(key);
@@ -180,6 +189,9 @@ public class Variables {
 		return Text.of();
 	}
 
+	/**
+	 * Instantiate the singleton instance
+	 */
 	public Variables() {
 		store = new Store();
 		// register some default variables
@@ -188,26 +200,41 @@ public class Variables {
 
 	private Store store;
 
+	/**
+	 * Register a new variable wrapper
+	 */
 	public boolean registerWrapper(VariableWrapper w) {
 		return store.registerWrapper(w);
 	}
 
+	/**
+	 * Register a new variable
+	 */
 	public boolean registerVariable(Variable v) {
 		return store.registerVariable(v);
 	}
 
 	// these methods allow you to register with lamdas
 
+	/**
+	 * Register a new variable wrapper
+	 */
 	public boolean registerWrapper(String key, Runnable r) {
 		return registerWrapper(key, (BiConsumer<Variable, Text>) (v, t) -> {
 			r.run();
 		});
 	}
 
+	/**
+	 * Register a new variable wrapper
+	 */
 	public boolean registerWrapper(String key, Supplier<Text> s) {
 		return registerWrapper(key, (BiFunction<Variable, Text, Text>) (v, t) -> s.get());
 	}
 
+	/**
+	 * Register a new variable wrapper
+	 */
 	public boolean registerWrapper(String key, BiConsumer<Variable, Text> c) {
 		return registerWrapper(key, (BiFunction<Variable, Text, Text>) (v, t) -> {
 			c.accept(v, t);
@@ -215,6 +242,9 @@ public class Variables {
 		});
 	}
 
+	/**
+	 * Register a new variable wrapper
+	 */
 	public boolean registerWrapper(String key, BiFunction<Variable, Text, Text> funct) {
 		return registerWrapper(new VariableWrapper(key) {
 
@@ -225,11 +255,18 @@ public class Variables {
 		});
 	}
 
+	/**
+	 * Register a new variable
+	 */
 	public boolean registerVariable(String key, Runnable task) {
 		return registerVariable(key.toLowerCase().trim(), (Consumer<Map<Param, Object>>) (objects) -> task.run());
 	}
 
 	// just acts on data
+
+	/**
+	 * Register a new variable
+	 */
 	public boolean registerVariable(String key, Consumer<Map<Param, Object>> task) {
 		return registerVariable(key, (Function<Map<Param, Object>, Text>) (o) -> {
 			task.accept(o);
@@ -238,11 +275,19 @@ public class Variables {
 	}
 
 	// just returns static info
+
+	/**
+	 * Register a new variable
+	 */
 	public boolean registerVariable(String key, Supplier<Text> replacer) {
 		return registerVariable(key, (Function<Map<Param, Object>, Text>) (o) -> replacer.get());
 	}
 
 	// returns info based on data
+
+	/**
+	 * Register a new variable
+	 */
 	public boolean registerVariable(String key, Function<Map<Param, Object>, Text> replacer) {
 		return registerVariable(new Variable(key.toLowerCase().trim()) {
 

@@ -44,12 +44,19 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Format type that is fired when an event, which is a subclass of or equal to
+ * the provided event class, is called.
+ */
 public class EventFormat extends Format {
 
 	private Optional<String> eventClass = Optional.empty();
 
 	private Format internal;
 
+	/**
+	 * Create a new event format.
+	 */
 	public EventFormat(ConfigurationNode node, Format f) {
 		super(node);
 		if (node == null || node.isVirtual()) {
@@ -75,6 +82,12 @@ public class EventFormat extends Format {
 		return Utils.classinstanceof(eventClass.get(), clazz);
 	}
 
+	/**
+	 * Fire the format.
+	 * 
+	 * In the future, when Events are split into Context and Cause, I will more
+	 * effectively support variables in this method.
+	 */
 	@Listener
 	public void onEvent(Event e) {
 		if (checkClass(e.getClass())) {

@@ -32,11 +32,17 @@ import org.spongepowered.api.text.format.TextColor;
 
 import me.Wundero.Ray.utils.TextUtils;
 
+/**
+ * Effect that highlights parts of a text object with color
+ */
 public class RainbowEffect extends Effect<Text> {
 
 	// highlight part of text
 	// ex: 1: abc 2 Abc 3 aBc 4 abC
 
+	/**
+	 * Create a new RainbowEffect for the text
+	 */
 	public static RainbowEffect create(String text, TextColor original, TextColor main, Optional<TextColor> second,
 			Optional<Integer> delay) {
 		RainbowEffect e = new RainbowEffect(Text.of(text), (t, i) -> {
@@ -89,6 +95,9 @@ public class RainbowEffect extends Effect<Text> {
 		return e;
 	}
 
+	/**
+	 * Create a new RainbowEffect for the text
+	 */
 	public static RainbowEffect create(Text t, TextColor main, Optional<TextColor> secondary, Optional<Integer> delay) {
 		return create(TextUtils.getContent(t, false), t.getColor(), main, secondary, delay);
 	}
@@ -99,6 +108,9 @@ public class RainbowEffect extends Effect<Text> {
 		}, f, d);
 	}
 
+	/**
+	 * Send the object to the player
+	 */
 	@Override
 	public boolean send(BiFunction<Text, Player, Boolean> sender, Text obj, Player p) {
 		return sender.apply(obj, p);

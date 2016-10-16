@@ -32,6 +32,9 @@ import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.translation.M;
 
+/**
+ * Testing class - used to test to see if translation files work.
+ */
 public class TranslationTestCommand implements CommandExecutor {
 
 	@Override

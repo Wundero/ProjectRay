@@ -42,6 +42,9 @@ import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Builder class for formats - saves to node then loads node.
+ */
 public class FormatBuilder {
 
 	private ConfigurationNode node;
@@ -52,12 +55,18 @@ public class FormatBuilder {
 	private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
 	private Optional<FormatContext> type;
 
+	/**
+	 * Create a new format builder
+	 */
 	public FormatBuilder(ConfigurationNode node, String name) {
 		this.node = node;
 		this.name = name;
 		template = TextTemplate.of();
 	}
 
+	/**
+	 * Build the format.
+	 */
 	public Format build() {
 		try {
 			node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
@@ -75,10 +84,16 @@ public class FormatBuilder {
 		return new StaticFormat(node);
 	}
 
+	/**
+	 * Build a format.
+	 */
 	public static FormatBuilder builder(Group group, String name) {
 		return new FormatBuilder(group.getConfig().getNode("format", name), name);
 	}
 
+	/**
+	 * Set the context.
+	 */
 	public FormatBuilder withType(FormatContext type) {
 		if (type == FormatContexts.DEFAULT) {
 			return this;
@@ -87,38 +102,65 @@ public class FormatBuilder {
 		return this;
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(String key) {
 		return withArg(key, null, null);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(String key, InternalHoverAction<?> hover) {
 		return withArg(key, null, hover);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(String key, InternalClickAction<?> click) {
 		return withArg(key, click, null);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover) {
 		return withArg(TextTemplate.arg(key), click, hover);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(DefaultArg arg) {
 		return withArg(arg.getBuilder(), arg.getClick(), arg.getHover());
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover) {
 		return withArg(builder, null, hover);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click) {
 		return withArg(builder, click, null);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(Arg.Builder builder) {
 		return withArg(builder, null, null);
 	}
 
+	/**
+	 * Add an arg
+	 */
 	public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click, InternalHoverAction<?> hover) {
 		Arg built = builder.build();
 		if (click != null) {
@@ -131,6 +173,9 @@ public class FormatBuilder {
 		return this;
 	}
 
+	/**
+	 * Add text
+	 */
 	public FormatBuilder withText(Text... texts) {
 		for (Text t : texts) {
 			template = template.concat(TextTemplate.of(t));

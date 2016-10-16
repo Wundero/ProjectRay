@@ -27,53 +27,87 @@ import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
 
 //really only useful for internals, but nice to have; saves time when repeating similar args
+/**
+ * Default argument for default formats to be loaded on setup into
+ * configuration.
+ */
 public class DefaultArg {
 	private Arg.Builder builder;
 	private InternalClickAction<?> click;
 	private InternalHoverAction<?> hover;
 	private boolean optional = false;
 
+	/**
+	 * Create a new Default Arg
+	 */
 	public DefaultArg(Arg.Builder b, InternalClickAction<?> c, InternalHoverAction<?> h) {
 		this.setBuilder(b);
 		this.setClick(c);
 		this.setHover(h);
 	}
 
+	/**
+	 * Create a new DefaultArg
+	 */
 	public DefaultArg(String s, InternalClickAction<?> c, InternalHoverAction<?> h) {
 		this(TextTemplate.arg(s), c, h);
 	}
 
+	/**
+	 * Return the argument
+	 */
 	public Arg.Builder getBuilder() {
 		return builder;
 	}
 
+	/**
+	 * Set the argument
+	 */
 	public DefaultArg setBuilder(Arg.Builder builder) {
 		this.builder = builder;
 		return this;
 	}
 
+	/**
+	 * Get the click action associated with this arg
+	 */
 	public InternalClickAction<?> getClick() {
 		return click;
 	}
 
+	/**
+	 * Set the click action associated with this arg.
+	 */
 	public DefaultArg setClick(InternalClickAction<?> click) {
 		this.click = click;
 		return this;
 	}
 
+	/**
+	 * Get the hover action associated with this arg.
+	 */
 	public InternalHoverAction<?> getHover() {
 		return hover;
 	}
 
+	/**
+	 * Set the hover action associated with this arg.
+	 */
 	public DefaultArg setHover(InternalHoverAction<?> hover) {
 		this.hover = hover;
 		return this;
 	}
 
+	/**
+	 * @return whether the arg is optional.
+	 */
 	public boolean isOptional() {
 		return optional;
 	}
 
+	/**
+	 * Set whether the arg is optional.
+	 */
 	public DefaultArg setOptional(boolean optional) {
 		this.optional = optional;
 		return this;

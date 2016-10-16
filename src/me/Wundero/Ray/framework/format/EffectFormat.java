@@ -44,12 +44,19 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Format type representing animated "effects". Like AnimatedFormat, however
+ * only storing an effect loaded from config.
+ */
 public class EffectFormat extends Format {
 
 	private Effect<?> effect;
 	private String type;
 	private EffectType etype;
 
+	/**
+	 * Create a new effect format.
+	 */
 	public EffectFormat(ConfigurationNode node) {
 		super(node);
 		if (node == null || node.isVirtual()) {
@@ -63,6 +70,9 @@ public class EffectFormat extends Format {
 		this.effect = etype.load(node);
 	}
 
+	/**
+	 * Creation prompt.
+	 */
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
 		return new Prompt(TextTemplate.of(TextColors.AQUA, "What type of effect would you like to use? ",
@@ -120,6 +130,9 @@ public class EffectFormat extends Format {
 		return false;
 	}
 
+	/**
+	 * Play the effect.
+	 */
 	@Override
 	public boolean send(MessageReceiver target, Map<String, Object> data, Optional<Object> sender) {
 		if (!(target instanceof Player)) {
@@ -132,6 +145,9 @@ public class EffectFormat extends Format {
 		return true;
 	}
 
+	/**
+	 * Play the effect.
+	 */
 	@Override
 	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender) {
 		if (!(target instanceof Player)) {

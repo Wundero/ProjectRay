@@ -35,6 +35,9 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.DefaultChannels;
 import me.Wundero.Ray.framework.channel.DefaultChannels.DefaultChannel;
 
+/**
+ * Load a default channel configuration into the file.
+ */
 public class ChannelSetupCommand implements CommandExecutor {
 
 	@Override

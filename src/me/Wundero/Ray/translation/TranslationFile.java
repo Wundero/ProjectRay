@@ -39,21 +39,31 @@ import org.spongepowered.api.text.translation.locale.Locales;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Represents a key-value store of translatable keys, as both a file and in
+ * memory. Each TranslationFile object represents one locale.
+ */
 public class TranslationFile {
 
-	//TODO test this
+	// TODO test this
 	private File file;
 	private Map<String, String> lines = Utils.sm();
 	private boolean usable = false;
 	private Locale locale;
 	private static Map<Locale, TranslationFile> files = Utils.sm();
 
+	/**
+	 * Load a map from file
+	 */
 	public TranslationFile(File file) {
 		this.setFile(file);
 		setLocale(Locale.forLanguageTag(file.getName().split(".")[0]));
 		parse(file, this);
 	}
 
+	/**
+	 * Get the translation for a key.
+	 */
 	public static Translation getTranslation(final String key) {
 		return new Translation() {
 
@@ -110,10 +120,16 @@ public class TranslationFile {
 		return t;
 	}
 
+	/**
+	 * Add a new translation.
+	 */
 	public String put(String key, String value) {
 		return lines.put(key, value);
 	}
 
+	/**
+	 * Get the locale this file represents
+	 */
 	public Locale getLocale() {
 		return locale;
 	}
@@ -122,6 +138,9 @@ public class TranslationFile {
 		this.locale = locale;
 	}
 
+	/**
+	 * Get whether this file has loaded
+	 */
 	public boolean isUsable() {
 		return usable;
 	}
@@ -130,6 +149,9 @@ public class TranslationFile {
 		this.usable = usable;
 	}
 
+	/**
+	 * Get the file this object loads from
+	 */
 	public File getFile() {
 		return file;
 	}

@@ -40,6 +40,9 @@ import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Format type that translates a set key into a string value. [UNTESTED]
+ */
 public class TranslatableFormat extends Format {
 
 	private String key;

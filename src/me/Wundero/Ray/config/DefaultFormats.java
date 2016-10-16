@@ -30,6 +30,9 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
 
+/**
+ * Several default formats - names correlate to context
+ */
 public class DefaultFormats {
 
 	public static final DefaultFormat BASIC_CHAT = new DefaultFormat("chat", FormatContexts.CHAT)

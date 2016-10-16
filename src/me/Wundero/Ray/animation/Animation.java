@@ -34,7 +34,8 @@ import me.Wundero.Ray.utils.Utils;
  */
 
 /**
- * generic animation class
+ * Generic animation that will iterate over a list of frames. Can repeat,
+ * cancel, pause, restart, and run asynchronously.
  */
 public class Animation<T> {
 
@@ -49,6 +50,9 @@ public class Animation<T> {
 	private Runnable stop;// what happens on stop
 	private Iterator<T> iter; // frames iter - removes need for index var
 
+	/**
+	 * Create a new animation
+	 */
 	public Animation(List<T> frames, Function<T, Integer> update, Function<T, Tristate> frameCheck) {
 		this.frames = frames;
 		this.update = update;
@@ -56,10 +60,16 @@ public class Animation<T> {
 		iter = frames.iterator();
 	}
 
+	/**
+	 * @return whether the animation is currently running
+	 */
 	public boolean isRunning() {
 		return running;
 	}
 
+	/**
+	 * Send a new frame
+	 */
 	public void update(final T frame) {// display frame call
 		Tristate t = frameCheck.apply(frame);
 		if (t == Tristate.FALSE) {
@@ -110,23 +120,40 @@ public class Animation<T> {
 		}
 	}
 
-	private T curFrame;// frame animation is about to display
+	private T curFrame = null;// frame animation is about to display
 	private Task cancellable;// task to display curFrame
 
+	/**
+	 * Start the animation
+	 */
 	public void start() {// execute first frame update if possible
+		if (curFrame != null) {
+			play();
+			return;
+		}
 		if (!running && iter.hasNext()) {
 			running = true;
 			update(curFrame = iter.next());
 		}
 	}
 
+	/**
+	 * Start the animation from where it left off.
+	 */
 	public void play() {// if we were paused, resume
+		if (curFrame == null) {
+			start();
+			return;
+		}
 		if (!running) {
 			running = true;
 			update(curFrame);
 		}
 	}
 
+	/**
+	 * Pause the animation. Execute play() to immediately resume the animation.
+	 */
 	public void pause() {// if playing, we cancel the current task but can
 							// resume
 		if (running) {
@@ -135,6 +162,10 @@ public class Animation<T> {
 		}
 	}
 
+	/**
+	 * Stop the animation. This is irrevocable if the stop function is
+	 * irrevocable.
+	 */
 	public void stop() {// if playing, cancel task and also run onStop() method
 		if (running) {
 			running = false;
@@ -145,26 +176,44 @@ public class Animation<T> {
 		}
 	}
 
+	/**
+	 * @return whether the animation will loop
+	 */
 	public boolean isLoop() {
 		return loop;
 	}
 
+	/**
+	 * Set whether the animation loops
+	 */
 	public void loop(boolean b) {
 		this.loop = b;
 	}
 
+	/**
+	 * Set whether the animation is asynchronous
+	 */
 	public void async(boolean b) {
 		this.async = b;
 	}
 
+	/**
+	 * @return whether the animation is asynchronous
+	 */
 	public boolean isAsync() {
 		return async;
 	}
 
+	/**
+	 * @return the function run when stop() is called.
+	 */
 	public Runnable getOnStop() {
 		return stop;
 	}
 
+	/**
+	 * Set the function to run when stop() is called.
+	 */
 	public void onStop(Runnable s) {
 		this.stop = s;
 	}

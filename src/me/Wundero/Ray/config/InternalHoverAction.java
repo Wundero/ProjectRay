@@ -71,6 +71,9 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		super(result);
 	}
 
+	/**
+	 * Creats a new ActionBuilder for this class.
+	 */
 	public static <T> ActionBuilder<T> builder() {
 		return new ActionBuilder<T>();
 	}
@@ -103,6 +106,9 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		}
 	}
 
+	/**
+	 * Get the type serializer for this class
+	 */
 	@SuppressWarnings("rawtypes")
 	public static TypeSerializer<InternalHoverAction> serializer() {
 		return new TypeSerializer<InternalHoverAction>() {
@@ -183,11 +189,17 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		return TextActions.showText(t.apply(p).build());
 	}
 
+	/**
+	 * Convert to a regular hover action and apply to the builder
+	 */
 	@Override
 	public void applyTo(Text.Builder builder) {
 		builder.onHover(this.toHover());
 	}
 
+	/**
+	 * Shows some parsed text.
+	 */
 	public static final class ShowTemplate extends InternalHoverAction<TextTemplate> {
 		private TextTemplate template;
 

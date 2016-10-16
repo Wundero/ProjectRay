@@ -25,9 +25,10 @@ package me.Wundero.Ray.variables;
 
 import org.spongepowered.api.text.Text;
 
+/**
+ * Represents something that will modify a returned text from a variable
+ */
 public abstract class VariableWrapper {
-
-	// TODO unsure about how to handle this
 
 	private final String key;
 
@@ -35,9 +36,15 @@ public abstract class VariableWrapper {
 		this.key = key.toLowerCase().trim();
 	}
 
+	/**
+	 * Get the name of this wrapper
+	 */
 	public final String getKey() {
 		return key;
 	}
 
+	/**
+	 * Wrap a variable and modify the text.
+	 */
 	public abstract Text parse(Variable v, Text returned);
 }

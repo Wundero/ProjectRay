@@ -63,11 +63,17 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 		super(result);
 	}
 
+	/**
+	 * Return the builder
+	 */
 	public static <T> ActionBuilder<T> builder() {
 		return new ActionBuilder<T>();
 	}
 
 	public static class ActionBuilder<R> {
+		/**
+		 * Build the action around a class
+		 */
 		@SuppressWarnings("unchecked")
 		public InternalClickAction<R> build(Class<?> type) {
 			switch (type.getSimpleName()) {
@@ -93,12 +99,18 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 
 		private R result = null;
 
+		/**
+		 * Set the result
+		 */
 		public ActionBuilder<R> withResult(R result) {
 			this.result = result;
 			return this;
 		}
 	}
 
+	/**
+	 * Get the type serializer for this class
+	 */
 	@SuppressWarnings("rawtypes")
 	public static TypeSerializer<InternalClickAction> serializer() {
 		return new ts();
@@ -184,29 +196,45 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 
 	}
 
+	/**
+	 * Convert this to a regular click action and apply it to a builder
+	 */
 	@Override
 	public void applyTo(Text.Builder builder) {
 		builder.onClick(this.toClick());
 	}
 
+	/**
+	 * Run a parsed command.
+	 */
 	public static final class RunTemplate extends ATemplate {
 		public RunTemplate(TextTemplate template) {
 			super(template);
 		}
 	}
 
+	/**
+	 * Open a parsed url.
+	 */
 	public static final class UrlTemplate extends ATemplate {
 		public UrlTemplate(TextTemplate template) {
 			super(template);
 		}
 	}
 
+	/**
+	 * Suggest a parsed command.
+	 */
 	public static final class SuggestTemplate extends ATemplate {
 		public SuggestTemplate(TextTemplate template) {
 			super(template);
 		}
 	}
 
+	/**
+	 * Template action superclass - stores a template and will apply and load
+	 * it.
+	 */
 	public static class ATemplate extends InternalClickAction<TextTemplate> {
 		private TextTemplate template;
 

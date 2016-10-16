@@ -38,6 +38,10 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
 
+/**
+ * Start talking to a channel. If the channel is not being listened to, listen
+ * to that channel.
+ */
 public class ChannelJoinCommand implements CommandExecutor {
 
 	@Override

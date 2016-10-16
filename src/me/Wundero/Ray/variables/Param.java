@@ -23,6 +23,9 @@ package me.Wundero.Ray.variables;
  SOFTWARE.
  */
 
+/**
+ * Represents all parts of a parsabledata and a few extras
+ */
 public enum Param {
 	SENDER, RECIPIENT, FORMAT, TEMPLATE, DATA, OBSERVER, PARSABLE;
 }

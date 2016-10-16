@@ -34,6 +34,9 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.conversation.format.FormatConversation;
 
+/**
+ * Start the format creation conversation
+ */
 public class FormatConversationCommand implements CommandExecutor {
 
 	@Override

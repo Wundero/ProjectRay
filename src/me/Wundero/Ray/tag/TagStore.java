@@ -30,10 +30,16 @@ import org.apache.commons.lang3.Validate;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Storage for all tags.
+ */
 public class TagStore {
 
 	private Map<String, Tag<?>> tags = Utils.sm();
 
+	/**
+	 * Register a new tag
+	 */
 	void register(Tag<?> t) {
 		if (has(t.getName())) {
 			return;
@@ -41,10 +47,16 @@ public class TagStore {
 		this.tags.put(t.getName(), t);
 	}
 
+	/**
+	 * Check to see if a tag exists
+	 */
 	public boolean has(String name) {
 		return tags.containsKey(name);
 	}
 
+	/**
+	 * Get a tag, if it exists
+	 */
 	@SuppressWarnings("unchecked")
 	public <T, R extends Tag<T>> Optional<R> get(String name, T verifiable, Class<R> tagClass) {
 		Tag<?> t = get(name).orElse(null);
@@ -60,6 +72,9 @@ public class TagStore {
 		return Optional.empty();
 	}
 
+	/**
+	 * Get a tag, if it exists
+	 */
 	public Optional<Tag<?>> get(String name) {
 		Validate.notEmpty(name);
 		return Optional.ofNullable(tags.get(name));

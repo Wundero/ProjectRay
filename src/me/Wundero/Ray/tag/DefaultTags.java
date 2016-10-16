@@ -23,6 +23,9 @@ package me.Wundero.Ray.tag;
  SOFTWARE.
  */
 
+/**
+ * Pseudo-enum list of all default tags
+ */
 public class DefaultTags {
 
 	// TODO impl the tag onto this

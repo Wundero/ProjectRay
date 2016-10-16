@@ -27,6 +27,9 @@ import java.util.Map;
 
 import org.spongepowered.api.text.Text;
 
+/**
+ * Represents a parsable variable
+ */
 public abstract class Variable {
 	private final String key;
 
@@ -34,8 +37,14 @@ public abstract class Variable {
 		this.key = key.toLowerCase().trim();
 	}
 
+	/**
+	 * Parse a variable based on data
+	 */
 	public abstract Text parse(Map<Param, Object> objects);
 
+	/**
+	 * @return the key of the variable
+	 */
 	public final String getKey() {
 		return key;
 	}

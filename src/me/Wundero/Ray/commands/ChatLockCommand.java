@@ -36,6 +36,9 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.features.ChatLock;
 
+/**
+ * Toggle whether the chat is locked.
+ */
 public class ChatLockCommand implements CommandExecutor {
 
 	@Override

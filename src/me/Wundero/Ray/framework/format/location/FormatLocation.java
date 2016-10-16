@@ -31,6 +31,9 @@ import me.Wundero.Ray.framework.format.Format;
  SOFTWARE.
  */
 
+/**
+ * Represents a place to which a message can be sent.
+ */
 public abstract class FormatLocation {
 
 	private final String name;
@@ -39,10 +42,16 @@ public abstract class FormatLocation {
 		this.name = name;
 	}
 
+	/**
+	 * @return the location's name.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Send a message to the location.
+	 */
 	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender);
 
 }

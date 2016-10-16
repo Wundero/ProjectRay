@@ -25,6 +25,10 @@ import java.util.regex.Pattern;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+/**
+ * Represents a context for a format. A context is how the plugin decides when
+ * to send a format.
+ */
 public class FormatContext {
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
@@ -33,32 +37,53 @@ public class FormatContext {
 	private String[] aliases;
 	private String name;
 
+	/**
+	 * Create a new context.
+	 */
 	public FormatContext(String name) {
 		this.setName(name);
 		this.setAliases(new String[] {});
 	}
 
+	/**
+	 * Create a new context.
+	 */
 	public FormatContext(String name, String[] aliases) {
 		this.setName(name);
 		this.setAliases(aliases);
 	}
 
+	/**
+	 * @return the aliases for the name.
+	 */
 	public String[] getAliases() {
 		return aliases;
 	}
 
+	/**
+	 * Set the aliases.
+	 */
 	public void setAliases(String[] aliases) {
 		this.aliases = aliases;
 	}
 
+	/**
+	 * @return the name.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Set the name.
+	 */
 	public void setName(String name) {
 		this.name = name.trim();
 	}
 
+	/**
+	 * Get a context from a string.
+	 */
 	public static FormatContext fromString(String s) {
 		if (s == null) {
 			return FormatContexts.DEFAULT;

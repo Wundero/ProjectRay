@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -105,6 +106,13 @@ public class Utils {
 	 */
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
+	}
+
+	/**
+	 * Remove non-null elements from a collection
+	 */
+	public static <T, C extends Collection<T>> Collection<T> nonNull(Collection<T> original, Supplier<C> factory) {
+		return original.stream().filter(t -> t != null).collect(Collectors.toCollection(factory));
 	}
 
 	/**

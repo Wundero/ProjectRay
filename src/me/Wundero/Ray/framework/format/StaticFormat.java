@@ -48,6 +48,9 @@ import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Standard format type that simply sends a text to the location.
+ */
 public class StaticFormat extends Format {
 	private TextTemplate template;
 
@@ -86,6 +89,9 @@ public class StaticFormat extends Format {
 		this.template = template;
 	}
 
+	/**
+	 * @return the template this parses, if it exists.
+	 */
 	public Optional<TextTemplate> getTemplate() {
 		if (usable) {
 			return Optional.ofNullable(template);

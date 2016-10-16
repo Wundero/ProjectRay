@@ -40,14 +40,25 @@ import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * This is a tag that has several "subtags", of which players can choose from to
+ * have parsed when this tag variable is parsed.
+ */
 public class SelectableTag extends Tag<Map<String, TextTemplate>> implements RaySerializable {
 
 	// TODO gui & cmd for selecting this
 
+	/**
+	 * Create a new SelectableTag
+	 */
 	public SelectableTag(String name, Map<String, TextTemplate> object) {
 		super(name, object);
 	}
 
+	/**
+	 * Verify if an object matches types with the generic type of this class
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean verify(Object o) {
 		if (!(o instanceof Map)) {
@@ -64,6 +75,9 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		}
 	}
 
+	/**
+	 * Get the textual tag for a player
+	 */
 	@Override
 	public Optional<Text> get(Optional<ParsableData> d) {
 		if (!d.isPresent()) {
@@ -78,10 +92,11 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		}
 		Player s = data.getSender().get();
 		RayPlayer r = RayPlayer.get(s);
-		String v = r.getSelected(this);
-		if (v == null) {
+		Optional<String> v2 = r.getSelected(this);
+		if (!v2.isPresent()) {
 			return Optional.empty();
 		}
+		String v = v2.get();
 		TextTemplate t = this.object.get(v);
 		Map<String, Object> dat = d.get().getKnown().orElse(Utils.sm());
 		dat.put("tag:" + v, "");// non recursive variable parse
@@ -91,6 +106,9 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		return Optional.ofNullable(t2);
 	}
 
+	/**
+	 * Save data to a configuration node
+	 */
 	@Override
 	public void serialize(ConfigurationNode onto) throws ObjectMappingException {
 		TextTemplate.of();
@@ -99,6 +117,9 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		}
 	}
 
+	/**
+	 * Load data from a configuration node
+	 */
 	@Override
 	public void deserialize(ConfigurationNode from) throws ObjectMappingException {
 		TextTemplate.of();

@@ -37,6 +37,9 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.Ray.framework.player.RayPlayer;
 
+/**
+ * Set your quote.
+ */
 public class QuoteCommand implements CommandExecutor {
 
 	@Override

@@ -44,8 +44,14 @@ import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.tag.Tag;
 import me.Wundero.Ray.utils.TextUtils;
 
+/**
+ * Class that loads default variables that come with the plugin into the store.
+ */
 public class DefaultVariables {
 
+	/**
+	 * Register all default vars and wrappers
+	 */
 	public static void register(Variables v) {
 		v.registerWrapper("stripped", (va, t) -> {
 			return TextUtils.strip(t);

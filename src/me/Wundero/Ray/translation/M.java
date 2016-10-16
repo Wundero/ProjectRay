@@ -25,11 +25,20 @@ package me.Wundero.Ray.translation;
 
 import org.spongepowered.api.text.Text;
 
+/**
+ * Simple class to translate messages.
+ */
 public class M {
+	/**
+	 * Translate a key.
+	 */
 	public static Text t(String key, Object... args) {
 		return Text.of(TranslationFile.getTranslation(key), args);
 	}
 
+	/**
+	 * Translate a key.
+	 */
 	public static Text translate(String key, Object... args) {
 		return t(key, args);
 	}

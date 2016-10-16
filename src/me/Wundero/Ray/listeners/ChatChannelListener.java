@@ -31,8 +31,15 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
 
+/**
+ * Listens to events to make sure channels are joined and left properly.
+ */
 public class ChatChannelListener {
 
+	/**
+	 * Registers players to listen to all channels allowed, and joins the most
+	 * populated channel
+	 */
 	@Listener(order = Order.EARLY)
 	public void onJoin(ClientConnectionEvent.Join event) {
 		if (!Ray.get().getChannels().useChannels()) {
@@ -64,6 +71,10 @@ public class ChatChannelListener {
 
 	}
 
+	/**
+	 * Remove the player from the channel.
+	 */
+	// TODO verify that this works.
 	@Listener(order = Order.LATE)
 	public void onLeave(ClientConnectionEvent.Disconnect event) {
 		if (!Ray.get().getChannels().useChannels()) {
@@ -71,9 +82,7 @@ public class ChatChannelListener {
 		}
 		for (ChatChannel c : Ray.get().getChannels().getAllChannels()) {
 			if (c.getMembersCollection().contains(event.getTargetEntity().getUniqueId())) {
-				c.removeMember(event.getTargetEntity().getUniqueId());// not
-																		// removing
-																		// properly?
+				c.removeMember(event.getTargetEntity().getUniqueId());
 			}
 		}
 	}

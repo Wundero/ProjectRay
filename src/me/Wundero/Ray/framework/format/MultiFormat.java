@@ -43,6 +43,10 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Format type that holds multiple subformats, and selects based on a selection
+ * mode which to use.
+ */
 public class MultiFormat extends Format {
 
 	private List<Format> formats = Utils.sl();

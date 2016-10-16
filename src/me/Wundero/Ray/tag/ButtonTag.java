@@ -32,6 +32,9 @@ import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Represents a tag that will be used like a button in chat.
+ */
 public class ButtonTag extends Tag<Text> {
 
 	public ButtonTag(String name, Text object) {

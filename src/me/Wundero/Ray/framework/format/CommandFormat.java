@@ -56,6 +56,9 @@ public class CommandFormat extends Format {
 	private boolean cancel = false;
 	private Format format;
 
+	/**
+	 * Create a command format.
+	 */
 	public CommandFormat(ConfigurationNode node, Format internal) {
 		super(node);
 		if (node == null || node.isVirtual()) {
@@ -86,6 +89,9 @@ public class CommandFormat extends Format {
 		}).submit(Ray.get().getPlugin());
 	}
 
+	/**
+	 * Parse a command.
+	 */
 	@Listener
 	public void onCommand(SendCommandEvent event) {
 		if (!event.getCause().containsType(Player.class)) {
@@ -115,6 +121,9 @@ public class CommandFormat extends Format {
 		}
 	}
 
+	/**
+	 * Creation prompt
+	 */
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
 		return new Prompt(TextTemplate.of("What command would you like to fire this format on?")) {
@@ -157,16 +166,25 @@ public class CommandFormat extends Format {
 		};
 	}
 
+	/**
+	 * Send the message to the internal format.
+	 */
 	@Override
 	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> opt) {
 		return format.send(target, args, opt);
 	}
 
+	/**
+	 * Send the message to the internal format.
+	 */
 	@Override
 	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> opt) {
 		return format.send(target, data, opt);
 	}
 
+	/**
+	 * Whether the wrapped format is or has the right class.
+	 */
 	@Override
 	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
 		if (format.getClass().equals(clazz)) {
@@ -175,6 +193,10 @@ public class CommandFormat extends Format {
 		return format.hasInternal(clazz, index);
 	}
 
+	/**
+	 * Returned the wrapped format if it is the right class. If it is not,
+	 * return what the wrapped format's getInternal returns.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {

@@ -31,6 +31,10 @@ import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.utils.TextUtils;
 
+/**
+ * Scroll over a large text within a frame. Example: abcdefghijklmnopqrstuvwxyz
+ * with a frame of 5 -> abcdefg [hijkl] mnopqrstuvwxyz
+ */
 public class TextScrollEffect extends Effect<Text> {
 
 	private TextScrollEffect(Text obj, BiFunction<Text, Integer, Text> mod, int f, int d) {
@@ -45,6 +49,9 @@ public class TextScrollEffect extends Effect<Text> {
 		return s;
 	}
 
+	/**
+	 * Create a new text scrolling effect
+	 */
 	public static TextScrollEffect create(Text o, Optional<Integer> framelength, Optional<Integer> spaces,
 			Optional<Integer> charchange, Optional<Integer> delay) {
 		final int f = framelength.orElse(16);
@@ -77,6 +84,9 @@ public class TextScrollEffect extends Effect<Text> {
 		return new TextScrollEffect(officialObject, mod, TextUtils.length(officialObject) + s, d);
 	}
 
+	/**
+	 * Send the object to the player.
+	 */
 	@Override
 	public boolean send(BiFunction<Text, Player, Boolean> sender, Text obj, Player p) {
 		return sender.apply(obj, p);

@@ -34,6 +34,9 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.conversation.channel.ChatChannelConversation;
 
+/**
+ * Start the channel creation conversation
+ */
 public class ChannelConversationCommand implements CommandExecutor {
 
 	@Override

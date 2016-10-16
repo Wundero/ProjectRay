@@ -47,6 +47,10 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Represents a sendable object. Generic class that allows players to create
+ * dynamic formats depending on need.
+ */
 public abstract class Format {
 	private FormatContext context;
 	private String name;
@@ -59,8 +63,15 @@ public abstract class Format {
 		return o instanceof Format && ((Format) o).name.equals(this.name);
 	}
 
+	/**
+	 * Create a prompt for building the format.SF
+	 */
 	public abstract Prompt getConversationBuilder(Prompt returnTo, ConversationContext context);
 
+	/**
+	 * Build a conversation with a prompt to return to, context established, and
+	 * a node to set the context node to.
+	 */
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode) {
 		ConfigurationNode oldNode = c.getData("node");
 		oldNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
@@ -69,6 +80,10 @@ public abstract class Format {
 		return new FormatPrompt(p == null ? null : new WrapperPrompt(p, oldNode, c));
 	}
 
+	/**
+	 * Build a conversation with a prompt to return to, context established, a
+	 * format to build from, and a node to set the context node to.
+	 */
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode,
 			final Format chosen) {
 		ConfigurationNode oldNode = c.getData("node");
@@ -78,8 +93,20 @@ public abstract class Format {
 		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
 	}
 
+	/**
+	 * A method to get an internal format. Used only to execute console commands
+	 * from the Executing format type.
+	 * 
+	 * @return the internal format matching the class, if it exists.
+	 */
 	public abstract <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index);
 
+	/**
+	 * A method to check if an internal format exists. Used only to execute
+	 * console commands from the Executing format type.
+	 * 
+	 * @return whether the internal format matching the class exists.
+	 */
 	public abstract boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index);
 
 	private static class WrapperPrompt extends Prompt {
@@ -175,18 +202,34 @@ public abstract class Format {
 
 	// irrelevant boolean to prevent method signature conflicts
 
+	/**
+	 * Send a message to the location of this format, parsing for variables.
+	 */
 	public boolean send(MessageReceiver target, Map<String, Object> args, Object o, boolean irrelevant) {
 		return send(target, args, Optional.ofNullable(o));
 	}
 
+	/**
+	 * Send a message to the location of this format, parsing for variables.
+	 */
 	public boolean send(MessageReceiver target, ParsableData data, Object o, boolean irrelevant) {
 		return send(target, data, Optional.ofNullable(o));
 	}
 
+	/**
+	 * Send a message to the location of this format, parsing for variables.
+	 */
 	public abstract boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender);
 
+	/**
+	 * Send a message to the location of this format, parsing for variables.
+	 */
 	public abstract boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender);
 
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
 	protected boolean s(MessageReceiver target, Map<String, Object> a, TextTemplate t, Optional<Object> sender) {
 		Text te = get(t, a);
 		te = TextUtils.vars(te, new ParsableData().setKnown(a));
@@ -194,6 +237,10 @@ public abstract class Format {
 		return loc.send(te, target, this, sender);
 	}
 
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
 	protected boolean s(MessageReceiver target, ParsableData d, TextTemplate t, Optional<Object> sender) {
 		Text te = get(t, d);
 		te = TextUtils.vars(te, d);
@@ -201,26 +248,43 @@ public abstract class Format {
 		return loc.send(te, target, this, sender);
 	}
 
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
 	protected boolean s(MessageReceiver target, Map<String, Object> a, Text te, Optional<Object> sender) {
 		te = TextUtils.vars(te, new ParsableData().setKnown(a));
 		te = TextUtils.urls(te);
 		return loc.send(te, target, this, sender);
 	}
 
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
 	protected boolean s(MessageReceiver target, ParsableData d, Text te, Optional<Object> sender) {
 		te = TextUtils.vars(te, d);
 		te = TextUtils.urls(te);
 		return loc.send(te, target, this, sender);
 	}
 
+	/**
+	 * Apply data to template and build.
+	 */
 	protected Text get(TextTemplate t, Map<String, Object> data) {
 		return t.apply(data).build();
 	}
 
+	/**
+	 * Apply data to template and build.
+	 */
 	protected Text get(TextTemplate t, ParsableData data) {
 		return t.apply(parse(t, data)).build();
 	}
 
+	/**
+	 * Return the map of variables parsed for the data.
+	 */
 	protected Map<String, Object> parse(TextTemplate t, ParsableData data) {
 		if (data == null) {
 			return Utils.sm();
@@ -229,15 +293,24 @@ public abstract class Format {
 				data.getObserver(), Optional.of(this), data.isClickHover());
 	}
 
+	/**
+	 * @return the name of the format.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Set the name of the format.
+	 */
 	public Format setName(String name) {
 		this.name = name;
 		return this;
 	}
 
+	/**
+	 * Create a new format from a configuration node.
+	 */
 	public static Format create(ConfigurationNode node) {
 		if (node == null || node.isVirtual()) {
 			return null;
@@ -272,6 +345,12 @@ public abstract class Format {
 		return out;
 	}
 
+	/**
+	 * Create a new format.
+	 * 
+	 * NOTE: All extending classes should handle null nodes, for the
+	 * conversation builder.
+	 */
 	public Format(final ConfigurationNode node) {
 		this.setNode(Optional.ofNullable(node));
 		if (node == null || node.isVirtual()) {
@@ -286,39 +365,66 @@ public abstract class Format {
 		// forces type to be present
 	}
 
+	/**
+	 * Set where the message is to be sent.
+	 */
 	public void setLocation(FormatLocation loc) {
 		this.loc = loc;
 	}
 
+	/**
+	 * Set where the message is to be sent.
+	 */
 	public void setLocation(String name) {
 		this.loc = FormatLocations.fromString(name);
 	}
 
+	/**
+	 * Get where the message is to be sent.
+	 */
 	public FormatLocation getLocation() {
 		return loc;
 	}
 
+	/**
+	 * @return whether this format has finished loading.
+	 */
 	public boolean usable() {
 		return usable;
 	}
 
+	/**
+	 * Get the context of the format.
+	 */
 	public FormatContext getContext() {
 		return context;
 	}
 
+	/**
+	 * Set the context of the format.
+	 */
 	public Format setContext(FormatContext context) {
 		this.context = context;
 		return this;
 	}
 
+	/**
+	 * Get the config node of the format.
+	 */
 	public Optional<ConfigurationNode> getNode() {
 		return node;
 	}
 
+	/**
+	 * Set the config node of the format.
+	 */
 	public void setNode(Optional<ConfigurationNode> node) {
 		this.node = node;
 	}
 
+	/**
+	 * Return an empty Format based on the arg passed.
+	 */
 	public static Format valueOf(String arg) {
 		switch (arg.toLowerCase().trim()) {
 		case "animated":

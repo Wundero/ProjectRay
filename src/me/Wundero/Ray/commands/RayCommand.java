@@ -42,6 +42,9 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Help for all Ray commands.
+ */
 public class RayCommand implements CommandExecutor {
 
 	@Override

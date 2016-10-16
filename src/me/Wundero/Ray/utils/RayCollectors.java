@@ -27,8 +27,14 @@ import java.util.stream.Collector;
  SOFTWARE.
  */
 
+/**
+ * Some collectors for streams that are useful.
+ */
 public class RayCollectors {
 
+	/**
+	 * Create a synch list from a stream
+	 */
 	public static <T> Collector<T, List<T>, List<T>> rayList() {
 		return Collector.of(() -> Utils.sl(), List::add, (a, b) -> {
 			a.addAll(b);

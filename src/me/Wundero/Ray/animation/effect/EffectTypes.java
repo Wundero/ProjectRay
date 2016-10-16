@@ -37,10 +37,16 @@ import me.Wundero.Ray.animation.effect.EffectType.Setting;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Pseudo-enum list of all effect types
+ */
 public class EffectTypes {
 
 	private static List<EffectType> types;
 
+	/**
+	 * Highlight parts of text with color, scrolls to the right
+	 */
 	public static final EffectType RAINBOW_TEXT = new EffectType("rainbow", s -> {
 		TextColor orig = TextSerializers.FORMATTING_CODE.deserialize(s.getNode("text").getString("")).getColor();
 		String g = s.getNode("color").getString();
@@ -60,6 +66,9 @@ public class EffectTypes {
 		}
 	}, Utils.sl(new Setting("text", String.class, false), new Setting("color", String.class, false),
 			new Setting("second-color", String.class, true), new Setting("delay", Integer.class, true)));
+	/**
+	 * Scroll over a large text for a certain frame length
+	 */
 	public static final EffectType SCROLL_TEXT = new EffectType("scroll", s -> {
 		Text obj;
 		try {
@@ -78,10 +87,16 @@ public class EffectTypes {
 			new Setting("character-skip", Integer.class, true), new Setting("spaces", Integer.class, true),
 			new Setting("framelength", Integer.class, true)));
 
+	/**
+	 * @return all effect types
+	 */
 	public static List<EffectType> values() {
 		return Utils.sl(types);
 	}
 
+	/**
+	 * Get an effect type from it's name
+	 */
 	public static EffectType from(String s) {
 		s = s.toLowerCase().trim();
 		for (EffectType t : types) {

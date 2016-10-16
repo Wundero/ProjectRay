@@ -46,8 +46,14 @@ import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Singleton instances of locations. Proper descriptions on the Wiki.
+ */
 public class FormatLocations {
 
+	/**
+	 * Get a location from a string.
+	 */
 	public static FormatLocation fromString(String val) {
 		val = val.toLowerCase().trim();
 		switch (val) {

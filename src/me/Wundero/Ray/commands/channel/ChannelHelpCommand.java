@@ -40,6 +40,9 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * List channel related commands.
+ */
 public class ChannelHelpCommand implements CommandExecutor {
 
 	@Override

@@ -38,6 +38,10 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
 
+/**
+ * Stop listening to a channel. If you are speaking to the channel, that will
+ * also cease. If no channel is specified, the current speaking channel is used.
+ */
 public class ChannelLeaveCommand implements CommandExecutor {
 
 	@Override

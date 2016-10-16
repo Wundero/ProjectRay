@@ -34,6 +34,9 @@ import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Child commands of /ray
+ */
 public class Commands {
 
 	private static Map<List<String>, CommandCallable> children = Utils.sm();
@@ -62,10 +65,16 @@ public class Commands {
 						.description(Text.of("Filter chat messages")).build());
 	}
 
+	/**
+	 * Get all children
+	 */
 	public static Map<List<String>, ? extends CommandCallable> getChildren() {
 		return children;
 	}
 
+	/**
+	 * Get main command
+	 */
 	public static CommandExecutor getExecutor() {
 		return new RayCommand();
 	}

@@ -47,6 +47,9 @@ import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Message a player privately.
+ */
 public class MessageCommand implements CommandExecutor {
 
 	@Override

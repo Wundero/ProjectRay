@@ -26,6 +26,10 @@ package me.Wundero.Ray.config;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Represents a class which can be serialized or deserialized into a
+ * configuration file.
+ */
 public interface RaySerializable {
 
 	public void serialize(ConfigurationNode onto) throws ObjectMappingException;

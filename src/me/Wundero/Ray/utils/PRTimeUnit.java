@@ -175,6 +175,9 @@ public enum PRTimeUnit {
 		}
 	},
 
+	/**
+	 * Time unit representing 1/20th of a second
+	 */
 	TICKS {
 		public double toNanos(double d) {
 			return x(d, C7 / C0, MAX / (C7 / C0));

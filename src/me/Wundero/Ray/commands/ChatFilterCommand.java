@@ -37,6 +37,9 @@ import me.Wundero.Ray.features.ChatFilter;
  SOFTWARE.
  */
 
+/**
+ * Toggle whether the chat is being filtered.
+ */
 public class ChatFilterCommand implements CommandExecutor {
 
 	@Override

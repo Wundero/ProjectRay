@@ -37,6 +37,9 @@ import me.Wundero.Ray.utils.TextUtils;
  SOFTWARE.
  */
 
+/**
+ * Represents a linkable social media
+ */
 public enum SocialMedia {
 	YOUTUBE(Text.of(TextColors.DARK_RED, "[" + '\u25b6' + "]"), name -> {
 		try {
@@ -76,6 +79,9 @@ public enum SocialMedia {
 		}
 	}, s -> s.replace(" ", "."));
 
+	/**
+	 * Load a social media from name
+	 */
 	public static SocialMedia fromString(String s) {
 		if (s == null) {
 			return null;
@@ -121,16 +127,25 @@ public enum SocialMedia {
 		this(t, app, s -> s);
 	}
 
+	/**
+	 * Get the text tag without parsing for the username
+	 */
 	public Text getTag() {
 		return tag;
 	}
 
+	/**
+	 * Makes the text click action link to the player's chosen social media
+	 */
 	public Text formatTag(URL u) {
 		return TextUtils
 				.apply(getTag().toBuilder(), Optional.of(TextActions.openUrl(u)), Optional.empty(), Optional.empty())
 				.build();
 	}
 
+	/**
+	 * Get the url for the player's chosen media
+	 */
 	public URL apply(UUID u) {
 		if (RayPlayer.get(u) != null) {
 			return apply(RayPlayer.get(u));
@@ -139,14 +154,23 @@ public enum SocialMedia {
 		}
 	}
 
+	/**
+	 * Get the url for the player's chosen media
+	 */
 	public URL apply(RayPlayer r) {
 		return apply(r.getUser());
 	}
 
+	/**
+	 * Get the url for the player's chosen media
+	 */
 	public URL apply(User u) {
 		return apply(u.getName());
 	}
 
+	/**
+	 * Get the url for the player's chosen media
+	 */
 	public URL apply(String name) {
 		return userApplier.apply(sanitizer.apply(name));
 	}

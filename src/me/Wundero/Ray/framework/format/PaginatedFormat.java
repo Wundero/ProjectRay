@@ -39,6 +39,9 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Format type that splits formats into pages [each format is a page].
+ */
 public class PaginatedFormat extends Format {
 
 	private List<Format> pages = Utils.sl();

@@ -27,15 +27,24 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * Quasi-enum list of templates that can be applied to the config
+ */
 public class Templates {
 
 	// pseudo-enum methods that create configs when they are not already there.
 
+	/**
+	 * Build a basic config
+	 */
 	public static Template DEFAULT(Template.Builder t) {
 		// basic chat format
 		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.BASIC_CHAT).build().build();
 	}
 
+	/**
+	 * Build a more advanced config
+	 */
 	public static Template ADVANCED(Template.Builder t) {
 		// chat, join, leave and msg
 		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)
@@ -43,6 +52,11 @@ public class Templates {
 				.withFormat(DefaultFormats.MSG_SEND).build().build();
 	}
 
+	/**
+	 * Build a config with all format contexts, types and locations for testing.
+	 * 
+	 * NOTE: NOT ALL TYPES AND LOCATIONS HAVE BEEN USED IN THIS YET.
+	 */
 	public static Template TESTING(Template.Builder t) {
 		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)
 				.withFormat(DefaultFormats.LEAVE).withFormat(DefaultFormats.MSG_RECEIVE)
@@ -53,6 +67,9 @@ public class Templates {
 				.withFormat(DefaultFormats.WELCOME).build().build();
 	}
 
+	/**
+	 * Build an advanced, multi-group config
+	 */
 	public static Template MULTI_GROUP(Template.Builder t) {
 		// chat join and leave for two groups - not gonna use def formats
 		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)

@@ -69,6 +69,9 @@ import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 
+/**
+ * Main listener for contexts
+ */
 public class MainListener {
 
 	private boolean handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
@@ -162,6 +165,9 @@ public class MainListener {
 		return false;
 	}
 
+	/**
+	 * Fires chat context unless cause contains a separate context
+	 */
 	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
 		Map<String, Object> vars = Utils.sm();
@@ -195,6 +201,9 @@ public class MainListener {
 		}
 	}
 
+	/**
+	 * Fires join, motd, welcome and tab based contexts
+	 */
 	@Listener(order = Order.LATE)
 	public void onJoin(ClientConnectionEvent.Join event) {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
@@ -293,7 +302,9 @@ public class MainListener {
 		}).submit(Ray.get().getPlugin());
 	}
 
-	// Logs ALL commands that are handled by the server
+	/**
+	 * Logs commands sent by players, as well as sending them to spies.
+	 */
 	@Listener(order = Order.POST)
 	public void onCommand(SendCommandEvent event) {
 		String player = "";
@@ -333,6 +344,9 @@ public class MainListener {
 		}
 	}
 
+	/**
+	 * Fires the leave context
+	 */
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
 		Map<String, Object> vars = Utils.sm();
@@ -341,6 +355,9 @@ public class MainListener {
 		RayPlayer.updateTabs();
 	}
 
+	/**
+	 * Fires the kick context
+	 */
 	@Listener
 	public void onKick(KickPlayerEvent event) {
 		Map<String, Object> vars = Utils.sm();
@@ -349,6 +366,9 @@ public class MainListener {
 		RayPlayer.updateTabs();
 	}
 
+	/**
+	 * Fires the achievement context
+	 */
 	@Listener
 	public void onAch(GrantAchievementEvent.TargetPlayer event) {
 		Map<String, Object> vars = Utils.sm();

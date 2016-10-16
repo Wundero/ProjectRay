@@ -35,6 +35,9 @@ import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * Tag that can be used to link to player social media
+ */
 public class SocialMediaTag extends Tag<SocialMedia> {
 
 	public SocialMediaTag(String name, SocialMedia medium) {

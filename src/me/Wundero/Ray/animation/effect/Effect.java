@@ -51,6 +51,9 @@ public abstract class Effect<T> {
 
 	private Animation<T> anim;// animation for sending
 
+	/**
+	 * Create a new effect
+	 */
 	public Effect(T obj, BiFunction<T, Integer, T> mod, BiFunction<T, ParsableData, T> parser, int f, int d) {
 		this.object = obj;
 		this.mod = mod;
@@ -59,56 +62,95 @@ public abstract class Effect<T> {
 		this.parser = parser;
 	}
 
+	/**
+	 * Send the effect frame to a player.
+	 */
 	public abstract boolean send(BiFunction<Text, Player, Boolean> sender, T obj, Player p);
 
 	// access methods for anim - this cannot impl anim so instead has this
 
+	/**
+	 * Set whether the effect loops
+	 */
 	public void loop(boolean l) {
 		anim.loop(l);
 	}
 
+	/**
+	 * @return whether the effect loops
+	 */
 	public boolean loop() {
 		return anim.isLoop();
 	}
 
+	/**
+	 * Stop playing the effect
+	 */
 	public void stop() {
 		anim.stop();
 	}
 
+	/**
+	 * Start playing the effect
+	 */
 	public void start() {
 		anim.start();
 	}
 
+	/**
+	 * Set the stop function of the effect
+	 */
 	public void onStop(Runnable r) {
 		anim.onStop(r);
 	}
 
+	/**
+	 * Get the stop function of the effect
+	 */
 	public Runnable getOnStop() {
 		return anim.getOnStop();
 	}
 
+	/**
+	 * Get whether the effect is asynchronous
+	 */
 	public boolean async() {
 		return anim.isAsync();
 	}
 
+	/**
+	 * Set whether the effect is asynchronous
+	 */
 	public void async(boolean a) {
 		anim.async(a);
 	}
 
+	/**
+	 * Pause the effect
+	 */
 	public void pause() {
 		anim.pause();
 	}
 
+	/**
+	 * Resume the effect
+	 */
 	public void play() {
 		anim.play();
 	}
 
 	// TODO animation effect that supports T as vars - gen vars and then setup?
 
+	/**
+	 * Create the animation underlying this effect
+	 */
 	public void setupAnimation(Player p, Map<String, Object> d, BiFunction<Text, Player, Boolean> sender) {
 		setupAnimation(p, new ParsableData().setKnown(d), sender);
 	}
 
+	/**
+	 * Create the animation underlying this effect
+	 */
 	public void setupAnimation(Player p, ParsableData d, BiFunction<Text, Player, Boolean> sender) {
 		List<T> framez = Utils.sl();
 		for (int i = 0; i < frames; i++) {
@@ -130,22 +172,38 @@ public abstract class Effect<T> {
 		}, (f) -> Tristate.TRUE);
 	}
 
+	/**
+	 * Get the object upon which modifications are made to generate frames
+	 */
 	public T getObject() {
 		return object;
 	}
 
+	/**
+	 * Get the number of frames
+	 */
 	public int getFrames() {
 		return frames;
 	}
 
+	/**
+	 * Get the delay between each frame
+	 */
 	public int getDelay() {
 		return delay;
 	}
 
+	/**
+	 * Get the modifying function for this effect
+	 */
 	public BiFunction<T, Integer, T> getMod() {
 		return mod;
 	}
 
+	/**
+	 * Set the variable parser. [parses T for variables then returns a modified
+	 * T]
+	 */
 	public void setParser(BiFunction<T, ParsableData, T> parser) {
 		if (anim != null) {
 			return;
@@ -153,10 +211,16 @@ public abstract class Effect<T> {
 		this.parser = parser;
 	}
 
+	/**
+	 * Get the modified objects as a list.
+	 */
 	public List<T> getObjects() {
 		return objects;
 	}
 
+	/**
+	 * Set the list of modified objects.
+	 */
 	public void setObjects(List<T> objects) {
 		this.objects = objects;
 	}

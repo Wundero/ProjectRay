@@ -36,6 +36,9 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.framework.player.RayPlayer;
 
+/**
+ * Toggle whether a player is being ignored.
+ */
 public class IgnoreCommand implements CommandExecutor {
 
 	@Override
@@ -44,7 +47,7 @@ public class IgnoreCommand implements CommandExecutor {
 			src.sendMessage(Text.of(TextColors.RED, "You must be a player to ignore people!"));
 			return CommandResult.success();
 		}
-		Optional<Player> target = args.<Player>getOne("player");
+		Optional<Player> target = args.<Player> getOne("player");
 		if (!target.isPresent()) {
 			src.sendMessage(Text.of(TextColors.RED, "You must specify a player to ignore!"));
 			return CommandResult.success();

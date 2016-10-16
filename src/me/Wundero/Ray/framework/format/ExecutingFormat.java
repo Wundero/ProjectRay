@@ -46,11 +46,17 @@ import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
 
+/**
+ * Format type that sends commands when it is triggered.
+ */
 public class ExecutingFormat extends Format {
 
 	private Format wrapped;
 	private Map<String, Boolean> cmds = Utils.sm();
 
+	/**
+	 * Create a new executing format.
+	 */
 	public ExecutingFormat(ConfigurationNode node, Format internal) {
 		super(node);
 		if (node == null) {
@@ -67,6 +73,7 @@ public class ExecutingFormat extends Format {
 		}
 	}
 
+	@Override
 	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
 		if (wrapped.getClass().equals(clazz)) {
 			return true;
@@ -168,6 +175,9 @@ public class ExecutingFormat extends Format {
 
 	private List<UUID> senders = Utils.sl();
 
+	/**
+	 * Execute commands from the console; only fires once per trigger.
+	 */
 	public boolean execConsoles(UUID from, long timeoutMillis) {
 		if (senders.contains(from)) {
 			return false;
