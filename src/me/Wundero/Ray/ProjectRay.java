@@ -22,6 +22,7 @@ import org.spongepowered.api.text.Text;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
+import me.Wundero.Ray.commands.AfkCommand;
 import me.Wundero.Ray.commands.ClearChatCommand;
 import me.Wundero.Ray.commands.Commands;
 import me.Wundero.Ray.commands.IgnoreCommand;
@@ -290,6 +291,8 @@ public class ProjectRay {
 										.optional(GenericArguments.remainingJoinedStrings(Text.of("quote"))))
 								.permission("ray.quote").description(Text.of("Set your quote.")).build(),
 						"quote");
+		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new AfkCommand())
+				.description(Text.of("Toggle being AFK.")).permission("ray.afk").build(), "afk");
 		Sponge.getCommandManager()
 				.register(this,
 						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))

@@ -55,14 +55,17 @@ public class AfkListener {
 
 	private Map<UUID, Long> lastMoved = Utils.sm();
 	private Task checkTask = null;
+	private boolean cancelMovement;
 
 	/**
 	 * Create a new listener. Automatically registered. Timer will set players
 	 * as AFK after a certain time. Kick will kick players after a certain time.
 	 * Set either to -1 to disable their effects. Kick and Timer are in
-	 * milliseconds.
+	 * milliseconds. Cancel movement boolean decides whether to prevent players
+	 * from moving if AFK.
 	 */
-	public AfkListener(final int timer, final int kick) {
+	public AfkListener(final int timer, final int kick, boolean cancelMovement) {
+		this.cancelMovement = cancelMovement;
 		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
 		checkTask = Task.builder().interval(1, TimeUnit.SECONDS).async().execute(() -> {
 			for (Entry<UUID, Long> e : lastMoved.entrySet()) {
@@ -84,9 +87,13 @@ public class AfkListener {
 	/**
 	 * Cancel AFK on event.
 	 */
-	@Listener(order = Order.POST)
+	@Listener(order = Order.BEFORE_POST)
 	public void onMove(MoveEntityEvent event) {
 		if (event.getCause().contains(Player.class)) {
+			if (cancelMovement && RayPlayer.get(event.getCause().first(Player.class).get()).AFK()) {
+				event.setCancelled(true);
+				return;
+			}
 			update(event.getCause().first(Player.class).get());
 		}
 	}

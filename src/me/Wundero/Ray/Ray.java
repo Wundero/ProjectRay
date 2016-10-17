@@ -166,7 +166,8 @@ public class Ray {
 		}
 		this.setLock(new ChatLock());
 		this.setFilter(new ChatFilter());
-		new AfkListener(config.getNode("afk-timer").getInt(-1), config.getNode("afk-kick").getInt(-1));
+		new AfkListener(config.getNode("afk", "timer").getInt(-1), config.getNode("afk", "kick").getInt(-1),
+				config.getNode("afk", "cancel-movement").getBoolean(false));
 	}
 
 	/**
