@@ -207,7 +207,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires AFK context.
+	 * Fires AFK context
 	 */
 	@Listener(order = Order.POST)
 	public void onAFK(AfkEvent event) {
