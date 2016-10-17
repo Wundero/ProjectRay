@@ -26,6 +26,7 @@ import me.Wundero.Ray.framework.channel.ChatChannels;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.listeners.AfkListener;
 import me.Wundero.Ray.tag.TagStore;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
@@ -165,6 +166,7 @@ public class Ray {
 		}
 		this.setLock(new ChatLock());
 		this.setFilter(new ChatFilter());
+		new AfkListener(config.getNode("afk-timer").getInt(-1), config.getNode("afk-kick").getInt(-1));
 	}
 
 	/**

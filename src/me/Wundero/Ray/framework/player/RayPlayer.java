@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
@@ -42,7 +41,6 @@ import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
@@ -147,9 +145,7 @@ public class RayPlayer implements Socialable {
 	private ConfigurationNode config;
 	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
-	private Task afkTask = null;
 	private boolean afk = false;
-	private long lastMove = System.currentTimeMillis();
 	private Task tabHFTask = null;
 	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
@@ -159,29 +155,24 @@ public class RayPlayer implements Socialable {
 	private Optional<String> quote;
 
 	/**
-	 * Return the task for AFK checks
+	 * @return whether the player is AFK.
 	 */
-	public Task getAFKTask() {
-		return afkTask;
+	public boolean AFK() {
+		return afk;
 	}
 
 	/**
-	 * Start the AFK check task
+	 * Toggle whether the player is AFK.
 	 */
-	public Task startAFKTask() {
-		afkTask = Task.builder().async().execute(() -> {
-			// TODO list
-			// Configure AFK timeout
-			// Configure AFK kick timer
-			// Permissions handling (timer & kick)
-			if (System.currentTimeMillis() - lastMove > TimeUnit.MINUTES.toMillis(5)) {
-				afk = true;
-			} else {
-				afk = false;
-			}
-		}).interval(15, TimeUnit.SECONDS).submit(Ray.get().getPlugin());
-		Ray.get().registerTask(afkTask);
-		return afkTask;
+	public void toggleAFK() {
+		this.afk = !afk;
+	}
+
+	/**
+	 * Set whether the player is AFK.
+	 */
+	public void setAFK(boolean a) {
+		this.afk = a;
 	}
 
 	/**

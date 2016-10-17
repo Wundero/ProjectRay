@@ -53,6 +53,7 @@ public class FormatContexts {
 	public static FormatContext TABLIST_HEADER = new FormatContext("header", new String[] { "h" });
 	public static FormatContext TABLIST_FOOTER = new FormatContext("footer", new String[] { "f" });
 	public static FormatContext ANNOUNCEMENT = new FormatContext("announcement", new String[] { "a" });
+	public static FormatContext AFK = new FormatContext("afk");
 
 	private static Map<String, FormatContext> lookup = Utils.sm();
 

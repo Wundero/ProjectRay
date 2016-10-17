@@ -191,13 +191,46 @@ public class MainListener {
 			if (event.getCause().containsNamed("formatname")) {
 				fn = event.getCause().get("formatname", String.class);
 			}
-			if (event.getCause().contains("observer")) {
+			if (event.getCause().containsNamed("observer")) {
 				o = event.getCause().get("observer", Player.class);
+			}
+			if (event.getCause().containsNamed("vars")) {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> v2 = (Map<String, Object>) event.getCause().get("vars", Map.class).get();
+				vars.putAll(v2);
 			}
 			event.setCancelled(handle(event.getCause().get("formatcontext", FormatContext.class).get(), event, vars, p,
 					event.getChannel().get(), sf, st, fn, o));
 		} else {
 			event.setCancelled(handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get()));
+		}
+	}
+
+	/**
+	 * Fires AFK context.
+	 */
+	@Listener(order = Order.POST)
+	public void onAFK(AfkEvent event) {
+		Group g = RayPlayer.get(event.getAfkPlayer()).getActiveGroup();
+		if (g != null) {
+			Format f = g.getFormat(FormatContexts.AFK);
+			if (f != null) {
+				String s = event.isAFK() ? "w" : " longer";
+				Map<String, Object> v = Utils.sm();
+				v.put("afk", event.isAFK());
+				v.put("afkmessage", "no" + s);
+				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
+						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.AFK)
+								.named("vars", v).build(),
+						MessageChannel.TO_ALL, Utils.wrap(MessageChannel.TO_ALL),
+						new MessageEvent.MessageFormatter(
+								Text.of("" + event.getAfkPlayer().getName() + " is no" + s + " AFK.")),
+						Text.of("" + event.getAfkPlayer().getName() + " is no" + s + " AFK."), false);
+				Sponge.getEventManager().post(ev2);
+				if (!ev2.isCancelled()) {
+					ev2.getChannel().get().send(event.getAfkPlayer(), ev2.getMessage(), ChatTypes.CHAT);
+				}
+			}
 		}
 	}
 
