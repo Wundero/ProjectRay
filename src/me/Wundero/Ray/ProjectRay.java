@@ -27,12 +27,14 @@ import me.Wundero.Ray.commands.ClearChatCommand;
 import me.Wundero.Ray.commands.Commands;
 import me.Wundero.Ray.commands.IgnoreCommand;
 import me.Wundero.Ray.commands.MessageCommand;
+import me.Wundero.Ray.commands.MuteCommand;
 import me.Wundero.Ray.commands.QuoteCommand;
 import me.Wundero.Ray.commands.ReplyCommand;
 import me.Wundero.Ray.commands.channel.ChannelCommand;
 import me.Wundero.Ray.commands.channel.ChannelHelpCommand;
 import me.Wundero.Ray.commands.channel.ChannelJoinCommand;
 import me.Wundero.Ray.commands.channel.ChannelLeaveCommand;
+import me.Wundero.Ray.commands.channel.ChannelMuteCommand;
 import me.Wundero.Ray.commands.channel.ChannelQMCommand;
 import me.Wundero.Ray.commands.channel.ChannelRoleCommand;
 import me.Wundero.Ray.commands.channel.ChannelSetupCommand;
@@ -293,6 +295,10 @@ public class ProjectRay {
 						"quote");
 		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new AfkCommand())
 				.description(Text.of("Toggle being AFK.")).permission("ray.afk").build(), "afk");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new MuteCommand()).arguments(GenericArguments.player(Text.of("target")))
+						.permission("ray.mute").description(Text.of("Mute a player")).build(),
+				"mute");
 		Sponge.getCommandManager()
 				.register(this,
 						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
@@ -326,6 +332,13 @@ public class ProjectRay {
 										.arguments(
 												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
 										.build(), "who", "w")
+								.child(CommandSpec.builder().executor(new ChannelMuteCommand())
+										.arguments(GenericArguments.player(Text.of("target")),
+												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+										.permission("ray.channel.mute")
+										.description(
+												Text.of("Mute a player. Optionally provide what channel to mute them in."))
+										.build(), "mute")
 								.child(CommandSpec.builder().executor(new ChannelHelpCommand())
 										.description(Text.of("List channel commands.")).build(), "help", "h")
 								.child(CommandSpec.builder().executor(new ChannelSetupCommand())
