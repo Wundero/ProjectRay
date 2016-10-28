@@ -1031,6 +1031,23 @@ public class Utils {
 	}
 
 	/**
+	 * Return a user if there is one with the given name.
+	 */
+	public static Optional<User> getUser(String name) {
+		try {
+			return getUser(UUID.fromString(name));
+		} catch (Exception e) {
+			if (Sponge.getServer().getPlayer(name).isPresent()) {
+				return wrap(Sponge.getServer().getPlayer(name).orElse(null));
+			}
+			UserStorageService storage = Ray.get().getPlugin().getGame().getServiceManager()
+					.provide(UserStorageService.class).get();
+			Optional<User> opt = storage.get(name);
+			return opt;
+		}
+	}
+
+	/**
 	 * Return a user, if it exists, based off of the uuid.
 	 */
 	public static Optional<User> getUser(UUID uuid) {

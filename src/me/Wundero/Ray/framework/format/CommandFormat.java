@@ -48,6 +48,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 /**
  * This format type represents a type which will be called when a command is
  * fired by a player.
+ * 
+ * TODO move variables in onCommand
  */
 public class CommandFormat extends Format {
 
@@ -89,8 +91,13 @@ public class CommandFormat extends Format {
 		}).submit(Ray.get().getPlugin());
 	}
 
+	// Notes:
+	// If a CommandContext goes through some event that is a pre in the future,
+	// use that instead.
+	// CommandContext parse for named put as vars.
 	/**
-	 * Parse a command.
+	 * Parse a command. Currently there is no support for recipients other than
+	 * the player who sent the command.
 	 */
 	@Listener
 	public void onCommand(SendCommandEvent event) {

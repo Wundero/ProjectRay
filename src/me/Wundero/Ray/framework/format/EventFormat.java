@@ -47,6 +47,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 /**
  * Format type that is fired when an event, which is a subclass of or equal to
  * the provided event class, is called.
+ * 
+ * TODO more variables in onEvent
  */
 public class EventFormat extends Format {
 
@@ -92,21 +94,33 @@ public class EventFormat extends Format {
 	public void onEvent(Event e) {
 		if (checkClass(e.getClass())) {
 			ParsableData data = new ParsableData();
-			int i = 0;
-			for (Object o : e.getCause().all()) {
-				if (o instanceof Player) {
-					if (i == 0) {
-						data.setSender((Player) o);
-					} else if (i == 1) {
-						data.setRecipient((Player) o);
-					} else if (i == 2) {
-						data.setObserver((Player) o);
-					}
-					i++;
-				}
+			if (e.getCause().containsNamed("sender")) {
+				data.setSender(e.getCause().get("sender", Player.class));
 			}
+			if (e.getCause().containsNamed("sendfrom")) {
+				data.setSender(e.getCause().get("sendfrom", Player.class));
+			}
+			if (e.getCause().containsNamed("recipient")) {
+				data.setRecipient(e.getCause().get("recipient", Player.class));
+			}
+			if (e.getCause().containsNamed("sendto")) {
+				data.setRecipient(e.getCause().get("sendto", Player.class));
+			}
+			if (e.getCause().containsNamed("observer")) {
+				data.setObserver(e.getCause().get("observer", Player.class));
+			}
+			data.setClickHover(true);
+			data.setPage(e.getCause().get("page", Integer.class).orElse(0));
 			Map<String, Object> map = Utils.sm();
+			if (e.getCause().containsNamed("vars")) {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> v2 = (Map<String, Object>) e.getCause().get("vars", Map.class).get();
+				map.putAll(v2);
+			}
 			for (Map.Entry<String, Object> key : e.getCause().getNamedCauses().entrySet()) {
+				if (key.getKey().equals("vars")) {
+					continue;
+				}
 				if (!(key.getValue() instanceof Player)) {
 					map.put(key.getKey(), key.getValue());
 				}
