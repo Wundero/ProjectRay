@@ -25,6 +25,7 @@ package me.Wundero.Ray.framework.channel;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -42,6 +43,9 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
  */
 public class ChannelMemberCollection {
 	private List<ChannelMember> members = Utils.sl();
+	private Map<String, List<UUID>> serialization = Utils.sm();
+	private Map<UUID, String> revSer = Utils.sm();
+	private Map<UUID, Boolean> revMut = Utils.sm();
 
 	/**
 	 * Remove duplicates.
@@ -81,8 +85,16 @@ public class ChannelMemberCollection {
 			public ChannelMemberCollection deserialize(TypeToken<?> arg0, ConfigurationNode arg1)
 					throws ObjectMappingException {
 				ChannelMemberCollection out = new ChannelMemberCollection();
-				for (ConfigurationNode node : arg1.getChildrenMap().values()) {
-					out.add(node.getValue(TypeToken.of(ChannelMember.class)));
+				for (Map.Entry<Object, ? extends ConfigurationNode> e : arg1.getChildrenMap().entrySet()) {
+					out.serialization.put(e.getKey().toString(), Utils.sl());
+					for (Map.Entry<Object, ? extends ConfigurationNode> e2 : e.getValue().getChildrenMap().entrySet()) {
+						Object o = e2.getKey();
+						List<UUID> x = out.serialization.get(e.getKey().toString());
+						x.add(UUID.fromString(o.toString()));
+						out.serialization.put(e.getKey().toString(), x);
+						out.revSer.put(UUID.fromString(o.toString()), e.getKey().toString());
+						out.revMut.put(UUID.fromString(o.toString()), e2.getValue().getBoolean(false));
+					}
 				}
 				return out;
 			}
@@ -90,9 +102,12 @@ public class ChannelMemberCollection {
 			@Override
 			public void serialize(TypeToken<?> arg0, ChannelMemberCollection arg1, ConfigurationNode arg2)
 					throws ObjectMappingException {
-				for (ChannelMember m : arg1.members) {
-					ConfigurationNode mn = arg2.getNode(m.getUUID().toString());
-					mn.setValue(TypeToken.of(ChannelMember.class), m);
+				for (Map.Entry<String, List<UUID>> entry : arg1.serialization.entrySet()) {
+					ConfigurationNode n = arg2.getNode(entry.getValue());
+					for (UUID u : entry.getValue()) {
+						boolean isMuted = arg1.revMut.containsKey(u) ? arg1.revMut.get(u) : false;
+						n.getNode(u.toString()).setValue(isMuted);
+					}
 				}
 			}
 		};
@@ -197,6 +212,15 @@ public class ChannelMemberCollection {
 		return add(new ChannelMember(r));
 	}
 
+	private List<UUID> g(String k, UUID u) {
+		List<UUID> o = this.serialization.get(k);
+		if (o == null) {
+			o = Utils.sl();
+		}
+		o.add(u);
+		return o;
+	}
+
 	/**
 	 * Add the member.
 	 */
@@ -205,6 +229,16 @@ public class ChannelMemberCollection {
 			return false;
 		}
 		members.add(member);
+		String kx = revSer.get(member.getUniqueId());
+		if (kx == "banned") {
+			member.setBanned(true);
+		} else {
+			member.setRole(Role.valueOf(kx.toUpperCase()));
+		}
+		boolean muted = revMut.containsKey(member.getUniqueId()) && revMut.get(member.getUniqueId());
+		member.setMuted(muted);
+		String k = member.isBanned() ? "banned" : member.getRole().name();
+		this.serialization.put(k, g(k.toLowerCase(), member.getUniqueId()));
 		fix();
 		return true;
 	}

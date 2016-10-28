@@ -116,6 +116,16 @@ public class Utils {
 	}
 
 	/**
+	 * Add a value to a map containing a list of values mapped to a key.
+	 */
+	public static <K, T> Map<K, List<T>> addTo(Map<K, List<T>> map, K key, T value) {
+		List<T> tl = map.get(key);
+		tl.add(value);
+		map.put(key, tl);
+		return map;
+	}
+
+	/**
 	 * Check to see if num is within bounds b1 and b2, with defined exclusivity.
 	 */
 	public boolean in(int num, int b1, int b2, boolean el, boolean eg) {
