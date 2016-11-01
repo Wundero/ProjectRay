@@ -25,6 +25,7 @@ package me.Wundero.Ray.utils;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -110,7 +111,7 @@ public class TextUtils {
 		List<Text> children = original.getChildren();
 		original = original.toBuilder().removeAll().build();
 		Text.Builder out = Text.builder().color(original.getColor());
-		char[] chars = original.toPlain().toCharArray();
+		char[] chars = getContent(original, false).toCharArray();
 		Integer obC = percentDiscoloration.intValue();
 		Integer obS = percentObfuscation.intValue();
 		List<Text> cs = Utils.sl();
@@ -489,7 +490,7 @@ public class TextUtils {
 	 * Split the text object at a string reference.
 	 */
 	public static List<Text> split(Text t, String c, boolean skip) {
-		if (!(t instanceof LiteralText)) {
+		if (!lit(t)) {
 			return Utils.sl(t);
 		}
 		List<Text> out = Utils.sl();
@@ -580,7 +581,7 @@ public class TextUtils {
 			throw new IllegalArgumentException("Text must be present!");
 		}
 		Text t = tx.get(0);
-		if (!(t instanceof LiteralText)) {
+		if (!lit(t)) {
 			return t;
 		}
 		String c = getContent(t, true);
@@ -625,7 +626,7 @@ public class TextUtils {
 	 * account for extra characters included in the object]
 	 */
 	public static List<Text> splitAfterCharCount(Text t, int charCount, boolean repeat) {
-		if (!(t instanceof LiteralText)) {
+		if (!lit(t)) {
 			return Utils.sl(t);
 		}
 		List<Text> out = Utils.sl();
@@ -642,10 +643,20 @@ public class TextUtils {
 	}
 
 	/**
+	 * Substring a text starting at an index. Follows String.substring(a,b).
+	 */
+	public static Text substring(Text t, int start) {
+		return substring(t, start, length(t));
+	}
+
+	/**
 	 * Substring a text from one index to another. Follows the same rules as
-	 * "".substring(a,b);
+	 * String.substring(a,b);
 	 */
 	public static Text substring(Text t, int start, int finish) {
+		if (!lit(t)) {
+			return t;
+		}
 		if (start < 0) {
 			throw new IllegalArgumentException("Cannot start below 0!");
 		}
@@ -654,9 +665,6 @@ public class TextUtils {
 		}
 		if (finish == start) {
 			return Text.of();
-		}
-		if (!(t instanceof LiteralText)) {
-			return t;
 		}
 		String c = getContent(t, true);
 		if (start > c.length()) {
@@ -713,13 +721,167 @@ public class TextUtils {
 	}
 
 	/**
+	 * Check to see if the string contents of two texts are equal.
+	 */
+	public static boolean contentsEqual(Text one, Text two, boolean ignoreCase) {
+		String o = getContent(one, false);
+		String t = getContent(two, false);
+		return ignoreCase ? o.equalsIgnoreCase(t) : o.equals(t);
+	}
+
+	/**
+	 * Checks to see if a text is an instance of a LiteralText
+	 */
+	public static boolean lit(Text t) {
+		return t instanceof LiteralText;
+	}
+
+	/**
+	 * Remove extra whitespace from a text.
+	 */
+	public static Text trim(Text t) {
+		if (!lit(t)) {
+			return t;
+		}
+		LiteralText.Builder b = ((LiteralText) t).toBuilder();
+		return b.content(b.getContent().trim()).build();
+	}
+
+	/**
+	 * Sets the string content of a text to lower case.
+	 */
+	public static Text toLowerCase(Text in, Locale locale) {
+		if (!lit(in)) {
+			return in;
+		}
+		LiteralText.Builder b = ((LiteralText) in).toBuilder();
+		b.content(b.getContent().toLowerCase(locale));
+		return b.build();
+	}
+
+	/**
+	 * Sets the string content of a text to lower case.
+	 */
+	public static Text toLowerCase(Text in) {
+		if (!lit(in)) {
+			return in;
+		}
+		LiteralText.Builder b = ((LiteralText) in).toBuilder();
+		b.content(b.getContent().toLowerCase());
+		return b.build();
+	}
+
+	/**
+	 * Sets the string content of a text to upper case.
+	 */
+	public static Text toUpperCase(Text in, Locale locale) {
+		if (!lit(in)) {
+			return in;
+		}
+		LiteralText.Builder b = ((LiteralText) in).toBuilder();
+		b.content(b.getContent().toUpperCase(locale));
+		return b.build();
+	}
+
+	/**
+	 * Sets the string content of a text to upper case.
+	 */
+	public static Text toUpperCase(Text in) {
+		if (!lit(in)) {
+			return in;
+		}
+		LiteralText.Builder b = ((LiteralText) in).toBuilder();
+		b.content(b.getContent().toUpperCase());
+		return b.build();
+	}
+
+	/**
+	 * Check to see if a text contains a char.
+	 */
+	public static boolean contains(Text one, char two) {
+		return indexOf(one, two) > -1;
+	}
+
+	/**
+	 * Check to see if a text contains a string.
+	 */
+	public static boolean contains(Text one, String two) {
+		return indexOf(one, two) > -1;
+	}
+
+	/**
+	 * Check to see if a text contains another text.
+	 */
+	public static boolean contains(Text one, Text two) {
+		return indexOf(one, two) > -1;
+	}
+
+	/**
+	 * Compare the string contents of two texts.
+	 */
+	public static int compare(Text one, Text two) {
+		return getContent(one, false).compareTo(getContent(two, false));
+	}
+
+	/**
+	 * Check to see if a text ends with another text.
+	 */
+	public static boolean endsWith(Text in, Text part) {
+		return equals(substring(in, length(in) - length(part)), part, true, true, false);
+	}
+
+	/**
+	 * Check to see if a text ends with a string.
+	 */
+	public static boolean endsWith(Text in, String part) {
+		return getContent(in, false).endsWith(part);
+	}
+
+	/**
+	 * Check to see if a text starts with another text.
+	 */
+	public static boolean startsWith(Text in, Text part) {
+		return equals(substring(in, 0, length(part)), part, true, true, false);
+	}
+
+	/**
+	 * Check to see if a text starts with a string.
+	 */
+	public static boolean startsWith(Text in, String part) {
+		return getContent(in, false).startsWith(part);
+	}
+
+	/**
+	 * Compare two texts.
+	 */
+	public static boolean equals(Text one, Text two, boolean clickHover, boolean formats, boolean ignoreCase) {
+		if (!contentsEqual(one, two, ignoreCase)) {
+			return false;
+		}
+		if (clickHover && !extrasEqual(one, two)) {
+			return false;
+		}
+		if (formats && !formatsEqual(one, two)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Find the index of the val in the text.
 	 */
 	public static int indexOf(Text in, String val) {
-		if (!(in instanceof LiteralText)) {
+		return indexOf(in, val, 0);
+	}
+
+	/**
+	 * Find the index of the val in the text after an offset.
+	 */
+	public static int indexOf(Text in, String val, int offset) {
+		if (!lit(in)) {
 			return -1;
 		}
-		return ((LiteralText) in).getContent().indexOf(val);
+		return ((LiteralText) in).getContent().indexOf(val, offset);
 	}
 
 	/**
@@ -727,14 +889,23 @@ public class TextUtils {
 	 * for the index to be chosen: Content, format and actions.
 	 */
 	public static int indexOf(Text in, Text val) {
-		if (!(in instanceof LiteralText) && !(val instanceof LiteralText)) {
+		return indexOf(in, val, 0);
+	}
+
+	/**
+	 * Find the index of the val in the text after an offset. All of the
+	 * following must match for the index to be chosen: Content, format and
+	 * actions.
+	 */
+	public static int indexOf(Text in, Text val, int offset) {
+		if (!lit(in) && !lit(val)) {
 			return in.equals(val) ? 0 : -1;
-		} else if (!(in instanceof LiteralText) && !(val instanceof LiteralText)) {
+		} else if (!lit(in) || !lit(val)) {
 			return -1;
 		}
 		LiteralText t1 = (LiteralText) in;
 		LiteralText t2 = (LiteralText) val;
-		int c = t1.getContent().indexOf(t2.getContent());
+		int c = t1.getContent().indexOf(t2.getContent(), offset);
 		return extrasEqual(t1, t2) && formatsEqual(t1, t2) ? c : -1;
 	}
 
@@ -742,17 +913,24 @@ public class TextUtils {
 	 * Return the index of the val in the text.
 	 */
 	public static int indexOf(Text in, char val) {
-		if (!(in instanceof LiteralText)) {
+		return indexOf(in, val, 0);
+	}
+
+	/**
+	 * Return the index of the val in the text after an offset.
+	 */
+	public static int indexOf(Text in, char val, int offset) {
+		if (!lit(in)) {
 			return -1;
 		}
-		return ((LiteralText) in).getContent().indexOf(val);
+		return ((LiteralText) in).getContent().indexOf(val, offset);
 	}
 
 	/**
 	 * Capitalize the first letter of the text object.
 	 */
 	public static Text capitalize(Text t) {
-		if (!(t instanceof LiteralText)) {
+		if (!lit(t)) {
 			return t;
 		}
 		LiteralText t1 = (LiteralText) t;
@@ -786,7 +964,7 @@ public class TextUtils {
 	}
 
 	private static boolean capequalsnorm(Text t) {
-		if (!(t instanceof LiteralText)) {
+		if (!lit(t)) {
 			return true;
 		}
 		LiteralText t1 = (LiteralText) t;
@@ -811,7 +989,7 @@ public class TextUtils {
 	 * content(). If not, it will return toPlain().
 	 */
 	public static String getContent(Text t, boolean strict) {
-		if (t instanceof LiteralText) {
+		if (lit(t)) {
 			return ((LiteralText) t).getContent();
 		} else {
 			if (strict) {
@@ -938,7 +1116,7 @@ public class TextUtils {
 	 * Return the length of the content of the text object.
 	 */
 	public static int length(Text t) {
-		if (!(t instanceof LiteralText)) {
+		if (!lit(t)) {
 			return 0;
 		}
 		List<Text> children = t.getChildren();
