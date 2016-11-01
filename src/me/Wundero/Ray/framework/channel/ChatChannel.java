@@ -54,6 +54,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private ChannelMemberCollection members = new ChannelMemberCollection();
 	private String name;
 	private String permission;
+	private Optional<String> password;
 	private Text tag;
 	private double range;
 	private boolean hidden = false;
@@ -78,6 +79,9 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				out.range = arg1.getNode("range").getDouble(-1);
 				out.hidden = arg1.getNode("hidden").getBoolean(false);
 				out.autojoin = arg1.getNode("autojoin").getBoolean(true);
+				out.password = Utils.wrap2(arg1.getNode("password").getString(), (s) -> {
+					return s.isPresent() && !s.get().trim().isEmpty();
+				});
 				out.obfuscateRanged = arg1.getNode("range-obfuscation").getBoolean(false);
 				out.node = arg1;
 				return out;
@@ -95,6 +99,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				arg2.getNode("range").setValue(arg1.range);
 				arg2.getNode("hidden").setValue(arg1.hidden);
 				arg2.getNode("autojoin").setValue(arg1.autojoin);
+				arg1.password.ifPresent(pass -> arg2.getNode("password").setValue(pass));
 				arg2.getNode("range-obfuscation").setValue(arg1.obfuscateRanged);
 			}
 		};
@@ -353,6 +358,23 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	 */
 	public void setObfuscateRanged(boolean obfuscateRanged) {
 		this.obfuscateRanged = obfuscateRanged;
+	}
+
+	/**
+	 * @param text
+	 *            the password to set
+	 */
+	public void setPassword(String text) {
+		password = Utils.wrap2(text, (s) -> {
+			return s.isPresent() && !s.get().trim().isEmpty();
+		});
+	}
+
+	/**
+	 * @return the password
+	 */
+	public Optional<String> getPassword() {
+		return password;
 	}
 
 }

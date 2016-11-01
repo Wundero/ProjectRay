@@ -1,6 +1,7 @@
 package me.Wundero.Ray.framework.player.name;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.spongepowered.api.text.Text;
 
@@ -35,63 +36,111 @@ public class DisplayName implements Nicknamable, Prefixable, Suffixable {
 	private final Text original;
 	private Optional<Text> nick, prefix, suffix;
 
+	/**
+	 * Create a displayname handler with an original name
+	 */
 	public DisplayName(Text original) {
 		this.original = original;
 	}
 
-	public void offer(Text prefix, Text name, Text suffix) {
-		prefix(prefix);
-		nickname(name);
-		suffix(suffix);
+	/**
+	 * Apply the displayname to a functional applicant. Optional separator
+	 * string that will split prefix/name/suffix. To not use separator, set it
+	 * to null or "".
+	 */
+	public boolean apply(Function<Text, Boolean> applicant, String separator) {
+		Text.Builder b = Text.builder("");
+		Optional<Text> sep = Utils.wrap(Text.of(separator), separator != null, !separator.isEmpty());
+		prefix.ifPresent(t -> {
+			b.append(t);
+			sep.ifPresent(a -> b.append(a));
+		});
+		b.append(nick.orElse(original));
+		suffix.ifPresent(t -> {
+			sep.ifPresent(a -> b.append(a));
+			b.append(t);
+		});
+		return applicant.apply(b.build());
 	}
 
+	/**
+	 * Offer a displayname. All parameters are nullable.
+	 */
+	public boolean offer(Text prefix, Text name, Text suffix) {
+		boolean r = prefix(prefix);
+		if(r==false) {
+			return false;
+		}
+		r = r && nickname(name);
+		if(r==false) {
+			return false;
+		}
+		r = r && suffix(suffix);
+		return r;
+	}
+
+	/**
+	 * Clear the displayname and set it to the original.
+	 */
 	@Override
 	public void clear() {
 		offer(null, original(), null);
 	}
 
+	/**
+	 * Apply a suffix.
+	 */
 	@Override
 	public boolean suffix(Text suffix) {
-		Optional<Text> t = Utils.wrap(suffix);
-		if (t.isPresent()) {
-			this.suffix = t;
-		}
+		this.suffix = Utils.wrap(suffix);
 		return this.suffix.isPresent();
 	}
 
+	/**
+	 * Apply a prefix.
+	 */
 	@Override
 	public boolean prefix(Text prefix) {
-		Optional<Text> t = Utils.wrap(prefix);
-		if (t.isPresent()) {
-			this.prefix = t;
-		}
+		this.prefix = Utils.wrap(prefix);
 		return this.prefix.isPresent();
 	}
 
+	/**
+	 * Apply a nickname.
+	 */
 	@Override
 	public boolean nickname(Text nickname) {
-		Optional<Text> t = Utils.wrap(nickname);
-		if (t.isPresent()) {
-			this.nick = t;
-		}
+		this.nick = Utils.wrap(nickname);
 		return this.nick.isPresent();
 	}
 
+	/**
+	 * @return the original name.
+	 */
 	@Override
 	public Text original() {
 		return original;
 	}
 
+	/**
+	 * @return the nickname.
+	 */
 	@Override
 	public Optional<Text> nickname() {
 		return nick;
 	}
 
+	/**
+	 * @return the suffix.
+	 */
 	@Override
 	public Optional<Text> suffix() {
 		return suffix;
 	}
 
+	/**
+	 * @return the prefix.
+	 */
 	@Override
 	public Optional<Text> prefix() {
 		return prefix;
