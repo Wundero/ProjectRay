@@ -814,7 +814,11 @@ public class TextUtils {
 		if (t instanceof LiteralText) {
 			return ((LiteralText) t).getContent();
 		} else {
-			return strict ? "" : t.toPlain();
+			if (strict) {
+				throw new IllegalArgumentException("Unsupported text " + t);
+			} else {
+				return t.toPlain();
+			}
 		}
 	}
 
