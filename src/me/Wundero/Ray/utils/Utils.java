@@ -254,10 +254,17 @@ public class Utils {
 	}
 
 	/**
-	 * Create a synchronized list containing all objects in the parameters.
+	 * Create a synchronized list containing all objects in the parameters. If
+	 * an array is passed, a safe check is run to convert it to varargs support.
 	 */
+	@SuppressWarnings("unchecked")
 	@SafeVarargs
 	public static <T> List<T> sl(T... objs) {
+		if (objs.length == 1) {
+			if (objs[0] instanceof Object[]) {
+				objs = (T[]) objs[0];
+			}
+		}
 		List<T> l = sl();
 		for (T t : objs) {
 			l.add(t);

@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -68,6 +69,27 @@ import me.Wundero.Ray.variables.ParsableData;
 public class TextUtils {
 
 	/**
+	 * Return an empty text.
+	 */
+	public static Text EMPTY() {
+		return Text.EMPTY;
+	}
+
+	/**
+	 * Return a blank text.
+	 */
+	public static Text BLANK() {
+		return Text.of("");
+	}
+
+	/**
+	 * Return a text with a space character.
+	 */
+	public static Text SPACE() {
+		return Text.of(" ");
+	}
+
+	/**
 	 * Wipe the color from a text object.
 	 */
 	public static Text strip(Text t) {
@@ -98,6 +120,36 @@ public class TextUtils {
 		} else {
 			return text;
 		}
+	}
+
+	/**
+	 * Split a text and it's children into multiple text objects.
+	 */
+	public static List<Text> flatten(Text t) {
+		if (t.getChildren().isEmpty()) {
+			return Utils.sl(t);
+		}
+		List<Text> children = t.getChildren();
+		children.add(0, t.toBuilder().removeAll().build());
+		return children;
+	}
+
+	/**
+	 * Recursively split a text and it's children into multiple text objects.
+	 * Will recurse over children as well, until no text in the list contains
+	 * children.
+	 */
+	public static List<Text> flatten(Text t, boolean recursive) {
+		if (t.getChildren().isEmpty()) {
+			return Utils.sl(t);
+		}
+		if (!recursive) {
+			return flatten(t);
+		}
+		List<Text> f = flatten(t);
+		List<Text> out = Utils.sl(t.toBuilder().removeAll().build());
+		f.stream().forEach(text -> out.addAll(flatten(t, recursive)));
+		return out;
 	}
 
 	/**
@@ -307,6 +359,63 @@ public class TextUtils {
 			s = s.replace("\\u00a7", "&");
 		}
 		return TextSerializers.FORMATTING_CODE.stripCodes(s);
+	}
+
+	/**
+	 * Prepend two onto one.
+	 */
+	public static Text prepend(Text one, Text two) {
+		return two.concat(one);
+	}
+
+	/**
+	 * Append two onto one.
+	 */
+	public static Text append(Text one, Text two) {
+		return one.concat(two);
+	}
+
+	/**
+	 * Insert two into one.
+	 */
+	public static Text insert(Text one, Text two, int index) {
+		if (index == 0) {
+			return two.concat(one);
+		}
+		if (index == length(one)) {
+			return one.concat(two);
+		}
+		return substring(one, 0, index).concat(two).concat(substring(one, index));
+	}
+
+	/**
+	 * Remove all occurances of two in one.
+	 */
+	public static Text remove(Text one, Text two) {
+		Text o = one;
+		int i = 0;
+		int l = length(two);
+		while ((i = indexOf(o, two)) >= 0) {
+			o = substring(o, 0, i).concat(substring(o, i + l));
+		}
+		return o;
+	}
+
+	/**
+	 * Overlay one part of a text with another text.
+	 */
+	public static Text overlay(Text original, Text overlay, int start, int finish) {
+		Validate.isTrue(start > 0);
+		Validate.isTrue(finish > start);
+		Text.Builder b = Text.builder("");
+		if (start > 0) {
+			b.append(substring(original, 0, start));
+		}
+		b.append(overlay);
+		if (finish < length(original)) {
+			b.append(substring(original, finish));
+		}
+		return b.build();
 	}
 
 	/**
@@ -796,6 +905,76 @@ public class TextUtils {
 	}
 
 	/**
+	 * Join texts together.
+	 */
+	public static Text join(List<Text> texts, Text separator) {
+		if (texts.isEmpty()) {
+			return Text.EMPTY;
+		}
+		Text out = texts.get(0);
+		boolean b = true;
+		for (Text t : texts) {
+			out = out.concat(separator);
+			if (b) {
+				b = false;
+				continue;
+			}
+			out.concat(t);
+		}
+		return out;
+	}
+
+	/**
+	 * Join texts together.
+	 */
+	public static Text join(List<Text> texts) {
+		return join(texts, Text.of(" "));
+	}
+
+	/**
+	 * Join texts together.
+	 */
+	public static Text join(Text[] texts, Text separator) {
+		return join(Utils.sl(texts), separator);
+	}
+
+	/**
+	 * Join texts together.
+	 */
+	public static Text join(Text[] texts) {
+		return join(texts, Text.of(" "));
+	}
+
+	/**
+	 * Check to see if a text contains a char.
+	 */
+	public static boolean containsIgnoreCase(Text one, char two) {
+		return indexOf(toLowerCase(one), toLowerCase(two)) > -1;
+	}
+
+	private static String toLowerCase(String in) {
+		return in.toLowerCase();
+	}
+
+	private static char toLowerCase(char in) {
+		return Character.toLowerCase(in);
+	}
+
+	/**
+	 * Check to see if a text contains a string.
+	 */
+	public static boolean containsIgnoreCase(Text one, String two) {
+		return indexOf(toLowerCase(one), toLowerCase(two)) > -1;
+	}
+
+	/**
+	 * Check to see if a text contains another text.
+	 */
+	public static boolean containsIgnoreCase(Text one, Text two) {
+		return indexOf(toLowerCase(one), toLowerCase(two)) > -1;
+	}
+
+	/**
 	 * Check to see if a text contains a char.
 	 */
 	public static boolean contains(Text one, char two) {
@@ -1211,6 +1390,41 @@ public class TextUtils {
 		default:
 			return TextColors.NONE;
 		}
+	}
+
+	/**
+	 * check to see if a text has string content
+	 */
+	public static boolean hasContent(final Text text) {
+		if (text.isEmpty()) {
+			return false;
+		}
+		if (!(text instanceof LiteralText)) {
+			return true;
+		}
+		if (!((LiteralText) text).getContent().isEmpty()) {
+			return true;
+		}
+		for (final Text child : text.getChildren()) {
+			if (hasContent(child)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Condense children with same formats into singular text objects.
+	 */
+	public static Text condense(Text t) {
+		if (!hasContent(t)) {
+			return EMPTY();
+		}
+		if (t.getChildren().isEmpty()) {
+			return t;
+		}
+		List<Text> children = t.getChildren().stream().filter(tx -> hasContent(tx)).collect(RayCollectors.rayList());
+		return null;
 	}
 
 	/**
