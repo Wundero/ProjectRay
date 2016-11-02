@@ -244,7 +244,7 @@ public class MainListener {
 		p.setTabTask(() -> {
 			Player player = event.getTargetEntity();
 			final TabList list = player.getTabList();
-			List<TabListEntry> lx = Utils.sl(list.getEntries());
+			List<TabListEntry> lx = Utils.sl(list.getEntries(), true);
 			for (TabListEntry e : lx) {
 				Optional<Player> h = Sponge.getServer().getPlayer(e.getProfile().getUniqueId());
 				if (!h.isPresent()) {
@@ -359,7 +359,7 @@ public class MainListener {
 		Player sendto = (Player) trs;
 		Text msg = Text.of(player + "/" + event.getCommand() + " " + event.getArguments());
 
-		List<MessageReceiver> spies = Utils.sl();
+		List<MessageReceiver> spies = Utils.al();
 		for (Player p : Sponge.getServer().getOnlinePlayers()) {
 			RayPlayer r = RayPlayer.get(p);
 			if (r.spy() && !p.getName().equals(player)) {

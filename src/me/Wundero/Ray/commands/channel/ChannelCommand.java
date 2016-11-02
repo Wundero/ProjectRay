@@ -57,7 +57,7 @@ public class ChannelCommand implements CommandExecutor {
 		Player sender = (Player) src;
 		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.BLACK,
 				"]", " ", TextColors.GRAY, "Available channels:");
-		List<Text> texts = Utils.sl();
+		List<Text> texts = Utils.al();
 		for (ChatChannel channel : Ray.get().getChannels().getJoinableChannels(sender, false)) {
 			texts.add(buildForChannel(channel, sender));
 		}

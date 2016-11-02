@@ -151,7 +151,7 @@ public class StaticFormat extends Format {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.sl();
+			List<Option> options = Utils.al();
 			Text t1 = Text.builder("variable").color(TextColors.GOLD).onClick(TextActions.runCommand("variable"))
 					.onHover(TextActions.showText(Text.of("Click this to select variable!", TextColors.AQUA))).build();
 			Text t2 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
@@ -212,7 +212,7 @@ public class StaticFormat extends Format {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.sl();
+			List<Option> options = Utils.al();
 			options.add(
 					new Option("key",
 							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
@@ -373,7 +373,7 @@ public class StaticFormat extends Format {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.sl();
+			List<Option> options = Utils.al();
 			Text t1 = Text.builder("text").color(TextColors.GOLD).onClick(TextActions.runCommand("text"))
 					.onHover(TextActions
 							.showText(Text.of("Click this to select text (creates a new text)!", TextColors.AQUA)))

@@ -91,7 +91,7 @@ public class Template {
 			private String name;
 			private int priority = 0;
 			private String permission = "";
-			private List<String> parents = Utils.sl();
+			private List<String> parents = Utils.al();
 			private Builder parent;
 
 			GroupBuilder(ConfigurationNode node, String name, Builder parent) {

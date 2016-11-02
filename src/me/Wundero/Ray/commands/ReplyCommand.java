@@ -80,7 +80,7 @@ public class ReplyCommand implements CommandExecutor {
 				sendto.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto))),
 				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"), Text.of(message)),
 				Text.of(message), false);
-		List<MessageReceiver> spies = Utils.sl();
+		List<MessageReceiver> spies = Utils.al();
 		for (Player p : Sponge.getServer().getOnlinePlayers()) {
 			if (!RayPlayer.get(p).spy()) {
 				continue;

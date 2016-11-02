@@ -18,9 +18,11 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Spliterator;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -28,6 +30,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
@@ -123,6 +126,25 @@ public class Utils {
 		tl.add(value);
 		map.put(key, tl);
 		return map;
+	}
+
+	/**
+	 * Turn an array into a list of objects.
+	 */
+	public static List<Object> deconstructArray(Object[] arr) {
+		List<Object> out = al();
+		for (Object o : arr) {
+			if (o == null) {
+				out.add(o);
+				continue;
+			}
+			if (o.getClass().isArray()) {
+				out.addAll(deconstructArray((Object[]) o));
+			} else {
+				out.add(o);
+			}
+		}
+		return out;
 	}
 
 	/**
@@ -245,27 +267,118 @@ public class Utils {
 	}
 
 	/**
+	 * Create an array list containing all objects in the collection.
+	 */
+	public static <T> List<T> al(Collection<T> objs, boolean collection) {
+		List<T> l = al();
+		l.addAll(objs);
+		return l;
+	}
+
+	/**
+	 * Create an array list containing all objects in the array.
+	 */
+	public static <T> List<T> al(T[] objs, boolean arr) {
+		List<T> l = al();
+		for (T t : objs) {
+			l.add(t);
+		}
+		return l;
+	}
+
+	/**
+	 * Create an array list containing all objects in the parameters.
+	 */
+	@SafeVarargs
+	public static <T> List<T> al(T... objs) {
+		List<T> l = al(Tristate.FALSE);
+		for (T t : objs) {
+			l.add(t);
+		}
+		return l;
+	}
+
+	/**
+	 * Create an empty array list.
+	 */
+	public static <T> List<T> al() {
+		return al(Tristate.FALSE);
+	}
+
+	/**
+	 * Create an empty array list with indexOf strictness based off of the
+	 * tristate. TRUE means both o and get(i) equals methods must be true, FALSE
+	 * means one of them must be true, and NONE means that the default list impl
+	 * will be used.
+	 */
+	public static <T> List<T> al(final Tristate strict) {
+		// indexOf method coded such that the equals call supports either object
+		// equaling the other
+		// this allows support for ChannelMember; it's less strict but useful
+		// to me.
+		return (new ArrayList<T>() {
+
+			private static final long serialVersionUID = -9083645937669914699L;
+
+			@Override
+			public int indexOf(Object o) {
+				if (o == null) {
+					for (int i = 0; i < size(); i++) {
+						if (get(i) == null) {
+							return i;
+						}
+					}
+				} else {
+					for (int i = 0; i < size(); i++) {
+						if (strict == Tristate.TRUE) {
+							if (get(i).equals(o) && o.equals(get(i))) {
+								return i;
+							}
+						} else if (strict == Tristate.FALSE) {
+							if (get(i).equals(o) || o.equals(get(i))) {
+								return i;
+							}
+						} else {
+							if (get(i).equals(o)) {
+								return i;
+							}
+						}
+					}
+				}
+				return -1;
+			}
+
+		});
+	}
+
+	/**
 	 * Create a synchronized list containing all objects in the collection.
 	 */
-	public static <T> List<T> sl(Collection<T> objs) {
+
+	public static <T> List<T> sl(Collection<T> objs, boolean collection) {
 		List<T> l = sl();
 		l.addAll(objs);
 		return l;
 	}
 
 	/**
-	 * Create a synchronized list containing all objects in the parameters. If
-	 * an array is passed, a safe check is run to convert it to varargs support.
+	 * Create a synchronized list containing all objects in the array.
 	 */
-	@SuppressWarnings("unchecked")
+
+	public static <T> List<T> sl(T[] objs, boolean array) {
+		List<T> l = sl();
+		for (T t : objs) {
+			l.add(t);
+		}
+		return l;
+	}
+
+	/**
+	 * Create a synchronized list containing all objects in the parameters.
+	 */
 	@SafeVarargs
 	public static <T> List<T> sl(T... objs) {
-		if (objs.length == 1) {
-			if (objs[0] instanceof Object[]) {
-				objs = (T[]) objs[0];
-			}
-		}
-		List<T> l = sl();
+		List<T> l = sl(Tristate.FALSE);
 		for (T t : objs) {
 			l.add(t);
 		}
@@ -300,16 +413,19 @@ public class Utils {
 	 * the tristate. TRUE means both o and get(i) equals methods must be true,
 	 * FALSE means one of them must be true, and NONE means that the default
 	 * list impl will be used. The iterator of this list is immutable as well,
-	 * meaning that no modifications can be made through the iterator. This list
-	 * is completely thread safe and itrable without synchrnous blocks.
+	 * meaning that no modifications can be made through the iterator. All
+	 * iterable (and consequentially non-synchronizable within Java's framework)
+	 * methods are wrapped with an immutable copy of this array. This list is
+	 * completely thread safe and itrable without synchrnous blocks.
 	 */
+
 	public static <T> List<T> sl(final Tristate strict) {
 		// returns a new arraylist that copies itself for iteration (makes
-		// unsynchronized iter blocks safe)
-		// indexOf method coded such that the equals call supports either object
-		// equaling the other
-		// this allows support for ChannelMember; it's less strict but usefull
-		// to me.
+		// unsynchronized
+		// iter blocks safe)
+		// indexOf method coded such that the equals call
+		// supports either object equaling the other this allows support
+		// for ChannelMember; it's less strict but usefull to me.
 		return Collections.synchronizedList(new ArrayList<T>() {
 
 			private static final long serialVersionUID = -9083645937669914699L;
@@ -342,10 +458,38 @@ public class Utils {
 				return -1;
 			}
 
+			public Stream<T> stream() {
+				return imlist().stream();
+			}
+
+			@Override
+			public Stream<T> parallelStream() {
+				return imlist().parallelStream();
+			}
+
 			@SuppressWarnings("unchecked")
+			private ImmutableList<T> imlist() {
+				return (ImmutableList<T>) ImmutableList.builder().add(this.toArray()).build();
+			}
+
+			@Override
+			public Spliterator<T> spliterator() {
+				return imlist().spliterator();
+			}
+
+			@Override
+			public ListIterator<T> listIterator(int index) {
+				return imlist().listIterator(index);
+			}
+
+			@Override
+			public ListIterator<T> listIterator() {
+				return imlist().listIterator();
+			}
+
 			@Override
 			public Iterator<T> iterator() {
-				return (Iterator<T>) ImmutableList.builder().add(this.toArray()).build().iterator();
+				return imlist().iterator();
 			}
 
 		});
@@ -548,8 +692,8 @@ public class Utils {
 	 * Randomly arrange a List.
 	 */
 	public static <T> List<T> scramble(final List<T> list) {
-		List<T> out = sl();
-		List<T> in = sl(list);
+		List<T> out = al();
+		List<T> in = al(list, true);
 		Random r = new Random();
 		while (!in.isEmpty()) {
 			out.add(in.remove(r.nextInt(in.size())));
@@ -634,7 +778,7 @@ public class Utils {
 	 * Join a group of strings into one with a separator.
 	 */
 	public static String join(String sep, String... k) {
-		return join(sep, sl(k));
+		return join(sep, al(k, true));
 	}
 
 	/**
@@ -676,7 +820,7 @@ public class Utils {
 	 * method to call which takes no parameters and returns a string.
 	 */
 	public static <T> List<String> toStringList(List<T> o, Optional<Method> toCall) {
-		List<String> out = sl();
+		List<String> out = al();
 		if (!toCall.isPresent() || toCall.get().getReturnType() != String.class
 				|| toCall.get().getParameters().length > 0) {
 			for (Object o1 : o) {
@@ -686,7 +830,7 @@ public class Utils {
 		}
 		Method m = toCall.get();
 		for (Object o1 : o) {
-			List<Method> objMethods = sl(o1.getClass().getMethods());
+			List<Method> objMethods = al(o1.getClass().getMethods(), true);
 			if (!objMethods.contains(m)) {
 				out.add(o1.toString());
 			} else {
@@ -729,7 +873,7 @@ public class Utils {
 	 * Return a list that takes all of the parts in J before index i.
 	 */
 	public static <T> List<T> sub(int i, Iterable<T> j) {
-		List<T> o = sl();
+		List<T> o = al();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -746,7 +890,7 @@ public class Utils {
 	 */
 	@SafeVarargs
 	public static <T> List<T> sub(int i, T... j) {
-		List<T> o = sl();
+		List<T> o = al();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -763,7 +907,7 @@ public class Utils {
 	 * i.
 	 */
 	public static <T> List<T> post(int i, Iterable<T> j) {
-		List<T> o = sl();
+		List<T> o = al();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -781,7 +925,7 @@ public class Utils {
 	 */
 	@SafeVarargs
 	public static <T> List<T> post(int i, T... j) {
-		List<T> o = sl();
+		List<T> o = al();
 		int k = 0;
 		for (T s : j) {
 			k++;
@@ -797,7 +941,7 @@ public class Utils {
 	 * Remove duplicate items from a list.
 	 */
 	public static <T> List<T> removeDuplicates(List<T> list) {
-		return sl(list.stream().distinct().collect(Collectors.toList()));
+		return al(list.stream().distinct().collect(Collectors.toList()), true);
 	}
 
 	/**
@@ -862,7 +1006,7 @@ public class Utils {
 	 */
 	public static <T> List<T> alternate(T[] one, T[] two) {
 		int dif = one.length - two.length;
-		List<T> out = sl();
+		List<T> out = al();
 		if (dif > 0) {
 			int i = 0;
 			for (; i < two.length; i++) {
@@ -898,7 +1042,7 @@ public class Utils {
 	 */
 	public static <T> List<T> alternate(List<T> one, List<T> two) {
 		int dif = one.size() - two.size();
-		List<T> out = sl();
+		List<T> out = al();
 		if (dif > 0) {
 			int i = 0;
 			for (; i < two.size(); i++) {
@@ -1002,7 +1146,7 @@ public class Utils {
 	 * certain number of times.
 	 */
 	public static <T> List<T> fill(T original, BiFunction<T, Integer, T> mod, int times, boolean includeOriginal) {
-		List<T> out = sl();
+		List<T> out = al();
 		if (includeOriginal) {
 			out.add(original);
 		}
@@ -1035,7 +1179,7 @@ public class Utils {
 	 * Update the list of players stored alphabetically.
 	 */
 	public static void updatePlayersAlpha() {
-		playersAlphabetical = sort(sl(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers()));
+		playersAlphabetical = sort(sl(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers(), true));
 
 	}
 
@@ -1044,7 +1188,7 @@ public class Utils {
 	 */
 	public static List<Player> getPlayers() {
 		updatePlayersAlpha();
-		return sl(playersAlphabetical);
+		return sl(playersAlphabetical, true);
 	}
 
 	/**

@@ -47,7 +47,7 @@ public abstract class Effect<T> {
 	private BiFunction<T, ParsableData, T> parser;
 	private final int frames;// number of frames
 	private final int delay;// time delay between each frame
-	private List<T> objects = Utils.sl();// final list of frames
+	private List<T> objects = Utils.al();// final list of frames
 
 	private Animation<T> anim;// animation for sending
 

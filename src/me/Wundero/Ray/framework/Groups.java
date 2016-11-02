@@ -81,7 +81,7 @@ public class Groups {
 	 * Return all groups from all worlds.
 	 */
 	public List<Group> getAllGroups() {
-		List<Group> groups = Utils.sl();
+		List<Group> groups = Utils.al();
 		for (Map<String, Group> g1 : this.groups.values()) {
 			for (Group g : g1.values()) {
 				groups.add(g);

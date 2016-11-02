@@ -44,7 +44,7 @@ public abstract class Conversation {
 	private ConversationListener listener;
 	private ConversationContext context;
 	private boolean suppressMessages, echoInputs, started = false;
-	private List<ConversationCanceller> cancellers = Utils.sl();
+	private List<ConversationCanceller> cancellers = Utils.al();
 	private Text prefix = Text.of();
 
 	/**

@@ -437,7 +437,7 @@ public class RayPlayer implements Socialable {
 			return;
 		}
 		ConfigurationNode i = config.getNode("ignoring");
-		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)));
+		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)), true);
 		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
 		this.spy = config.getNode("spy").getBoolean(false);
 		loadTags(config.getNode("tags"));

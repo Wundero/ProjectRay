@@ -68,7 +68,7 @@ public class ChannelMemberCollection {
 	 */
 	public List<MessageReceiver> getMembers() {
 		fix();
-		List<MessageReceiver> l = Utils.sl();
+		List<MessageReceiver> l = Utils.al();
 		for (ChannelMember m : members) {
 			l.add(m.getReceiver());
 		}
@@ -86,7 +86,7 @@ public class ChannelMemberCollection {
 					throws ObjectMappingException {
 				ChannelMemberCollection out = new ChannelMemberCollection();
 				for (Map.Entry<Object, ? extends ConfigurationNode> e : arg1.getChildrenMap().entrySet()) {
-					out.serialization.put(e.getKey().toString(), Utils.sl());
+					out.serialization.put(e.getKey().toString(), Utils.al());
 					for (Map.Entry<Object, ? extends ConfigurationNode> e2 : e.getValue().getChildrenMap().entrySet()) {
 						Object o = e2.getKey();
 						List<UUID> x = out.serialization.get(e.getKey().toString());

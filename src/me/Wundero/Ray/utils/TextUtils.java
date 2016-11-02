@@ -127,7 +127,7 @@ public class TextUtils {
 	 */
 	public static List<Text> flatten(Text t) {
 		if (t.getChildren().isEmpty()) {
-			return Utils.sl(t);
+			return Utils.al(t);
 		}
 		List<Text> children = t.getChildren();
 		children.add(0, t.toBuilder().removeAll().build());
@@ -141,13 +141,13 @@ public class TextUtils {
 	 */
 	public static List<Text> flatten(Text t, boolean recursive) {
 		if (t.getChildren().isEmpty()) {
-			return Utils.sl(t);
+			return Utils.al(t);
 		}
 		if (!recursive) {
 			return flatten(t);
 		}
 		List<Text> f = flatten(t);
-		List<Text> out = Utils.sl(t.toBuilder().removeAll().build());
+		List<Text> out = Utils.al(t.toBuilder().removeAll().build());
 		f.stream().forEach(text -> out.addAll(flatten(t, recursive)));
 		return out;
 	}
@@ -166,7 +166,7 @@ public class TextUtils {
 		char[] chars = getContent(original, false).toCharArray();
 		Integer obC = percentDiscoloration.intValue();
 		Integer obS = percentObfuscation.intValue();
-		List<Text> cs = Utils.sl();
+		List<Text> cs = Utils.al();
 		Random rng = new Random();
 		TextColor co = original.getColor();
 		for (Character c : chars) {
@@ -176,7 +176,7 @@ public class TextUtils {
 				cs.add(Text.of(co, c));
 			}
 		}
-		List<Text> toBuild = Utils.sl();
+		List<Text> toBuild = Utils.al();
 		for (Text t : cs) {
 			if (rng.nextInt(100) < obC) {
 				toBuild.add(t.toBuilder().color(TextColors.DARK_GRAY).build());
@@ -483,7 +483,7 @@ public class TextUtils {
 						List<String> alt = Utils.alternate(parts, allmatches(content, matcher));
 						LiteralText.Builder ob = builder;
 						builder = (LiteralText.Builder) LiteralText.builder();
-						List<String> pz = Utils.sl(parts);
+						List<String> pz = Utils.al(parts, true);
 						for (String s : alt) {
 							if (pz.contains(s)) {
 								LiteralText t = replaceRegex(bf(s, ob).build(), matcher, replacer, useClickHover);
@@ -497,7 +497,7 @@ public class TextUtils {
 						List<String> alt = Utils.alternate(allmatches(content, matcher), parts);
 						LiteralText.Builder ob = builder;
 						builder = (LiteralText.Builder) LiteralText.builder();
-						List<String> pz = Utils.sl(parts);
+						List<String> pz = Utils.al(parts, true);
 						for (String s : alt) {
 							if (pz.contains(s)) {
 								builder.append(replaceRegex(bf(s, ob).build(), matcher, replacer, useClickHover));
@@ -519,7 +519,7 @@ public class TextUtils {
 					String out = matcher.matcher(s).replaceAll("%s");
 					String st = s;
 					Matcher m = matcher.matcher(s);
-					List<Object> b = Utils.sl();
+					List<Object> b = Utils.al();
 					while ((m = m.reset(st)).find()) {
 						String g = m.group();
 						b.add(replacer.apply(g).orElse(LiteralText.builder("").build()).toPlain());
@@ -545,7 +545,7 @@ public class TextUtils {
 					String out = matcher.matcher(a).replaceAll("%s");
 					String st = a;
 					Matcher m = matcher.matcher(a);
-					List<Object> b = Utils.sl();
+					List<Object> b = Utils.al();
 					while ((m = m.reset(st)).find()) {
 						String g = m.group();
 						b.add(TextSerializers.FORMATTING_CODE
@@ -600,17 +600,17 @@ public class TextUtils {
 	 */
 	public static List<Text> split(Text t, String c, boolean skip) {
 		if (!lit(t)) {
-			return Utils.sl(t);
+			return Utils.al(t);
 		}
-		List<Text> out = Utils.sl();
+		List<Text> out = Utils.al();
 		List<Text> children = t.getChildren();
 		LiteralText.Builder text = ((LiteralText) t).toBuilder();
 		String content = text.getContent();
 		if (!content.contains(c)) {
-			return Utils.sl(t);
+			return Utils.al(t);
 		}
 		if (content.equals(c)) {
-			return skip ? Utils.sl() : Utils.sl(t);
+			return skip ? Utils.al() : Utils.al(t);
 		}
 		Pattern p = Pattern.compile(c, Pattern.LITERAL);
 		Matcher m = p.matcher(content);
@@ -736,9 +736,9 @@ public class TextUtils {
 	 */
 	public static List<Text> splitAfterCharCount(Text t, int charCount, boolean repeat) {
 		if (!lit(t)) {
-			return Utils.sl(t);
+			return Utils.al(t);
 		}
-		List<Text> out = Utils.sl();
+		List<Text> out = Utils.al();
 		int times = length(t) % charCount;
 		if (!repeat) {
 			times = 1;
@@ -935,7 +935,7 @@ public class TextUtils {
 	 * Join texts together.
 	 */
 	public static Text join(Text[] texts, Text separator) {
-		return join(Utils.sl(texts), separator);
+		return join(Utils.al(texts, true), separator);
 	}
 
 	/**
@@ -1028,6 +1028,14 @@ public class TextUtils {
 	 */
 	public static boolean startsWith(Text in, String part) {
 		return getContent(in, false).startsWith(part);
+	}
+
+	/**
+	 * Check to see if two texts are equal, including click/hover, format and
+	 * case.
+	 */
+	public static boolean equals(Text one, Text two) {
+		return equals(one, two, true, true, false);
 	}
 
 	/**
@@ -1125,7 +1133,7 @@ public class TextUtils {
 					break;
 				}
 			}
-			List<Text> ot = Utils.sl();
+			List<Text> ot = Utils.al();
 			if (found) {
 				for (int x = 0; x < txs.size(); x++) {
 					if (x == i) {
@@ -1283,7 +1291,7 @@ public class TextUtils {
 	private static String[] allmatches(final String a, final Pattern b) {
 		String f = a;
 		Matcher m = b.matcher(f);
-		List<String> o = Utils.sl();
+		List<String> o = Utils.al();
 		while ((m = m.reset(f)).find()) {
 			o.add(m.group());
 			f = m.replaceFirst("");
@@ -1414,6 +1422,67 @@ public class TextUtils {
 	}
 
 	/**
+	 * Merge the content of two texts into one text object
+	 */
+	public static Text merge(Text one, Text two) {
+		if (one == null || two == null) {
+			throw new IllegalArgumentException("Texts cannot be null!");
+		}
+		if (!extrasEqual(one, two) || !formatsEqual(one, two)) {
+			throw new IllegalArgumentException("Both texts must have matching formats and extras!");
+		}
+		if (!lit(one) || !lit(two)) {
+			throw new IllegalArgumentException("Both texts must have literal string content!");
+		}
+		if (!one.getChildren().isEmpty() || !two.getChildren().isEmpty()) {
+			throw new IllegalArgumentException("Texts cannot have children!");
+		}
+		LiteralText.Builder b = (LiteralText.Builder) one.toBuilder();
+		b.content(b.getContent() + "" + ((LiteralText) two).getContent());
+		return b.build();
+	}
+
+	/**
+	 * Merge the children of a text object.
+	 */
+	public static Text mergeChildrenIfPossible(Text t) {
+		if (t.getChildren().isEmpty()) {
+			return t;
+		}
+		Text cur = t.toBuilder().removeAll().build();
+		List<Text> texts = Utils.al();
+		for (Text child : t.getChildren()) {
+			try {
+				cur = merge(cur, child);
+			} catch (Exception e) {
+				if (child.getChildren().isEmpty()) {
+					texts.add(cur);
+					cur = child;
+				} else {
+					try {
+						cur = merge(cur, mergeChildrenIfPossible(child));
+					} catch (Exception e2) {
+						texts.add(cur);
+						// assume optional is present due to nature of children.
+						// exception throwing is important here anyways
+						cur = Utils.getLast(flatten(mergeChildrenIfPossible(child))).get();
+					}
+				}
+			}
+		}
+		Text out = texts.isEmpty() ? cur : texts.get(0);
+		boolean f = true;
+		for (Text t2 : texts) {
+			if (f) {
+				f = false;
+				continue;
+			}
+			out.concat(t2);
+		}
+		return out;
+	}
+
+	/**
 	 * Condense children with same formats into singular text objects.
 	 */
 	public static Text condense(Text t) {
@@ -1423,8 +1492,28 @@ public class TextUtils {
 		if (t.getChildren().isEmpty()) {
 			return t;
 		}
-		List<Text> children = t.getChildren().stream().filter(tx -> hasContent(tx)).collect(RayCollectors.rayList());
-		return null;
+		Text out = mergeChildrenIfPossible(t);
+		if (out.isEmpty()) {
+			List<Text> children = out.getChildren().stream().filter(tex -> !tex.isEmpty())
+					.collect(RayCollectors.rayList());
+			if (children.isEmpty()) {
+				return EMPTY();
+			}
+			Text child = children.get(0);
+			boolean f = true;
+			for (Text t2 : children) {
+				if (f) {
+					f = false;
+					continue;
+				}
+				child.concat(t2);
+			}
+			return child;
+		} else {
+			List<Text> children = out.getChildren();
+			return out.toBuilder().removeAll()
+					.append(children.stream().filter(tex -> !tex.isEmpty()).collect(RayCollectors.rayList())).build();
+		}
 	}
 
 	/**

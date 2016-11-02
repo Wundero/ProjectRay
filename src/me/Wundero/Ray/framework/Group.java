@@ -175,7 +175,7 @@ public class Group {
 	 * @return all formats on all worlds.
 	 */
 	public List<Format> getAllFormats() {
-		List<Format> out = Utils.sl();
+		List<Format> out = Utils.al();
 		for (List<Format> f : formats.values()) {
 			out.addAll(f);
 		}
@@ -187,7 +187,7 @@ public class Group {
 	 *         a safeguard against stack overflow.
 	 */
 	public List<Format> getAllFormats(boolean inherits, int recurseTimes) {
-		List<Format> out2 = Utils.sl();
+		List<Format> out2 = Utils.al();
 		out2.addAll(getAllFormats());
 		List<Group> groups = getParentsGroups();
 		for (Group g : groups) {
@@ -201,8 +201,8 @@ public class Group {
 	 * against infinite parent loops are in place.
 	 */
 	public List<Group> getParentsGroups() {
-		List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
-		List<Group> torem = Utils.sl();
+		List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(world).values(), true);
+		List<Group> torem = Utils.al();
 		for (Group g : groups) {
 			if (!parents.contains(g.name)) {
 				torem.add(g);
@@ -228,8 +228,8 @@ public class Group {
 	 */
 	public List<Format> getFormats(FormatContext type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
-			List<Group> groups = Utils.sl(Ray.get().getGroups().getGroups(world).values());
-			List<Group> torem = Utils.sl();
+			List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(world).values(), true);
+			List<Group> torem = Utils.al();
 			for (Group g : groups) {
 				if (!parents.contains(g.name)) {
 					torem.add(g);
@@ -251,7 +251,7 @@ public class Group {
 					return formats;
 				}
 			}
-			return Utils.sl();
+			return Utils.al();
 		}
 		return formats.get(type);
 	}

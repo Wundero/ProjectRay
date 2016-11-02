@@ -41,25 +41,25 @@ public class Commands {
 
 	private static Map<List<String>, CommandCallable> children = Utils.sm();
 	static {
-		children.put(Utils.sl("format"), CommandSpec.builder().permission("ray.formatbuilder")
+		children.put(Utils.al("format"), CommandSpec.builder().permission("ray.formatbuilder")
 				.description(Text.of("Create a new format.")).executor(new FormatConversationCommand()).build());
-		children.put(Utils.sl("announce"),
+		children.put(Utils.al("announce"),
 				CommandSpec.builder().permission("ray.announcementbuilder")
 						.description(Text.of("Create a new announcement"))
 						.executor(new AnnouncementConversationCommand()).build());
-		children.put(Utils.sl("channel"), CommandSpec.builder().permission("ray.channelbuilder")
+		children.put(Utils.al("channel"), CommandSpec.builder().permission("ray.channelbuilder")
 				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
 
-		children.put(Utils.sl("test-translate"),
+		children.put(Utils.al("test-translate"),
 				CommandSpec.builder().permission("ray.translate.test").executor(new TranslationTestCommand())
 						.arguments(GenericArguments.string(Text.of("key")),
 								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("args"))))
 						.description(Text.of("Test translations.")).build());
-		children.put(Utils.sl("lock"),
+		children.put(Utils.al("lock"),
 				CommandSpec.builder().permission("ray.chatlock").executor(new ChatLockCommand())
 						.description(Text.of("Lock chat messages"))
 						.arguments(GenericArguments.optional(GenericArguments.bool(Text.of("value")))).build());
-		children.put(Utils.sl("filter"),
+		children.put(Utils.al("filter"),
 				CommandSpec.builder().arguments(GenericArguments.optional(GenericArguments.bool(Text.of("value"))))
 						.executor(new ChatFilterCommand()).permission("ray.chatfilter")
 						.description(Text.of("Filter chat messages")).build());

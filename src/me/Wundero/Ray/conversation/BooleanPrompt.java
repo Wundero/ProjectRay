@@ -107,7 +107,7 @@ public abstract class BooleanPrompt extends Prompt {
 	 */
 	@Override
 	public Optional<List<Option>> options(ConversationContext context) {
-		List<Option> list = Utils.sl();
+		List<Option> list = Utils.al();
 		list.add(new Option("yes", Text.builder("[" + (useunicode ? '\u2713' : 'Y') + "]").color(TextColors.GREEN)
 				.onClick(TextActions.runCommand("y")).build(), true));
 		list.add(new Option("no", Text.builder("[" + (useunicode ? '\u2715' : 'N') + "]").color(TextColors.RED)

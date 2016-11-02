@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -41,6 +40,7 @@ import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.conversation.TypePrompt;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.RayCollectors;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -92,7 +92,7 @@ public class AnimatedFormat extends Format {
 		ConfigurationNode frames = node.getNode("frames");
 		this.initialDelay = Utils.wrap(node.getNode("initial-delay").getInt());
 		Map<Format, Integer> t = Utils.sm();
-		List<Frame> framez = Utils.sl();
+		List<Frame> framez = Utils.al();
 		for (ConfigurationNode frame : frames.getChildrenMap().values()) {
 			Format f = null;
 			try {
@@ -114,7 +114,7 @@ public class AnimatedFormat extends Format {
 		framez.sort((frame1, frame2) -> {
 			return frame1.getO() - frame2.getO();
 		});
-		inOrder = Utils.sl(framez.stream().map(frame -> frame.getV()).collect(Collectors.toList()));
+		inOrder = framez.stream().map(frame -> frame.getV()).collect(RayCollectors.syncList());
 		initialDelay.ifPresent((delay) -> {
 			Format f = new Format(null) {
 

@@ -202,7 +202,7 @@ public class MultiFormat extends Format {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> list = Utils.sl();
+			List<Option> list = Utils.al();
 			list.add(Option.build("sequence", "sequence"));
 			list.add(Option.build("shuffle", "shuffle"));
 			list.add(Option.build("random", "random"));

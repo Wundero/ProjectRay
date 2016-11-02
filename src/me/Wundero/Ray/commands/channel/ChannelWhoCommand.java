@@ -73,7 +73,7 @@ public class ChannelWhoCommand implements CommandExecutor {
 		}
 		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.BLACK,
 				"]", " ", TextColors.GRAY, "Players in channel " + c.getName() + ":");
-		List<Text> texts = Utils.sl();
+		List<Text> texts = Utils.al();
 		for (MessageReceiver m : c.getMembers()) {
 			if (m instanceof Player) {
 				Object v = Ray.get().getVariables().get("displayname", new ParsableData().withSender((Player) m),

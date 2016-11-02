@@ -47,7 +47,7 @@ public class ChannelHelpCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		List<Text> texts = Utils.sl();
+		List<Text> texts = Utils.al();
 		texts.add(cmdgen("channel", "View a list of channels.", "", false, "ch"));
 		texts.add(cmdgen("help", "View a list of channel commands.", "", true, "h"));
 		texts.add(cmdgen("join", "Join a channel.", "<channel>", true, "j"));

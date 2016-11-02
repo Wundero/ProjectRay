@@ -144,7 +144,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.sl();
+			List<Option> options = Utils.al();
 			options.add(new Option("all",
 					Text.builder("all").color(TextColors.GOLD).onClick(TextActions.runCommand("all"))
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to choose all!"))).build(),
@@ -200,7 +200,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.sl();
+			List<Option> options = Utils.al();
 			for (String g : Ray.get().getGroups().getGroups(context.getData("world").toString()).keySet()) {
 				options.add(new Option(g,
 						Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
@@ -374,7 +374,7 @@ public class FormatConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.sl();
+			List<Option> options = Utils.al();
 			for (FormatContext type : FormatContexts.values()) {
 				if (type == FormatContexts.DEFAULT) {
 					continue;

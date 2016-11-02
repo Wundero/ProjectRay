@@ -35,8 +35,18 @@ public class RayCollectors {
 	/**
 	 * Create a synch list from a stream
 	 */
-	public static <T> Collector<T, List<T>, List<T>> rayList() {
+	public static <T> Collector<T, List<T>, List<T>> syncList() {
 		return Collector.of(() -> Utils.sl(), List::add, (a, b) -> {
+			a.addAll(b);
+			return a;
+		});
+	}
+	
+	/**
+	 * Create an array list from a stream
+	 */
+	public static <T> Collector<T, List<T>, List<T>> rayList() {
+		return Collector.of(() -> Utils.al(), List::add, (a, b) -> {
 			a.addAll(b);
 			return a;
 		});

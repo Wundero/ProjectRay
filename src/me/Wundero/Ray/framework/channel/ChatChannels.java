@@ -114,7 +114,7 @@ public class ChatChannels {
 	 */
 	public List<ChatChannel> getJoinableChannels(Player player, boolean showHidden) {
 		List<ChatChannel> l = getAllChannels();
-		List<ChatChannel> o = Utils.sl();
+		List<ChatChannel> o = Utils.al();
 		for (ChatChannel c : l) {
 			if (c.isHidden() && !showHidden) {
 				continue;
@@ -131,7 +131,7 @@ public class ChatChannels {
 	 * Return all the channels.
 	 */
 	public List<ChatChannel> getAllChannels() {
-		return Utils.sl(channels.values());
+		return Utils.al(channels.values(), true);
 	}
 
 	/**

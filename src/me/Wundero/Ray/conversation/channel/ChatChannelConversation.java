@@ -183,7 +183,7 @@ public class ChatChannelConversation {
 
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> out = Utils.sl();
+			List<Option> out = Utils.al();
 			out.add(new Option("permission",
 					Text.builder("permission").onClick(TextActions.runCommand("permission"))
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select permission!")))

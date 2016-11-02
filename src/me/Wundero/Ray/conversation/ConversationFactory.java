@@ -48,7 +48,7 @@ public class ConversationFactory {
 	private ConversationListener listener = null;
 	private ConversationContext context;
 	private boolean suppressMessages = true, echoInputs = false;
-	private List<ConversationCanceller> cancellers = Utils.sl();
+	private List<ConversationCanceller> cancellers = Utils.al();
 	private Object plugin;
 	private Map<String, Object> initialContextdata = Utils.sm();
 	private Text prefix = Text.of();

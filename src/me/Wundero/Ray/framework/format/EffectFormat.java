@@ -85,7 +85,7 @@ public class EffectFormat extends Format {
 
 			@Override
 			public Optional<List<Option>> options(ConversationContext context) {
-				List<Option> opts = Utils.sl();
+				List<Option> opts = Utils.al();
 				for (EffectType et : EffectTypes.values()) {
 					opts.add(Option.build(et.getName(), et.getName()));
 				}

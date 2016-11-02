@@ -64,7 +64,7 @@ public class EffectTypes {
 			String text = TextUtils.strip(s.getNode("text").getString(""));
 			return RainbowEffect.create(text, orig, get, sec, del);
 		}
-	}, Utils.sl(new Setting("text", String.class, false), new Setting("color", String.class, false),
+	}, Utils.al(new Setting("text", String.class, false), new Setting("color", String.class, false),
 			new Setting("second-color", String.class, true), new Setting("delay", Integer.class, true)));
 	/**
 	 * Scroll over a large text for a certain frame length
@@ -83,7 +83,7 @@ public class EffectTypes {
 				x -> x.isPresent() && x.get() > 0);
 		Optional<Integer> del = Utils.wrap2(s.getNode("delay").getInt(10), null, x -> x.isPresent() && x.get() > 0);
 		return TextScrollEffect.create(obj, len, spa, cha, del);
-	}, Utils.sl(new Setting("text", String.class, false), new Setting("delay", Integer.class, true),
+	}, Utils.al(new Setting("text", String.class, false), new Setting("delay", Integer.class, true),
 			new Setting("character-skip", Integer.class, true), new Setting("spaces", Integer.class, true),
 			new Setting("framelength", Integer.class, true)));
 
@@ -91,7 +91,7 @@ public class EffectTypes {
 	 * @return all effect types
 	 */
 	public static List<EffectType> values() {
-		return Utils.sl(types);
+		return Utils.al(types, true);
 	}
 
 	/**

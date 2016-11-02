@@ -51,7 +51,7 @@ public class RayCommand implements CommandExecutor {
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Ray", TextColors.BLACK, "]",
 				" ", TextColors.GRAY, "Ray commands:");
-		List<Text> texts = Utils.sl();
+		List<Text> texts = Utils.al();
 		for (List<String> o : Commands.getChildren().keySet()) {
 			texts.add(buildTextForCmd(src, Commands.getChildren().get(o), o));
 		}

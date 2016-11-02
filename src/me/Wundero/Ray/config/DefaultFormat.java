@@ -52,7 +52,7 @@ public class DefaultFormat {
 	 */
 	public DefaultFormat(String name, FormatContext type) {
 		this.name = name;
-		this.parts = Utils.sl();
+		this.parts = Utils.al();
 		this.type = type;
 	}
 

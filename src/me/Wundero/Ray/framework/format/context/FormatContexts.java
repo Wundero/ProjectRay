@@ -87,7 +87,7 @@ public class FormatContexts {
 	 * Get all format contexts.
 	 */
 	public static List<FormatContext> values() {
-		return Utils.sl(lookup.values());
+		return Utils.al(lookup.values(), true);
 	}
 
 	/**

@@ -45,11 +45,11 @@ public class RayIntersectedMessageChannel implements MessageChannel {
 	protected final List<MessageChannel> channels;
 
 	public RayIntersectedMessageChannel(MessageChannel... channels) {
-		this.channels = Utils.sl(channels);
+		this.channels = Utils.al(channels, true);
 	}
 
 	public RayIntersectedMessageChannel(Collection<MessageChannel> channels) {
-		this.channels = Utils.sl(channels);
+		this.channels = Utils.al(channels, true);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class RayIntersectedMessageChannel implements MessageChannel {
 	@Override
 	public Collection<MessageReceiver> getMembers() {
 		if (channels == null || channels.isEmpty()) {// prevents IOOBE and NPE
-			return Utils.sl();
+			return Utils.al();
 		}
 		Collection<MessageReceiver> out = channels.get(0).getMembers();
 		return channels.stream().flatMap(channel -> channel.getMembers().stream()).filter(r -> out.contains(r))
