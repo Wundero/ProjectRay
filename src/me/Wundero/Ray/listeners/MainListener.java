@@ -264,6 +264,7 @@ public class MainListener {
 						Optional.of(pla.getUniqueId()));
 			}
 		});
+		Task.builder().delayTicks(20).execute(() -> RayPlayer.updateTabs()).submit(Ray.get().getPlugin());
 		p.startTabHFTask();
 		final Group g = p.getActiveGroup();
 		if (g != null) {
