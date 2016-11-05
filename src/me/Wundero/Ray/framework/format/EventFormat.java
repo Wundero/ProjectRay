@@ -29,8 +29,12 @@ import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -40,6 +44,8 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.listeners.AfkEvent;
+import me.Wundero.Ray.utils.EventUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -52,9 +58,21 @@ import ninja.leaping.configurate.ConfigurationNode;
  */
 public class EventFormat extends Format {
 
+	private static Map<String, Class<?>> spongeEvents = Utils.sm();
+	static {
+		spongeEvents.put("join", ClientConnectionEvent.Join.class);
+		spongeEvents.put("login", ClientConnectionEvent.Join.class);
+		spongeEvents.put("leave", ClientConnectionEvent.Disconnect.class);
+		spongeEvents.put("disconnect", ClientConnectionEvent.Disconnect.class);
+		spongeEvents.put("quit", ClientConnectionEvent.Disconnect.class);
+		spongeEvents.put("chat", MessageChannelEvent.Chat.class);
+		spongeEvents.put("afk", AfkEvent.class);
+	}
+
 	private Optional<String> eventClass = Optional.empty();
 
 	private Format internal;
+	private boolean cancel;
 
 	/**
 	 * Create a new event format.
@@ -66,9 +84,8 @@ public class EventFormat extends Format {
 		}
 		internal = f;
 		String cname = node.getNode("event").getString();
-		if (cname != null) {
-			eventClass = Optional.of(cname);
-		}
+		this.eventClass = Utils.wrap(cname, !cname.trim().isEmpty());
+		this.cancel = node.getNode("cancel").getBoolean(true);
 		Task.builder().intervalTicks(20).execute((task) -> {
 			if (f.usable) {
 				Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
@@ -77,9 +94,17 @@ public class EventFormat extends Format {
 		}).submit(Ray.get().getPlugin());
 	}
 
+	private boolean needsDelay(Class<?> clazz) {
+		return ClientConnectionEvent.Join.class.isAssignableFrom(clazz);
+	}
+
 	private boolean checkClass(Class<?> clazz) {
 		if (!eventClass.isPresent()) {
 			return false;
+		}
+		String ec = eventClass.get().toLowerCase().trim();
+		if (spongeEvents.containsKey(ec) && spongeEvents.get(ec) != null) {
+			return spongeEvents.get(ec).isAssignableFrom(clazz);
 		}
 		return Utils.classinstanceof(eventClass.get(), clazz);
 	}
@@ -93,6 +118,12 @@ public class EventFormat extends Format {
 	@Listener
 	public void onEvent(Event e) {
 		if (checkClass(e.getClass())) {
+			if (cancel && e instanceof Cancellable) {
+				((Cancellable) e).setCancelled(true);
+			}
+			if (cancel && e instanceof MessageEvent) {
+				((MessageEvent) e).setMessageCancelled(true);
+			}
 			ParsableData data = new ParsableData();
 			if (e.getCause().containsNamed("sender")) {
 				data.setSender(e.getCause().get("sender", Player.class));
@@ -125,12 +156,25 @@ public class EventFormat extends Format {
 					map.put(key.getKey(), key.getValue());
 				}
 			}
+			map.putAll(EventUtils.getValues(e, true));
 			data.setKnown(map);
-			if (data.getRecipient().isPresent()) {
-				send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)));
+			if (needsDelay(e.getClass())) {
+				Task.builder().delayTicks(20).execute(() -> {
+					if (data.getRecipient().isPresent()) {
+						send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)));
+					} else {
+						for (Player p : Sponge.getServer().getOnlinePlayers()) {
+							send(p, data, Utils.wrap(data.getSender().orElse(null)));
+						}
+					}
+				}).submit(Ray.get().getPlugin());
 			} else {
-				for (Player p : Sponge.getServer().getOnlinePlayers()) {
-					send(p, data, Utils.wrap(data.getSender().orElse(null)));
+				if (data.getRecipient().isPresent()) {
+					send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)));
+				} else {
+					for (Player p : Sponge.getServer().getOnlinePlayers()) {
+						send(p, data, Utils.wrap(data.getSender().orElse(null)));
+					}
 				}
 			}
 		}

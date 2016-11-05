@@ -148,6 +148,47 @@ public class Utils {
 	}
 
 	/**
+	 * Combine multiple lists into one.
+	 */
+	@SafeVarargs
+	public static <T> List<T> combine(List<T>... lists) {
+		List<T> out = al();
+		for (List<T> l : lists) {
+			for (T t : l) {
+				if (!out.contains(t)) {
+					out.add(t);
+				}
+			}
+		}
+		return out;
+	}
+
+	/**
+	 * Combine multiple arrays into one.
+	 */
+	@SuppressWarnings("unchecked")
+	@SafeVarargs
+	public static <T> T[] combine(T[]... arrs) {
+		List<T> out = al();
+		for (T[] a : arrs) {
+			for (T t : a) {
+				if (!out.contains(t)) {
+					out.add(t);
+				}
+			}
+		}
+		return (T[]) out.toArray(new Object[out.size()]);
+	}
+
+	/**
+	 * Check to see if an array contains an object.
+	 */
+	public static <T> boolean contains(T[] arr, T obj) {
+		List<T> list = al(arr, true);
+		return list.contains(obj);
+	}
+
+	/**
 	 * Check to see if num is within bounds b1 and b2, with defined exclusivity.
 	 */
 	public boolean in(int num, int b1, int b2, boolean el, boolean eg) {

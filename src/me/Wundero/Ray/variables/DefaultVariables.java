@@ -36,6 +36,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.Ray.Ray;
@@ -68,6 +69,42 @@ public class DefaultVariables {
 				return Text.of();
 			}
 			return TextSerializers.FORMATTING_CODE.deserialize(quote.get());
+		});
+		v.registerVariable("afk", (objects) -> {
+			Param playerToUse = Param.SENDER;
+			Player player = null;
+			if (objects.containsKey(Param.DATA)) {
+				String data = (String) objects.get(Param.DATA);
+				switch (data) {
+				case "sender":
+					break;
+				case "recipient":
+				case "recip":
+					playerToUse = Param.RECIPIENT;
+					break;
+				case "observer":
+				case "killer":
+					playerToUse = Param.OBSERVER;
+					break;
+				default:
+					playerToUse = Param.DATA;
+					Optional<Player> po = Sponge.getServer().getPlayer(data);
+					if (!po.isPresent()) {
+						return Text.of();
+					}
+					player = po.get();
+				}
+			}
+			if (!objects.containsKey(playerToUse)) {
+				return Text.of();
+			}
+			if (player == null) {
+				player = (Player) objects.get(playerToUse);
+			}
+			if (player == null) {
+				return Text.of();
+			}
+			return RayPlayer.get(player).AFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.of();
 		});
 		v.registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		v.registerVariable("player", (objects) -> {

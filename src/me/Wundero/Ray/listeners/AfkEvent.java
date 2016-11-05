@@ -27,25 +27,33 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.impl.AbstractEvent;
+import org.spongepowered.api.event.impl.AbstractMessageEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.TextUtils;
 
 /**
  * Represents an event which changes the state of the player being AFK.
  */
-public class AfkEvent extends AbstractEvent implements Cancellable {
+public class AfkEvent extends AbstractMessageEvent implements Cancellable {
 
 	private Cause cause;
 	private Player afker;
-	private boolean afk, cancelled;
+	private boolean afk, mafk, cancelled = false, mcancelled = false;
 
 	private AfkEvent(Cause c, Player a, boolean afk) {
 		this.cause = c;
 		this.afker = a;
 		this.afk = afk;
-		this.cancelled = false;
+		this.mafk = afk;
+		super.originalMessage = a.getDisplayNameData().displayName().exists()
+				? Text.of(TextColors.GRAY, " * ")
+						.concat(a.getDisplayNameData().displayName().get()
+								.concat(Text.of(TextColors.GRAY, " is no" + (afk ? "w" : " longer") + " AFK!")))
+				: Text.of(TextColors.GRAY, " * " + a.getName() + " is no" + (afk ? "w" : " longer") + " AFK!");
 	}
 
 	/**
@@ -55,6 +63,23 @@ public class AfkEvent extends AbstractEvent implements Cancellable {
 		AfkEvent e = new AfkEvent(Cause.source(Ray.get().getPlugin()).named("player", p).build(), p, afk);
 		if (!Sponge.getEventManager().post(e)) {
 			RayPlayer.get(e.getAfkPlayer()).setAFK(e.isAFK());
+			Text msg = e.getMessage();
+			if (e.mafk != e.afk) {
+				if (TextUtils.equals(msg, e.getOriginalMessage())) {
+					msg = e.getAfkPlayer().getDisplayNameData().displayName().exists()
+							? Text.of(TextColors.GRAY, " * ")
+									.concat(e.getAfkPlayer().getDisplayNameData().displayName().get()
+											.concat(Text.of(TextColors.GRAY,
+													" is no" + (e.afk ? "w" : " longer") + " AFK!")))
+							: Text.of(TextColors.GRAY, " * " + e.getAfkPlayer().getName() + " is no"
+									+ (e.afk ? "w" : " longer") + " AFK!");
+				}
+			}
+			if (!e.mcancelled) {
+				for (Player px : Sponge.getServer().getOnlinePlayers()) {
+					px.sendMessage(msg);
+				}
+			}
 		}
 	}
 
@@ -115,6 +140,38 @@ public class AfkEvent extends AbstractEvent implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancel) {
 		this.cancelled = cancel;
+	}
+
+	/**
+	 * Get the original message.
+	 */
+	@Override
+	public Text getOriginalMessage() {
+		return this.originalMessage;
+	}
+
+	/**
+	 * Get whether the message will be sent.
+	 */
+	@Override
+	public boolean isMessageCancelled() {
+		return this.mcancelled;
+	}
+
+	/**
+	 * Set whether the message will be sent.
+	 */
+	@Override
+	public void setMessageCancelled(boolean cancelled) {
+		this.mcancelled = cancelled;
+	}
+
+	/**
+	 * Get the message formatter.
+	 */
+	@Override
+	public MessageFormatter getFormatter() {
+		return this.formatter;
 	}
 
 }

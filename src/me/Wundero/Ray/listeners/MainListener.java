@@ -217,7 +217,7 @@ public class MainListener {
 			if (f != null) {
 				String s = event.isAFK() ? "w" : " longer";
 				Map<String, Object> v = Utils.sm();
-				v.put("afk", event.isAFK());
+				v.put("afk", event.isAFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.EMPTY);
 				v.put("afkmessage", "no" + s);
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.AFK)
