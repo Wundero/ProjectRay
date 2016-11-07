@@ -31,6 +31,10 @@ import me.Wundero.Ray.utils.Utils;
  SOFTWARE.
  */
 
+/**
+ * Represents a textual displayname for a player containing a prefix, nickname
+ * and suffix.
+ */
 public class DisplayName implements Nicknamable, Prefixable, Suffixable {
 
 	private final Text original;
@@ -68,11 +72,11 @@ public class DisplayName implements Nicknamable, Prefixable, Suffixable {
 	 */
 	public boolean offer(Text prefix, Text name, Text suffix) {
 		boolean r = prefix(prefix);
-		if(r==false) {
+		if (r == false) {
 			return false;
 		}
 		r = r && nickname(name);
-		if(r==false) {
+		if (r == false) {
 			return false;
 		}
 		r = r && suffix(suffix);

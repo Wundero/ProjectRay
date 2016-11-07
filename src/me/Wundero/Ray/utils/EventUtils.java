@@ -30,6 +30,10 @@ import org.spongepowered.api.event.Event;
  SOFTWARE.
  */
 
+/**
+ * A utilities class for event based methods. Subject to change when the overall
+ * event api changes.
+ */
 public class EventUtils {
 
 	/**

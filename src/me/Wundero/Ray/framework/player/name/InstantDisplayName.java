@@ -28,6 +28,9 @@ import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.text.Text;
 
+/**
+ * Instantly apply the displayname to a function when it is changed.
+ */
 public class InstantDisplayName extends DisplayName {
 
 	private Function<Text, Boolean> applier;

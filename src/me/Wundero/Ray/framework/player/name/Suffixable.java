@@ -27,6 +27,9 @@ import java.util.Optional;
 
 import org.spongepowered.api.text.Text;
 
+/**
+ * Represents something that can hold a suffix.
+ */
 public interface Suffixable extends Changable {
 
 	boolean suffix(Text suffix);

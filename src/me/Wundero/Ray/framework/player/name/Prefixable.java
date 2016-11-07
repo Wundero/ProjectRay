@@ -28,6 +28,9 @@ import org.spongepowered.api.text.Text;
  SOFTWARE.
  */
 
+/**
+ * Represents something that can hold a prefix.
+ */
 public interface Prefixable extends Changable {
 
 	boolean prefix(Text prefix);
