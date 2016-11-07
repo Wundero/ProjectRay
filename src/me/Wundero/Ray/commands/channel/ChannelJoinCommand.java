@@ -62,7 +62,8 @@ public class ChannelJoinCommand implements CommandExecutor {
 			s.sendMessage(Text.of(TextColors.RED, "That is not a valid channel!"));
 			return CommandResult.success();
 		}
-		if (!c.canJoin(s)) {
+		Optional<String> password = arg1.getOne("password");
+		if (!c.canJoin(s, password)) {
 			s.sendMessage(Text.of(TextColors.RED, "You cannot join that channel!"));
 			return CommandResult.success();
 		}

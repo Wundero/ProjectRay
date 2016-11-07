@@ -23,6 +23,8 @@ package me.Wundero.Ray.listeners;
  SOFTWARE.
  */
 
+import java.util.Optional;
+
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -48,15 +50,16 @@ public class ChatChannelListener {
 		ChatChannel mostIn = null;
 		for (ChatChannel c : Ray.get().getChannels().getJoinableChannels(event.getTargetEntity(), true)) {
 			if (c.isAutojoin()) {
-				if (c.canJoin(event.getTargetEntity())) {
+				if (c.canJoin(event.getTargetEntity(), Optional.empty())) {
 					c.addMember(event.getTargetEntity());
 					RayPlayer.get(event.getTargetEntity()).addListenChannel(c);
-				}
-				if (mostIn == null) {
-					mostIn = c;
-				} else {
-					if (mostIn.compareTo(c) < 0) {
+
+					if (mostIn == null) {
 						mostIn = c;
+					} else {
+						if (mostIn.compareTo(c) < 0) {
+							mostIn = c;
+						}
 					}
 				}
 			}

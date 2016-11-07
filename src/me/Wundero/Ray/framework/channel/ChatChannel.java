@@ -158,7 +158,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	/**
 	 * @return whether the player can join the channel.
 	 */
-	public boolean canJoin(Player player) {
+	public boolean canJoin(Player player, Optional<String> password) {
 		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
 			return false;
 		}
@@ -169,6 +169,12 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		ChannelMember m = members.get(player);
 		if (m != null && m.isBanned()) {
 			return false;
+		}
+		if (this.password.isPresent()) {
+			if (!password.isPresent()) {
+				return false;
+			}
+			return this.password.get().equals(password.get());
 		}
 		return true;
 	}

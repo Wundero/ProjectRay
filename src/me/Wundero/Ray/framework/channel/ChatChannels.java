@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.channel;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -119,7 +120,7 @@ public class ChatChannels {
 			if (c.isHidden() && !showHidden) {
 				continue;
 			}
-			if (c.canJoin(player)) {
+			if (c.canJoin(player, Optional.empty())) {
 				o.add(c);
 			}
 

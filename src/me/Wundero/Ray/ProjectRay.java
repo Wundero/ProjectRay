@@ -321,7 +321,10 @@ public class ProjectRay {
 										.build(), "role", "r")
 								.child(CommandSpec.builder().executor(new ChannelJoinCommand())
 										.description(Text.of("Join a channel."))
-										.arguments(GenericArguments.string(Text.of("channel"))).build(), "join", "j")
+										.arguments(GenericArguments.string(Text.of("channel")),
+												GenericArguments.optional(
+														GenericArguments.remainingJoinedStrings(Text.of("password"))))
+										.build(), "join", "j")
 								.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
 										.description(Text.of("Leave a channel."))
 										.arguments(
