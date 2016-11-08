@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -1204,34 +1203,6 @@ public class Utils {
 		return out;
 	}
 
-	private static List<Player> playersAlphabetical = sl();
-
-	private static List<Player> sort(List<Player> list) {
-		list.sort(new Comparator<Player>() {
-			@Override
-			public int compare(Player o1, Player o2) {
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
-		});
-		return list;
-	}
-
-	/**
-	 * Update the list of players stored alphabetically.
-	 */
-	public static void updatePlayersAlpha() {
-		playersAlphabetical = sort(sl(Ray.get().getPlugin().getGame().getServer().getOnlinePlayers(), true));
-
-	}
-
-	/**
-	 * Return the list of players in alphabetical order.
-	 */
-	public static List<Player> getPlayers() {
-		updatePlayersAlpha();
-		return sl(playersAlphabetical, true);
-	}
-
 	/**
 	 * Return a user if there is one with the given name.
 	 */
@@ -1250,15 +1221,47 @@ public class Utils {
 	}
 
 	/**
+	 * Return a user if there is one with the given name.
+	 */
+	public static Optional<User> getUser(String name, boolean useCache) {
+		try {
+			return getUser(UUID.fromString(name), useCache);
+		} catch (Exception e) {
+			if (Sponge.getServer().getPlayer(name).isPresent()) {
+				return wrap(Sponge.getServer().getPlayer(name).orElse(null));
+			}
+			UserStorageService storage = Ray.get().getPlugin().getGame().getServiceManager()
+					.provide(UserStorageService.class).get();
+			Optional<User> opt = storage.get(name);
+			return opt;
+		}
+	}
+
+	/**
 	 * Return a user, if it exists, based off of the uuid.
 	 */
 	public static Optional<User> getUser(UUID uuid) {
-		return wrap(getUser(uuid, true));
+		return getUser(uuid, true);
 	}
 
-	private static User getUser(UUID uuid, boolean k) {
+	/**
+	 * Return a user, if it exists, based off of the uuid.
+	 */
+	public static Optional<User> getUser(UUID uuid, boolean useCache) {
+		return wrap(getUser(uuid, useCache, null));
+	}
+
+	private static User getUser(UUID uuid, boolean cache, Object irrelevant) {
 		Optional<Player> p = Sponge.getServer().getPlayer(uuid);
 		if (!p.isPresent()) {
+			if (cache) {
+				UserCache c = Ray.get().getCache();
+				if (c.containsKey(uuid)) {
+					if (c.get(uuid).isPresent()) {
+						return c.get(uuid).get();
+					}
+				}
+			}
 			UserStorageService storage = Ray.get().getPlugin().getGame().getServiceManager()
 					.provide(UserStorageService.class).get();
 			Optional<User> opt = storage.get(uuid);

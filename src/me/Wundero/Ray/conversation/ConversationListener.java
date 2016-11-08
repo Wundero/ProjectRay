@@ -28,8 +28,10 @@ import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
@@ -168,6 +170,19 @@ public abstract class ConversationListener {
 				event.setChannel(cj);
 			});
 			return;
+		}
+	}
+
+	/**
+	 * Update player reference on death
+	 */
+	@Listener(order = Order.POST)
+	public final void internaldeath(DestructEntityEvent.Death event) {
+		if (event.getTargetEntity() instanceof Player) {
+			Player p = (Player) event.getTargetEntity();
+			if (p.getUniqueId().equals(conversation.getContext().getHolderID())) {
+				conversation.getContext().updateHolder();
+			}
 		}
 	}
 

@@ -324,9 +324,6 @@ public abstract class Format {
 		if (!node.getNode("formats").isVirtual()) {
 			return buildFormat(node, new MultiFormat(node), event, cmd, ex);
 		}
-		if (!node.getNode("key").isVirtual()) {
-			return buildFormat(node, new TranslatableFormat(node), event, cmd, ex);
-		}
 		return buildFormat(node, new StaticFormat(node), event, cmd, ex);
 	}
 
@@ -450,10 +447,6 @@ public abstract class Format {
 		case "many":
 		case "m":
 			return mf;
-		case "translatable":
-		case "translate":
-		case "t":
-			return tf;
 		case "command":
 		case "cmd":
 		case "c":
@@ -468,6 +461,5 @@ public abstract class Format {
 	private static StaticFormat sf = new StaticFormat(null);
 	private static EventFormat ef = new EventFormat(null, null);
 	private static MultiFormat mf = new MultiFormat(null);
-	private static TranslatableFormat tf = new TranslatableFormat(null);
 	private static CommandFormat cf = new CommandFormat(null, null);
 }

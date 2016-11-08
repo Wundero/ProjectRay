@@ -345,7 +345,7 @@ public class ProjectRay {
 								.child(CommandSpec.builder().executor(new ChannelHelpCommand())
 										.description(Text.of("List channel commands.")).build(), "help", "h")
 								.child(CommandSpec.builder().executor(new ChannelSetupCommand())
-										.permission("ray.channel.setup")
+										.permission("ray.channel.setup").description(Text.of("Create a new channel."))
 										.arguments(GenericArguments
 												.optional(GenericArguments.remainingJoinedStrings(Text.of("type"))))
 										.build(), "setup")

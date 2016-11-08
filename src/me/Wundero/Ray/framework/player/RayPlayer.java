@@ -101,7 +101,7 @@ public class RayPlayer implements Socialable {
 	 */
 	public static void updateTabs() {
 		for (RayPlayer p : cache.values()) {
-			if (p.user.isOnline() && p.user.getPlayer().isPresent()) {
+			if (p.isOnline()) {
 				p.updateTab();
 			}
 		}
@@ -137,7 +137,6 @@ public class RayPlayer implements Socialable {
 		return getRay(u);
 	}
 
-	private User user;
 	private UUID uuid;
 	private Map<String, Group> groups;
 	private Optional<RayPlayer> lastMessaged = Optional.empty();
@@ -153,6 +152,28 @@ public class RayPlayer implements Socialable {
 	private Map<SelectableTag, String> selectedTags = Utils.sm();
 	private boolean spy = false;
 	private Optional<String> quote;
+
+	/**
+	 * Get the player object if user is online.
+	 */
+	public Optional<Player> getPlayer() {
+		return getUser().getPlayer();
+	}
+
+	/**
+	 * Check to see if the player is online.
+	 */
+	public boolean isOnline() {
+		User u = getUser();
+		return u.isOnline() && u.getPlayer().isPresent();
+	}
+
+	/**
+	 * Check to see if the player has a permission.
+	 */
+	public boolean hasPermission(String s) {
+		return getUser().hasPermission(s);
+	}
 
 	/**
 	 * @return whether the player is AFK.
@@ -208,7 +229,7 @@ public class RayPlayer implements Socialable {
 	 * Set the player's spy toggle
 	 */
 	public void setSpy(boolean spy) {
-		if (user.hasPermission("ray.spy") && spy) {
+		if (hasPermission("ray.spy") && spy) {
 			this.spy = spy;
 		} else {
 			this.spy = false;
@@ -296,10 +317,10 @@ public class RayPlayer implements Socialable {
 	 */
 	public void startTabHFTask() {
 		tabHFTask = Task.builder().execute(t -> {
-			if (!user.isOnline() || !user.getPlayer().isPresent()) {
+			if (!isOnline()) {
 				return;
 			}
-			Player p = user.getPlayer().get();
+			Player p = getPlayer().get();
 			TabList list = p.getTabList();
 			boolean h = !headerQueue.isEmpty() || !list.getHeader().isPresent();
 			boolean f = !footerQueue.isEmpty() || !list.getFooter().isPresent();
@@ -410,8 +431,8 @@ public class RayPlayer implements Socialable {
 	 */
 	public void applyChannel() {
 		if (activeChannel != null) {
-			if (user.isOnline() && user.getPlayer().isPresent()) {
-				user.getPlayer().get().setMessageChannel(activeChannel);
+			if (isOnline()) {
+				getPlayer().get().setMessageChannel(activeChannel);
 			}
 		}
 	}
@@ -424,8 +445,8 @@ public class RayPlayer implements Socialable {
 			return;
 		}
 		activeChannel = channel;
-		if (user.isOnline() && user.getPlayer().isPresent()) {
-			user.getPlayer().get().setMessageChannel(activeChannel);
+		if (isOnline()) {
+			getPlayer().get().setMessageChannel(activeChannel);
 		}
 	}
 
@@ -473,7 +494,7 @@ public class RayPlayer implements Socialable {
 		config.getNode("channel")
 				.setValue(activeChannel == null ? config.getNode("channel").getString(null) : activeChannel.getName());
 		saveTags(config.getNode("tags"));
-		config.getNode("lastname").setValue(user.getName());
+		config.getNode("lastname").setValue(getUser().getName());
 		if (getDisplayName().isPresent()) {
 			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
 		}
@@ -509,7 +530,7 @@ public class RayPlayer implements Socialable {
 	 * Set displayname if the player is online
 	 */
 	public void checkDisplayname() {
-		if (!user.isOnline() || !user.getPlayer().isPresent()) {
+		if (!isOnline()) {
 			return;
 		}
 		Object o = Ray.get().getVariables().get("displayname",
@@ -566,14 +587,14 @@ public class RayPlayer implements Socialable {
 	 * @return the user
 	 */
 	public User getUser() {
-		return user;
+		return Utils.getUser(uuid).get();
 	}
 
 	/**
 	 * Set the user
 	 */
 	private void setUser(User user) {
-		this.user = user;
+		this.uuid = user.getUniqueId();
 	}
 
 	/**
@@ -587,11 +608,11 @@ public class RayPlayer implements Socialable {
 	 * Return the group applied for the user's current world
 	 */
 	public Group getActiveGroup() {
-		if (!user.isOnline()) {
+		if (!getUser().isOnline()) {
 			return gg("all");
 		}
-		return gg((user.getPlayer().get()).getWorld().getName()) == null ? gg("all")
-				: gg((user.getPlayer().get()).getWorld().getName());
+		return gg((getPlayer().get()).getWorld().getName()) == null ? gg("all")
+				: gg((getPlayer().get()).getWorld().getName());
 	}
 
 	private Group gg(String world) {

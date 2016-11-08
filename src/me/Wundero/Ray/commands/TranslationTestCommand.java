@@ -30,7 +30,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.text.Text;
 
-import me.Wundero.Ray.translation.M;
+import me.Wundero.Ray.translation.I18n;
 
 /**
  * Testing class - used to test to see if translation files work.
@@ -45,11 +45,11 @@ public class TranslationTestCommand implements CommandExecutor {
 		Text t = Text.of();
 		if (argz != null && argz.contains(" ")) {
 			Object[] a = argz.split(" ");
-			t = M.t(key, a);
+			t = I18n.t(key, a);
 		} else if (argz != null) {
-			t = M.t(key, argz);
+			t = I18n.t(key, argz);
 		} else {
-			t = M.t(key);
+			t = I18n.t(key);
 		}
 		src.sendMessage(t);
 		return CommandResult.success();

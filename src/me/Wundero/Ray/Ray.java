@@ -29,6 +29,7 @@ import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.listeners.AfkListener;
 import me.Wundero.Ray.tag.TagStore;
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.UserCache;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import me.Wundero.Ray.variables.Variables;
@@ -109,6 +110,8 @@ public class Ray {
 	private TagStore tags;
 	// econ
 	private EconomyService econ;
+	// cache
+	private UserCache cache;
 
 	private ChatFilter filter;
 	private ChatLock lock;
@@ -145,6 +148,7 @@ public class Ray {
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
 		this.setTags(new TagStore());
+		this.setCache(new UserCache());
 		try {
 			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
 			if (!f.exists()) {
@@ -466,5 +470,20 @@ public class Ray {
 	 */
 	public void setLock(ChatLock lock) {
 		this.lock = lock;
+	}
+
+	/**
+	 * @return the cache
+	 */
+	public UserCache getCache() {
+		return cache;
+	}
+
+	/**
+	 * @param cache
+	 *            the cache to set
+	 */
+	public void setCache(UserCache cache) {
+		this.cache = cache;
 	}
 }

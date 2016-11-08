@@ -51,7 +51,7 @@ import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
-import me.Wundero.Ray.translation.M;
+import me.Wundero.Ray.translation.I18n;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -70,7 +70,7 @@ public class FormatConversation {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));
 			return;
 		}
-		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ").concat(M.t("conversation.exit.reminder")));
+		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ").concat(I18n.t("conversation.exit.reminder")));
 		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(true)
 				.withPrefix(Text.of(TextColors.AQUA, "[Formats]")).withCanceller(new ConversationCanceller() {
 

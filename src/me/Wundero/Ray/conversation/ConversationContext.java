@@ -23,6 +23,9 @@ package me.Wundero.Ray.conversation;
  SOFTWARE.
  */
 
+import java.util.UUID;
+
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -36,6 +39,7 @@ import me.Wundero.Ray.DataHolder;
 public class ConversationContext extends DataHolder {
 	// data for conversation
 	private Player holder;
+	private UUID holderID;
 	private Object plugin;
 	private MessageChannel original;
 
@@ -65,6 +69,15 @@ public class ConversationContext extends DataHolder {
 
 	private void setHolder(Player holder) {
 		this.holder = holder;
+		this.setHolderID(holder.getUniqueId());
+	}
+
+	/**
+	 * Update player reference object
+	 */
+	public void updateHolder() {
+		Player p = Sponge.getServer().getPlayer(holderID).get();
+		setHolder(p);
 	}
 
 	/**
@@ -91,5 +104,16 @@ public class ConversationContext extends DataHolder {
 	 */
 	public void setOriginal(MessageChannel original) {
 		this.original = original;
+	}
+
+	/**
+	 * @return the holderID
+	 */
+	public UUID getHolderID() {
+		return holderID;
+	}
+
+	private void setHolderID(UUID holderID) {
+		this.holderID = holderID;
 	}
 }
