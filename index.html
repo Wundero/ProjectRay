@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Ray by Wundero</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Wundero/Ray">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Wundero/Ray/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Wundero/Ray/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Ray</h1>
+          <p>Open Source Sponge Chat Management</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/Wundero">Wundero</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a id="ray--" class="anchor" href="#ray--" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ray  <a href="https://travis-ci.org/Wundero/Ray"><img src="https://travis-ci.org/Wundero/Ray.svg?branch=master" alt="Build Status"></a>
+</h1>
+
+<p>Ray is an open source chat management system built for Sponge.</p>
+
+<p>Download: <a href="https://github.com/Wundero/Ray/releases"><strong>[Here]</strong></a></p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>This plugin requires SpongeAPI version 5.X or newer.</p>
+
+<h1>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h1>
+
+<p>This plugin allows you to completely control the formatting of chat messages.</p>
+
+<h2>
+<a id="groups" class="anchor" href="#groups" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Groups</h2>
+
+<p>This plugin uses "groups" to section users off into separate, permission based format selections. Each group has an optional permission and priority; the groups with the highest number for priority will be chosen over lower numbers. Each user will automatically be assigned a group based on their highest priority permitted group.</p>
+
+<h2>
+<a id="formats" class="anchor" href="#formats" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Formats</h2>
+
+<p>Each group contains "formats", which are what handle text replacement in messages. Each format is backed by json based text, which replaces variables and parses json.</p>
+
+<p>To create formats, it is <strong>highly</strong> recommended to use the in-game format builder rather than editing the config, as it will prevent errors and other problems.</p>
+
+<p><strong>View information about formats <a href="https://github.com/Wundero/Ray/wiki/Formats">[Here]</a></strong></p>
+
+<p>Formats are split in two ways: Types and Contexts.</p>
+
+<h3>
+<a id="format-types" class="anchor" href="#format-types" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Format Types</h3>
+
+<p>Format types are how the format is displayed; for instance, an animation displaying consecutive frames. Several types store internal format(s), which can be any type too. You can have an event format which triggers an animated format with multi formats containing translatables.</p>
+
+<p><strong>View information about format types <a href="https://github.com/Wundero/Ray/wiki/Format-Types">[Here]</a>.</strong></p>
+
+<h3>
+<a id="format-contexts" class="anchor" href="#format-contexts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Format contexts</h3>
+
+<p>Format contexts are when and where the format is displayed; for instance, when players send chat messages. The plugin by default comes with several contexts built in.</p>
+
+<p><strong>View information about format contexts <a href="https://github.com/Wundero/Ray/wiki/Format-contexts">[Here]</a>.</strong></p>
+
+<h2>
+<a id="channels" class="anchor" href="#channels" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Channels</h2>
+
+<p>This plugin also has internal support for customizable ChatChannels, which are customizable and have an in-game builder.</p>
+
+<p><strong>View information about channels <a href="https://github.com/Wundero/Ray/wiki/Channels">[Here]</a>.</strong></p>
+
+<h2>
+<a id="tags" class="anchor" href="#tags" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tags</h2>
+
+<p>Tags are a generic "button" that can be used in chat to create dynamic effects. There are several types of tags included in the plugin.</p>
+
+<p><strong>View information about tags <a href="https://github.com/Wundero/Ray/wiki/Tags">[Here]</a>.</strong></p>
+
+<h3>
+<a id="extras" class="anchor" href="#extras" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extras</h3>
+
+<p>Download: <a href="https://github.com/Wundero/Ray/releases"><strong>[Here]</strong></a></p>
+
+<p>Source: <a href="https://github.com/Wundero/Ray/"><strong>[Here]</strong></a></p>
+
+<p>Wiki: <a href="https://github.com/Wundero/Ray/wiki"><strong>[Here]</strong></a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
