@@ -189,6 +189,11 @@ public class ChatChannelConversation {
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select permission!")))
 							.build(),
 					"string"));
+			out.add(new Option("password",
+					Text.builder("password").onClick(TextActions.runCommand("password"))
+							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select password!")))
+							.build(),
+					"string"));
 			out.add(new Option("tag",
 					Text.builder("tag").onClick(TextActions.runCommand("tag"))
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select tag!")))
