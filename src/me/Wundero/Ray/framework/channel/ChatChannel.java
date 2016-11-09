@@ -64,6 +64,47 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	private Role defRole = Role.GUEST;
 
 	/**
+	 * Set the range.
+	 */
+	public void setRange(Double r) {
+		if (r == null || r < 0) {
+			this.range = -1;
+		} else {
+			this.range = r;
+		}
+	}
+
+	/**
+	 * Set the permission needed for this channel.
+	 */
+	public void setPermission(String perm) {
+		if (perm != null && !perm.trim().isEmpty()) {
+			this.permission = perm;
+		}
+	}
+
+	/**
+	 * Set the tag of the channel.
+	 */
+	public void setTag(Text t) {
+		if (t == null) {
+			t = Text.EMPTY;
+		}
+		this.tag = t;
+	}
+
+	/**
+	 * Set the tag of the channel.
+	 */
+	public void setTag(String s) {
+		if (s == null) {
+			setTag(Text.EMPTY);
+		} else {
+			setTag(TextSerializers.FORMATTING_CODE.deserialize(s));
+		}
+	}
+
+	/**
 	 * Set the role of a player.
 	 */
 	public boolean setRole(MessageReceiver r, Role role) {
