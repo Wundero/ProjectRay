@@ -41,13 +41,13 @@ import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.Utils;
 
 /**
- * Mute a player in a channel.
+ * A command to ban a user from a channel.
  */
-public class ChannelMuteCommand implements CommandExecutor {
+public class ChannelBanCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!(src.hasPermission("ray.channel.mute"))) {
+		if (!(src.hasPermission("ray.channel.ban"))) {
 			throw new CommandException(Text.of(TextColors.RED, "You are not allowed to do that!"));
 		}
 		if (!Ray.get().getChannels().useChannels()) {
@@ -95,11 +95,11 @@ public class ChannelMuteCommand implements CommandExecutor {
 		ChatChannel cc = ch.isPresent()
 				? Utils.wrap(Ray.get().getChannels().getChannel(ch.get())).orElse(RayPlayer.get(p).getActiveChannel())
 				: RayPlayer.get(p).getActiveChannel();
-		cc.toggleMute(p);
-		boolean cur = cc.isMuted(p);
+		cc.toggleBan(p);
+		boolean cur = cc.isBanned(p);
 		String s = "no" + (cur ? "w" : " longer");
 		String x = " in channel " + (ch.isPresent() ? ch.get() : RayPlayer.get(p).getActiveChannel().getName());
-		src.sendMessage(Text.of(TextColors.RED, "" + p.getName() + " is " + s + " muted" + x + "!"));
+		src.sendMessage(Text.of(TextColors.RED, "" + p.getName() + " is " + s + " banned" + x + "!"));
 		return CommandResult.success();
 	}
 

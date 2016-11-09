@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -533,6 +534,22 @@ public class Utils {
 			}
 
 		});
+	}
+
+	/**
+	 * Return a hash map containing the pre-existing map of values.
+	 */
+	public static <K, V> Map<K, V> hm(Map<? extends K, ? extends V> m) {
+		Map<K, V> m1 = hm();
+		m1.putAll(m);
+		return m1;
+	}
+
+	/**
+	 * Create an empty HashMap.
+	 */
+	public static <K, V> Map<K, V> hm() {
+		return new HashMap<K, V>();
 	}
 
 	/**

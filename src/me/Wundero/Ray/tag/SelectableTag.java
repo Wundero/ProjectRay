@@ -98,7 +98,7 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 		}
 		String v = v2.get();
 		TextTemplate t = this.object.get(v);
-		Map<String, Object> dat = d.get().getKnown().orElse(Utils.sm());
+		Map<String, Object> dat = d.get().getKnown().orElse(Utils.hm());
 		dat.put("tag:" + v, "");// non recursive variable parse
 		ParsableData d2 = d.get();
 		d2.setKnown(dat);
@@ -123,7 +123,7 @@ public class SelectableTag extends Tag<Map<String, TextTemplate>> implements Ray
 	@Override
 	public void deserialize(ConfigurationNode from) throws ObjectMappingException {
 		TextTemplate.of();
-		this.object = Utils.sm();
+		this.object = Utils.hm();
 		for (Map.Entry<Object, ? extends ConfigurationNode> e : from.getChildrenMap().entrySet()) {
 			this.object.put(e.getKey().toString(), e.getValue().getValue(TypeToken.of(TextTemplate.class)));
 		}

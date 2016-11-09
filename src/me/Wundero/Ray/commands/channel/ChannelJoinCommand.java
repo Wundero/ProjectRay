@@ -64,11 +64,11 @@ public class ChannelJoinCommand implements CommandExecutor {
 		}
 		Optional<String> password = arg1.getOne("password");
 		if (!c.canJoin(s, password)) {
-			s.sendMessage(Text.of(TextColors.RED, "You cannot join that channel!"));
+			s.sendMessage(Text.of(TextColors.RED, "That is not a valid password!"));
 			return CommandResult.success();
 		}
 		if (!RayPlayer.get(s).listeningTo(c)) {
-			c.addMember(s);
+			c.addMember(s, password);
 			RayPlayer.get(s).addListenChannel(c);
 		}
 		RayPlayer.get(s).setActiveChannel(c);

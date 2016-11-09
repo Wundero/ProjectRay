@@ -51,7 +51,7 @@ public class ChatChannelListener {
 		for (ChatChannel c : Ray.get().getChannels().getJoinableChannels(event.getTargetEntity(), true)) {
 			if (c.isAutojoin()) {
 				if (c.canJoin(event.getTargetEntity(), Optional.empty())) {
-					c.addMember(event.getTargetEntity());
+					c.addMember(event.getTargetEntity(), Optional.empty());
 					RayPlayer.get(event.getTargetEntity()).addListenChannel(c);
 
 					if (mostIn == null) {
@@ -77,14 +77,13 @@ public class ChatChannelListener {
 	/**
 	 * Remove the player from the channel.
 	 */
-	// TODO verify that this works.
 	@Listener(order = Order.LATE)
 	public void onLeave(ClientConnectionEvent.Disconnect event) {
 		if (!Ray.get().getChannels().useChannels()) {
 			return;
 		}
 		for (ChatChannel c : Ray.get().getChannels().getAllChannels()) {
-			if (c.getMembersCollection().contains(event.getTargetEntity().getUniqueId())) {
+			if (c.hasMember(event.getTargetEntity().getUniqueId())) {
 				c.removeMember(event.getTargetEntity().getUniqueId());
 			}
 		}

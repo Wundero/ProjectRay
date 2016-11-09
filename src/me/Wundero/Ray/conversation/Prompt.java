@@ -154,7 +154,7 @@ public abstract class Prompt {
 	 * available.
 	 */
 	public Text formatTemplate(ConversationContext context) {
-		Map<String, Object> args = Utils.sm();
+		Map<String, Object> args = Utils.hm();
 		args.put("options", buildList(options(context)));
 		args = Ray.get().setVars(args, template, Optional.of(context.getHolder()), Optional.empty(), Optional.empty(),
 				Optional.empty(), false);

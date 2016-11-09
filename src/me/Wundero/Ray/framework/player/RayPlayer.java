@@ -149,7 +149,7 @@ public class RayPlayer implements Socialable {
 	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
 	private List<String> listenChannels = Utils.sl();
 	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
-	private Map<SelectableTag, String> selectedTags = Utils.sm();
+	private Map<SelectableTag, String> selectedTags = Utils.hm();
 	private boolean spy = false;
 	private Optional<String> quote;
 
@@ -260,8 +260,8 @@ public class RayPlayer implements Socialable {
 		if (name == null) {
 			return Optional.empty();
 		}
-		if (Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).isPresent()) {
-			return Utils.wrap(selectedTags.get(Ray.get().getTags().get(name, Utils.sm(), SelectableTag.class).get()));
+		if (Ray.get().getTags().get(name, Utils.hm(), SelectableTag.class).isPresent()) {
+			return Utils.wrap(selectedTags.get(Ray.get().getTags().get(name, Utils.hm(), SelectableTag.class).get()));
 		} else {
 			return Optional.empty();
 		}
@@ -466,17 +466,17 @@ public class RayPlayer implements Socialable {
 	}
 
 	private static Map<SelectableTag, String> deconvert(Map<String, String> in) {
-		Map<SelectableTag, String> out = Utils.sm();
+		Map<SelectableTag, String> out = Utils.hm();
 		if (in != null) {
 			for (String t : in.keySet()) {
-				out.put(Ray.get().getTags().get(t, Utils.sm(), SelectableTag.class).get(), out.get(t));
+				out.put(Ray.get().getTags().get(t, Utils.hm(), SelectableTag.class).get(), out.get(t));
 			}
 		}
 		return out;
 	}
 
 	private static Map<String, String> convert(Map<SelectableTag, String> in) {
-		Map<String, String> out = Utils.sm();
+		Map<String, String> out = Utils.hm();
 		for (SelectableTag t : in.keySet()) {
 			out.put(t.getName(), in.get(t));
 		}
@@ -510,7 +510,7 @@ public class RayPlayer implements Socialable {
 	}
 
 	private void loadTags(ConfigurationNode node) {
-		Map<String, String> o = Utils.sm();
+		Map<String, String> o = Utils.hm();
 		for (Entry<Object, ? extends ConfigurationNode> e : node.getChildrenMap().entrySet()) {
 			o.put(e.getKey().toString(), e.getValue().getString());
 		}

@@ -65,7 +65,7 @@ public class AnnouncementConversation {
 			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));
 			return;
 		}
-		Map<String, Object> data = Utils.sm();
+		Map<String, Object> data = Utils.hm();
 		ConfigurationNode node = Ray.get().getConfig().getNode("worlds", "all", "groups", "default");
 		data.put("node", node);
 		Conversation c = ConversationFactory.builder(Ray.get().getPlugin()).withEcho(true)

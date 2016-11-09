@@ -91,7 +91,7 @@ public class AnimatedFormat extends Format {
 		}
 		ConfigurationNode frames = node.getNode("frames");
 		this.initialDelay = Utils.wrap(node.getNode("initial-delay").getInt());
-		Map<Format, Integer> t = Utils.sm();
+		Map<Format, Integer> t = Utils.hm();
 		List<Frame> framez = Utils.al();
 		for (ConfigurationNode frame : frames.getChildrenMap().values()) {
 			Format f = null;

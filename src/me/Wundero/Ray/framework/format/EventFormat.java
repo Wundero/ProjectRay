@@ -142,7 +142,7 @@ public class EventFormat extends Format {
 			}
 			data.setClickHover(true);
 			data.setPage(e.getCause().get("page", Integer.class).orElse(0));
-			Map<String, Object> map = Utils.sm();
+			Map<String, Object> map = Utils.hm();
 			if (e.getCause().containsNamed("vars")) {
 				@SuppressWarnings("unchecked")
 				Map<String, Object> v2 = (Map<String, Object>) e.getCause().get("vars", Map.class).get();

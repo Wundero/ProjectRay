@@ -50,7 +50,7 @@ public class ConversationFactory {
 	private boolean suppressMessages = true, echoInputs = false;
 	private List<ConversationCanceller> cancellers = Utils.al();
 	private Object plugin;
-	private Map<String, Object> initialContextdata = Utils.sm();
+	private Map<String, Object> initialContextdata = Utils.hm();
 	private Text prefix = Text.of();
 
 	private ConversationFactory() {

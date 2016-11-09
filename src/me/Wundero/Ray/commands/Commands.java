@@ -39,7 +39,7 @@ import me.Wundero.Ray.utils.Utils;
  */
 public class Commands {
 
-	private static Map<List<String>, CommandCallable> children = Utils.sm();
+	private static Map<List<String>, CommandCallable> children = Utils.hm();
 	static {
 		children.put(Utils.al("format"), CommandSpec.builder().permission("ray.formatbuilder")
 				.description(Text.of("Create a new format.")).executor(new FormatConversationCommand()).build());

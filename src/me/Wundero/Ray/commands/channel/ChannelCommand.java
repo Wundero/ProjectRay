@@ -75,10 +75,10 @@ public class ChannelCommand implements CommandExecutor {
 		out = out.concat(channel.getTag());
 		out = out.concat(Text.of(TextColors.AQUA, " " + channel.getName()));
 		TextColor c = TextColors.AQUA;
-		if (channel.getMembersCollection().contains(source.getUniqueId())) {
+		if (channel.hasMember(source.getUniqueId())) {
 			c = TextColors.GOLD;
 		}
-		out = out.concat(Text.of(TextColors.GRAY, ": ", c, channel.getMembersCollection().size() - 1));
+		out = out.concat(Text.of(TextColors.GRAY, ": ", c, channel.getSize()));
 		return out;
 	}
 

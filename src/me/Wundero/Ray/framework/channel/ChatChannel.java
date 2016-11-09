@@ -23,23 +23,22 @@ package me.Wundero.Ray.framework.channel;
  SOFTWARE.
  */
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.AbstractMutableMessageChannel;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -49,9 +48,10 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 /**
  * Represents a channel through which users communicate.
  */
-public class ChatChannel implements MutableMessageChannel, Comparable<ChatChannel> {
+public class ChatChannel extends AbstractMutableMessageChannel implements Comparable<ChatChannel> {
 
-	private ChannelMemberCollection members = new ChannelMemberCollection();
+	private List<UUID> muted, banned = Utils.sl();
+	private Map<UUID, Role> roles = Utils.sm();;
 	private String name;
 	private String permission;
 	private Optional<String> password;
@@ -61,6 +61,103 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	private boolean autojoin = true;
 	private boolean obfuscateRanged = false;
 	private ConfigurationNode node;
+	private Role defRole = Role.GUEST;
+
+	/**
+	 * Set the role of a player.
+	 */
+	public boolean setRole(MessageReceiver r, Role role) {
+		if (r instanceof Player && hasMember(r)) {
+			return setRole(((Player) r).getUniqueId(), role);
+		}
+		return false;
+	}
+
+	/**
+	 * Set the role of a player.
+	 */
+	public boolean setRole(UUID u, Role r) {
+		if (!hasMember(u) || r == null) {
+			return false;
+		}
+		roles.put(u, r);
+		return true;
+	}
+
+	/**
+	 * Get the role of a player.
+	 */
+	public Role getRole(MessageReceiver r) {
+		if (!hasMember(r)) {
+			return null;
+		}
+		if (r instanceof Player) {
+			return roles.get(((Player) r).getUniqueId());
+		} else {
+			return Role.MOD;
+		}
+	}
+
+	/**
+	 * Get the role of the player.
+	 */
+	public Role getRole(UUID u) {
+		if (!hasMember(u)) {
+			return null;
+		}
+		return roles.get(u);
+	}
+
+	/**
+	 * Return the size of the array.
+	 */
+	public int getSize() {
+		return (int) members.stream().filter(recip -> recip instanceof Player).map((r) -> ((Player) r).getUniqueId())
+				.distinct().count();
+	}
+
+	public boolean removeMember(UUID u) {
+		Optional<User> ou = Utils.getUser(u);
+		if (!ou.isPresent()) {
+			return false;
+		}
+		User uu = ou.get();
+		if (uu.isOnline() && uu.getPlayer().isPresent()) {
+			return removeMember(uu.getPlayer().get());
+		}
+		return false;
+	}
+
+	public boolean addMember(MessageReceiver member, Optional<String> password) {
+		if (!this.password.isPresent()) {
+			return addMember(member);
+		} else {
+			if (password.isPresent()) {
+				if (password.get().equals(this.password.get())) {
+					return addMember(member);
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+	}
+
+	@Deprecated
+	@Override
+	public boolean addMember(MessageReceiver member) {
+		if (member instanceof Player) {
+			UUID u = ((Player) member).getUniqueId();
+			if (banned.contains(u)) {
+				return false;
+			}
+			if (!roles.containsKey(u)) {
+				roles.put(u, defRole);
+			}
+		}
+		return super.addMember(member);
+	}
 
 	/**
 	 * Type serializers for easy configuration saving.
@@ -75,7 +172,6 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				out.permission = arg1.getNode("permission").getString(null);
 				out.tag = TextSerializers.FORMATTING_CODE
 						.deserialize(arg1.getNode("tag").getString("[" + out.name.charAt(0) + "]"));
-				out.members = arg1.getNode("members").getValue(TypeToken.of(ChannelMemberCollection.class));
 				out.range = arg1.getNode("range").getDouble(-1);
 				out.hidden = arg1.getNode("hidden").getBoolean(false);
 				out.autojoin = arg1.getNode("autojoin").getBoolean(true);
@@ -84,6 +180,7 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 				});
 				out.obfuscateRanged = arg1.getNode("range-obfuscation").getBoolean(false);
 				out.node = arg1;
+				out = deserializeMembers(out, arg1);
 				return out;
 			}
 
@@ -95,14 +192,244 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 					arg2.getNode("permission").setValue(arg1.permission);
 				}
 				arg2.getNode("tag").setValue(TextSerializers.FORMATTING_CODE.serialize(arg1.tag));
-				arg2.getNode("members").setValue(TypeToken.of(ChannelMemberCollection.class), arg1.members);
 				arg2.getNode("range").setValue(arg1.range);
 				arg2.getNode("hidden").setValue(arg1.hidden);
 				arg2.getNode("autojoin").setValue(arg1.autojoin);
 				arg1.password.ifPresent(pass -> arg2.getNode("password").setValue(pass));
 				arg2.getNode("range-obfuscation").setValue(arg1.obfuscateRanged);
+				serializeMembers(arg1, arg2);
 			}
 		};
+	}
+
+	private static ChatChannel deserializeMembers(ChatChannel ch, ConfigurationNode node) {
+		ConfigurationNode n = node.getNode("members");
+		for (ConfigurationNode user : n.getChildrenMap().values()) {
+			UUID u = UUID.fromString(user.getKey().toString());
+			boolean m = user.getNode("muted").getBoolean(false);
+			boolean b = user.getNode("banned").getBoolean(false);
+			Role r = Role.valueOf(user.getNode("role").getString(ch.defRole.name()).toUpperCase());
+			ch.roles.put(u, r);
+			if (m) {
+				ch.muted.add(u);
+			}
+			if (b) {
+				ch.banned.add(u);
+			}
+		}
+		return ch;
+	}
+
+	private static void serializeMembers(ChatChannel ch, ConfigurationNode node) {
+		ConfigurationNode n = node.getNode("members");
+		for (UUID user : ch.roles.keySet()) {
+			ConfigurationNode c = n.getNode(user.toString());
+			c.getNode("muted").setValue(ch.muted.contains(user));
+			c.getNode("banned").setValue(ch.banned.contains(user));
+			c.getNode("role").setValue(ch.roles.get(user).name().toLowerCase());
+		}
+	}
+
+	/**
+	 * Returns whether or not the receiver can speak into the channel.
+	 */
+	public boolean canSpeak(MessageReceiver r) {
+		if (r instanceof Player) {
+			return canSpeak(((Player) r).getUniqueId());
+		} else {
+			return members.contains(r);
+		}
+	}
+
+	/**
+	 * Returns whether or not the player with uuid u can speak.
+	 */
+	public boolean canSpeak(UUID u) {
+		if (banned.contains(u) || muted.contains(u)) {
+			return false;
+		}
+		User ud = Utils.getUser(u).get();
+		return ud.hasPermission(this.permission) && members.contains(ud);
+	}
+
+	/**
+	 * Check to see whether the member is in the channel.
+	 */
+	public boolean hasMember(MessageReceiver r) {
+		if (r instanceof Player) {
+			return hasMember(((Player) r).getUniqueId()) && members.contains(r);
+		} else {
+			return members.contains(r);
+		}
+	}
+
+	/**
+	 * Check to see whether the member is in the channel.
+	 */
+	public boolean hasMember(UUID u) {
+		return roles.containsKey(u);
+	}
+
+	/**
+	 * Check to see whether the receiver can join the channel.
+	 */
+	public boolean canJoin(MessageReceiver r, Optional<String> password) {
+		if (r instanceof Player) {
+			return canJoin(((Player) r).getUniqueId(), password);
+		} else {
+			return !members.contains(r);
+		}
+	}
+
+	/**
+	 * Check to see whether the player can join the channel.
+	 */
+	public boolean canJoin(UUID uuid, Optional<String> password) {
+		if (banned.contains(uuid)) {
+			return false;
+		}
+		if (this.password.isPresent()) {
+			if (!password.isPresent() || !password.get().equals(this.password.get())) {
+				return false;
+			}
+		}
+		User u = Utils.getUser(uuid).get();
+		if (u.hasPermission(this.permission)) {
+			return !members.contains(u);
+		}
+		return false;
+	}
+
+	/**
+	 * Toggle whether a player is banned.
+	 */
+	public boolean toggleBan(MessageReceiver r) {
+		return r instanceof Player ? toggleBan(((Player) r).getUniqueId()) : false;
+	}
+
+	/**
+	 * Toggle whether a player is banned.
+	 */
+	public boolean toggleBan(UUID u) {
+		if (isBanned(u)) {
+			return unban(u);
+		} else {
+			return ban(u);
+		}
+	}
+
+	/**
+	 * Ban a player.
+	 */
+	public boolean ban(MessageReceiver r) {
+		return r instanceof Player ? ban(((Player) r).getUniqueId()) : false;
+	}
+
+	/**
+	 * Ban a player.
+	 */
+	public boolean ban(UUID u) {
+		if (banned.contains(u)) {
+			return false;
+		}
+		return banned.add(u);
+	}
+
+	/**
+	 * Unban a player.
+	 */
+	public boolean unban(MessageReceiver r) {
+		return r instanceof Player ? unban(((Player) r).getUniqueId()) : false;
+	}
+
+	/**
+	 * Unban a player.
+	 */
+	public boolean unban(UUID u) {
+		return banned.remove(u);
+	}
+
+	/**
+	 * Toggle whether a player is muted.
+	 */
+	public boolean toggleMute(MessageReceiver r) {
+		return r instanceof Player ? toggleMute(((Player) r).getUniqueId()) : false;
+	}
+
+	/**
+	 * Toggle whether a player is muted.
+	 */
+	public boolean toggleMute(UUID u) {
+		if (isMuted(u)) {
+			return unmute(u);
+		} else {
+			return mute(u);
+		}
+	}
+
+	/**
+	 * Mute a player.
+	 */
+	public boolean mute(MessageReceiver r) {
+		return r instanceof Player ? mute(((Player) r).getUniqueId()) : false;
+	}
+
+	/**
+	 * Mute a player.
+	 */
+	public boolean mute(UUID u) {
+		if (muted.contains(u)) {
+			return false;
+		}
+		return muted.add(u);
+	}
+
+	/**
+	 * Unmute a player.
+	 */
+	public boolean unmute(MessageReceiver r) {
+		return r instanceof Player ? unmute(((Player) r).getUniqueId()) : false;
+	}
+
+	/**
+	 * Unmute a player.
+	 */
+	public boolean unmute(UUID u) {
+		return muted.remove(u);
+	}
+
+	/**
+	 * Check to see whether a player is muted.
+	 */
+	public boolean isMuted(MessageReceiver r) {
+		if (r instanceof Player) {
+			return isMuted(((Player) r).getUniqueId());
+		}
+		return false;
+	}
+
+	/**
+	 * Check to see whether a player is muted.
+	 */
+	public boolean isMuted(UUID u) {
+		return muted.contains(u);
+	}
+
+	/**
+	 * Check to see whether a player is banned.
+	 */
+	public boolean isBanned(UUID u) {
+		return banned.contains(u);
+	}
+
+	/**
+	 * Check to see whether a player is banned.
+	 */
+	public boolean isBanned(MessageReceiver r) {
+		if (r instanceof Player) {
+			return isBanned(((Player) r).getUniqueId());
+		}
+		return false;
 	}
 
 	/**
@@ -112,24 +439,19 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 		members.addAll(MessageChannel.TO_CONSOLE.getMembers());
 	}
 
-	private boolean c(MessageReceiver recipient) {
-		if (recipient instanceof Player) {
-			return members.contains(((Player) recipient).getUniqueId());
-		}
-		return members.contains(recipient);
-	}
-
 	/**
 	 * Make sure the message can be sent; obfuscates it as well (obfuscation is
 	 * overwritten by MainListener.handle() if that is called.
 	 */
 	@Override
 	public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original, ChatType type) {
-		if (!c(recipient) || members.get(recipient).isBanned()) {
+		if (!hasMember(recipient) || isBanned(recipient)) {
+			// if recip is not in or is banned
 			return Optional.empty();
 		}
 		if (sender instanceof MessageReceiver
-				&& (!members.contains((MessageReceiver) sender) || !members.get((MessageReceiver) sender).canSpeak())) {
+				&& (!hasMember((MessageReceiver) sender) || !canSpeak((MessageReceiver) sender))) {
+			// if sender is not in, is banned or is muted
 			return Optional.empty();
 		}
 		if (range > 0 && range < Double.MAX_VALUE && sender instanceof Player && recipient instanceof Player) {
@@ -153,118 +475,6 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	 */
 	public double range() {
 		return range;
-	}
-
-	/**
-	 * @return whether the player can join the channel.
-	 */
-	public boolean canJoin(Player player, Optional<String> password) {
-		if (permission != null && !permission.isEmpty() && !player.hasPermission(permission)) {
-			return false;
-		}
-		if (members == null) {
-			members = new ChannelMemberCollection();
-			members.addAll(MessageChannel.TO_CONSOLE.getMembers());
-		}
-		ChannelMember m = members.get(player);
-		if (m != null && m.isBanned()) {
-			return false;
-		}
-		if (this.password.isPresent()) {
-			if (!password.isPresent()) {
-				return false;
-			}
-			return this.password.get().equals(password.get());
-		}
-		return true;
-	}
-
-	@Override
-	public Collection<MessageReceiver> getMembers() {
-		return members.getMembers();
-	}
-
-	@Override
-	public boolean addMember(MessageReceiver member) {
-		if (c(member)) {
-			if (member instanceof Player) {
-				members.remove(((Player) member).getUniqueId());
-			} else {
-				members.remove(member);
-			}
-		}
-		if (member instanceof Player) {
-			Player p = (Player) member;
-			if (permission != null && !permission.isEmpty() && !p.hasPermission(permission)) {
-				return false;
-			}
-		}
-		return members.add(member);
-	}
-
-	@Override
-	public boolean removeMember(MessageReceiver member) {
-		return members.remove(member);
-	}
-
-	/**
-	 * Remove the member from the UUID.
-	 */
-	public boolean removeMember(UUID uuid) {
-		return members.remove(uuid);
-	}
-
-	/**
-	 * Ban a member.
-	 */
-	public void banMember(MessageReceiver member) {
-		members.get(member).setBanned(true);
-	}
-
-	/**
-	 * Change a member's role.
-	 */
-	public boolean setMemberRole(MessageReceiver member, Role role) {
-		if (!members.contains(member)) {
-			return false;
-		}
-		members.get(member).setRole(role);
-		return true;
-	}
-
-	/**
-	 * Mute a member.
-	 */
-	public boolean muteMember(MessageReceiver member) {
-		boolean r = !members.get(member).isMuted();
-		members.get(member).setMuted(true);
-		return r;
-	}
-
-	/**
-	 * Mute a member for a period of time.
-	 */
-	public boolean muteMember(MessageReceiver member, long time, TimeUnit unit) {
-		if (muteMember(member)) {
-			Ray.get().registerTask(Task.builder().async().delay(time, unit).execute(() -> {
-				unmuteMember(member);
-			}).submit(Ray.get().getPlugin()));
-		}
-		return false;
-	}
-
-	/**
-	 * Unmute a member.
-	 */
-	public boolean unmuteMember(MessageReceiver member) {
-		boolean r = members.get(member).isMuted();
-		members.get(member).setMuted(false);
-		return r;
-	}
-
-	@Override
-	public void clearMembers() {
-		members.clear();
 	}
 
 	/**
@@ -321,13 +531,6 @@ public class ChatChannel implements MutableMessageChannel, Comparable<ChatChanne
 	 */
 	public void setAutojoin(boolean autojoin) {
 		this.autojoin = autojoin;
-	}
-
-	/**
-	 * Get the collection wrapper for the members.
-	 */
-	public ChannelMemberCollection getMembersCollection() {
-		return members;
 	}
 
 	@Override

@@ -287,9 +287,9 @@ public abstract class Format {
 	 */
 	protected Map<String, Object> parse(TextTemplate t, ParsableData data) {
 		if (data == null) {
-			return Utils.sm();
+			return Utils.hm();
 		}
-		return Ray.get().setVars(data.getKnown().orElse(Utils.sm()), t, data.getSender(), data.getRecipient(),
+		return Ray.get().setVars(data.getKnown().orElse(Utils.hm()), t, data.getSender(), data.getRecipient(),
 				data.getObserver(), Optional.of(this), data.isClickHover());
 	}
 

@@ -51,8 +51,8 @@ public class FormatBuilder {
 	@SuppressWarnings("unused")
 	private String name;
 	private TextTemplate template;
-	private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
-	private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
+	private Map<Arg, InternalClickAction<?>> clicks = Utils.hm();
+	private Map<Arg, InternalHoverAction<?>> hovers = Utils.hm();
 	private Optional<FormatContext> type;
 
 	/**

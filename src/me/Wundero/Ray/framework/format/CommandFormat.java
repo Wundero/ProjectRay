@@ -106,7 +106,7 @@ public class CommandFormat extends Format {
 		}
 		Player s = event.getCause().first(Player.class).get();
 		ParsableData d = new ParsableData();
-		Map<String, Object> k = Utils.sm();
+		Map<String, Object> k = Utils.hm();
 		k.put("command", event.getCommand() + " " + event.getArguments());
 		d.setKnown(k);
 		d.setSender(s);

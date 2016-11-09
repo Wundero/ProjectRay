@@ -103,7 +103,7 @@ public class MainListener {
 		final UUID exf = UUID.randomUUID();
 		final Optional<ExecutingFormat> ef = f instanceof ExecutingFormat ? Optional.of((ExecutingFormat) f)
 				: f.getInternal(ExecutingFormat.class, Optional.empty());
-		final Map<String, Object> args = Utils.sm(v);
+		final Map<String, Object> args = Utils.hm(v);
 		ChatChannel pc = r.getActiveChannel();
 		boolean obfuscate = pc != null && pc.isObfuscateRanged();
 		double range = pc == null ? -1 : pc.range();
@@ -116,7 +116,7 @@ public class MainListener {
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
-				Map<String, Object> mc = Utils.sm(args);
+				Map<String, Object> mc = Utils.hm(args);
 				if (recipient instanceof Player && sender instanceof Player) {
 					Player s = (Player) sender;
 					Player r = (Player) recipient;
@@ -170,7 +170,7 @@ public class MainListener {
 	 */
 	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
-		Map<String, Object> vars = Utils.sm();
+		Map<String, Object> vars = Utils.hm();
 		Player p = null;
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
@@ -216,7 +216,7 @@ public class MainListener {
 			Format f = g.getFormat(FormatContexts.AFK);
 			if (f != null) {
 				String s = event.isAFK() ? "w" : " longer";
-				Map<String, Object> v = Utils.sm();
+				Map<String, Object> v = Utils.hm();
 				v.put("afk", event.isAFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.EMPTY);
 				v.put("afkmessage", "no" + s);
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
@@ -383,7 +383,7 @@ public class MainListener {
 	 */
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
-		Map<String, Object> vars = Utils.sm();
+		Map<String, Object> vars = Utils.hm();
 		event.setMessageCancelled(
 				handle(FormatContexts.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
 		RayPlayer.updateTabs();
@@ -394,7 +394,7 @@ public class MainListener {
 	 */
 	@Listener
 	public void onKick(KickPlayerEvent event) {
-		Map<String, Object> vars = Utils.sm();
+		Map<String, Object> vars = Utils.hm();
 		event.setMessageCancelled(
 				handle(FormatContexts.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
 		RayPlayer.updateTabs();
@@ -405,7 +405,7 @@ public class MainListener {
 	 */
 	@Listener
 	public void onAch(GrantAchievementEvent.TargetPlayer event) {
-		Map<String, Object> vars = Utils.sm();
+		Map<String, Object> vars = Utils.hm();
 		Achievement ach = event.getAchievement();
 		vars.put("achievement",
 				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());

@@ -79,7 +79,7 @@ public class Variables {
 		Optional<Variable> var = store.getVariable(key);
 		if (var.isPresent()) {
 			Variable v = var.get();
-			Map<Param, Object> map = Utils.sm();
+			Map<Param, Object> map = Utils.hm();
 			for (Param p : Param.values()) {
 				// add all params that are available to map
 				switch (p) {
@@ -134,7 +134,7 @@ public class Variables {
 			Optional<Variable> vx = store.getVariable(decdata[1]);
 			if (vx.isPresent()) {
 				data = data.substring(data.indexOf(":"));
-				Map<Param, Object> map = Utils.sm();
+				Map<Param, Object> map = Utils.hm();
 				for (Param p : Param.values()) {
 					// add all params that are available to map
 					switch (p) {

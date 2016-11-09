@@ -44,8 +44,6 @@ import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.config.Template;
 import me.Wundero.Ray.config.Templates;
 import me.Wundero.Ray.framework.Groups;
-import me.Wundero.Ray.framework.channel.ChannelMember;
-import me.Wundero.Ray.framework.channel.ChannelMemberCollection;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.listeners.ChatChannelListener;
 import me.Wundero.Ray.listeners.MainListener;
@@ -177,8 +175,6 @@ public class ProjectRay {
 		TypeSerializerCollection t = opts.getSerializers();
 		t.registerType(TypeToken.of(InternalClickAction.class), InternalClickAction.serializer());
 		t.registerType(TypeToken.of(InternalHoverAction.class), InternalHoverAction.serializer());
-		t.registerType(TypeToken.of(ChannelMember.class), ChannelMember.serializer());
-		t.registerType(TypeToken.of(ChannelMemberCollection.class), ChannelMemberCollection.serializer());
 		t.registerType(TypeToken.of(ChatChannel.class), ChatChannel.serializer());
 		return opts.setSerializers(t);
 	}

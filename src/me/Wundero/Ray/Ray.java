@@ -286,7 +286,7 @@ public class Ray {
 	 */
 	public Map<String, Object> setVars(ParsableData data, TextTemplate template, Optional<Format> formatUsed,
 			boolean ch) {
-		return setVars(data.getKnown().orElse(Utils.sm()), template, data.getSender(), data.getRecipient(),
+		return setVars(data.getKnown().orElse(Utils.hm()), template, data.getSender(), data.getRecipient(),
 				data.getObserver(), formatUsed, ch);
 	}
 
@@ -297,7 +297,7 @@ public class Ray {
 	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Optional<Player> sender,
 			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
 		if (known == null) {
-			known = Utils.sm();
+			known = Utils.hm();
 		}
 		// template is required to get the args to fill
 		if (template == null) {
@@ -315,7 +315,7 @@ public class Ray {
 
 		// for every key that is known that exists in the template, add it to
 		// fill
-		Map<String, Object> out = Utils.sm();
+		Map<String, Object> out = Utils.hm();
 		for (String key : known.keySet()) {
 			if (template.getArguments().containsKey(key)) {
 				out.put(key, known.get(key));

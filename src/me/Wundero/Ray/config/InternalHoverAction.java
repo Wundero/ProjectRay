@@ -182,7 +182,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 					new HoverAction.ShowEntity.Ref(((Ref) this.getResult()).uuid, ((Ref) this.getResult()).name));
 		}
 		TextTemplate t = ((ShowTemplate) this).template;
-		Map<String, Object> p = Utils.sm();
+		Map<String, Object> p = Utils.hm();
 		for (String k : t.getArguments().keySet()) {
 			p.put(k, t.getOpenArgString() + k + t.getCloseArgString());
 		}

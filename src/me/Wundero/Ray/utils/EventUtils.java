@@ -43,14 +43,14 @@ public class EventUtils {
 	 * the cause, so long as they were not overwritten.
 	 */
 	public static Map<String, Object> getValues(Event e, boolean skipCause) {
-		Map<String, Object> causeValues = skipCause ? Utils.sm() : e.getCause().getNamedCauses();
+		Map<String, Object> causeValues = skipCause ? Utils.hm() : e.getCause().getNamedCauses();
 		causeValues.putAll(execMethods(e.getClass(), e));
 		return causeValues;
 	}
 
 	@SuppressWarnings("unchecked")
 	private static <T> Map<String, Object> execMethods(Class<? extends T> clazz, T obj) {
-		Map<String, Object> out = Utils.sm();
+		Map<String, Object> out = Utils.hm();
 		for (Method m : Utils.combine(clazz.getDeclaredMethods(), clazz.getMethods())) {
 			if (canUseMethod(m)) {
 				Optional<Object> ret = Optional.empty();

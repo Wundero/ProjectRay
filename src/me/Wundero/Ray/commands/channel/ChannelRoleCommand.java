@@ -61,8 +61,7 @@ public class ChannelRoleCommand implements CommandExecutor {
 		String y = usetarget ? target.getName() + "'s" : "Your";
 		String y2 = usetarget ? target.getName() + "'s" : "your";
 		if (!set) {
-			Role r = RayPlayer.get(target).getActiveChannel().getMembersCollection().get(target.getUniqueId())
-					.getRole();
+			Role r = RayPlayer.get(target).getActiveChannel().getRole(target);
 			String n = RayPlayer.get(target).getActiveChannel().getName();
 			Text t = Text.of(TextColors.AQUA,
 					y + " role in channel " + n + " is " + StringUtils.capitalize(r.name().toLowerCase()) + ".");
@@ -79,7 +78,7 @@ public class ChannelRoleCommand implements CommandExecutor {
 			src.sendMessage(Text.of(TextColors.RED, "That is not a valid role!"));
 			return CommandResult.success();
 		}
-		RayPlayer.get(target).getActiveChannel().setMemberRole(target, r);
+		RayPlayer.get(target).getActiveChannel().setRole(target, r);
 		src.sendMessage(Text.of(TextColors.AQUA, "You have successfully set " + y2 + " role to " + role + "."));
 		return CommandResult.success();
 	}

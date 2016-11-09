@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  */
 public class OptionalMap<K, V> {
 
-	private Map<K, V> m = Utils.sm();
+	private Map<K, V> m = Utils.hm();
 
 	public OptionalMap() {
 	}

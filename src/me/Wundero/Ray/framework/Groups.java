@@ -71,7 +71,7 @@ public class Groups {
 	public Group load(ConfigurationNode groupNode) {
 		String worldname = groupNode.getParent().getParent().getKey().toString();
 		Group group = new Group(worldname, groupNode, worldname.equalsIgnoreCase("all"));
-		Map<String, Group> map = groups.getOrDefault(worldname, Utils.sm());
+		Map<String, Group> map = groups.getOrDefault(worldname, Utils.hm());
 		map.put(group.getName(), group);
 		groups.put(worldname, map);
 		return group;
@@ -132,7 +132,7 @@ public class Groups {
 	 * Get the groups a player can use.
 	 */
 	public Map<String, Group> getGroups(User user) {
-		Map<String, Group> out = Utils.sm();
+		Map<String, Group> out = Utils.hm();
 		for (String world : groups.keySet()) {
 			if (getMainGroup(user, world) == null) {
 				continue;
@@ -149,7 +149,7 @@ public class Groups {
 	 * Get the groups on a world; as well as all global groups.
 	 */
 	public Map<String, Group> getGroups(String world) {
-		Map<String, Group> out = groups.get(world) == null ? Utils.sm() : groups.get(world);
+		Map<String, Group> out = groups.get(world) == null ? Utils.hm() : groups.get(world);
 		if (!world.equalsIgnoreCase("all")) {
 			out.putAll(getGroups("all"));
 		}

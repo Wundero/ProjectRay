@@ -167,8 +167,8 @@ public class Template {
 				private Optional<Consumer<ConfigurationNode>> locdataset = Optional.empty();
 				private GroupBuilder parent;
 				private TextTemplate template;
-				private Map<Arg, InternalClickAction<?>> clicks = Utils.sm();
-				private Map<Arg, InternalHoverAction<?>> hovers = Utils.sm();
+				private Map<Arg, InternalClickAction<?>> clicks = Utils.hm();
+				private Map<Arg, InternalHoverAction<?>> hovers = Utils.hm();
 
 				FormatBuilder(ConfigurationNode node, String name, GroupBuilder parent) {
 					this.node = node;

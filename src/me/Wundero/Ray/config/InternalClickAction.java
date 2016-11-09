@@ -178,7 +178,7 @@ public abstract class InternalClickAction<R> extends TextAction<R> {
 			return TextActions.executeCallback((Consumer<CommandSource>) this.getResult());
 		}
 		TextTemplate t = ((ATemplate) this).getTemplate();
-		Map<String, Object> p = Utils.sm();
+		Map<String, Object> p = Utils.hm();
 		for (String k : t.getArguments().keySet()) {
 			p.put(k, t.getOpenArgString() + k + t.getCloseArgString());
 		}

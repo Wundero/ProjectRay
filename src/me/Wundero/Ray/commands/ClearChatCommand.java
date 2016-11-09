@@ -89,8 +89,8 @@ public class ClearChatCommand implements CommandExecutor {
 		return out;
 	}
 
-	private static Map<String, List<Text>> clears = Utils.sm();
-	private static Map<Integer, TextColor> rainCols = Utils.sm();
+	private static Map<String, List<Text>> clears = Utils.hm();
+	private static Map<Integer, TextColor> rainCols = Utils.hm();
 	private static final Text BLOCKS = Text.of(Utils.join(Utils.fill("" + '\u2588', (t, i) -> t, 16, true)));
 
 	/**
