@@ -54,6 +54,11 @@ public class FormatContexts {
 	public static FormatContext TABLIST_FOOTER = new FormatContext("footer", new String[] { "f" });
 	public static FormatContext ANNOUNCEMENT = new FormatContext("announcement", new String[] { "a" });
 	public static FormatContext AFK = new FormatContext("afk");
+	public static FormatContext INFO = new FormatContext("info");
+	public static FormatContext RULES = new FormatContext("rules");
+	public static FormatContext BROADCAST = new FormatContext("broadcast");
+	public static FormatContext ACTION = new FormatContext("action", new String[] { "me" });
+	public static FormatContext HELPOP = new FormatContext("helpop", new String[] { "help-op", "help op" });
 
 	private static Map<String, FormatContext> lookup = Utils.sm();
 
@@ -61,8 +66,8 @@ public class FormatContexts {
 		for (Field f : FormatContexts.class.getDeclaredFields()) {
 			try {
 				FormatContext type = (FormatContext) f.get(null);
-				// Class cast exception is fired by line 62. This is a good
-				// thing; it means it won't use lookup as a format context.
+				// Class cast exception is fired the by line above. This is a
+				// good thing; it means it won't use lookup as a format context.
 				rft(type);
 			} catch (Exception e) {
 			}
