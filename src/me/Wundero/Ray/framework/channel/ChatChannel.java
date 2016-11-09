@@ -64,6 +64,15 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	private Role defRole = Role.GUEST;
 
 	/**
+	 * Set the default role.
+	 */
+	public void setDefaultRole(Role r) {
+		if (r != null) {
+			defRole = r;
+		}
+	}
+
+	/**
 	 * Set the range.
 	 */
 	public void setRange(Double r) {

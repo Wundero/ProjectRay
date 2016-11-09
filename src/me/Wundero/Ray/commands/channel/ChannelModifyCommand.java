@@ -35,6 +35,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
+import me.Wundero.Ray.framework.channel.Role;
 
 /**
  * A command to modify settings of a channel.
@@ -82,6 +83,13 @@ public class ChannelModifyCommand implements CommandExecutor {
 			break;
 		case "autojoin":
 			c.setAutojoin(getFrom(value.orElse(""), false));
+			reset = true;
+			break;
+		case "default-role":
+		case "defaultrole":
+		case "defrole":
+		case "role":
+			c.setDefaultRole(Role.valueOf(value.orElse("GUEST").toUpperCase().trim()));
 			reset = true;
 			break;
 		case "obfuscaterange":
