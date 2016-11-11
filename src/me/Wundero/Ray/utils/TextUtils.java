@@ -68,6 +68,8 @@ import me.Wundero.Ray.variables.ParsableData;
  */
 public class TextUtils {
 
+	public static final Pattern COLOR_PATTERN = Utils.compile("\\&[a-f0-9]", Pattern.CASE_INSENSITIVE);
+
 	/**
 	 * Return an empty text.
 	 */
@@ -451,18 +453,22 @@ public class TextUtils {
 	 *            Whether or not to parse click and hover actions as well.
 	 */
 	public static LiteralText replaceRegex(LiteralText original, Pattern matcher,
-			Function<String, Optional<LiteralText>> replacer, boolean useClickHover) {
+			Function<LiteralText, Optional<LiteralText>> replacer, boolean useClickHover) {
 		if (original == null) {
 			return null;
 		}
 		List<Text> children = original.getChildren();
 		LiteralText.Builder builder = original.toBuilder();
+		TextFormat f = builder.getFormat();
+		Optional<ClickAction<?>> cl = builder.getClickAction();
+		Optional<HoverAction<?>> ho = builder.getHoverAction();
+		Optional<ShiftClickAction<?>> sc = builder.getShiftClickAction();
 		builder.removeAll();
 		String content = builder.getContent();
 		if (matcher.matcher(content).find()) {
 			Matcher m = matcher.matcher(content);
 			if (m.matches()) {
-				builder = replacer.apply(content).orElse(LiteralText.of("")).toBuilder();
+				builder = replacer.apply(builder.build()).orElse(LiteralText.of("")).toBuilder();
 			} else {
 				String[] parts = content.split(matcher.pattern());
 				if (parts.length == 0) {
@@ -470,7 +476,9 @@ public class TextUtils {
 					builder = null;
 					while ((m = m.reset(c)).find()) {
 						String g = m.group();
-						LiteralText t = replacer.apply(g).orElse(LiteralText.of(""));
+						LiteralText t = replacer.apply(
+								(LiteralText) TextUtils.apply(LiteralText.builder(g).format(f), cl, ho, sc).build())
+								.orElse(LiteralText.of(""));
 						if (builder == null) {
 							builder = t.toBuilder();
 						} else {
@@ -489,7 +497,8 @@ public class TextUtils {
 								LiteralText t = replaceRegex(bf(s, ob).build(), matcher, replacer, useClickHover);
 								builder.append(t);
 							} else {
-								Optional<LiteralText> t = replacer.apply(s);
+								Optional<LiteralText> t = replacer.apply((LiteralText) TextUtils
+										.apply(LiteralText.builder(s).format(f), cl, ho, sc).build());
 								builder.append(t.orElse(LiteralText.of("")));
 							}
 						}
@@ -502,7 +511,8 @@ public class TextUtils {
 							if (pz.contains(s)) {
 								builder.append(replaceRegex(bf(s, ob).build(), matcher, replacer, useClickHover));
 							} else {
-								Optional<LiteralText> t = replacer.apply(s);
+								Optional<LiteralText> t = replacer.apply((LiteralText) TextUtils
+										.apply(LiteralText.builder(s).format(f), cl, ho, sc).build());
 								builder.append(t.orElse(LiteralText.of("")));
 							}
 						}
@@ -522,7 +532,9 @@ public class TextUtils {
 					List<Object> b = Utils.al();
 					while ((m = m.reset(st)).find()) {
 						String g = m.group();
-						b.add(replacer.apply(g).orElse(LiteralText.builder("").build()).toPlain());
+						b.add(replacer.apply(
+								(LiteralText) TextUtils.apply(LiteralText.builder(g).format(f), cl, ho, sc).build())
+								.orElse(LiteralText.builder("").build()).toPlain());
 						st = m.replaceFirst("");
 					}
 					out = format(out, b);
@@ -549,7 +561,10 @@ public class TextUtils {
 					while ((m = m.reset(st)).find()) {
 						String g = m.group();
 						b.add(TextSerializers.FORMATTING_CODE
-								.serialize(replacer.apply(g).orElse(LiteralText.builder("").build())));
+								.serialize(replacer
+										.apply((LiteralText) TextUtils
+												.apply(LiteralText.builder(g).format(f), cl, ho, sc).build())
+										.orElse(LiteralText.builder("").build())));
 						st = m.replaceFirst("");
 					}
 					out = format(out, b);
@@ -1218,8 +1233,10 @@ public class TextUtils {
 	}
 
 	private static LiteralText makeURLUnclickable(LiteralText text) {
-		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (match) -> {
-			return Optional.of(Text.of(match.replace(".", " ")));
+		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (matchtext) -> {
+			String match = getContent(matchtext, false);
+			return Optional.of((LiteralText) apply(Text.builder(match.replace(".", " ")).format(matchtext.getFormat()),
+					matchtext.toBuilder()).build());
 		}, true);
 	}
 
@@ -1234,11 +1251,13 @@ public class TextUtils {
 	 * Parse a text for urls and replace them.
 	 */
 	public static LiteralText makeURLClickable(LiteralText text) {
-		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (match) -> {
+		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (matchtext) -> {
+			String match = getContent(matchtext, true);
 			if (!Utils.toUrlSafe(match).isPresent()) {
-				return Optional.of(Text.of(match));
+				return Optional.of(matchtext);
 			}
-			return Optional.of(Text.builder(match).color(TextColors.BLUE).style(TextStyles.ITALIC, TextStyles.UNDERLINE)
+			return Optional.of(Text.builder(match)
+					.format((TextFormat.of(TextColors.BLUE, TextStyles.ITALIC).merge(matchtext.getFormat())))
 					.onClick(TextActions.openUrl(Utils.toUrlSafe(match).get()))
 					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to go to " + match + "!")))
 					.build());
@@ -1249,7 +1268,8 @@ public class TextUtils {
 	 * Parse a text for variables and replace them.
 	 */
 	public static LiteralText parseForVariables(LiteralText text, ParsableData data) {
-		return TextUtils.replaceRegex(text, Utils.VAR_PATTERN, (match) -> {
+		return TextUtils.replaceRegex(text, Utils.VAR_PATTERN, (matchtext) -> {
+			String match = getContent(matchtext, true);
 			String proper = match.replace("{", "").replace("}", "");
 			Object out = Ray.get().getVariables().get(proper, data, Optional.empty(), Optional.empty());
 			if (data.getKnown().isPresent() && data.getKnown().get().containsKey(proper)) {

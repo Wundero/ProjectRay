@@ -61,6 +61,7 @@ public class ChannelSetupCommand implements CommandExecutor {
 		default:
 			DefaultChannels.applyChannels(Ray.get().getChannels().getNode(), DefaultChannel.SIMPLE);
 		}
+		src.sendMessage(Text.of(TextColors.AQUA, "Channel setup loaded!"));
 		return CommandResult.success();
 	}
 

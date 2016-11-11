@@ -175,7 +175,12 @@ public class MainListener {
 		if (event.getCause().containsType(Player.class)) {
 			p = (Player) event.getCause().first(Player.class).get();
 		}
-		vars.put("message", TextUtils.transIf(event.getRawMessage().toPlain(), p));
+		Text msg = event.getRawMessage();
+		if (TextUtils.COLOR_PATTERN.matcher(TextUtils.getContent(msg, false)).find()) {
+			// safe parse colors
+			msg = TextUtils.transIf(TextUtils.getContent(event.getRawMessage(), false), p);
+		}
+		vars.put("message", msg);
 		if (event.getCause().containsNamed("formatcontext")) {
 			Optional<Player> sf = Optional.empty();
 			Optional<Player> st = Optional.empty();

@@ -268,7 +268,9 @@ public class FormatLocations {
 	public static final FormatLocation TAB_ENTRY = new FormatLocation("tab_entry") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p) {
+			System.out.println("tab update");
 			if (p == null || !p.isPresent() || !(target instanceof Player)) {
+				System.out.println("not online/real");
 				return false;
 			}
 			Object operatable = p.get();
@@ -278,10 +280,12 @@ public class FormatLocations {
 			} else if (operatable instanceof User) {
 				uuid = ((User) operatable).getUniqueId();
 			} else {
+				System.out.println("not online/real");
 				return false;
 			}
 			Optional<TabListEntry> oe = ((Player) target).getTabList().getEntry(uuid);
 			oe.ifPresent(e -> e.setDisplayName(text));
+			System.out.println("disp set");
 			return oe.isPresent();
 		}
 	};

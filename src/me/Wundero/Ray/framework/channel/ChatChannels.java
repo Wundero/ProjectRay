@@ -118,6 +118,7 @@ public class ChatChannels {
 		List<ChatChannel> o = Utils.al();
 		for (ChatChannel c : l) {
 			if (c.isHidden() && !showHidden) {
+				System.out.println("hidden");
 				continue;
 			}
 			if (c.canJoin(player, Optional.empty())) {

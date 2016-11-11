@@ -193,7 +193,7 @@ public class Template {
 									hovers.get(a));
 						}
 						if (type.isPresent()) {
-							node.getNode("type").setValue(type.get().getName());
+							node.getNode("context").setValue(type.get().getName());
 						}
 						if (loc.isPresent()) {
 							node.getNode("location").setValue(loc.get().getName());

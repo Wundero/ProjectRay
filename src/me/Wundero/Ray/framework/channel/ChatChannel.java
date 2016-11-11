@@ -50,11 +50,11 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
  */
 public class ChatChannel extends AbstractMutableMessageChannel implements Comparable<ChatChannel> {
 
-	private List<UUID> muted, banned = Utils.sl();
+	private List<UUID> muted = Utils.sl(), banned = Utils.sl();
 	private Map<UUID, Role> roles = Utils.sm();;
 	private String name;
 	private String permission;
-	private Optional<String> password;
+	private Optional<String> password = Optional.empty();
 	private Text tag;
 	private double range;
 	private boolean hidden = false;
@@ -179,7 +179,7 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	}
 
 	public boolean addMember(MessageReceiver member, Optional<String> password) {
-		if (!this.password.isPresent()) {
+		if (!this.password.isPresent() || this.password.get().isEmpty()) {
 			return addMember(member);
 		} else {
 			if (password.isPresent()) {
@@ -225,9 +225,9 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 				out.range = arg1.getNode("range").getDouble(-1);
 				out.hidden = arg1.getNode("hidden").getBoolean(false);
 				out.autojoin = arg1.getNode("autojoin").getBoolean(true);
-				out.password = Utils.wrap2(arg1.getNode("password").getString(), (s) -> {
-					return s.isPresent() && !s.get().trim().isEmpty();
-				});
+				if (!arg1.getNode("password").isVirtual()) {
+					out.setPassword(arg1.getNode("password").getString());
+				}
 				out.obfuscateRanged = arg1.getNode("range-obfuscation").getBoolean(false);
 				out.node = arg1;
 				out = deserializeMembers(out, arg1);
@@ -299,7 +299,14 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 			return false;
 		}
 		User ud = Utils.getUser(u).get();
-		return ud.hasPermission(this.permission) && members.contains(ud);
+		return hasPermission(ud) && members.contains(ud);
+	}
+
+	/**
+	 * Check whether the user has permission to speak/join/listen
+	 */
+	public boolean hasPermission(User u) {
+		return permission == null || permission.isEmpty() || u.hasPermission(this.permission);
 	}
 
 	/**
@@ -327,7 +334,7 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		if (r instanceof Player) {
 			return canJoin(((Player) r).getUniqueId(), password);
 		} else {
-			return !members.contains(r);
+			return true;
 		}
 	}
 
@@ -336,17 +343,20 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	 */
 	public boolean canJoin(UUID uuid, Optional<String> password) {
 		if (banned.contains(uuid)) {
+			System.out.println("banned");
 			return false;
 		}
-		if (this.password.isPresent()) {
+		if (this.password.isPresent() && !this.getPassword().get().isEmpty()) {
 			if (!password.isPresent() || !password.get().equals(this.password.get())) {
+				System.out.println("pass");
 				return false;
 			}
 		}
 		User u = Utils.getUser(uuid).get();
-		if (u.hasPermission(this.permission)) {
-			return !members.contains(u);
+		if (hasPermission(u)) {
+			return true;
 		}
+		System.out.println("perm");
 		return false;
 	}
 

@@ -22,18 +22,26 @@ import org.spongepowered.api.text.Text;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
+import me.Wundero.Ray.commands.ActionCommand;
 import me.Wundero.Ray.commands.AfkCommand;
+import me.Wundero.Ray.commands.BroadcastCommand;
 import me.Wundero.Ray.commands.ClearChatCommand;
 import me.Wundero.Ray.commands.Commands;
+import me.Wundero.Ray.commands.HelpOpCommand;
 import me.Wundero.Ray.commands.IgnoreCommand;
+import me.Wundero.Ray.commands.InfoCommand;
 import me.Wundero.Ray.commands.MessageCommand;
 import me.Wundero.Ray.commands.MuteCommand;
 import me.Wundero.Ray.commands.QuoteCommand;
 import me.Wundero.Ray.commands.ReplyCommand;
+import me.Wundero.Ray.commands.RulesCommand;
+import me.Wundero.Ray.commands.SpyCommand;
+import me.Wundero.Ray.commands.channel.ChannelBanCommand;
 import me.Wundero.Ray.commands.channel.ChannelCommand;
 import me.Wundero.Ray.commands.channel.ChannelHelpCommand;
 import me.Wundero.Ray.commands.channel.ChannelJoinCommand;
 import me.Wundero.Ray.commands.channel.ChannelLeaveCommand;
+import me.Wundero.Ray.commands.channel.ChannelModifyCommand;
 import me.Wundero.Ray.commands.channel.ChannelMuteCommand;
 import me.Wundero.Ray.commands.channel.ChannelQMCommand;
 import me.Wundero.Ray.commands.channel.ChannelRoleCommand;
@@ -45,6 +53,7 @@ import me.Wundero.Ray.config.Template;
 import me.Wundero.Ray.config.Templates;
 import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.framework.channel.ChatChannel;
+import me.Wundero.Ray.listeners.AfkListener;
 import me.Wundero.Ray.listeners.ChatChannelListener;
 import me.Wundero.Ray.listeners.MainListener;
 import me.Wundero.Ray.utils.Utils;
@@ -85,7 +94,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
  * This class is the main instance of the plugin, which stores much of Sponge's
  * plugin requisite information.
  */
-@Plugin(id = "ray", name = "Ray", version = "1.0.0", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = "ray", name = "Ray", version = "1.0.2", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 
@@ -237,6 +246,7 @@ public class ProjectRay {
 		Ray.get().load(this);
 		Ray.get().setGroups(new Groups(config.getNode("worlds")));
 		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
+		new AfkListener(300, -1, false);// TODO load values
 	}
 
 	/**
@@ -295,6 +305,30 @@ public class ProjectRay {
 				CommandSpec.builder().executor(new MuteCommand()).arguments(GenericArguments.player(Text.of("target")))
 						.permission("ray.mute").description(Text.of("Mute a player")).build(),
 				"mute");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new ActionCommand()).permission("ray.action")
+						.description(Text.of("Describe yourself doing something."))
+						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message"))).build(),
+				"action", "me");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new BroadcastCommand()).permission("ray.broadcast")
+						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
+						.description(Text.of("Send a message to everyone on the server.")).build(),
+				"broadcast", "bc");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new HelpOpCommand()).permission("ray.helpop")
+						.description(Text.of("Ask for help from staff members on the server."))
+						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message"))).build(),
+				"helpop");
+		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new RulesCommand())
+				.permission("ray.rules").description(Text.of("View the server rules.")).build(), "rules");
+		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new InfoCommand())
+				.description(Text.of("View the server info.")).permission("ray.info").build(), "info");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new SpyCommand()).permission("ray.spy")
+						.description(Text.of("Toggle whether you can see private messages between other players."))
+						.build(),
+				"spy", "socialspy");
 		Sponge.getCommandManager()
 				.register(this,
 						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
@@ -326,6 +360,15 @@ public class ProjectRay {
 										.arguments(
 												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
 										.build(), "leave", "l")
+								.child(CommandSpec.builder().executor(new ChannelCommand())
+										.description(Text.of("List all channels.")).build(), "list")
+								.child(CommandSpec.builder().executor(new ChannelBanCommand())
+										.arguments(GenericArguments.player(Text.of("target")),
+												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+										.permission("ray.channel.ban")
+										.description(
+												Text.of("Ban a player. Optionally provide what channel to mute them in."))
+										.build(), "ban")
 								.child(CommandSpec.builder().executor(new ChannelWhoCommand())
 										.description(Text.of("List the players in a channel."))
 										.arguments(
@@ -345,6 +388,13 @@ public class ProjectRay {
 										.arguments(GenericArguments
 												.optional(GenericArguments.remainingJoinedStrings(Text.of("type"))))
 										.build(), "setup")
+								.child(CommandSpec.builder().executor(new ChannelModifyCommand())
+										.arguments(GenericArguments.string(Text.of("channel")),
+												GenericArguments.string(Text.of("property")),
+												GenericArguments.optional(
+														GenericArguments.remainingJoinedStrings(Text.of("value"))))
+										.permission("ray.channel.modify")
+										.description(Text.of("Modify values for a channel.")).build(), "modify", "mod")
 								.build(),
 						"channel", "ch");
 	}

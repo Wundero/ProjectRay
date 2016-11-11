@@ -323,7 +323,7 @@ public class Group {
 	 * Set the permission for this group.
 	 */
 	public void setPermission(String permission) {
-		this.permission = Utils.wrap(permission, !permission.isEmpty());
+		this.permission = Utils.wrap2(permission, perm -> perm.isPresent() && !perm.get().isEmpty());
 	}
 
 	/**

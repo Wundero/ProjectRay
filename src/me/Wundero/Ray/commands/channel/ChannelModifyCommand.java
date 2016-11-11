@@ -23,6 +23,7 @@ package me.Wundero.Ray.commands.channel;
  SOFTWARE.
  */
 
+import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.command.CommandException;
@@ -36,6 +37,7 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.channel.Role;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * A command to modify settings of a channel.
@@ -50,6 +52,12 @@ public class ChannelModifyCommand implements CommandExecutor {
 		String ch = args.getOne("channel")
 				.orElseThrow(() -> new CommandException(Text.of(TextColors.RED, "You must specify a channel!")))
 				.toString();
+		if (!args.hasAny("property")) {
+			src.sendMessage(Text.of(TextColors.RED, "You must specify a property!"));
+			src.sendMessage(Text.of(TextColors.AQUA, "Available properties:"));
+			src.sendMessages(proptexts("tag", "permission", "range", "password", "hidden", "autojoin", "default-role",
+					"obfuscate-range"));
+		}
 		String key = args.getOne("property")
 				.orElseThrow(() -> new CommandException(Text.of(TextColors.RED, "You must specify a property!")))
 				.toString();
@@ -73,6 +81,8 @@ public class ChannelModifyCommand implements CommandExecutor {
 				c.setRange(getFrom(value.get(), -1));
 			}
 			break;
+		case "pass":
+		case "passphrase":
 		case "password":
 			c.setPassword(value.orElse(null));
 			reset = true;
@@ -94,6 +104,7 @@ public class ChannelModifyCommand implements CommandExecutor {
 			break;
 		case "obfuscaterange":
 		case "obfuscatedrange":
+		case "obfuscated-range":
 		case "obfuscate":
 		case "obfuscated":
 		case "obfuscate-range":
@@ -106,6 +117,14 @@ public class ChannelModifyCommand implements CommandExecutor {
 		Text t = Text.of(TextColors.AQUA, "The value of " + key + " was " + x + ".");
 		src.sendMessage(t);
 		return CommandResult.success();
+	}
+
+	private static List<Text> proptexts(String... strings) {
+		List<Text> out = Utils.al();
+		for (String s : strings) {
+			out.add(Text.of(TextColors.GOLD, s));
+		}
+		return out;
 	}
 
 	private static double getFrom(String s, double def) {

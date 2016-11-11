@@ -28,6 +28,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractMessageEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -54,6 +55,7 @@ public class AfkEvent extends AbstractMessageEvent implements Cancellable {
 						.concat(a.getDisplayNameData().displayName().get()
 								.concat(Text.of(TextColors.GRAY, " is no" + (afk ? "w" : " longer") + " AFK!")))
 				: Text.of(TextColors.GRAY, " * " + a.getName() + " is no" + (afk ? "w" : " longer") + " AFK!");
+		super.formatter = new MessageEvent.MessageFormatter(originalMessage);
 	}
 
 	/**

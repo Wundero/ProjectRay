@@ -104,7 +104,7 @@ public class DefaultVariables {
 			if (player == null) {
 				return Text.of();
 			}
-			return RayPlayer.get(player).AFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.of();
+			return RayPlayer.get(player).AFK() ? Text.of(TextColors.GRAY, "[AFK] ") : Text.of();
 		});
 		v.registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		v.registerVariable("player", (objects) -> {

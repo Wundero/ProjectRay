@@ -70,14 +70,17 @@ public class AfkListener {
 		checkTask = Task.builder().interval(1, TimeUnit.SECONDS).async().execute(() -> {
 			for (Entry<UUID, Long> e : lastMoved.entrySet()) {
 				Optional<User> u = Utils.getUser(e.getKey());
-				if (!u.isPresent() || !u.get().getPlayer().isPresent()) {
+				if (!u.isPresent() || !u.get().isOnline() || !u.get().getPlayer().isPresent()) {
 					continue;
 				}
 				Player p = u.get().getPlayer().get();
-				if ((System.currentTimeMillis() - e.getValue()) > kick && kick < 0) {
+				if ((System.currentTimeMillis() - e.getValue()) > TimeUnit.SECONDS.toMillis(kick) && kick > 0) {
 					p.kick(Text.of("You were AFK for too long!"));
-				} else if ((System.currentTimeMillis() - e.getValue()) > timer && timer < 0) {
-					AfkEvent.setAFK(p, true);
+				} else if ((System.currentTimeMillis() - e.getValue()) > TimeUnit.SECONDS.toMillis(timer)
+						&& timer > 0) {
+					if (!RayPlayer.get(p).AFK()) {
+						AfkEvent.setAFK(p, true);
+					}
 				}
 			}
 		}).submit(Ray.get().getPlugin());
@@ -87,14 +90,14 @@ public class AfkListener {
 	/**
 	 * Cancel AFK on event.
 	 */
-	@Listener(order = Order.BEFORE_POST)
+	@Listener(order = Order.POST)
 	public void onMove(MoveEntityEvent event) {
-		if (event.getCause().contains(Player.class)) {
-			if (cancelMovement && RayPlayer.get(event.getCause().first(Player.class).get()).AFK()) {
+		if (event.getTargetEntity() instanceof Player) {
+			if (cancelMovement && RayPlayer.get((Player) event.getTargetEntity()).AFK()) {
 				event.setCancelled(true);
 				return;
 			}
-			update(event.getCause().first(Player.class).get());
+			update((Player) event.getTargetEntity());
 		}
 	}
 
@@ -103,7 +106,7 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onCommand(SendCommandEvent event) {
-		if (event.getCause().contains(Player.class)) {
+		if (event.getCause().containsType(Player.class)) {
 			update(event.getCause().first(Player.class).get());
 		}
 	}
@@ -113,7 +116,7 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onTalk(MessageChannelEvent.Chat event) {
-		if (event.getCause().contains(Player.class)) {
+		if (event.getCause().containsType(Player.class)) {
 			update(event.getCause().first(Player.class).get());
 		}
 	}
@@ -123,8 +126,8 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onSleep(SleepingEvent event) {
-		if (event.getCause().contains(Player.class)) {
-			update(event.getCause().first(Player.class).get());
+		if (event.getTargetEntity() instanceof Player) {
+			update((Player) event.getTargetEntity());
 		}
 	}
 
@@ -133,7 +136,7 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onInteract(InteractEntityEvent event) {
-		if (event.getCause().contains(Player.class)) {
+		if (event.getCause().containsType(Player.class)) {
 			update(event.getCause().first(Player.class).get());
 		}
 	}
@@ -143,8 +146,12 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onFish(FishingEvent event) {
-		if (event.getCause().contains(Player.class)) {
-			update(event.getCause().first(Player.class).get());
+		Optional<UUID> creator = event.getFishHook().getCreator();
+		if (creator.isPresent()) {
+			User u = Utils.getUser(creator.get()).orElse(null);
+			if (u != null && u.isOnline() && u.getPlayer().isPresent()) {
+				update(u.getPlayer().get());
+			}
 		}
 	}
 

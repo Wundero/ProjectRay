@@ -49,12 +49,27 @@ public class ChannelHelpCommand implements CommandExecutor {
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		List<Text> texts = Utils.al();
 		texts.add(cmdgen("channel", "View a list of channels.", "", false, "ch"));
+		texts.add(cmdgen("list", "View a list of channels.", "", true));
 		texts.add(cmdgen("help", "View a list of channel commands.", "", true, "h"));
 		texts.add(cmdgen("join", "Join a channel.", "<channel>", true, "j"));
 		texts.add(cmdgen("leave", "Leave a channel.", "[channel]", true, "l"));
 		texts.add(
 				cmdgen("quickmessage", "Message a channel without joining it.", "<channel> <message...>", true, "qm"));
-		texts.add(cmdgen("role", "View or edit channel member roles.", "[player] [set <role>]", true, "r"));
+		if (src.hasPermission("ray.channel.role")) {
+			texts.add(cmdgen("role", "View or edit channel member roles.", "[player] [set <role>]", true, "r"));
+		}
+		if (src.hasPermission("ray.channel.mute")) {
+			texts.add(cmdgen("mute", "Mute a player in a channel.", "<player> [channel]", true));
+		}
+		if (src.hasPermission("ray.channel.ban")) {
+			texts.add(cmdgen("ban", "Ban a player from a channel.", "<player> [channel]", true));
+		}
+		if (src.hasPermission("ray.channel.modify")) {
+			texts.add(cmdgen("modify", "Edit channel configurations.", "<channel> <property> [value]", true));
+		}
+		if (src.hasPermission("ray.channel.setup")) {
+			texts.add(cmdgen("setup", "Set up default channel configurations.", "[config-level]", true));
+		}
 		texts.add(cmdgen("who", "View who is in a channel.", "[channel]", true, "w"));
 		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.BLACK,
 				"]", " ", TextColors.GRAY, "Channel commands:");

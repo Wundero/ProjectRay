@@ -45,6 +45,7 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
 /**
@@ -69,14 +70,16 @@ public class MessageCommand implements CommandExecutor {
 				Cause.source(Ray.get()).named("formatcontext", FormatContexts.MESSAGE_SEND).named("sendfrom", sendfrom)
 						.named("sendto", sendto).build(),
 				sendfrom.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendfrom))),
-				new MessageEvent.MessageFormatter(Text.of("You to ", sendto.getName()), Text.of(message)),
-				Text.of(message), false);
+				new MessageEvent.MessageFormatter(Text.of("You to ", sendto.getName()),
+						TextUtils.transIf(message, sendfrom)),
+				TextUtils.transIf(message, sendfrom), false);
 		MessageChannelEvent.Chat event2 = SpongeEventFactory.createMessageChannelEventChat(
 				Cause.source(Ray.get()).named("formatcontext", FormatContexts.MESSAGE_RECEIVE)
 						.named("sendfrom", sendfrom).named("sendto", sendto).build(),
 				sendto.getMessageChannel(), Optional.of(MessageChannel.combined(MessageChannel.fixed(sendto))),
-				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"), Text.of(message)),
-				Text.of(message), false);
+				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to you"),
+						TextUtils.transIf(message, sendfrom)),
+				TextUtils.transIf(message, sendfrom), false);
 		List<MessageReceiver> spies = Utils.al();
 		for (Player p : Sponge.getServer().getOnlinePlayers()) {
 			if (!RayPlayer.get(p).spy()) {
@@ -93,8 +96,8 @@ public class MessageCommand implements CommandExecutor {
 				sendto.getMessageChannel(),
 				Optional.of(MessageChannel.combined(MessageChannel.fixed(spies), MessageChannel.TO_CONSOLE)),
 				new MessageEvent.MessageFormatter(Text.of(sendfrom.getName(), " to " + sendto.getName()),
-						Text.of(message)),
-				Text.of(message), false);
+						TextUtils.transIf(message, sendfrom)),
+				TextUtils.transIf(message, sendfrom), false);
 		if (!Sponge.getEventManager().post(event) && !Sponge.getEventManager().post(event2)) {
 			event.getChannel().get().send(sendfrom, event.getMessage());
 			event2.getChannel().get().send(sendfrom, event2.getMessage());

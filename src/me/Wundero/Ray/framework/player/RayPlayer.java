@@ -151,7 +151,7 @@ public class RayPlayer implements Socialable {
 	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
 	private Map<SelectableTag, String> selectedTags = Utils.hm();
 	private boolean spy = false;
-	private Optional<String> quote;
+	private Optional<String> quote = Optional.empty();
 
 	/**
 	 * Get the player object if user is online.
