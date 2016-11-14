@@ -406,9 +406,17 @@ public class RayPlayer implements Socialable {
 			TabList list = p.getTabList();
 			boolean h = !headerQueue.isEmpty() || !list.getHeader().isPresent();
 			boolean f = !footerQueue.isEmpty() || !list.getFooter().isPresent();
-			Text he = h ? pop(headerQueue, EMPTY_TEXT_HEADER) : EMPTY_TEXT_HEADER;
-			Text fo = f ? pop(footerQueue, EMPTY_TEXT_HEADER) : EMPTY_TEXT_HEADER;
-			p.getTabList().setHeaderAndFooter(he, fo);
+			Text he = pop(headerQueue, EMPTY_TEXT_HEADER);
+			Text fo = pop(footerQueue, EMPTY_TEXT_HEADER);
+			// multi-if statement to increase performance (impl packet sending
+			// limited to one)
+			if (h && f) {
+				list.setHeaderAndFooter(he, fo);
+			} else if (h) {
+				list.setHeader(he);
+			} else if (f) {
+				list.setFooter(fo);
+			}
 		}).intervalTicks(1).submit(Ray.get().getPlugin());
 	}
 
