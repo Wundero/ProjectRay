@@ -45,6 +45,13 @@ public class InstantDisplayName extends DisplayName {
 		this.setApplier(Validate.notNull(applicant));
 		this.setSeparator(separator);
 	}
+	
+	/**
+	 * Get displayname.
+	 */
+	public Text getDisplayName() {
+		return super.getDisplayName(separator);
+	}
 
 	/**
 	 * Add a nickname and, if possible, apply it.

@@ -68,6 +68,32 @@ public class DisplayName implements Nicknamable, Prefixable, Suffixable {
 	}
 
 	/**
+	 * Return the displayname. Optional separator string that will split
+	 * prefix/name/suffix. To not use separator, set it to null or "".
+	 */
+	public Text getDisplayName(String separator) {
+		Text.Builder b = Text.builder("");
+		Optional<Text> sep = Utils.wrap(Text.of(separator), separator != null, !separator.isEmpty());
+		prefix.ifPresent(t -> {
+			b.append(t);
+			sep.ifPresent(a -> b.append(a));
+		});
+		b.append(nick.orElse(original));
+		suffix.ifPresent(t -> {
+			sep.ifPresent(a -> b.append(a));
+			b.append(t);
+		});
+		return b.build();
+	}
+
+	/**
+	 * Offer a displayname. Parameter is nullable.
+	 */
+	public boolean offer(Text displayname) {
+		return offer(Text.EMPTY, displayname, Text.EMPTY);
+	}
+
+	/**
 	 * Offer a displayname. All parameters are nullable.
 	 */
 	public boolean offer(Text prefix, Text name, Text suffix) {
