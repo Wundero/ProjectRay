@@ -245,7 +245,7 @@ public class FormatConversation {
 		@Override
 		public boolean isInputValid(ConversationContext context, String input) {
 			Group group = context.getData("group");
-			for (Format f : group.getAllFormats()) {
+			for (Format f : group.getAllFormats().get()) {
 				if (f.getName().equalsIgnoreCase(input.trim())) {
 					return false;
 				}

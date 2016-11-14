@@ -61,6 +61,7 @@ import me.Wundero.Ray.framework.RayCombinedMessageChannel;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.ExecutingFormat;
 import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.framework.format.FormatCollection;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
@@ -90,19 +91,18 @@ public class MainListener {
 		if (g == null) {
 			return false;
 		}
-		Format fx;
+		FormatCollection fx;
 		if (formatName.isPresent()) {
-			fx = g.getFormat(t, formatName.get());
+			fx = g.getFormats(t, formatName.get());
 		} else {
-			fx = g.getFormat(t);
+			fx = g.getFormats(t);
 		}
-		if (fx == null) {
+		if (fx == null || fx.isEmpty()) {
 			return false;
 		}
-		final Format f = fx;
+		final FormatCollection f = fx;
 		final UUID exf = UUID.randomUUID();
-		final Optional<ExecutingFormat> ef = f instanceof ExecutingFormat ? Optional.of((ExecutingFormat) f)
-				: f.getInternal(ExecutingFormat.class, Optional.empty());
+		final List<ExecutingFormat> ef = f.getInternals(ExecutingFormat.class, Optional.empty());
 		final Map<String, Object> args = Utils.hm(v);
 		ChatChannel pc = r.getActiveChannel();
 		boolean obfuscate = pc != null && pc.isObfuscateRanged();
@@ -141,15 +141,17 @@ public class MainListener {
 						return Optional.empty();
 					}
 				}
-				ef.ifPresent((format) -> {
-					format.execConsoles(exf, 1000);
-				});
-				if (!f.send(recipient, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
-						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
-						.setClickHover(true)
-						.setObserver(observer.isPresent() ? observer
-								: recipient instanceof Player ? Optional.of((Player) recipient) : Optional.empty()),
-						Optional.of(msgsender.orElse(p).getUniqueId()))) {
+				for (ExecutingFormat ftx : ef) {
+					ftx.execConsoles(exf, 1000);
+				}
+				if (f.sendAll(recipient,
+						new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
+								.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
+								.setClickHover(true)
+								.setObserver(observer.isPresent() ? observer
+										: recipient instanceof Player ? Optional.of((Player) recipient)
+												: Optional.empty()),
+						Optional.of(msgsender.orElse(p).getUniqueId())) == 0) {
 					return Optional.of(original);
 				}
 				return Optional.empty();
@@ -218,8 +220,8 @@ public class MainListener {
 	public void onAFK(AfkEvent event) {
 		Group g = RayPlayer.get(event.getAfkPlayer()).getActiveGroup();
 		if (g != null) {
-			Format f = g.getFormat(FormatContexts.AFK);
-			if (f != null) {
+			FormatCollection f = g.getFormats(FormatContexts.AFK);
+			if (f != null && !f.isEmpty()) {
 				String s = event.isAFK() ? "w" : " longer";
 				Map<String, Object> v = Utils.hm();
 				v.put("afk", event.isAFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.EMPTY);
@@ -246,44 +248,62 @@ public class MainListener {
 	public void onJoin(ClientConnectionEvent.Join event) {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
+		System.out.println("presettabtask");
 		p.setTabTask(() -> {
 			Player player = event.getTargetEntity();
+			System.out.println("running tab task");
 			final TabList list = player.getTabList();
 			List<TabListEntry> lx = Utils.sl(list.getEntries(), true);
+			System.out.println("list retrieved");
 			for (TabListEntry e : lx) {
+				System.out.println("getting player for entry");
 				Optional<Player> h = Sponge.getServer().getPlayer(e.getProfile().getUniqueId());
 				if (!h.isPresent()) {
+					System.out.println("no player exists, continuing");
 					continue;
 				}
+				System.out.println("player exist");
 				Player pla = h.get();
 				RayPlayer plx = RayPlayer.get(pla);
 				Group g = plx.getActiveGroup();
 				if (g == null) {
+					System.out.println("group null");
 					continue;
 				}
-				Format f = g.getFormat(FormatContexts.TABLIST_ENTRY);
-				if (f == null || f.getLocation() != FormatLocations.TAB_ENTRY) {
+				FormatCollection f = g.getFormats(FormatContexts.TABLIST_ENTRY);
+				if (f == null || f.isEmpty()) {
+					System.out.println("no format");
 					continue;
 				}
-				f.send(player, new ParsableData().setClickHover(false).setSender(pla).setRecipient(player),
+				List<Format> fx = Utils.al();
+				for (Format fc : f.get()) {
+					if (fc.getLocation() == FormatLocations.TAB_ENTRY) {
+						fx.add(fc);
+					}
+				}
+				new FormatCollection(fx).sendAll(player,
+						new ParsableData().setClickHover(false).setSender(pla).setRecipient(player),
 						Optional.of(pla.getUniqueId()));
 			}
 		});
 		Task.builder().delayTicks(20).execute(() -> RayPlayer.updateTabs()).submit(Ray.get().getPlugin());
+		System.out.println("tabtaskset&update");
 		p.startTabHFTask();
 		final Group g = p.getActiveGroup();
 		if (g != null) {
 			Task.builder().delayTicks(20).execute(() -> {
-				Format h = g.getFormat(FormatContexts.TABLIST_HEADER);
-				Format f = g.getFormat(FormatContexts.TABLIST_FOOTER);
-				if (h != null) {
-					h.send(event.getTargetEntity(), new ParsableData().setClickHover(false)
-							.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
+				FormatCollection h = g.getFormats(FormatContexts.TABLIST_HEADER);
+				FormatCollection f = g.getFormats(FormatContexts.TABLIST_FOOTER);
+				if (h != null && !h.isEmpty()) {
+					h.sendAll(
+							event.getTargetEntity(), new ParsableData().setClickHover(false)
+									.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
 							Optional.of(event.getTargetEntity()));
 				}
-				if (f != null) {
-					f.send(event.getTargetEntity(), new ParsableData().setClickHover(false)
-							.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
+				if (f != null && !f.isEmpty()) {
+					f.sendAll(
+							event.getTargetEntity(), new ParsableData().setClickHover(false)
+									.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
 							Optional.of(event.getTargetEntity()));
 				}
 			}).submit(Ray.get().getPlugin());

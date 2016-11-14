@@ -4,12 +4,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.framework.format.FormatCollection;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -47,7 +47,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  * determines internal functionality.
  */
 public class Group {
-	private Map<FormatContext, List<Format>> formats = Utils.sm();
+	private Map<FormatContext, FormatCollection> formats = Utils.sm();
 	private List<String> parents = Utils.sl();
 	private String world;
 	private int priority;
@@ -71,9 +71,9 @@ public class Group {
 	 */
 	public void addFormat(Format format) {
 		FormatContext type = format.getContext();
-		List<Format> f = formats.get(type);
+		FormatCollection f = formats.get(type);
 		if (f == null) {
-			f = Utils.sl();
+			f = new FormatCollection();
 		}
 		f.add(format);
 		formats.put(type, f);
@@ -105,9 +105,9 @@ public class Group {
 			Format f = Format.create(node);
 			FormatContext type = f.getContext();
 			if (!formats.containsKey(type)) {
-				formats.put(type, Utils.sl(f));
+				formats.put(type, new FormatCollection(Utils.sl(f)));
 			} else {
-				List<Format> list = formats.get(type);
+				FormatCollection list = formats.get(type);
 				list.add(f);
 				formats.put(type, list);
 			}
@@ -119,81 +119,28 @@ public class Group {
 	}
 
 	/**
-	 * Return a format based off of a context. Index queries against the
-	 * internal list, and if the index is too large or the list is empty, null
-	 * is returned.
-	 */
-	public Format getFormat(FormatContext type, int index) {
-		if (getFormats(type) == null || getFormats(type).isEmpty()) {
-			return null;
-		}
-		if (getFormats(type).size() <= index) {
-			return null;
-		}
-		return getFormats(type).get(index);
-	}
-
-	/**
-	 * Return the first format based off of the context.
-	 */
-	public Format getFormat(FormatContext type) {
-		return getFormat(type, 0);
-	}
-
-	/**
-	 * Return a format basec on the context. If random is true, it will be
-	 * random; if not, it will be the first one.
-	 */
-	public Format getFormat(FormatContext type, boolean random) {
-		if (random) {
-			return getRandomFormat(type);
-		}
-		return getFormat(type, 0);
-	}
-
-	/**
-	 * Return a random format from a context.
-	 */
-	public Format getRandomFormat(FormatContext type) {
-		List<Format> fmats = getFormats(type);
-		return fmats.get(new Random().nextInt(fmats.size()));
-	}
-
-	/**
-	 * Return a format that has a particular name.
-	 */
-	public Format getFormat(FormatContext type, String name) {
-		for (Format f : getFormats(type)) {
-			if (f.getName().equalsIgnoreCase(name)) {
-				return f;
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * @return all formats on all worlds.
 	 */
-	public List<Format> getAllFormats() {
+	public FormatCollection getAllFormats() {
 		List<Format> out = Utils.al();
-		for (List<Format> f : formats.values()) {
-			out.addAll(f);
+		for (FormatCollection f : formats.values()) {
+			out.addAll(f.get());
 		}
-		return out;
+		return new FormatCollection(out);
 	}
 
 	/**
 	 * @return all formats on all worlds, for this and parents. RecurseTimes is
 	 *         a safeguard against stack overflow.
 	 */
-	public List<Format> getAllFormats(boolean inherits, int recurseTimes) {
+	public FormatCollection getAllFormats(boolean inherits, int recurseTimes) {
 		List<Format> out2 = Utils.al();
-		out2.addAll(getAllFormats());
+		out2.addAll(getAllFormats().get());
 		List<Group> groups = getParentsGroups();
 		for (Group g : groups) {
-			out2.addAll(recurseTimes > 0 ? g.getAllFormats(inherits, recurseTimes - 1) : g.getAllFormats());
+			out2.addAll(recurseTimes > 0 ? g.getAllFormats(inherits, recurseTimes - 1).get() : g.getAllFormats().get());
 		}
-		return out2;
+		return new FormatCollection(out2);
 	}
 
 	/**
@@ -224,9 +171,23 @@ public class Group {
 	}
 
 	/**
+	 * Get all formats that match a name.
+	 */
+	public FormatCollection getFormats(FormatContext type, String name) {
+		FormatCollection col = getFormats(type);
+		List<Format> out = Utils.al();
+		for (Format f : col.get()) {
+			if (f.getName().equals(name)) {
+				out.add(f);
+			}
+		}
+		return new FormatCollection(out);
+	}
+
+	/**
 	 * Get all formats from a context. Checks against parents.
 	 */
-	public List<Format> getFormats(FormatContext type) {
+	public FormatCollection getFormats(FormatContext type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
 			List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(world).values(), true);
 			List<Group> torem = Utils.al();
@@ -244,14 +205,14 @@ public class Group {
 					return o1.priority - o2.priority;
 				}
 			});
-			List<Format> formats;
+			FormatCollection formats;
 			for (Group g : groups) {
 				formats = g.getFormats(type);
 				if (!(formats == null || formats.isEmpty())) {
 					return formats;
 				}
 			}
-			return Utils.al();
+			return new FormatCollection();
 		}
 		return formats.get(type);
 	}
