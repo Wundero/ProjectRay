@@ -1,4 +1,4 @@
-# Ray  [![Build Status](https://travis-ci.org/Wundero/Ray.svg?branch=master)](https://travis-ci.org/Wundero/Ray)
+# Ray  [![Build Status](https://travis-ci.org/Wundero/Ray.svg?branch=master)](https://travis-ci.org/Wundero/Ray) [![codebeat badge](https://codebeat.co/badges/babc8e5b-0a8f-422f-8017-5ea8f0c88fac)](https://codebeat.co/projects/github-com-wundero-ray)
 Ray is an open source chat management system built for Sponge.
 
 Download: [__[Here]__](https://github.com/Wundero/Ray/releases)
