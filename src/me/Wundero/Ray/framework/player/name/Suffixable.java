@@ -30,7 +30,7 @@ import org.spongepowered.api.text.Text;
 /**
  * Represents something that can hold a suffix.
  */
-public interface Suffixable extends Changable {
+public interface Suffixable extends Changeable {
 
 	boolean suffix(Text suffix);
 

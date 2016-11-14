@@ -26,7 +26,7 @@ package me.Wundero.Ray.framework.player.name;
 /**
  * Represents a value that can be changed.
  */
-public interface Changable {
+public interface Changeable {
 
 	void clear();
 

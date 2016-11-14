@@ -30,7 +30,7 @@ import org.spongepowered.api.text.Text;
 /**
  * Represents something that can hold a nickname.
  */
-public interface Nicknamable extends Changable {
+public interface Nicknamable extends Changeable {
 
 	boolean nickname(Text nickname);
 
