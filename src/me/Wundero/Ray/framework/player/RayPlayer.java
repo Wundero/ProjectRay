@@ -26,7 +26,7 @@ package me.Wundero.Ray.framework.player;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +35,9 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.tab.TabList;
@@ -51,6 +54,7 @@ import me.Wundero.Ray.animation.AnimationQueue;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
+import me.Wundero.Ray.framework.player.name.InstantDisplayName;
 import me.Wundero.Ray.tag.SelectableTag;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -146,12 +150,90 @@ public class RayPlayer implements Socialable {
 	private Runnable tabTask;
 	private boolean afk = false;
 	private Task tabHFTask = null;
-	private ArrayDeque<Text> headerQueue = new ArrayDeque<>(), footerQueue = new ArrayDeque<>();
+	private Deque<Text> headerQueue = Utils.sd(), footerQueue = Utils.sd();
 	private List<String> listenChannels = Utils.sl();
 	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
 	private Map<SelectableTag, String> selectedTags = Utils.hm();
 	private boolean spy = false;
 	private Optional<String> quote = Optional.empty();
+	private InstantDisplayName disp = new InstantDisplayName(Text.of(this.getUser().getName()), (displayname) -> {
+		if (!getPlayer().isPresent()) {
+			return false;
+		}
+		DataTransactionResult result = getPlayer().get().tryOffer(Keys.DISPLAY_NAME, displayname);
+		boolean s = result.isSuccessful();
+		boolean c = false;
+		for (ImmutableValue<?> val : result.getSuccessfulData()) {
+			if (val.get() == displayname) {
+				c = true;
+				break;
+			}
+		}
+		return c && s;
+	}, " ");
+
+	/**
+	 * Get the prefix if available.
+	 */
+	public Optional<Text> getPrefix() {
+		return disp.prefix();
+	}
+
+	/**
+	 * Get the suffix if available.
+	 */
+	public Optional<Text> getSuffix() {
+		return disp.suffix();
+	}
+
+	/**
+	 * Get the nickname
+	 */
+	public Text getNickname() {
+		return disp.nickname().orElse(disp.original());
+	}
+
+	/**
+	 * Get the displayname.
+	 */
+	public Text getDisplayname() {
+		return disp.getDisplayName();
+	}
+
+	/**
+	 * Set display name
+	 */
+	public boolean setDisplayname(Text text) {
+		return disp.offer(text);
+	}
+
+	/**
+	 * Set display name
+	 */
+	public boolean setDisplayname(Text prefix, Text nickname, Text suffix) {
+		return disp.offer(prefix, nickname, suffix);
+	}
+
+	/**
+	 * Set suffix
+	 */
+	public boolean setSuffix(Text suffix) {
+		return disp.suffix(suffix);
+	}
+
+	/**
+	 * Set nickname
+	 */
+	public boolean setNickname(Text nickname) {
+		return disp.nickname(nickname);
+	}
+
+	/**
+	 * Set prefix
+	 */
+	public boolean setPrefix(Text prefix) {
+		return disp.prefix(prefix);
+	}
 
 	/**
 	 * Get the player object if user is online.
@@ -306,7 +388,7 @@ public class RayPlayer implements Socialable {
 		tabHFTask.cancel();
 	}
 
-	private synchronized Text pop(ArrayDeque<Text> from, Text def) {
+	private synchronized Text pop(Deque<Text> from, Text def) {
 		return Utils.pop(from, def);
 	}
 
@@ -324,25 +406,9 @@ public class RayPlayer implements Socialable {
 			TabList list = p.getTabList();
 			boolean h = !headerQueue.isEmpty() || !list.getHeader().isPresent();
 			boolean f = !footerQueue.isEmpty() || !list.getFooter().isPresent();
-			if (h && f) {
-				synchronized (headerQueue) {
-					synchronized (footerQueue) {
-						Text he = pop(headerQueue, EMPTY_TEXT_HEADER);
-						Text fo = pop(footerQueue, EMPTY_TEXT_HEADER);
-						p.getTabList().setHeaderAndFooter(he, fo);
-					}
-				}
-			} else if (h) {
-				synchronized (headerQueue) {
-					Text he = pop(headerQueue, EMPTY_TEXT_HEADER);
-					p.getTabList().setHeader(he);
-				}
-			} else if (f) {
-				synchronized (footerQueue) {
-					Text he = pop(footerQueue, EMPTY_TEXT_HEADER);
-					p.getTabList().setFooter(he);
-				}
-			}
+			Text he = h ? pop(headerQueue, EMPTY_TEXT_HEADER) : EMPTY_TEXT_HEADER;
+			Text fo = f ? pop(footerQueue, EMPTY_TEXT_HEADER) : EMPTY_TEXT_HEADER;
+			p.getTabList().setHeaderAndFooter(he, fo);
 		}).intervalTicks(1).submit(Ray.get().getPlugin());
 	}
 

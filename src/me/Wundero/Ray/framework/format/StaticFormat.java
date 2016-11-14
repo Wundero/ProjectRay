@@ -317,19 +317,7 @@ public class StaticFormat extends Format {
 				key = text;
 				return new ArgTypePrompt(this, r);
 			case "click":
-				Class<?> clickType = InternalClickAction.SuggestTemplate.class;
-				if (text.toLowerCase().startsWith("run:")) {
-					clickType = InternalClickAction.RunTemplate.class;
-					text = text.substring(4);
-				}
-				if (text.toLowerCase().startsWith("suggest:")) {
-					text = text.substring(8);
-				}
-				if (text.toLowerCase().startsWith("url:")) {
-					clickType = InternalClickAction.UrlTemplate.class;
-					text = text.substring(4);
-				}
-				click = InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
+				click = findClick(text);
 				return new ArgTypePrompt(this, r);
 			case "hover":
 				hover = InternalHoverAction.builder().withResult(TextUtils.parse(text, true))
@@ -480,19 +468,7 @@ public class StaticFormat extends Format {
 				this.text = TextSerializers.FORMATTING_CODE.deserialize(text);
 				return new TextTypePrompt(this, r);
 			case "click":
-				Class<?> clickType = InternalClickAction.SuggestTemplate.class;
-				if (text.toLowerCase().startsWith("run:")) {
-					clickType = InternalClickAction.RunTemplate.class;
-					text = text.substring(4);
-				}
-				if (text.toLowerCase().startsWith("suggest:")) {
-					text = text.substring(8);
-				}
-				if (text.toLowerCase().startsWith("url:")) {
-					clickType = InternalClickAction.UrlTemplate.class;
-					text = text.substring(4);
-				}
-				click = InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
+				click = findClick(text);
 				return new TextTypePrompt(this, r);
 			case "hover":
 				hover = InternalHoverAction.builder().withResult(TextUtils.parse(text, true))
@@ -502,6 +478,23 @@ public class StaticFormat extends Format {
 			return this;
 		}
 
+	}
+
+	private static InternalClickAction<?> findClick(String t) {
+		String text = t.toLowerCase();
+		Class<?> clickType = InternalClickAction.SuggestTemplate.class;
+		if (text.toLowerCase().startsWith("run:")) {
+			clickType = InternalClickAction.RunTemplate.class;
+			text = text.substring(4);
+		}
+		if (text.toLowerCase().startsWith("suggest:")) {
+			text = text.substring(8);
+		}
+		if (text.toLowerCase().startsWith("url:")) {
+			clickType = InternalClickAction.UrlTemplate.class;
+			text = text.substring(4);
+		}
+		return InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
 	}
 
 	@Override

@@ -308,6 +308,105 @@ public class Utils {
 	}
 
 	/**
+	 * Create a synchronous array deque containing all objects in the
+	 * collection.
+	 */
+	public static <T> Deque<T> sd(Collection<T> objs, boolean collection) {
+		Deque<T> d = ad();
+		for (T t : objs) {
+			d.add(t);
+		}
+		return d;
+	}
+
+	/**
+	 * Create a synchronous array deque containing all objects in the array.
+	 */
+	public static <T> Deque<T> sd(T[] objs, boolean arr) {
+		Deque<T> d = ad();
+		for (T t : objs) {
+			d.add(t);
+		}
+		return d;
+	}
+
+	/**
+	 * Create a synchronous array deque containing all objects in the
+	 * parameters.
+	 */
+	@SafeVarargs
+	public static <T> Deque<T> sd(T... objs) {
+		Deque<T> d = ad(Tristate.FALSE);
+		for (T t : objs) {
+			d.add(t);
+		}
+		return d;
+	}
+
+	/**
+	 * Create an empty, synchronous array deque.
+	 */
+	public static <T> Deque<T> sd() {
+		return ad(Tristate.FALSE);
+	}
+
+	/**
+	 * Create an empty, synchronous array deque. Equality strictness based on
+	 * tristate.
+	 */
+	public static <T> Deque<T> sd(Tristate strict) {
+		return (Deque<T>) Collections.synchronizedCollection(new ArRayDeque<T>(strict, true));
+	}
+
+	/**
+	 * Create an array deque containing all objects in the collection.
+	 */
+	public static <T> Deque<T> ad(Collection<T> objs, boolean collection) {
+		Deque<T> d = ad();
+		for (T t : objs) {
+			d.add(t);
+		}
+		return d;
+	}
+
+	/**
+	 * Create an array deque containing all objects in the array.
+	 */
+	public static <T> Deque<T> ad(T[] objs, boolean arr) {
+		Deque<T> d = ad();
+		for (T t : objs) {
+			d.add(t);
+		}
+		return d;
+	}
+
+	/**
+	 * Create an array deque containing all objects in the parameters.
+	 */
+	@SafeVarargs
+	public static <T> Deque<T> ad(T... objs) {
+		Deque<T> d = ad(Tristate.FALSE);
+		for (T t : objs) {
+			d.add(t);
+		}
+		return d;
+	}
+
+	/**
+	 * Create an empty array deque.
+	 */
+	public static <T> Deque<T> ad() {
+		return ad(Tristate.FALSE);
+	}
+
+	/**
+	 * Create an empty array deque. Equality strictness based on tristate.
+	 */
+	public static <T> Deque<T> ad(Tristate strict) {
+		return new ArRayDeque<T>(strict, false);
+	}
+
+	/**
 	 * Create an array list containing all objects in the collection.
 	 */
 	public static <T> List<T> al(Collection<T> objs, boolean collection) {
