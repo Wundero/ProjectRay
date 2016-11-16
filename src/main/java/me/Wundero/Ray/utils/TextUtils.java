@@ -140,6 +140,9 @@ public class TextUtils {
 		if (codePoint == '\n') {
 			return 0;
 		}
+		if (codePoint == 32) {
+			return 4 + (isBold ? 1 : 0);
+		}
 		int nonUnicodeIdx = forceUnicode ? -1 : ASCII_PNG_CHARS.indexOf(codePoint);
 		double width;
 		if (codePoint > 0 && nonUnicodeIdx != -1) {
@@ -202,6 +205,23 @@ public class TextUtils {
 	/*
 	 * End of font rendering
 	 */
+	private static final int LINE_WIDTH = 320;
+
+	/**
+	 * Get the number of lines for a text object. If it contains newlines,
+	 * account for those as well.
+	 */
+	public int getLines(Text text) {
+		if (contains(text, "\n")) {
+			List<Text> spl = newlines(text);
+			int total = 0;
+			for (Text s : spl) {
+				total += getLines(s);
+			}
+			return total;
+		}
+		return (int) Math.ceil((double) getWidth(text, false) / LINE_WIDTH);
+	}
 
 	public static final Pattern COLOR_PATTERN = Utils.compile("\\&[a-f0-9]", Pattern.CASE_INSENSITIVE);
 
