@@ -1,3 +1,4 @@
+
 package me.Wundero.Ray.framework.format;
 /*
  The MIT License (MIT)

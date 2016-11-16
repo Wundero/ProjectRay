@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -62,6 +63,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
+
+import com.flowpowered.math.GenericMath;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.config.InternalClickAction;
@@ -187,6 +190,13 @@ public class TextUtils {
 		return (int) Math.ceil(getWidth0(text, false, forceUnicode));
 	}
 
+	/**
+	 * Get the width of a text object's content.
+	 */
+	public static int getWidth(Text text) {
+		return getWidth(text, false);
+	}
+
 	private static double getWidth0(Text text, boolean parentIsbold, boolean forceUnicode) {
 		double width = 0;
 		boolean thisIsBold = text.getStyle().isBold().orElse(parentIsbold);
@@ -208,10 +218,86 @@ public class TextUtils {
 	private static final int LINE_WIDTH = 320;
 
 	/**
+	 * Center text between padding, with a space
+	 */
+	public static Text center(Text text, Text padding) {
+		int inputLength = getWidth(text);
+		// Minecraft breaks lines when the next character would be > then
+		// LINE_WIDTH, this seems most graceful way to fail
+		if (inputLength >= LINE_WIDTH) {
+			return text;
+		}
+		Text styledSpace = withStyle(LiteralText.of(" "), text);
+		Text textWithSpaces = addSpaces(styledSpace, text);
+
+		// Minecraft breaks lines when the next character would be > then
+		// LINE_WIDTH
+		boolean addSpaces = getWidth(textWithSpaces) <= LINE_WIDTH;
+
+		int paddingLength = getWidth(padding);
+		final Text.Builder output = Text.builder();
+
+		// Using 0 width unicode symbols as padding throws us into an unending
+		// loop, replace them with the default padding
+		if (paddingLength < 1) {
+			Text defaultPadding = Text.of("=");
+			padding = defaultPadding;
+			paddingLength = getWidth(withStyle(defaultPadding, text));
+		}
+
+		// if we only need padding
+		if (inputLength == 0) {
+			addPadding(padding, output, GenericMath.floor((double) LINE_WIDTH / paddingLength));
+		} else {
+			if (addSpaces) {
+				text = textWithSpaces;
+				inputLength = getWidth(textWithSpaces);
+			}
+
+			int paddingNecessary = LINE_WIDTH - inputLength;
+
+			int paddingCount = GenericMath.floor(paddingNecessary / paddingLength);
+			// pick a halfway point
+			int beforePadding = GenericMath.floor(paddingCount / 2.0);
+			// Do not use ceil, this prevents floating point errors.
+			int afterPadding = paddingCount - beforePadding;
+
+			addPadding(padding, output, beforePadding);
+			output.append(text);
+			addPadding(padding, output, afterPadding);
+		}
+
+		return finalizeBuilder(text, output);
+	}
+
+	private static Text withStyle(Text text, Text styled) {
+		return text.toBuilder().color(styled.getColor()).style(styled.getStyle()).build();
+	}
+
+	private static Text finalizeBuilder(Text text, Text.Builder build) {
+		build.color(text.getColor()).style(text.getStyle());
+		return build.build();
+	}
+
+	private static Text addSpaces(Text spaces, Text text) {
+		Text.Builder build = Text.builder().color(text.getColor()).style(text.getStyle());
+		build.append(spaces);
+		build.append(text);
+		build.append(spaces);
+		return build.build();
+	}
+
+	private static void addPadding(Text padding, Text.Builder build, int count) {
+		if (count > 0) {
+			build.append(Collections.nCopies(count, padding));
+		}
+	}
+
+	/**
 	 * Get the number of lines for a text object. If it contains newlines,
 	 * account for those as well.
 	 */
-	public int getLines(Text text) {
+	public static int getLines(Text text) {
 		if (contains(text, "\n")) {
 			List<Text> spl = newlines(text);
 			int total = 0;

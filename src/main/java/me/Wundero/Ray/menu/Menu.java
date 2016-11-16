@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
@@ -15,6 +14,7 @@ import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.translation.Translator;
 import me.Wundero.Ray.utils.TextUtils;
 
@@ -49,6 +49,7 @@ public abstract class Menu {
 	protected Player holder;
 	protected Translator translator;
 	protected Optional<Menu> source;
+	protected boolean fillSpacesFromTop = false;
 	protected Text title = null;
 	protected Text pathTitle = Text.of();
 
@@ -76,8 +77,8 @@ public abstract class Menu {
 	private final void paginate(List<Text> h, List<Text> b, List<Text> f) {
 		Text header = TextUtils.join(h, Text.of("\n"));
 		Text footer = TextUtils.join(f, Text.of("\n"));
-		PaginationList.Builder builder = Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-				.contents(b).padding(Text.of('\u2500'));
+		PaginationList.Builder builder = Ray.get().getPaginationService().builder().contents(b)
+				.padding(Text.of('\u2500'));
 		builder.header(header).footer(footer);
 		if (source.isPresent()) {
 			pathTitle = source.get().pathTitle;
@@ -167,7 +168,11 @@ public abstract class Menu {
 		}
 		int spaces = lb - body.size();
 		while (spaces > 0) {
-			body.add(Text.of(" "));
+			if (fillSpacesFromTop) {
+				body.add(0, Text.of(" "));
+			} else {
+				body.add(Text.of(" "));
+			}
 			spaces--;
 		}
 		paginate(header, body, footer);

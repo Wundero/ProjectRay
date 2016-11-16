@@ -27,6 +27,7 @@ import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.listeners.AfkListener;
+import me.Wundero.Ray.pagination.RayPaginationService;
 import me.Wundero.Ray.tag.TagStore;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.UserCache;
@@ -93,6 +94,9 @@ public class Ray {
 		return singleton;
 	}
 
+	// paginate texts. Use instead of sponges pagination service.
+	private RayPaginationService paginationService;
+
 	// instance of the plugin to give to things like tasks and sponge singleton
 	// calls
 	private ProjectRay plugin;
@@ -149,6 +153,7 @@ public class Ray {
 		this.setChannels(new ChatChannels());
 		this.setTags(new TagStore());
 		this.setCache(new UserCache());
+		this.setPaginationService(new RayPaginationService());
 		try {
 			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
 			if (!f.exists()) {
@@ -485,5 +490,19 @@ public class Ray {
 	 */
 	public void setCache(UserCache cache) {
 		this.cache = cache;
+	}
+
+	/**
+	 * @return the paginationService
+	 */
+	public RayPaginationService getPaginationService() {
+		return paginationService;
+	}
+
+	/**
+	 * @param paginationService the paginationService to set
+	 */
+	public void setPaginationService(RayPaginationService paginationService) {
+		this.paginationService = paginationService;
 	}
 }
