@@ -24,6 +24,7 @@ package me.Wundero.Ray.utils;
  */
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -152,6 +153,16 @@ public class TextUtils {
 		List<Text> out = Utils.al(t.toBuilder().removeAll().build());
 		f.stream().forEach(text -> out.addAll(flatten(t, recursive)));
 		return out;
+	}
+
+	/**
+	 * Apply all text actions, in order, to the text.
+	 */
+	public static Text.Builder applyAll(Text.Builder builder, TextAction<?>... actions) {
+		for (TextAction<?> act : actions) {
+			act.applyTo(builder);
+		}
+		return builder;
 	}
 
 	/**
@@ -922,11 +933,11 @@ public class TextUtils {
 	/**
 	 * Join texts together.
 	 */
-	public static Text join(List<Text> texts, Text separator) {
+	public static Text join(Collection<Text> texts, Text separator) {
 		if (texts.isEmpty()) {
 			return Text.EMPTY;
 		}
-		Text out = texts.get(0);
+		Text out = texts.iterator().next();
 		boolean b = true;
 		for (Text t : texts) {
 			out = out.concat(separator);
@@ -942,7 +953,7 @@ public class TextUtils {
 	/**
 	 * Join texts together.
 	 */
-	public static Text join(List<Text> texts) {
+	public static Text join(Collection<Text> texts) {
 		return join(texts, Text.of(" "));
 	}
 

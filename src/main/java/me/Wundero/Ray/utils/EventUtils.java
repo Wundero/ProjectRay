@@ -51,7 +51,7 @@ public class EventUtils {
 	@SuppressWarnings("unchecked")
 	private static <T> Map<String, Object> execMethods(Class<? extends T> clazz, T obj) {
 		Map<String, Object> out = Utils.hm();
-		for (Method m : Utils.combine(clazz.getDeclaredMethods(), clazz.getMethods())) {
+		for (Method m : Utils.combine(true, clazz.getDeclaredMethods(), clazz.getMethods())) {
 			if (canUseMethod(m)) {
 				Optional<Object> ret = Optional.empty();
 				try {

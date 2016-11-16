@@ -51,7 +51,9 @@ import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
-import me.Wundero.Ray.translation.I18n;
+import me.Wundero.Ray.translation.M;
+import me.Wundero.Ray.translation.Translator;
+import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
@@ -67,12 +69,14 @@ public class FormatConversation {
 	 */
 	public static void start(Player player) {
 		if (!player.hasPermission("ray.formatbuilder")) {
-			player.sendMessage(Text.of(TextColors.RED, "You do not have permission to do this!"));
+			M.sm(player, "error.nopermission");
 			return;
 		}
-		player.sendMessage(Text.of(TextColors.AQUA, "[Formats] ").concat(I18n.t("conversation.exit.reminder")));
+		final Translator t = new Translator(player);
+		player.sendMessage(
+				t.t("prefix.format").concat(TextUtils.SPACE()).concat(t.t("conversation.creation.exit.reminder", "format")));
 		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(true)
-				.withPrefix(Text.of(TextColors.AQUA, "[Formats]")).withCanceller(new ConversationCanceller() {
+				.withPrefix(t.t("prefix.format")).withCanceller(new ConversationCanceller() {
 
 					@Override
 					public boolean shouldCancel(ConversationContext context, String input) {
@@ -93,8 +97,7 @@ public class FormatConversation {
 								node.setValue(null);
 							}
 						}
-						context.getHolder().sendMessage(
-								Text.of(TextColors.AQUA, "[Formats] ", TextColors.RED, "Format creation cancelled!"));
+						context.sendMessage(t.t("conversion.creation.cancelled", "Format"));
 					}
 
 				}).withListener(new ConversationListener() {

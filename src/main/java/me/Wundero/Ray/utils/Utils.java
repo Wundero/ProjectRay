@@ -148,14 +148,14 @@ public class Utils {
 	}
 
 	/**
-	 * Combine multiple lists into one.
+	 * Combine multiple lists into one. Boolean to filter unique items.
 	 */
 	@SafeVarargs
-	public static <T> List<T> combine(List<T>... lists) {
+	public static <T> List<T> combine(boolean distinct, List<T>... lists) {
 		List<T> out = al();
 		for (List<T> l : lists) {
 			for (T t : l) {
-				if (!out.contains(t)) {
+				if (!out.contains(t) || !distinct) {
 					out.add(t);
 				}
 			}
@@ -164,15 +164,15 @@ public class Utils {
 	}
 
 	/**
-	 * Combine multiple arrays into one.
+	 * Combine multiple arrays into one. Boolean to filter unique items.
 	 */
 	@SuppressWarnings("unchecked")
 	@SafeVarargs
-	public static <T> T[] combine(T[]... arrs) {
+	public static <T> T[] combine(boolean distinct, T[]... arrs) {
 		List<T> out = al();
 		for (T[] a : arrs) {
 			for (T t : a) {
-				if (!out.contains(t)) {
+				if (!out.contains(t) || !distinct) {
 					out.add(t);
 				}
 			}

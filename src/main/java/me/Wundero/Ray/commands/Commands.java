@@ -49,12 +49,6 @@ public class Commands {
 						.executor(new AnnouncementConversationCommand()).build());
 		children.put(Utils.al("channel"), CommandSpec.builder().permission("ray.channelbuilder")
 				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
-
-		children.put(Utils.al("test-translate"),
-				CommandSpec.builder().permission("ray.translate.test").executor(new TranslationTestCommand())
-						.arguments(GenericArguments.string(Text.of("key")),
-								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("args"))))
-						.description(Text.of("Test translations.")).build());
 		children.put(Utils.al("lock"),
 				CommandSpec.builder().permission("ray.chatlock").executor(new ChatLockCommand())
 						.description(Text.of("Lock chat messages"))
