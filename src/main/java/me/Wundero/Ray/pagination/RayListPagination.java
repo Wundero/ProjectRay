@@ -36,65 +36,65 @@ import static me.Wundero.Ray.translation.RaySpongeCommonTranslationHelper.t;
  */
 
 class RayListPagination extends RayActivePagination {
-    private final List<List<Text>> pages;
+	private final List<List<Text>> pages;
 
-    public RayListPagination(MessageReceiver src, List<Map.Entry<Text, Integer>> lines,
-            Text title, Text header, Text footer, Text padding, int linesPerPage) {
-        super(src, title, header, footer, padding, linesPerPage);
-        List<List<Text>> pages = new ArrayList<>();
-        List<Text> currentPage = new ArrayList<>();
-        int currentPageLines = 0;
+	public RayListPagination(MessageReceiver src, List<Map.Entry<Text, Integer>> lines, Text title, Text header,
+			Text footer, Text padding, int linesPerPage, boolean scroll) {
+		super(src, title, header, footer, padding, linesPerPage, scroll);
+		List<List<Text>> pages = new ArrayList<>();
+		List<Text> currentPage = new ArrayList<>();
+		int currentPageLines = 0;
 
-        for (Map.Entry<Text, Integer> ent : lines) {
-            final boolean finiteLinesPerPage  = getMaxContentLinesPerPage() > 0;
-            final boolean willExceedPageLength = ent.getValue() + currentPageLines > getMaxContentLinesPerPage();
-            final boolean currentPageNotEmpty = currentPageLines != 0;
-            final boolean spillToNextPage = finiteLinesPerPage && willExceedPageLength && currentPageNotEmpty;
-            if (spillToNextPage) {
-                padPage(currentPage, currentPageLines, true);
-                currentPageLines = 0;
-                pages.add(currentPage);
-                currentPage = new ArrayList<>();
-            }
-            currentPageLines += ent.getValue();
-            currentPage.add(ent.getKey());
-        }
-        //last page is not yet committed
-        final boolean lastPageNotEmpty = currentPageLines > 0;
-        if (lastPageNotEmpty) {
-            if (!pages.isEmpty()) {
-                // Only pad if we have a previous page
-                padPage(currentPage, currentPageLines, false);
-            }
-            pages.add(currentPage);
-        }
-        this.pages = pages;
-    }
+		for (Map.Entry<Text, Integer> ent : lines) {
+			final boolean finiteLinesPerPage = getMaxContentLinesPerPage() > 0;
+			final boolean willExceedPageLength = ent.getValue() + currentPageLines > getMaxContentLinesPerPage();
+			final boolean currentPageNotEmpty = currentPageLines != 0;
+			final boolean spillToNextPage = finiteLinesPerPage && willExceedPageLength && currentPageNotEmpty;
+			if (spillToNextPage) {
+				padPage(currentPage, currentPageLines, true);
+				currentPageLines = 0;
+				pages.add(currentPage);
+				currentPage = new ArrayList<>();
+			}
+			currentPageLines += ent.getValue();
+			currentPage.add(ent.getKey());
+		}
+		// last page is not yet committed
+		final boolean lastPageNotEmpty = currentPageLines > 0;
+		if (lastPageNotEmpty) {
+			if (!pages.isEmpty()) {
+				// Only pad if we have a previous page
+				padPage(currentPage, currentPageLines, false);
+			}
+			pages.add(currentPage);
+		}
+		this.pages = pages;
+	}
 
-    @Override
-    protected Iterable<Text> getLines(int page) throws CommandException {
-        if (this.pages.size() == 0) {
-            return ImmutableList.of();
-        } else if (page < 1) {
-            throw new CommandException(t("Page %s does not exist!", page));
-        } else if (page > this.pages.size()) {
-            throw new CommandException(t("Page %s is too high", page));
-        }
-        return this.pages.get(page - 1);
-    }
+	@Override
+	protected Iterable<Text> getLines(int page) throws CommandException {
+		if (this.pages.size() == 0) {
+			return ImmutableList.of();
+		} else if (page < 1) {
+			throw new CommandException(t("Page %s does not exist!", page));
+		} else if (page > this.pages.size()) {
+			throw new CommandException(t("Page %s is too high", page));
+		}
+		return this.pages.get(page - 1);
+	}
 
-    @Override
-    protected boolean hasPrevious(int page) {
-        return page > 1;
-    }
+	@Override
+	protected boolean hasPrevious(int page) {
+		return page > 1;
+	}
 
-    @Override
-    protected boolean hasNext(int page) {
-        return page < this.pages.size();
-    }
+	@Override
+	protected boolean hasNext(int page) {
+		return page < this.pages.size();
+	}
 
-    @Override
-    protected int getTotalPages() {
-        return this.pages.size();
-    }
+	@Override
+	protected int getTotalPages() {
+		return this.pages.size();
+	}
 }

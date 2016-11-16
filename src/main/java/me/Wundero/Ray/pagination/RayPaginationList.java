@@ -52,6 +52,7 @@ public class RayPaginationList implements PaginationList {
 	private Optional<Text> footer;
 	private Text paginationSpacer;
 	private int linesPerPage;
+	private boolean scrolling = false;
 
 	public RayPaginationList(RayPaginationService service, Iterable<Text> contents, Text title, Text header,
 			Text footer, Text paginationSpacer, int linesPerPage) {
@@ -62,6 +63,16 @@ public class RayPaginationList implements PaginationList {
 		this.footer = Optional.ofNullable(footer);
 		this.paginationSpacer = paginationSpacer;
 		this.linesPerPage = linesPerPage;
+	}
+
+	public RayPaginationList(RayPaginationService service, Iterable<Text> contents, Text title, Text header,
+			Text footer, Text paginationSpacer, int linesPerPage, boolean scroll) {
+		this(service, contents, title, header, footer, paginationSpacer, linesPerPage);
+		this.scrolling = scroll;
+	}
+	
+	public boolean scroll() {
+		return scrolling;
 	}
 
 	@Override
@@ -120,15 +131,19 @@ public class RayPaginationList implements PaginationList {
 												// it's probably reasonable to
 												// copy it to another list
 			pagination = new RayListPagination(receiver, ImmutableList.copyOf(counts), title, this.header.orElse(null),
-					this.footer.orElse(null), this.paginationSpacer, linesPerPage);
+					this.footer.orElse(null), this.paginationSpacer, linesPerPage, scrolling);
 		} else {
 			pagination = new RayIterablePagination(receiver, counts, title, this.header.orElse(null),
-					this.footer.orElse(null), this.paginationSpacer, linesPerPage);
+					this.footer.orElse(null), this.paginationSpacer, linesPerPage, scrolling);
 		}
 
 		this.service.getPaginationState(receiver, true).put(pagination);
 		try {
-			pagination.nextPage();
+			if (!scrolling) {
+				pagination.nextPage();
+			} else {
+				pagination.specificPage(pagination.getTotalPages());
+			}
 		} catch (CommandException e) {
 			receiver.sendMessage(CommandMessageFormatting.error(e.getText()));
 		}

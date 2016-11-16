@@ -15,6 +15,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.pagination.RayPaginationListBuilder;
 import me.Wundero.Ray.translation.Translator;
 import me.Wundero.Ray.utils.TextUtils;
 
@@ -50,6 +51,7 @@ public abstract class Menu {
 	protected Translator translator;
 	protected Optional<Menu> source;
 	protected boolean fillSpacesFromTop = false;
+	protected boolean scrolling = false;
 	protected Text title = null;
 	protected Text pathTitle = Text.of();
 
@@ -74,7 +76,7 @@ public abstract class Menu {
 		this.source = Optional.of(from);
 	}
 
-	private final void paginate(List<Text> h, List<Text> b, List<Text> f) {
+	private final void paginate(List<Text> h, List<Text> b, List<Text> f, boolean scroll) {
 		Text header = TextUtils.join(h, Text.of("\n"));
 		Text footer = TextUtils.join(f, Text.of("\n"));
 		PaginationList.Builder builder = Ray.get().getPaginationService().builder().contents(b)
@@ -86,6 +88,9 @@ public abstract class Menu {
 			builder.title(pathTitle);
 		} else {
 			builder.title(title);
+		}
+		if (builder instanceof RayPaginationListBuilder) {
+			builder = ((RayPaginationListBuilder) builder).scroll(scroll);
 		}
 		builder.sendTo(holder);
 	}
@@ -175,7 +180,7 @@ public abstract class Menu {
 			}
 			spaces--;
 		}
-		paginate(header, body, footer);
+		paginate(header, body, footer, scrolling);
 	}
 
 }

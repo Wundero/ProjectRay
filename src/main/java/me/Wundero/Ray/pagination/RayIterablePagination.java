@@ -43,8 +43,8 @@ public class RayIterablePagination extends RayActivePagination {
 	private int lastPage;
 
 	public RayIterablePagination(MessageReceiver src, Iterable<Map.Entry<Text, Integer>> counts, Text title,
-			Text header, Text footer, Text padding, int lines) {
-		super(src, title, header, footer, padding, lines);
+			Text header, Text footer, Text padding, int lines, boolean scroll) {
+		super(src, title, header, footer, padding, lines, scroll);
 		this.countIterator = Iterators.peekingIterator(counts.iterator());
 	}
 

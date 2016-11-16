@@ -60,19 +60,21 @@ abstract class RayActivePagination {
 	private int currentPage;
 	private final int maxContentLinesPerPage;
 	private final Text padding;
+	protected final boolean scroll;
 
 	public RayActivePagination(MessageReceiver src, Text title, Text header, Text footer, Text padding,
-			int linesPerPage) {
+			int linesPerPage, boolean scroll) {
 		this.src = new WeakReference<>(src);
 		this.title = title;
 		this.header = header;
 		this.footer = footer;
 		this.padding = padding;
-		this.nextPageText = t("»").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
+		this.scroll = scroll;
+		this.nextPageText = t(scroll?"Scroll down":"»").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
 				.onClick(TextActions.runCommand("/pagination " + this.id.toString() + " next"))
 				.onHover(TextActions.showText(Text.of("/page next"))).onShiftClick(TextActions.insertText("/page next"))
 				.build();
-		this.prevPageText = t("«").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
+		this.prevPageText = t(scroll?"Scroll up":"«").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
 				.onClick(TextActions.runCommand("/pagination " + this.id.toString() + " prev"))
 				.onHover(TextActions.showText(Text.of("/page prev"))).onShiftClick(TextActions.insertText("/page prev"))
 				.build();
