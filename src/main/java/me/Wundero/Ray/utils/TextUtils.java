@@ -23,6 +23,9 @@ package me.Wundero.Ray.utils;
  SOFTWARE.
  */
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.command.CommandSource;
@@ -68,6 +72,136 @@ import me.Wundero.Ray.variables.ParsableData;
  * A class containing methods that help parse Text objects.
  */
 public class TextUtils {
+
+	/*
+	 * Font size rendering - Credit to simon816
+	 */
+	private static final String ASCII_PNG_CHARS = "ÀÁÂÈÊËÍÓÔÕÚßãõğİ"
+			+ "ıŒœŞşŴŵžȇ\u0000\u0000\u0000\u0000\u0000\u0000\u0000" + " !\"#$%&\'()*+,-./" + "0123456789:;<=>?"
+			+ "@ABCDEFGHIJKLMNO" + "PQRSTUVWXYZ[\\]^_" + "`abcdefghijklmno" + "pqrstuvwxyz{|}~\u0000"
+			+ "ÇüéâäàåçêëèïîìÄÅ" + "ÉæÆôöòûùÿÖÜø£Ø×ƒ" + "áíóúñÑªº¿®¬½¼¡«»" + "░▒▓│┤╡╢╖╕╣║╗╝╜╛┐" + "└┴┬├─┼╞╟╚╔╩╦╠═╬╧"
+			+ "╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀" + "αβΓπΣσμτΦΘΩδ∞∅∈∩" + "≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000";
+
+	private static final int[] ASCII_PNG_CHAR_WIDTHS = new int[ASCII_PNG_CHARS.length()];
+	private static final byte[] UNICODE_CHAR_WIDTHS = new byte[65536];
+
+	static {
+		try {
+			computeCharWidths();
+			InputStream gStream = TextUtils.class.getResourceAsStream("glyph_sizes.bin");
+			gStream.read(UNICODE_CHAR_WIDTHS);
+			gStream.close();
+		} catch (IOException e) {
+			throw new ExceptionInInitializerError(e);
+		}
+	}
+
+	private static void computeCharWidths() throws IOException {
+		InputStream iStream = TextUtils.class.getResourceAsStream("ascii.png");
+		BufferedImage img = ImageIO.read(iStream);
+		iStream.close();
+		int width = img.getWidth();
+		int height = img.getHeight();
+		int[] imgData = new int[width * height];
+		img.getRGB(0, 0, width, height, imgData, 0, width);
+		int charH = height / 16;
+		int charW = width / 16;
+		float lvt_9_1_ = 8.0F / (float) charW;
+		for (int idx = 0; idx < 256; ++idx) {
+			if (idx == 32) {
+				ASCII_PNG_CHAR_WIDTHS[idx] = 4;
+				continue;
+			}
+			int col = idx % 16;
+			int row = idx / 16;
+			int offX;
+			for (offX = charW - 1; offX >= 0; --offX) {
+				int imgX = col * charW + offX;
+				boolean hasValue = true;
+				for (int offY = 0; offY < charH && hasValue; ++offY) {
+					int imgY = (row * charW + offY) * width;
+					if ((imgData[imgX + imgY] >> 24 & 255) != 0) {
+						hasValue = false;
+					}
+				}
+				if (!hasValue) {
+					break;
+				}
+			}
+			++offX;
+			ASCII_PNG_CHAR_WIDTHS[idx] = (int) (0.5D + (double) ((float) offX * lvt_9_1_)) + 1;
+		}
+	}
+
+	/**
+	 * Get the width of a character.
+	 */
+	public static double getWidth(int codePoint, boolean isBold, boolean forceUnicode) {
+		if (codePoint == '\n') {
+			return 0;
+		}
+		int nonUnicodeIdx = forceUnicode ? -1 : ASCII_PNG_CHARS.indexOf(codePoint);
+		double width;
+		if (codePoint > 0 && nonUnicodeIdx != -1) {
+			width = ASCII_PNG_CHAR_WIDTHS[nonUnicodeIdx];
+		} else {
+			int squashedVal = UNICODE_CHAR_WIDTHS[codePoint] & 255;
+			if (squashedVal == 0) {
+				return 0;
+			}
+			int upper = squashedVal >>> 4;
+			int lower = squashedVal & 15;
+			width = ((lower + 1) - upper) / 2 + 1;
+		}
+		if (isBold && width > 0) {
+			width += 1;
+		}
+		return width;
+	}
+
+	/**
+	 * Get the widths of all characters in the string.
+	 */
+	public static int getStringWidth(String text, boolean isBold, boolean forceUnicode) {
+		double width = 0;
+		for (int i = 0; i < text.length(); ++i) {
+			width += getWidth(text.codePointAt(i), isBold, forceUnicode);
+		}
+		return (int) Math.ceil(width);
+	}
+
+	/**
+	 * Get the width of a character.
+	 */
+	public static int getWidth(char c, boolean isBold, boolean forceUnicode) {
+		return (int) Math.ceil(getWidth((int) c, isBold, forceUnicode));
+	}
+
+	/**
+	 * Get the width of a text object's content.
+	 */
+	public static int getWidth(Text text, boolean forceUnicode) {
+		return (int) Math.ceil(getWidth0(text, false, forceUnicode));
+	}
+
+	private static double getWidth0(Text text, boolean parentIsbold, boolean forceUnicode) {
+		double width = 0;
+		boolean thisIsBold = text.getStyle().isBold().orElse(parentIsbold);
+		if (text instanceof LiteralText) {
+			String content = ((LiteralText) text).getContent();
+			width += getStringWidth(content, thisIsBold, forceUnicode);
+			for (Text child : text.getChildren()) {
+				width += getWidth0(child, thisIsBold, forceUnicode);
+			}
+		} else {
+			width += getStringWidth(text.toPlain(), thisIsBold, forceUnicode);
+		}
+		return width;
+	}
+
+	/*
+	 * End of font rendering
+	 */
 
 	public static final Pattern COLOR_PATTERN = Utils.compile("\\&[a-f0-9]", Pattern.CASE_INSENSITIVE);
 
