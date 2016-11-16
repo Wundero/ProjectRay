@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -87,7 +88,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			case "ShowText":
 				return (InternalHoverAction<R>) TextUtils.showText((Text) result);
 			case "ShowItem":
-				return (InternalHoverAction<R>) TextUtils.showItem((ItemStack) result);
+				return (InternalHoverAction<R>) TextUtils.showItem((ItemStackSnapshot) result);
 			case "ShowEntity":
 				return (InternalHoverAction<R>) TextUtils.showEntity((Ref) result);
 			case "ShowAchievement":
@@ -124,7 +125,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 				case icc + "ShowText":
 					return TextUtils.showText(result.getValue(TypeToken.of(Text.class)));
 				case icc + "ShowItem":
-					return TextUtils.showItem(result.getValue(TypeToken.of(ItemStack.class)));
+					return TextUtils.showItem(result.getValue(TypeToken.of(ItemStackSnapshot.class)));
 				case icc + "ShowAchievement":
 					return TextUtils.showAchievement(result.getValue(TypeToken.of(Achievement.class)));
 				case icc + "ShowEntity":
@@ -172,7 +173,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			return TextActions.showText((Text) this.getResult());
 		}
 		if (this instanceof ShowItem) {
-			return TextActions.showItem((ItemStack) this.getResult());
+			return TextActions.showItem((ItemStackSnapshot) this.getResult());
 		}
 		if (this instanceof ShowAchievement) {
 			return TextActions.showAchievement((Achievement) this.getResult());
@@ -237,7 +238,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 	/**
 	 * Shows information about an item.
 	 */
-	public static final class ShowItem extends InternalHoverAction<ItemStack> {
+	public static final class ShowItem extends InternalHoverAction<ItemStackSnapshot> {
 
 		/**
 		 * Constructs a new {@link ShowItem} instance that will show information
@@ -246,7 +247,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 		 * @param item
 		 *            The item to display
 		 */
-		public ShowItem(ItemStack item) {
+		public ShowItem(ItemStackSnapshot item) {
 			super(item);
 		}
 

@@ -41,7 +41,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.LiteralText.Builder;
@@ -315,7 +315,7 @@ public class TextUtils {
 	/**
 	 * Create an internalhoveraction with an item
 	 */
-	public static InternalHoverAction<?> showItem(ItemStack i) {
+	public static InternalHoverAction<?> showItem(ItemStackSnapshot i) {
 		return new InternalHoverAction.ShowItem(i);
 	}
 
