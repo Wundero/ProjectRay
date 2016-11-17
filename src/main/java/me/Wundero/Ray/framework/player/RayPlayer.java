@@ -55,6 +55,7 @@ import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.framework.player.name.InstantDisplayName;
+import me.Wundero.Ray.menu.ChatMenu;
 import me.Wundero.Ray.tag.SelectableTag;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -499,7 +500,7 @@ public class RayPlayer implements Socialable {
 	public ChatChannel getActiveChannel() {
 		return activeChannel;
 	}
-
+	
 	/**
 	 * Set the active chanel as the messagechannel of the player
 	 */
@@ -507,9 +508,13 @@ public class RayPlayer implements Socialable {
 		if (activeChannel != null) {
 			if (isOnline()) {
 				getPlayer().get().setMessageChannel(activeChannel);
+				activeChannel.getMenus().get(this.uuid).send();
+				this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
 			}
 		}
 	}
+	
+	private ChatMenu activeMenu = null;
 
 	/**
 	 * Set the channel this user speaks into
@@ -521,6 +526,8 @@ public class RayPlayer implements Socialable {
 		activeChannel = channel;
 		if (isOnline()) {
 			getPlayer().get().setMessageChannel(activeChannel);
+			activeChannel.getMenus().get(this.uuid).send();
+			this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
 		}
 	}
 
@@ -790,6 +797,23 @@ public class RayPlayer implements Socialable {
 			return medium.apply(name);
 		}
 		return null;
+	}
+
+	/**
+	 * @return the activeMenu
+	 */
+	public ChatMenu getActiveMenu() {
+		return activeMenu;
+	}
+
+	/**
+	 * @param activeMenu the activeMenu to set
+	 */
+	public void setActiveMenu(ChatMenu activeMenu) {
+		this.activeMenu = activeMenu;
+		if(!activeMenu.isActive()) {
+			activeMenu.send();
+		}
 	}
 
 }

@@ -23,12 +23,16 @@ package me.Wundero.Ray.listeners;
  SOFTWARE.
  */
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -49,11 +53,13 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.Group;
@@ -75,21 +81,21 @@ import me.Wundero.Ray.variables.ParsableData;
  */
 public class MainListener {
 
-	private boolean handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
+	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel) {
 		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 	}
 
-	private boolean handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
+	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip, Optional<String> formatName,
 			Optional<Player> observer) {
 		if (p == null) {
-			return false;
+			return Tristate.UNDEFINED;
 		}
 		RayPlayer r = RayPlayer.getRay(p);
 		Group g = r.getActiveGroup();
 		if (g == null) {
-			return false;
+			return Tristate.UNDEFINED;
 		}
 		FormatCollection fx;
 		if (formatName.isPresent()) {
@@ -98,7 +104,7 @@ public class MainListener {
 			fx = g.getFormats(t);
 		}
 		if (fx == null || fx.isEmpty()) {
-			return false;
+			return Tristate.UNDEFINED;
 		}
 		final FormatCollection f = fx;
 		final UUID exf = UUID.randomUUID();
@@ -164,7 +170,7 @@ public class MainListener {
 
 		});
 		e.setChannel(newchan);
-		return false;
+		return Tristate.FALSE;
 	}
 
 	/**
@@ -206,11 +212,89 @@ public class MainListener {
 				Map<String, Object> v2 = (Map<String, Object>) event.getCause().get("vars", Map.class).get();
 				vars.putAll(v2);
 			}
-			event.setCancelled(handle(event.getCause().get("formatcontext", FormatContext.class).get(), event, vars, p,
-					event.getChannel().get(), sf, st, fn, o));
+			Tristate hd = handle(event.getCause().get("formatcontext", FormatContext.class).get(), event, vars, p,
+					event.getChannel().get(), sf, st, fn, o);
+			if (hd == Tristate.TRUE) {
+				event.setCancelled(true);
+				event.setMessageCancelled(true);
+			} else if (hd == Tristate.UNDEFINED) {
+				if (Ray.get().isUseChatMenus()) {
+					MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
+					RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
+					event.setChannel(mc);
+				} else {
+					event.setCancelled(true);
+					event.setMessageCancelled(true);
+				}
+			}
 		} else {
-			event.setCancelled(handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get()));
+			Tristate hd = handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get());
+			if (hd == Tristate.TRUE) {
+				event.setCancelled(true);
+				event.setMessageCancelled(true);
+			} else if (hd == Tristate.UNDEFINED) {
+				if (Ray.get().isUseChatMenus()) {
+					MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
+					RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
+					event.setChannel(mc);
+				} else {
+					event.setCancelled(true);
+					event.setMessageCancelled(true);
+				}
+			}
 		}
+	}
+
+	private static class RayDelegateMenuChannel implements MessageChannel {
+
+		private MessageChannel from;
+
+		public RayDelegateMenuChannel(MessageChannel from) {
+			this.from = from;
+		}
+
+		@Override
+		public void send(@Nullable Object sender, Text original, ChatType type) {
+			checkNotNull(original, "original text");
+			checkNotNull(type, "type");
+			for (MessageReceiver member : this.getMembers()) {
+				boolean chattype = member instanceof ChatTypeMessageReceiver;
+				Optional<Text> msg = Optional.empty();
+				if (member instanceof ChatTypeMessageReceiver) {
+					msg = from.transformMessage(sender, member, original, type);
+				} else {
+					msg = from.transformMessage(sender, member, original, type);
+				}
+				if (Ray.get().isUseChatMenus()) {
+					if (sender instanceof CommandSource && member instanceof Player) {
+						msg.ifPresent(text -> RayPlayer.get((Player) member).getActiveMenu()
+								.addMessage((CommandSource) sender, text, UUID.randomUUID()));
+					} else {
+						msg.ifPresent(text -> {
+							if (chattype) {
+								((ChatTypeMessageReceiver) member).sendMessage(type, text);
+							} else {
+								member.sendMessage(text);
+							}
+						});
+					}
+				} else {
+					msg.ifPresent(text -> {
+						if (chattype) {
+							((ChatTypeMessageReceiver) member).sendMessage(type, text);
+						} else {
+							member.sendMessage(text);
+						}
+					});
+				}
+			}
+		}
+
+		@Override
+		public Collection<MessageReceiver> getMembers() {
+			return from.getMembers();
+		}
+
 	}
 
 	/**
@@ -409,8 +493,18 @@ public class MainListener {
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
 		Map<String, Object> vars = Utils.hm();
-		event.setMessageCancelled(
-				handle(FormatContexts.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get()));
+		Tristate hd = handle(FormatContexts.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get());
+		if (hd == Tristate.TRUE) {
+			event.setMessageCancelled(true);
+		} else if (hd == Tristate.UNDEFINED) {
+			if (Ray.get().isUseChatMenus()) {
+				MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
+				RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
+				event.setChannel(mc);
+			} else {
+				event.setMessageCancelled(true);
+			}
+		}
 		RayPlayer.updateTabs();
 	}
 
@@ -420,8 +514,18 @@ public class MainListener {
 	@Listener
 	public void onKick(KickPlayerEvent event) {
 		Map<String, Object> vars = Utils.hm();
-		event.setMessageCancelled(
-				handle(FormatContexts.KICK, event, vars, event.getTargetEntity(), event.getChannel().get()));
+		Tristate hd = handle(FormatContexts.KICK, event, vars, event.getTargetEntity(), event.getChannel().get());
+		if (hd == Tristate.TRUE) {
+			event.setMessageCancelled(true);
+		} else if (hd == Tristate.UNDEFINED) {
+			if (Ray.get().isUseChatMenus()) {
+				MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
+				RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
+				event.setChannel(mc);
+			} else {
+				event.setMessageCancelled(true);
+			}
+		}
 		RayPlayer.updateTabs();
 	}
 
@@ -434,9 +538,19 @@ public class MainListener {
 		Achievement ach = event.getAchievement();
 		vars.put("achievement",
 				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());
-		event.setMessageCancelled(
-				handle(FormatContexts.ACHIEVEMENT, event, vars, event.getTargetEntity(), event.getChannel().get()));
-
+		Tristate hd = handle(FormatContexts.ACHIEVEMENT, event, vars, event.getTargetEntity(),
+				event.getChannel().get());
+		if (hd == Tristate.TRUE) {
+			event.setMessageCancelled(true);
+		} else if (hd == Tristate.UNDEFINED) {
+			if (Ray.get().isUseChatMenus()) {
+				MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
+				RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
+				event.setChannel(mc);
+			} else {
+				event.setMessageCancelled(true);
+			}
+		}
 	}
 
 }

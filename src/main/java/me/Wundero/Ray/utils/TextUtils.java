@@ -1178,6 +1178,9 @@ public class TextUtils {
 			return Text.EMPTY;
 		}
 		Text out = texts.iterator().next();
+		if (texts.size() == 1) {
+			return out;
+		}
 		boolean b = true;
 		for (Text t : texts) {
 			out = out.concat(separator);

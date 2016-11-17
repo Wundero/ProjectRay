@@ -32,6 +32,7 @@ import org.spongepowered.api.boss.BossBarColors;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
@@ -41,9 +42,11 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
 
+import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 /**
@@ -110,6 +113,23 @@ public class FormatLocations {
 	public static final FormatLocation CHAT = new FormatLocation("chat") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o) {
+			if (Ray.get().isUseChatMenus() && target instanceof Player && o.isPresent()) {
+				Object or = o.get();
+				if (or instanceof CommandSource || or instanceof UUID) {
+					RayPlayer r = RayPlayer.get((Player) target);
+					if (or instanceof CommandSource) {
+						r.getActiveMenu().addMessage((CommandSource) or, text, UUID.randomUUID());
+						return true;
+					} else {
+						Optional<User> ou = Utils.getUser((UUID) or);
+						if (ou.isPresent() && ou.get().getPlayer().isPresent() && ou.get().isOnline()) {
+							Player p = ou.get().getPlayer().get();
+							r.getActiveMenu().addMessage(p, text, UUID.randomUUID());
+							return true;
+						}
+					}
+				}
+			}
 			target.sendMessage(text);
 			return true;
 		}

@@ -1,11 +1,14 @@
 package me.Wundero.Ray.menu;
 
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
@@ -18,6 +21,7 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.pagination.RayPaginationListBuilder;
 import me.Wundero.Ray.translation.Translator;
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)
@@ -47,7 +51,8 @@ public abstract class Menu {
 
 	protected static final int MAX_LINES = 20;
 
-	protected Player holder;
+	protected WeakReference<Player> holder;
+	protected UUID holderUUID;
 	protected Translator translator;
 	protected Optional<Menu> source;
 	protected boolean fillSpacesFromTop = false;
@@ -66,7 +71,8 @@ public abstract class Menu {
 	public abstract List<Text> renderFooter();
 
 	public Menu(Player player) {
-		this.holder = player;
+		this.holder = new WeakReference<Player>(player);
+		this.holderUUID = player.getUniqueId();
 		this.translator = new Translator(player);
 		this.source = Optional.empty();
 	}
@@ -92,7 +98,25 @@ public abstract class Menu {
 		if (builder instanceof RayPaginationListBuilder) {
 			builder = ((RayPaginationListBuilder) builder).scroll(scroll);
 		}
-		builder.sendTo(holder);
+		builder.sendTo(getPlayer().orElseThrow(() -> new IllegalArgumentException("Player must be online!")));
+	}
+
+	public Optional<Player> getPlayer() {
+		if (holder.get() == null) {
+			Optional<User> u = Utils.getUser(holderUUID);
+			if (!u.isPresent()) {
+				return Optional.empty();
+			}
+			User us = u.get();
+			if (!us.isOnline()) {
+				return Optional.empty();
+			}
+			Optional<Player> p = us.getPlayer();
+			p.ifPresent(player -> holder = new WeakReference<Player>(player));
+			return p;
+		} else {
+			return Utils.wrap(holder.get());
+		}
 	}
 
 	protected Text createTitle(String title) {
@@ -159,11 +183,12 @@ public abstract class Menu {
 	}
 
 	protected final void runCommandAndRefreshMenu(String command) {
-		Sponge.getCommandManager().process(holder, command);
+		Sponge.getCommandManager().process(
+				getPlayer().orElseThrow(() -> new IllegalArgumentException("Player must be online!")), command);
 		send();
 	}
 
-	public final void send() {
+	public void send() {
 		List<Text> header = renderHeader();
 		List<Text> body = renderBody();
 		List<Text> footer = renderFooter();

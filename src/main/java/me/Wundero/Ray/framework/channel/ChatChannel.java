@@ -39,6 +39,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.Ray.menu.ChatMenu;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -51,6 +52,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 public class ChatChannel extends AbstractMutableMessageChannel implements Comparable<ChatChannel> {
 
 	private List<UUID> muted = Utils.sl(), banned = Utils.sl();
+	private Map<UUID, ChatMenu> menus = Utils.sm();
 	private Map<UUID, Role> roles = Utils.sm();;
 	private String name;
 	private String permission;
@@ -173,6 +175,7 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		}
 		User uu = ou.get();
 		if (uu.isOnline() && uu.getPlayer().isPresent()) {
+			this.menus.remove(uu);
 			return removeMember(uu.getPlayer().get());
 		}
 		return false;
@@ -205,6 +208,7 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 			if (!roles.containsKey(u)) {
 				roles.put(u, defRole);
 			}
+			this.menus.put(u, new ChatMenu((Player) member, this.getName()));
 		}
 		return super.addMember(member);
 	}
@@ -644,6 +648,13 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	 */
 	public Optional<String> getPassword() {
 		return password;
+	}
+
+	/**
+	 * @return the menus
+	 */
+	public Map<UUID, ChatMenu> getMenus() {
+		return menus;
 	}
 
 }

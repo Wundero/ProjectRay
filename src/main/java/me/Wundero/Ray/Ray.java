@@ -119,6 +119,7 @@ public class Ray {
 
 	private ChatFilter filter;
 	private ChatLock lock;
+	private boolean useChatMenus = false;
 
 	/**
 	 * Return the economy service, if available
@@ -151,6 +152,11 @@ public class Ray {
 		this.setConfig(plugin.getConfig());
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
+		if (channels.useChannels()) {
+			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
+		} else {
+			this.setUseChatMenus(false);
+		}
 		this.setTags(new TagStore());
 		this.setCache(new UserCache());
 		this.setPaginationService(new RayPaginationService());
@@ -500,9 +506,25 @@ public class Ray {
 	}
 
 	/**
-	 * @param paginationService the paginationService to set
+	 * @param paginationService
+	 *            the paginationService to set
 	 */
 	public void setPaginationService(RayPaginationService paginationService) {
 		this.paginationService = paginationService;
+	}
+
+	/**
+	 * @return the useChatMenus
+	 */
+	public boolean isUseChatMenus() {
+		return useChatMenus;
+	}
+
+	/**
+	 * @param useChatMenus
+	 *            the useChatMenus to set
+	 */
+	private void setUseChatMenus(boolean useChatMenus) {
+		this.useChatMenus = useChatMenus;
 	}
 }
