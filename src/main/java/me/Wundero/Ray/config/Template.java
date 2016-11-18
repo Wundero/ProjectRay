@@ -196,6 +196,7 @@ public class Template {
 							node.getNode("context").setValue(type.get().getName());
 						}
 						if (loc.isPresent()) {
+							System.out.println("loc: " + loc.get().getName());
 							node.getNode("location").setValue(loc.get().getName());
 							if (locdataset.isPresent()) {
 								locdataset.get().accept(node.getNode("location-data"));

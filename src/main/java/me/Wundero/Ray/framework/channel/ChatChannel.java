@@ -164,8 +164,8 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	 * Return the size of the array.
 	 */
 	public int getSize() {
-		return (int) members.stream().filter(recip -> recip instanceof Player).map((r) -> ((Player) r).getUniqueId())
-				.distinct().count();
+		return (int) members.stream().filter(recip -> recip instanceof User && ((User) recip).isOnline())
+				.map((r) -> ((Player) r).getUniqueId()).distinct().count();
 	}
 
 	public boolean removeMember(UUID u) {
@@ -347,12 +347,10 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	 */
 	public boolean canJoin(UUID uuid, Optional<String> password) {
 		if (banned.contains(uuid)) {
-			System.out.println("banned");
 			return false;
 		}
 		if (this.password.isPresent() && !this.getPassword().get().isEmpty()) {
 			if (!password.isPresent() || !password.get().equals(this.password.get())) {
-				System.out.println("pass");
 				return false;
 			}
 		}
@@ -360,7 +358,6 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		if (hasPermission(u)) {
 			return true;
 		}
-		System.out.println("perm");
 		return false;
 	}
 

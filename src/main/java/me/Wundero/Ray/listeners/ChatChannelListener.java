@@ -74,19 +74,4 @@ public class ChatChannelListener {
 
 	}
 
-	/**
-	 * Remove the player from the channel.
-	 */
-	@Listener(order = Order.LATE)
-	public void onLeave(ClientConnectionEvent.Disconnect event) {
-		if (!Ray.get().getChannels().useChannels()) {
-			return;
-		}
-		for (ChatChannel c : Ray.get().getChannels().getAllChannels()) {
-			if (c.hasMember(event.getTargetEntity().getUniqueId())) {
-				c.removeMember(event.getTargetEntity().getUniqueId());
-			}
-		}
-	}
-
 }

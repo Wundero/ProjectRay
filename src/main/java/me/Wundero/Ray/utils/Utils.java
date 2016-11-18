@@ -1390,4 +1390,15 @@ public class Utils {
 		return u2;
 	}
 
+	/**
+	 * Print the current stack trace.
+	 */
+	public static void stackTrace() {
+		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+		for (StackTraceElement e : trace) {
+			System.out.println(
+					e.getClassName() + "." + e.getMethodName() + "(" + e.getFileName() + ":" + e.getLineNumber() + ")");
+		}
+	}
+
 }

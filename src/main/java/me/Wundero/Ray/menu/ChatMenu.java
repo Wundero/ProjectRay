@@ -84,6 +84,11 @@ public class ChatMenu extends Menu {
 			return id - o.id;
 		}
 	}
+	
+	public void activate() {
+		this.active = true;
+		this.unread = 0;
+	}
 
 	// NOTE: UNORDERED LIST
 	private List<TextHolder> messages = Utils

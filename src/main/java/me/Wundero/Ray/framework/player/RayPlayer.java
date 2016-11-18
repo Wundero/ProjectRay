@@ -157,21 +157,7 @@ public class RayPlayer implements Socialable {
 	private Map<SelectableTag, String> selectedTags = Utils.hm();
 	private boolean spy = false;
 	private Optional<String> quote = Optional.empty();
-	private InstantDisplayName disp = new InstantDisplayName(Text.of(this.getUser().getName()), (displayname) -> {
-		if (!getPlayer().isPresent()) {
-			return false;
-		}
-		DataTransactionResult result = getPlayer().get().tryOffer(Keys.DISPLAY_NAME, displayname);
-		boolean s = result.isSuccessful();
-		boolean c = false;
-		for (ImmutableValue<?> val : result.getSuccessfulData()) {
-			if (val.get() == displayname) {
-				c = true;
-				break;
-			}
-		}
-		return c && s;
-	}, " ");
+	private InstantDisplayName disp = null;
 
 	/**
 	 * Get the prefix if available.
@@ -500,7 +486,7 @@ public class RayPlayer implements Socialable {
 	public ChatChannel getActiveChannel() {
 		return activeChannel;
 	}
-	
+
 	/**
 	 * Set the active chanel as the messagechannel of the player
 	 */
@@ -508,12 +494,14 @@ public class RayPlayer implements Socialable {
 		if (activeChannel != null) {
 			if (isOnline()) {
 				getPlayer().get().setMessageChannel(activeChannel);
-				activeChannel.getMenus().get(this.uuid).send();
-				this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+				if (Ray.get().isUseChatMenus()) {
+					activeChannel.getMenus().get(this.uuid).send();
+					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+				}
 			}
 		}
 	}
-	
+
 	private ChatMenu activeMenu = null;
 
 	/**
@@ -526,8 +514,10 @@ public class RayPlayer implements Socialable {
 		activeChannel = channel;
 		if (isOnline()) {
 			getPlayer().get().setMessageChannel(activeChannel);
-			activeChannel.getMenus().get(this.uuid).send();
-			this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+			if (Ray.get().isUseChatMenus()) {
+				activeChannel.getMenus().get(this.uuid).activate();
+				this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+			}
 		}
 	}
 
@@ -627,6 +617,21 @@ public class RayPlayer implements Socialable {
 		this.uuid = u.getUniqueId();
 		this.setGroups(Ray.get().getGroups().getGroups(u));
 		this.checkDisplayname();
+		this.disp = new InstantDisplayName(Text.of(u.getName()), (displayname) -> {
+			if (!getPlayer().isPresent()) {
+				return false;
+			}
+			DataTransactionResult result = getPlayer().get().tryOffer(Keys.DISPLAY_NAME, displayname);
+			boolean s = result.isSuccessful();
+			boolean c = false;
+			for (ImmutableValue<?> val : result.getSuccessfulData()) {
+				if (val.get() == displayname) {
+					c = true;
+					break;
+				}
+			}
+			return c && s;
+		}, " ");
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
 		File f = new File(p, u.getUniqueId() + ".conf");
 		if (!p.exists()) {
@@ -807,11 +812,12 @@ public class RayPlayer implements Socialable {
 	}
 
 	/**
-	 * @param activeMenu the activeMenu to set
+	 * @param activeMenu
+	 *            the activeMenu to set
 	 */
 	public void setActiveMenu(ChatMenu activeMenu) {
 		this.activeMenu = activeMenu;
-		if(!activeMenu.isActive()) {
+		if (!activeMenu.isActive()) {
 			activeMenu.send();
 		}
 	}
