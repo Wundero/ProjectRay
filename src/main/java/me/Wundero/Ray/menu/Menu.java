@@ -49,7 +49,7 @@ import me.Wundero.Ray.utils.Utils;
 
 public abstract class Menu {
 
-	protected static final int MAX_LINES = 20;
+	protected static final int MAX_LINES = 18;
 
 	protected WeakReference<Player> holder;
 	protected UUID holderUUID;
@@ -62,6 +62,10 @@ public abstract class Menu {
 
 	public void setTitle(Text title) {
 		this.title = title;
+	}
+	
+	public UUID getHolderUUID() {
+		return holderUUID;
 	}
 
 	public abstract List<Text> renderBody();
@@ -87,7 +91,12 @@ public abstract class Menu {
 		Text footer = TextUtils.join(f, Text.of("\n"));
 		PaginationList.Builder builder = Ray.get().getPaginationService().builder().contents(b)
 				.padding(Text.of('\u2500'));
-		builder.header(header).footer(footer);
+		if (!h.isEmpty()) {
+			builder.header(header);
+		}
+		if (!f.isEmpty()) {
+			builder.footer(footer);
+		}
 		if (source.isPresent()) {
 			pathTitle = source.get().pathTitle;
 			pathTitle = pathTitle.concat(Text.of(TextColors.GRAY, " / ")).concat(title);
@@ -101,6 +110,12 @@ public abstract class Menu {
 		builder.sendTo(getPlayer().orElseThrow(() -> new IllegalArgumentException("Player must be online!")));
 	}
 
+	public void updatePlayer(Player p) {
+		if(p.getUniqueId().equals(this.holderUUID)) {
+			this.holder = new WeakReference<Player>(p);
+		}
+	}
+	
 	public Optional<Player> getPlayer() {
 		if (holder.get() == null) {
 			Optional<User> u = Utils.getUser(holderUUID);

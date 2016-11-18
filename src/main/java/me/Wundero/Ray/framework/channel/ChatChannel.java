@@ -23,6 +23,7 @@ package me.Wundero.Ray.framework.channel;
  SOFTWARE.
  */
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.util.Tristate;
 
 import com.google.common.reflect.TypeToken;
 
@@ -64,6 +66,11 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	private boolean obfuscateRanged = false;
 	private ConfigurationNode node;
 	private Role defRole = Role.GUEST;
+
+	@Override
+	public Collection<MessageReceiver> getMembers() {
+		return members;
+	}
 
 	/**
 	 * Set the default role.
@@ -197,9 +204,42 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		}
 	}
 
+	private Tristate containsMember(MessageReceiver r) {
+		for (MessageReceiver re : members) {
+			if (re == r) {
+				return Tristate.TRUE;
+			}
+			if (re instanceof Player && r instanceof Player) {
+				UUID reu = ((Player) re).getUniqueId();
+				UUID ru = ((Player) r).getUniqueId();
+				if (reu.equals(ru)) {
+					return Tristate.UNDEFINED;
+				}
+			}
+		}
+		return Tristate.FALSE;
+	}
+
 	@Deprecated
 	@Override
 	public boolean addMember(MessageReceiver member) {
+		Tristate cm = containsMember(member);
+		if (cm == Tristate.TRUE) {
+			return false;
+		} else if (cm == Tristate.UNDEFINED) {
+			UUID u = ((Player) member).getUniqueId();
+			MessageReceiver old = null;
+			for (MessageReceiver r : members) {
+				if (r instanceof Player) {
+					UUID u2 = ((Player) r).getUniqueId();
+					if (u2.equals(u)) {
+						old = r;
+						break;
+					}
+				}
+			}
+			members.remove(old);
+		}
 		if (member instanceof Player) {
 			UUID u = ((Player) member).getUniqueId();
 			if (banned.contains(u)) {
@@ -208,7 +248,11 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 			if (!roles.containsKey(u)) {
 				roles.put(u, defRole);
 			}
-			this.menus.put(u, new ChatMenu((Player) member, this.getName()));
+			if (!this.menus.containsKey(u)) {
+				this.menus.put(u, new ChatMenu((Player) member, this.getName(), this));
+			} else {
+				this.menus.get(u).updatePlayer((Player) member);
+			}
 		}
 		return super.addMember(member);
 	}

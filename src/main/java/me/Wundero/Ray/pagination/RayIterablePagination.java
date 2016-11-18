@@ -71,13 +71,13 @@ public class RayIterablePagination extends RayActivePagination {
 			if (!this.countIterator.hasNext()) {
 				// Pad the last page, but only if it isn't the first.
 				if (page > 1) {
-					padPage(ret, addedLines, false);
+					padPage(ret, addedLines, false, false);
 				}
 				break;
 			}
 			if (addedLines + this.countIterator.peek().getValue() > getMaxContentLinesPerPage()) {
 				// Add the continuation marker, pad if required
-				padPage(ret, addedLines, true);
+				padPage(ret, addedLines, true, false);
 				break;
 			}
 			Map.Entry<Text, Integer> ent = this.countIterator.next();

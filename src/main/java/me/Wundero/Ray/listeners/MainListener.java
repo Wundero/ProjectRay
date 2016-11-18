@@ -23,16 +23,12 @@ package me.Wundero.Ray.listeners;
  SOFTWARE.
  */
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -53,7 +49,6 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
@@ -127,7 +122,6 @@ public class MainListener {
 					Player s = (Player) sender;
 					Player r = (Player) recipient;
 					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
-						System.out.println("ignore");
 						return Optional.empty();
 					}
 					if (obfuscate && !Utils.inRange(r.getLocation(), s.getLocation(), range)) {
@@ -145,7 +139,6 @@ public class MainListener {
 								percentDiscoloration);
 						mc.put("message", m);
 					} else if (!Utils.inRange(s.getLocation(), r.getLocation(), range)) {
-						System.out.println("norange");
 						return Optional.empty();
 					}
 				}
@@ -160,10 +153,8 @@ public class MainListener {
 										: recipient instanceof Player ? Optional.of((Player) recipient)
 												: Optional.empty()),
 						Optional.of(msgsender.orElse(p).getUniqueId())) == 0) {
-					System.out.println("none sent");
 					return Optional.of(original);
 				}
-				System.out.println("sent");
 				return Optional.empty();
 			}
 
@@ -173,7 +164,6 @@ public class MainListener {
 			}
 
 		});
-		System.out.println("success?");
 		e.setChannel(newchan);
 		return Tristate.FALSE;
 	}
@@ -219,95 +209,23 @@ public class MainListener {
 			}
 			Tristate hd = handle(event.getCause().get("formatcontext", FormatContext.class).get(), event, vars, p,
 					event.getChannel().get(), sf, st, fn, o);
-			if (hd == Tristate.TRUE) {
+			if (hd == Tristate.TRUE || hd == Tristate.UNDEFINED) {
 				event.setCancelled(true);
 				event.setMessageCancelled(true);
-			} else if (hd == Tristate.UNDEFINED) {
-				if (Ray.get().isUseChatMenus()) {
-					MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
-					RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
-					event.setChannel(mc);
-				} else {
-					event.setCancelled(true);
-					event.setMessageCancelled(true);
-				}
+			} else {
+				event.setCancelled(false);
+				event.setMessageCancelled(false);
 			}
 		} else {
 			Tristate hd = handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get());
 			if (hd == Tristate.TRUE) {
 				event.setCancelled(true);
 				event.setMessageCancelled(true);
-			} else if (hd == Tristate.FALSE) {
-				if (Ray.get().isUseChatMenus()) {
-					MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
-					RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
-					event.setChannel(mc);
-				} else {
-					event.setCancelled(false);
-					event.setMessageCancelled(false);
-				}
 			} else {
-				event.setCancelled(true);
-				event.setMessageCancelled(true);
+				event.setCancelled(false);
+				event.setMessageCancelled(false);
 			}
 		}
-	}
-
-	private static class RayDelegateMenuChannel implements MessageChannel {
-
-		private MessageChannel from;
-
-		public RayDelegateMenuChannel(MessageChannel from) {
-			this.from = from;
-		}
-
-		@Override
-		public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original, ChatType type) {
-			return from.transformMessage(sender, recipient, original, type);
-		}
-
-		@Override
-		public void send(@Nullable Object sender, Text original, ChatType type) {
-			checkNotNull(original, "original text");
-			checkNotNull(type, "type");
-			for (MessageReceiver member : this.getMembers()) {
-				boolean chattype = member instanceof ChatTypeMessageReceiver;
-				Optional<Text> msg = Optional.empty();
-				if (member instanceof ChatTypeMessageReceiver) {
-					msg = from.transformMessage(sender, member, original, type);
-				} else {
-					msg = from.transformMessage(sender, member, original, type);
-				}
-				if (Ray.get().isUseChatMenus()) {
-					if (sender instanceof CommandSource && member instanceof Player) {
-						msg.ifPresent(text -> RayPlayer.get((Player) member).getActiveMenu()
-								.addMessage((CommandSource) sender, text, UUID.randomUUID()));
-					} else {
-						msg.ifPresent(text -> {
-							if (chattype) {
-								((ChatTypeMessageReceiver) member).sendMessage(type, text);
-							} else {
-								member.sendMessage(text);
-							}
-						});
-					}
-				} else {
-					msg.ifPresent(text -> {
-						if (chattype) {
-							((ChatTypeMessageReceiver) member).sendMessage(type, text);
-						} else {
-							member.sendMessage(text);
-						}
-					});
-				}
-			}
-		}
-
-		@Override
-		public Collection<MessageReceiver> getMembers() {
-			return from.getMembers();
-		}
-
 	}
 
 	/**
@@ -319,6 +237,8 @@ public class MainListener {
 		if (g != null) {
 			FormatCollection f = g.getFormats(FormatContexts.AFK);
 			if (f != null && !f.isEmpty()) {
+				System.out.println("good");
+				event.setMessageCancelled(true);
 				String s = event.isAFK() ? "w" : " longer";
 				Map<String, Object> v = Utils.hm();
 				v.put("afk", event.isAFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.EMPTY);
@@ -326,10 +246,8 @@ public class MainListener {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.AFK)
 								.named("vars", v).build(),
-						MessageChannel.TO_ALL, Utils.wrap(MessageChannel.TO_ALL),
-						new MessageEvent.MessageFormatter(
-								Text.of("" + event.getAfkPlayer().getName() + " is no" + s + " AFK.")),
-						Text.of("" + event.getAfkPlayer().getName() + " is no" + s + " AFK."), false);
+						MessageChannel.TO_ALL, Utils.wrap(MessageChannel.TO_ALL), event.getFormatter(),
+						event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
 					ev2.getChannel().get().send(event.getAfkPlayer(), ev2.getMessage(), ChatTypes.CHAT);
@@ -497,24 +415,11 @@ public class MainListener {
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
 		Map<String, Object> vars = Utils.hm();
-		System.out.println("dc");
 		Tristate hd = handle(FormatContexts.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get());
 		if (hd == Tristate.TRUE) {
-			System.out.println("uh oh");
 			event.setMessageCancelled(true);
-		} else if (hd == Tristate.FALSE) {
-			System.out.println("parsed");
-			System.out.println(event.getMessage().toPlain());
-			event.setMessageCancelled(false);
-			if (Ray.get().isUseChatMenus()) {
-				System.out.println("xhu");
-				MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
-				RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
-				event.setChannel(mc);
-			}
 		} else {
-			System.out.println("fuck");
-			event.setMessageCancelled(true);
+			event.setMessageCancelled(false);
 		}
 		RayPlayer.updateTabs();
 	}
@@ -528,16 +433,8 @@ public class MainListener {
 		Tristate hd = handle(FormatContexts.KICK, event, vars, event.getTargetEntity(), event.getChannel().get());
 		if (hd == Tristate.TRUE) {
 			event.setMessageCancelled(true);
-		} else if (hd == Tristate.FALSE) {
-			if (Ray.get().isUseChatMenus()) {
-				MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
-				RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
-				event.setChannel(mc);
-			} else {
-				event.setMessageCancelled(false);
-			}
 		} else {
-			event.setMessageCancelled(true);
+			event.setMessageCancelled(false);
 		}
 		RayPlayer.updateTabs();
 	}
@@ -555,16 +452,8 @@ public class MainListener {
 				event.getChannel().get());
 		if (hd == Tristate.TRUE) {
 			event.setMessageCancelled(true);
-		} else if (hd == Tristate.FALSE) {
-			if (Ray.get().isUseChatMenus()) {
-				MessageChannel ch = event.getChannel().orElse(event.getOriginalChannel());
-				RayDelegateMenuChannel mc = new RayDelegateMenuChannel(ch);
-				event.setChannel(mc);
-			} else {
-				event.setMessageCancelled(false);
-			}
 		} else {
-			event.setMessageCancelled(true);
+			event.setMessageCancelled(false);
 		}
 	}
 

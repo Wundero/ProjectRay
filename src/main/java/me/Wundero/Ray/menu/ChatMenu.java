@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -81,34 +82,43 @@ public class ChatMenu extends Menu {
 
 		@Override
 		public int compareTo(TextHolder o) {
-			return id - o.id;
+			return o.id - id;
 		}
 	}
-	
+
+	public void deactive() {
+		this.active = false;
+	}
+
 	public void activate() {
 		this.active = true;
 		this.unread = 0;
 	}
 
 	// NOTE: UNORDERED LIST
-	private List<TextHolder> messages = Utils
-			.sl(Utils.fill(new TextHolder(TextUtils.SPACE(), UUID.randomUUID(), 0), (holder, iter) -> {
-				holder.id = iter;
-				return holder;
-			}, 100, false), true);
+	private List<TextHolder> messages = Utils.sl();
 	private Map<UUID, Text> replaced = Utils.sm();
-	private boolean active = true;
+	private boolean active = false;
 	private ChatMenu toUpdate = null;
+	private ChatChannel srcChannel = null;
 	private int unread = 0;
 
-	public ChatMenu(Player player, Menu from, String name) {
-		super(player, from);
-		this.scrolling = true;
-		this.title = createTitle(name);
+	public ChatChannel getChannel() {
+		return srcChannel;
 	}
 
-	public ChatMenu(Player player, String name) {
+	public ChatMenu(Player player, Menu from, String name, ChatChannel src) {
+		super(player, from);
+		this.fillSpacesFromTop = true;
+		this.scrolling = true;
+		this.title = createTitle(name);
+		this.srcChannel = src;
+	}
+
+	public ChatMenu(Player player, String name, ChatChannel src) {
 		super(player);
+		this.srcChannel = src;
+		this.fillSpacesFromTop = true;
 		this.scrolling = true;
 		this.title = createTitle(name);
 	}
@@ -176,7 +186,7 @@ public class ChatMenu extends Menu {
 		synchronized (messages) {
 			other = Utils.al(messages, true);
 		}
-		return other.stream().sorted(new Comparator<TextHolder>() {
+		List<Text> out = other.stream().sorted(new Comparator<TextHolder>() {
 			@Override
 			public int compare(TextHolder o1, TextHolder o2) {
 				return o1.compareTo(o2);
@@ -184,6 +194,7 @@ public class ChatMenu extends Menu {
 		}).map(holder -> {
 			return holder.getText();
 		}).collect(RayCollectors.rayList());
+		return out;
 	}
 
 	protected void addSpace() {
@@ -227,14 +238,16 @@ public class ChatMenu extends Menu {
 			throw new IllegalArgumentException("Player must be online!");
 		}
 		List<ChatMenu> out = Utils.al();
+		List<String> names = Utils.al();
 		for (String listening : RayPlayer.get(holderUUID).getListenChannels()) {
 			ChatChannel ch = Ray.get().getChannels().getChannel(listening);
 			if (ch == null || !ch.getMenus().containsKey(holderUUID)) {
 				continue;
 			}
 			ChatMenu men = ch.getMenus().get(holderUUID);
-			if (men != null) {
+			if (men != null && men != this && !names.contains(men.getChannel().getName())) {
 				out.add(men);
+				names.add(men.getChannel().getName());
 			}
 		}
 		return out;
@@ -251,8 +264,20 @@ public class ChatMenu extends Menu {
 		return Text.of(TextColors.RED, removeAction(u), removeHover(), "[X]");
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Text nameButton(ChatMenu caller) {
 		Text t = this.title;
+		if (this.title.getClickAction().isPresent()) {
+			ClickAction<?> c = this.title.getClickAction().get();
+			if (c.getResult() instanceof Consumer) {
+				t = t.toBuilder().onClick(TextActions.executeCallback(src -> {
+					if (src instanceof Player) {
+						RayPlayer.get((Player) src).setActiveChannel(getChannel());
+					}
+					((Consumer<CommandSource>) c.getResult()).accept(src);
+				})).build();
+			}
+		}
 		t = t.toBuilder().onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to switch channels!"))).build();
 		this.toUpdate = caller;
 		if (unread > 0) {
@@ -316,7 +341,7 @@ public class ChatMenu extends Menu {
 
 	@Override
 	public List<Text> renderFooter() {
-		Text otherCMs = nameButton(null);
+		Text otherCMs = Text.of("").concat(nameButton(null));
 		Text separator = Text.of(TextColors.GRAY, " | ");
 		for (ChatMenu m : this.getChatMenus()) {
 			otherCMs = otherCMs.concat(separator).concat(m.nameButton(this));

@@ -44,6 +44,8 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.Utils;
 
@@ -106,6 +108,9 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onCommand(SendCommandEvent event) {
+		if (event.getCommand().equalsIgnoreCase("afk")) {
+			return;
+		}
 		if (event.getCause().containsType(Player.class)) {
 			update(event.getCause().first(Player.class).get());
 		}
@@ -116,6 +121,12 @@ public class AfkListener {
 	 */
 	@Listener(order = Order.POST)
 	public void onTalk(MessageChannelEvent.Chat event) {
+		if (event.getCause().containsNamed("formatcontext")) {
+			FormatContext ctx = event.getCause().get("formatcontext", FormatContext.class).get();
+			if (ctx == FormatContexts.AFK) {
+				return;
+			}
+		}
 		if (event.getCause().containsType(Player.class)) {
 			update(event.getCause().first(Player.class).get());
 		}

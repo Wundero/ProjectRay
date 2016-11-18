@@ -1,5 +1,7 @@
 package me.Wundero.Ray.pagination;
 
+import static me.Wundero.Ray.translation.RaySpongeCommonTranslationHelper.t;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,7 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 
 import com.google.common.collect.ImmutableList;
 
-import static me.Wundero.Ray.translation.RaySpongeCommonTranslationHelper.t;
+import me.Wundero.Ray.utils.Utils;
 /*
  The MIT License (MIT)
 
@@ -41,8 +43,13 @@ class RayListPagination extends RayActivePagination {
 	public RayListPagination(MessageReceiver src, List<Map.Entry<Text, Integer>> lines, Text title, Text header,
 			Text footer, Text padding, int linesPerPage, boolean scroll) {
 		super(src, title, header, footer, padding, linesPerPage, scroll);
-		List<List<Text>> pages = new ArrayList<>();
-		List<Text> currentPage = new ArrayList<>();
+
+		this.pages = buildPages(lines);
+	}
+
+	private List<List<Text>> buildNotScroll(List<Map.Entry<Text, Integer>> lines) {
+		List<List<Text>> pages = Utils.al();
+		List<Text> currentPage = Utils.al();
 		int currentPageLines = 0;
 
 		for (Map.Entry<Text, Integer> ent : lines) {
@@ -51,7 +58,7 @@ class RayListPagination extends RayActivePagination {
 			final boolean currentPageNotEmpty = currentPageLines != 0;
 			final boolean spillToNextPage = finiteLinesPerPage && willExceedPageLength && currentPageNotEmpty;
 			if (spillToNextPage) {
-				padPage(currentPage, currentPageLines, true);
+				padPage(currentPage, currentPageLines, true, false);
 				currentPageLines = 0;
 				pages.add(currentPage);
 				currentPage = new ArrayList<>();
@@ -62,13 +69,66 @@ class RayListPagination extends RayActivePagination {
 		// last page is not yet committed
 		final boolean lastPageNotEmpty = currentPageLines > 0;
 		if (lastPageNotEmpty) {
-			if (!pages.isEmpty()) {
+			if (!pages.isEmpty() && !scroll) {
 				// Only pad if we have a previous page
-				padPage(currentPage, currentPageLines, false);
+				padPage(currentPage, currentPageLines, false, false);
 			}
 			pages.add(currentPage);
 		}
-		this.pages = pages;
+		return pages;
+	}
+
+	private List<List<Text>> buildScroll(List<Map.Entry<Text, Integer>> lines) {
+		List<List<Text>> pages = Utils.al();
+		List<Text> currentPage = Utils.al();
+		int currentPageLines = 0;
+
+		for (Map.Entry<Text, Integer> ent : lines) {
+			final boolean finiteLinesPerPage = getMaxContentLinesPerPage() > 0;
+			final boolean willExceedPageLength = ent.getValue() + currentPageLines > getMaxContentLinesPerPage();
+			final boolean currentPageNotEmpty = currentPageLines != 0;
+			final boolean spillToNextPage = finiteLinesPerPage && willExceedPageLength && currentPageNotEmpty;
+			if (spillToNextPage) {
+				padPage(currentPage, currentPageLines, true, false);
+				currentPageLines = 0;
+				pages.add(currentPage);
+				currentPage = new ArrayList<>();
+			}
+			currentPageLines += ent.getValue();
+			currentPage.add(ent.getKey());
+		}
+		// last page is not yet committed
+		final boolean lastPageNotEmpty = currentPageLines > 0;
+		if (lastPageNotEmpty) {
+			pages.add(currentPage);
+		}
+		int lineDiff = this.getMaxContentLinesPerPage() - currentPageLines;
+		List<List<Text>> mod = Utils.al(pages, true);
+		for (int i = pages.size() - 1; i >= 0; i--) {
+			if (i == 0) {
+				List<Text> c = mod.get(i);
+				padPage(c, currentPageLines, false, false);
+				break;
+			}
+			int x = lineDiff;
+			List<Text> c1 = mod.get(i);
+			List<Text> c2 = mod.get(i - 1);
+			while (x > 0) {
+				c1.add(0, c2.remove(c2.size() - 1));
+				x--;
+			}
+			mod.set(i, c1);
+			mod.set(i - 1, c2);
+		}
+		return mod;
+	}
+
+	private List<List<Text>> buildPages(List<Map.Entry<Text, Integer>> map) {
+		if (super.scroll) {
+			return buildScroll(map);
+		} else {
+			return buildNotScroll(map);
+		}
 	}
 
 	@Override

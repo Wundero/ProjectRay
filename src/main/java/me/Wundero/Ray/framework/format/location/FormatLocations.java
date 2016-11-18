@@ -114,13 +114,31 @@ public class FormatLocations {
 				if (or instanceof CommandSource || or instanceof UUID) {
 					RayPlayer r = RayPlayer.get((Player) target);
 					if (or instanceof CommandSource) {
-						r.getActiveMenu().addMessage((CommandSource) or, text, UUID.randomUUID());
+						if (or instanceof Player) {
+							RayPlayer r2 = RayPlayer.get((Player) or);
+							if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
+									&& r2.getActiveChannel().getMenus().get(r.getUniqueId()) != null) {
+								r2.getActiveChannel().getMenus().get(r.getUniqueId()).addMessage((CommandSource) or,
+										text, UUID.randomUUID());
+							} else {
+								r.getActiveMenu().addMessage((CommandSource) or, text, UUID.randomUUID());
+							}
+							return true;
+						} else {
+							r.getActiveMenu().addMessage((CommandSource) or, text, UUID.randomUUID());
+						}
 						return true;
 					} else {
 						Optional<User> ou = Utils.getUser((UUID) or);
 						if (ou.isPresent() && ou.get().getPlayer().isPresent() && ou.get().isOnline()) {
-							Player p = ou.get().getPlayer().get();
-							r.getActiveMenu().addMessage(p, text, UUID.randomUUID());
+							RayPlayer r2 = RayPlayer.get(ou.get().getPlayer().get());
+							if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
+									&& r2.getActiveChannel().getMenus().get(r.getUniqueId()) != null) {
+								r2.getActiveChannel().getMenus().get(r.getUniqueId())
+										.addMessage((CommandSource) ou.get(), text, UUID.randomUUID());
+							} else {
+								r.getActiveMenu().addMessage((CommandSource) ou.get(), text, UUID.randomUUID());
+							}
 							return true;
 						}
 					}

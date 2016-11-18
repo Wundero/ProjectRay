@@ -495,8 +495,13 @@ public class RayPlayer implements Socialable {
 			if (isOnline()) {
 				getPlayer().get().setMessageChannel(activeChannel);
 				if (Ray.get().isUseChatMenus()) {
-					activeChannel.getMenus().get(this.uuid).send();
+					try {
+						this.getActiveMenu().deactive();
+					} catch (Exception e) {
+					}
 					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+					this.getActiveMenu().activate();
+					activeChannel.getMenus().get(this.uuid).send();
 				}
 			}
 		}
@@ -515,8 +520,12 @@ public class RayPlayer implements Socialable {
 		if (isOnline()) {
 			getPlayer().get().setMessageChannel(activeChannel);
 			if (Ray.get().isUseChatMenus()) {
-				activeChannel.getMenus().get(this.uuid).activate();
-				this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+				try {
+					activeChannel.getMenus().get(this.uuid).activate();
+					this.activeMenu.deactive();
+					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+				} catch (Exception e) {
+				}
 			}
 		}
 	}

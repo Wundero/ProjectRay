@@ -70,11 +70,12 @@ abstract class RayActivePagination {
 		this.footer = footer;
 		this.padding = padding;
 		this.scroll = scroll;
-		this.nextPageText = t(scroll?"Scroll down":"»").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
+		this.nextPageText = t(scroll ? "Scroll down" : "»").toBuilder().color(TextColors.BLUE)
+				.style(TextStyles.UNDERLINE)
 				.onClick(TextActions.runCommand("/pagination " + this.id.toString() + " next"))
 				.onHover(TextActions.showText(Text.of("/page next"))).onShiftClick(TextActions.insertText("/page next"))
 				.build();
-		this.prevPageText = t(scroll?"Scroll up":"«").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
+		this.prevPageText = t(scroll ? "Scroll up" : "«").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
 				.onClick(TextActions.runCommand("/pagination " + this.id.toString() + " prev"))
 				.onHover(TextActions.showText(Text.of("/page prev"))).onShiftClick(TextActions.insertText("/page prev"))
 				.build();
@@ -194,13 +195,18 @@ abstract class RayActivePagination {
 		return ret.build();
 	}
 
-	protected void padPage(final List<Text> currentPage, final int currentPageLines, final boolean addContinuation) {
+	protected void padPage(final List<Text> currentPage, final int currentPageLines, final boolean addContinuation,
+			final boolean reverse) {
 		final int maxContentLinesPerPage = getMaxContentLinesPerPage();
 		for (int i = currentPageLines; i < maxContentLinesPerPage; i++) {
 			if (addContinuation && i == maxContentLinesPerPage - 1) {
 				currentPage.add(CONTINUATION_TEXT);
 			} else {
-				currentPage.add(0, Text.EMPTY);
+				if (!reverse) {
+					currentPage.add(0, Text.EMPTY);
+				} else {
+					currentPage.add(Text.EMPTY);
+				}
 			}
 		}
 	}

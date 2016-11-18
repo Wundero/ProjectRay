@@ -67,6 +67,9 @@ public class Translator {
 	 * Parse the string using message formatters, then parse colors.
 	 */
 	public Text t(String key, Object... args) {
+		if (messages == null) {
+			return Text.EMPTY;
+		}
 		return messages.t(key, args);
 	}
 
@@ -74,6 +77,9 @@ public class Translator {
 	 * Parse the string using message formatters.
 	 */
 	public String tl(String key, Object... args) {
+		if (messages == null) {
+			return key;
+		}
 		return messages.tl(key, args);
 	}
 

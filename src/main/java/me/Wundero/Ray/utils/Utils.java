@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1390,14 +1391,71 @@ public class Utils {
 		return u2;
 	}
 
+	public static <T> Map<Integer, T> from(List<T> list) {
+		Map<Integer, T> out = hm();
+		for (int i = 0; i < list.size(); i++) {
+			out.put(i, list.get(i));
+		}
+		return out;
+	}
+
+	public static <T> List<T> from(Map<Integer, T> map) {
+		List<T> out = al();
+		List<Integer> order = al(map.keySet(), true);
+		order.sort(new Comparator<Integer>() {
+
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return Integer.compare(o1, o2);
+			}
+
+		});
+		int last = 0;
+		for (int i : order) {
+			if (i < 0) {
+				continue;
+			}
+			if (i == 0) {
+				out.add(map.get(i));
+				continue;
+			}
+			int dif = i - last;
+			while (dif > 1) {
+				out.add(null);
+				dif--;
+			}
+			out.add(map.get(i));
+			last = i;
+		}
+		return out;
+	}
+
+	public static <T> List<T> flatten(List<List<T>> list) {
+		List<T> out = al();
+		for (List<T> l : list) {
+			for (T t : l) {
+				out.add(t);
+			}
+		}
+		return out;
+	}
+
 	/**
 	 * Print the current stack trace.
 	 */
 	public static void stackTrace() {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+		boolean b = false;
 		for (StackTraceElement e : trace) {
 			System.out.println(
 					e.getClassName() + "." + e.getMethodName() + "(" + e.getFileName() + ":" + e.getLineNumber() + ")");
+			if (e.getMethodName().equals("stackTrace") && e.getClassName().endsWith("Utils")) {
+				if (b) {
+					return;
+				} else {
+					b = true;
+				}
+			}
 		}
 	}
 
