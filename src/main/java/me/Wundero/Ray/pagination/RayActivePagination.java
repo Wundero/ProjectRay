@@ -17,6 +17,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)
@@ -60,11 +61,13 @@ abstract class RayActivePagination {
 	private int currentPage;
 	private final int maxContentLinesPerPage;
 	private final Text padding;
+	protected final boolean clearChat;
 	protected final boolean scroll;
 
 	public RayActivePagination(MessageReceiver src, Text title, Text header, Text footer, Text padding,
-			int linesPerPage, boolean scroll) {
+			int linesPerPage, boolean scroll, boolean clearchat) {
 		this.src = new WeakReference<>(src);
+		this.clearChat = clearchat;
 		this.title = title;
 		this.header = header;
 		this.footer = footer;
@@ -151,6 +154,9 @@ abstract class RayActivePagination {
 		}
 		if (this.footer != null) {
 			toSend.add(this.footer);
+		}
+		if (clearChat) {
+			toSend.addAll(0, Utils.fill(Text.of(" "), (t, i) -> t, 100, true));
 		}
 		src.sendMessages(toSend);
 	}

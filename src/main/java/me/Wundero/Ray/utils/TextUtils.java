@@ -48,6 +48,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.LiteralText.Builder;
@@ -62,7 +63,10 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.text.translation.Translatable;
+import org.spongepowered.api.text.translation.Translation;
 
 import com.flowpowered.math.GenericMath;
 
@@ -344,6 +348,38 @@ public class TextUtils {
 			b.append(strip(f));
 		}
 		return b.build();
+	}
+
+	public static Text of() {
+		return Text.of();
+	}
+
+	public static Text of(char character) {
+		return Text.of(character);
+	}
+
+	public static Text of(Translation t, Object... args) {
+		return Text.of("").concat(Text.of(t, args));
+	}
+
+	public static Text of(Translatable t, Object... args) {
+		return Text.of("").concat(Text.of(t, args));
+	}
+
+	public static Text of(Selector sel) {
+		return Text.of(sel);
+	}
+
+	public static Text of(Score score) {
+		return Text.of(score);
+	}
+
+	public static Text of(Object... contents) {
+		return Text.of("").concat(Text.of(contents));
+	}
+
+	public static Text of(String s) {
+		return Text.of(s);
 	}
 
 	/**

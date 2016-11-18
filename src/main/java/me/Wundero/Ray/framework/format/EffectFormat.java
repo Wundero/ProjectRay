@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -134,12 +135,12 @@ public class EffectFormat extends Format {
 	 * Play the effect.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> data, Optional<Object> sender) {
+	public boolean send(MessageReceiver target, Map<String, Object> data, Optional<Object> sender, Optional<UUID> u) {
 		if (!(target instanceof Player)) {
 			return false;
 		}
 		effect.setupAnimation((Player) target, data, (text, player) -> {
-			return s(target, data, text, sender);
+			return s(target, data, text, sender, u);
 		});
 		effect.start();
 		return true;
@@ -149,12 +150,12 @@ public class EffectFormat extends Format {
 	 * Play the effect.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender) {
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u) {
 		if (!(target instanceof Player)) {
 			return false;
 		}
 		effect.setupAnimation((Player) target, data, (text, player) -> {
-			return s(target, data, text, sender);
+			return s(target, data, text, sender, u);
 		});
 		effect.start();
 		return true;

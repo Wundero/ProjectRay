@@ -42,7 +42,7 @@ public class RayPaginationListBuilder implements PaginationList.Builder {
 	private Text footer;
 	private Text paginationSpacer = Text.of("=");
 	private int linesPerPage = 20;
-	private boolean scroll = false;
+	private boolean scroll = false, clear = false;
 
 	private PaginationList paginationList;
 
@@ -98,8 +98,13 @@ public class RayPaginationListBuilder implements PaginationList.Builder {
 		return this;
 	}
 
-	public PaginationList.Builder scroll(boolean scroll) {
+	public RayPaginationListBuilder scroll(boolean scroll) {
 		this.scroll = scroll;
+		return this;
+	}
+
+	public RayPaginationListBuilder clear(boolean clear) {
+		this.clear = clear;
 		return this;
 	}
 
@@ -109,7 +114,7 @@ public class RayPaginationListBuilder implements PaginationList.Builder {
 
 		if (this.paginationList == null) {
 			this.paginationList = new RayPaginationList(this.service, this.contents, this.title, this.header,
-					this.footer, this.paginationSpacer, this.linesPerPage, scroll);
+					this.footer, this.paginationSpacer, this.linesPerPage, scroll, clear);
 		}
 		return this.paginationList;
 	}

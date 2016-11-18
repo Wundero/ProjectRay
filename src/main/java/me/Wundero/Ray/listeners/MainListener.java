@@ -103,6 +103,7 @@ public class MainListener {
 		}
 		final FormatCollection f = fx;
 		final UUID exf = UUID.randomUUID();
+		final UUID locid = UUID.randomUUID();
 		final List<ExecutingFormat> ef = f.getInternals(ExecutingFormat.class, Optional.empty());
 		final Map<String, Object> args = Utils.hm(v);
 		ChatChannel pc = r.getActiveChannel();
@@ -117,6 +118,7 @@ public class MainListener {
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
+				System.out.println("parsing");
 				Map<String, Object> mc = Utils.hm(args);
 				if (recipient instanceof Player && sender instanceof Player) {
 					Player s = (Player) sender;
@@ -152,7 +154,7 @@ public class MainListener {
 								.setObserver(observer.isPresent() ? observer
 										: recipient instanceof Player ? Optional.of((Player) recipient)
 												: Optional.empty()),
-						Optional.of(msgsender.orElse(p).getUniqueId())) == 0) {
+						Optional.of(msgsender.orElse(p).getUniqueId()), Utils.wrap(locid)) == 0) {
 					return Optional.of(original);
 				}
 				return Optional.empty();
@@ -237,7 +239,6 @@ public class MainListener {
 		if (g != null) {
 			FormatCollection f = g.getFormats(FormatContexts.AFK);
 			if (f != null && !f.isEmpty()) {
-				System.out.println("good");
 				event.setMessageCancelled(true);
 				String s = event.isAFK() ? "w" : " longer";
 				Map<String, Object> v = Utils.hm();
@@ -267,6 +268,7 @@ public class MainListener {
 			Player player = event.getTargetEntity();
 			final TabList list = player.getTabList();
 			List<TabListEntry> lx = Utils.sl(list.getEntries(), true);
+			Optional<UUID> u = Utils.presentUUID();
 			for (TabListEntry e : lx) {
 				Optional<Player> h = Sponge.getServer().getPlayer(e.getProfile().getUniqueId());
 				if (!h.isPresent()) {
@@ -290,7 +292,7 @@ public class MainListener {
 				}
 				new FormatCollection(fx).sendAll(player,
 						new ParsableData().setClickHover(false).setSender(pla).setRecipient(player),
-						Optional.of(pla.getUniqueId()));
+						Optional.of(pla.getUniqueId()), u);
 			}
 		});
 		Task.builder().delayTicks(20).execute(() -> RayPlayer.updateTabs()).submit(Ray.get().getPlugin());
@@ -301,16 +303,16 @@ public class MainListener {
 				FormatCollection h = g.getFormats(FormatContexts.TABLIST_HEADER);
 				FormatCollection f = g.getFormats(FormatContexts.TABLIST_FOOTER);
 				if (h != null && !h.isEmpty()) {
-					h.sendAll(
-							event.getTargetEntity(), new ParsableData().setClickHover(false)
-									.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
-							Optional.of(event.getTargetEntity()));
+					h.sendAll(event.getTargetEntity(),
+							new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
+									.setRecipient(event.getTargetEntity()),
+							Optional.of(event.getTargetEntity()), Utils.presentUUID());
 				}
 				if (f != null && !f.isEmpty()) {
-					f.sendAll(
-							event.getTargetEntity(), new ParsableData().setClickHover(false)
-									.setSender(event.getTargetEntity()).setRecipient(event.getTargetEntity()),
-							Optional.of(event.getTargetEntity()));
+					f.sendAll(event.getTargetEntity(),
+							new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
+									.setRecipient(event.getTargetEntity()),
+							Optional.of(event.getTargetEntity()), Utils.presentUUID());
 				}
 			}).submit(Ray.get().getPlugin());
 		}

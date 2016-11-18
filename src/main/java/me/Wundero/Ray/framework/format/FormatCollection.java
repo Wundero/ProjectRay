@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.text.channel.MessageReceiver;
 
@@ -137,24 +138,24 @@ public class FormatCollection {
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, boolean irrelevant) {
-		return sendAll(target, args, Utils.wrap(o));
+	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, UUID u, boolean irrelevant) {
+		return sendAll(target, args, Utils.wrap(o), Utils.wrap(u));
 	}
 
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, ParsableData data, Object o, boolean irrelevant) {
-		return sendAll(target, data, Utils.wrap(o));
+	public int sendAll(MessageReceiver target, ParsableData data, Object o, UUID u, boolean irrelevant) {
+		return sendAll(target, data, Utils.wrap(o), Utils.wrap(u));
 	}
 
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, Map<String, Object> args, Optional<Object> sender) {
+	public int sendAll(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u) {
 		int count = 0;
 		for (Format f : this.formats) {
-			if (f.send(target, args, sender)) {
+			if (f.send(target, args, sender, u)) {
 				count++;
 			}
 		}
@@ -164,10 +165,10 @@ public class FormatCollection {
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, ParsableData data, Optional<Object> sender) {
+	public int sendAll(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u) {
 		int count = 0;
 		for (Format f : this.formats) {
-			if (f.send(target, data, sender)) {
+			if (f.send(target, data, sender, u)) {
 				count++;
 			}
 		}

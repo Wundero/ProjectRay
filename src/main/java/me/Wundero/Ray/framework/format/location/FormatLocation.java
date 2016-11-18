@@ -1,6 +1,7 @@
 package me.Wundero.Ray.framework.format.location;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -52,6 +53,14 @@ public abstract class FormatLocation {
 	/**
 	 * Send a message to the location.
 	 */
-	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender);
+	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender,
+			Optional<UUID> textId);
+
+	/**
+	 * Send a message to the location.
+	 */
+	public boolean send(Text text, MessageReceiver target, Format format, Optional<Object> sender) {
+		return send(text, target, format, sender, Optional.empty());
+	}
 
 }

@@ -108,8 +108,8 @@ public class FormatLocations {
 
 	public static final FormatLocation CHAT = new FormatLocation("chat") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o) {
-			if (Ray.get().isUseChatMenus() && target instanceof Player && o.isPresent()) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
+			if (Ray.get().isUseChatMenus() && target instanceof Player && o.isPresent() && u.isPresent()) {
 				Object or = o.get();
 				if (or instanceof CommandSource || or instanceof UUID) {
 					RayPlayer r = RayPlayer.get((Player) target);
@@ -119,13 +119,13 @@ public class FormatLocations {
 							if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
 									&& r2.getActiveChannel().getMenus().get(r.getUniqueId()) != null) {
 								r2.getActiveChannel().getMenus().get(r.getUniqueId()).addMessage((CommandSource) or,
-										text, UUID.randomUUID());
+										text, u.orElse(UUID.randomUUID()));
 							} else {
-								r.getActiveMenu().addMessage((CommandSource) or, text, UUID.randomUUID());
+								r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()));
 							}
 							return true;
 						} else {
-							r.getActiveMenu().addMessage((CommandSource) or, text, UUID.randomUUID());
+							r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()));
 						}
 						return true;
 					} else {
@@ -135,9 +135,10 @@ public class FormatLocations {
 							if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
 									&& r2.getActiveChannel().getMenus().get(r.getUniqueId()) != null) {
 								r2.getActiveChannel().getMenus().get(r.getUniqueId())
-										.addMessage((CommandSource) ou.get(), text, UUID.randomUUID());
+										.addMessage((CommandSource) ou.get(), text, u.orElse(UUID.randomUUID()));
 							} else {
-								r.getActiveMenu().addMessage((CommandSource) ou.get(), text, UUID.randomUUID());
+								r.getActiveMenu().addMessage((CommandSource) ou.get(), text,
+										u.orElse(UUID.randomUUID()));
 							}
 							return true;
 						}
@@ -151,7 +152,7 @@ public class FormatLocations {
 
 	public static final FormatLocation SCOREBOARD = new FormatLocation("scoreboard") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
 			// TODO this
 			return false;
 		}
@@ -162,7 +163,7 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TITLE_SUBTITLE = new FormatLocation("title_subtitle") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -184,7 +185,7 @@ public class FormatLocations {
 	};
 	public static final FormatLocation SUBTITLE = new FormatLocation("subtitle") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -203,7 +204,7 @@ public class FormatLocations {
 
 	public static final FormatLocation TITLE = new FormatLocation("title") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -222,7 +223,7 @@ public class FormatLocations {
 
 	public static final FormatLocation BOSSBAR = new FormatLocation("bossbar") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -289,7 +290,8 @@ public class FormatLocations {
 
 	public static final FormatLocation ACTIONBAR = new FormatLocation("actionbar") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> operatable) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> operatable,
+				Optional<UUID> u) {
 			if (!(target instanceof ChatTypeMessageReceiver)) {
 				return false;
 			}
@@ -301,7 +303,7 @@ public class FormatLocations {
 
 	public static final FormatLocation TAB_ENTRY = new FormatLocation("tab_entry") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u) {
 			if (p == null || !p.isPresent() || !(target instanceof Player)) {
 				return false;
 			}
@@ -322,7 +324,7 @@ public class FormatLocations {
 
 	public static final FormatLocation TAB_FOOTER = new FormatLocation("tab_footer") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -334,7 +336,7 @@ public class FormatLocations {
 
 	public static final FormatLocation TAB_HEADER = new FormatLocation("tab_header") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
 			if (!(target instanceof Player)) {
 				return false;
 			}

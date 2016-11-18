@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -100,19 +101,19 @@ public class StaticFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u) {
 		if (!getTemplate().isPresent()) {
 			return false;
 		}
-		return this.s(f, args, getTemplate().get(), o);
+		return this.s(f, args, getTemplate().get(), o, u);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o) {
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u) {
 		if (!getTemplate().isPresent()) {
 			return false;
 		}
-		return this.s(f, data, getTemplate().get(), o);
+		return this.s(f, data, getTemplate().get(), o, u);
 	}
 
 	private static class TemplateBuilderTypePrompt extends Prompt {

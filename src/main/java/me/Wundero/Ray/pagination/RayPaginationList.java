@@ -52,7 +52,7 @@ public class RayPaginationList implements PaginationList {
 	private Optional<Text> footer;
 	private Text paginationSpacer;
 	private int linesPerPage;
-	private boolean scrolling = false;
+	private boolean scrolling = false, clear = false;
 
 	public RayPaginationList(RayPaginationService service, Iterable<Text> contents, Text title, Text header,
 			Text footer, Text paginationSpacer, int linesPerPage) {
@@ -66,11 +66,12 @@ public class RayPaginationList implements PaginationList {
 	}
 
 	public RayPaginationList(RayPaginationService service, Iterable<Text> contents, Text title, Text header,
-			Text footer, Text paginationSpacer, int linesPerPage, boolean scroll) {
+			Text footer, Text paginationSpacer, int linesPerPage, boolean scroll, boolean clear) {
 		this(service, contents, title, header, footer, paginationSpacer, linesPerPage);
 		this.scrolling = scroll;
+		this.clear = clear;
 	}
-	
+
 	public boolean scroll() {
 		return scrolling;
 	}
@@ -131,10 +132,10 @@ public class RayPaginationList implements PaginationList {
 												// it's probably reasonable to
 												// copy it to another list
 			pagination = new RayListPagination(receiver, ImmutableList.copyOf(counts), title, this.header.orElse(null),
-					this.footer.orElse(null), this.paginationSpacer, linesPerPage, scrolling);
+					this.footer.orElse(null), this.paginationSpacer, linesPerPage, scrolling, clear);
 		} else {
 			pagination = new RayIterablePagination(receiver, counts, title, this.header.orElse(null),
-					this.footer.orElse(null), this.paginationSpacer, linesPerPage, scrolling);
+					this.footer.orElse(null), this.paginationSpacer, linesPerPage, scrolling, clear);
 		}
 
 		this.service.getPaginationState(receiver, true).put(pagination);

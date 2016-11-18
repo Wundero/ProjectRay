@@ -56,14 +56,14 @@ public abstract class Menu {
 	protected Translator translator;
 	protected Optional<Menu> source;
 	protected boolean fillSpacesFromTop = false;
-	protected boolean scrolling = false;
+	protected boolean scrolling = false, clear = false;
 	protected Text title = null;
 	protected Text pathTitle = Text.of();
 
 	public void setTitle(Text title) {
 		this.title = title;
 	}
-	
+
 	public UUID getHolderUUID() {
 		return holderUUID;
 	}
@@ -86,7 +86,7 @@ public abstract class Menu {
 		this.source = Optional.of(from);
 	}
 
-	private final void paginate(List<Text> h, List<Text> b, List<Text> f, boolean scroll) {
+	private final void paginate(List<Text> h, List<Text> b, List<Text> f, boolean scroll, boolean clear) {
 		Text header = TextUtils.join(h, Text.of("\n"));
 		Text footer = TextUtils.join(f, Text.of("\n"));
 		PaginationList.Builder builder = Ray.get().getPaginationService().builder().contents(b)
@@ -105,17 +105,17 @@ public abstract class Menu {
 			builder.title(title);
 		}
 		if (builder instanceof RayPaginationListBuilder) {
-			builder = ((RayPaginationListBuilder) builder).scroll(scroll);
+			builder = ((RayPaginationListBuilder) builder).scroll(scroll).clear(clear);
 		}
 		builder.sendTo(getPlayer().orElseThrow(() -> new IllegalArgumentException("Player must be online!")));
 	}
 
 	public void updatePlayer(Player p) {
-		if(p.getUniqueId().equals(this.holderUUID)) {
+		if (p.getUniqueId().equals(this.holderUUID)) {
 			this.holder = new WeakReference<Player>(p);
 		}
 	}
-	
+
 	public Optional<Player> getPlayer() {
 		if (holder.get() == null) {
 			Optional<User> u = Utils.getUser(holderUUID);
@@ -220,7 +220,7 @@ public abstract class Menu {
 			}
 			spaces--;
 		}
-		paginate(header, body, footer, scrolling);
+		paginate(header, body, footer, scrolling, clear);
 	}
 
 }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.text.Text;
@@ -106,13 +107,13 @@ public class MultiFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o) {
-		return getNext(true).send(f, args, o);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u) {
+		return getNext(true).send(f, args, o, u);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o) {
-		return getNext(true).send(f, data, o);
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u) {
+		return getNext(true).send(f, data, o, u);
 	}
 
 	private static class NamePrompt extends Prompt {

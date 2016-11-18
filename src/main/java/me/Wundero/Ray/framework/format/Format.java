@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -205,27 +206,71 @@ public abstract class Format {
 	/**
 	 * Send a message to the location of this format, parsing for variables.
 	 */
-	public boolean send(MessageReceiver target, Map<String, Object> args, Object o, boolean irrelevant) {
-		return send(target, args, Optional.ofNullable(o));
+	public boolean send(MessageReceiver target, Map<String, Object> args, Object o, UUID uuid, boolean irrelevant) {
+		return send(target, args, Optional.ofNullable(o), Utils.wrap(uuid));
 	}
 
 	/**
 	 * Send a message to the location of this format, parsing for variables.
 	 */
-	public boolean send(MessageReceiver target, ParsableData data, Object o, boolean irrelevant) {
-		return send(target, data, Optional.ofNullable(o));
+	public boolean send(MessageReceiver target, ParsableData data, Object o, UUID uuid, boolean irrelevant) {
+		return send(target, data, Optional.ofNullable(o), Utils.wrap(uuid));
 	}
 
 	/**
 	 * Send a message to the location of this format, parsing for variables.
 	 */
-	public abstract boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender);
+	public abstract boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender,
+			Optional<UUID> uuid);
 
 	/**
 	 * Send a message to the location of this format, parsing for variables.
 	 */
-	public abstract boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender);
+	public abstract boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender,
+			Optional<UUID> uuid);
 
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
+	protected boolean s(MessageReceiver target, Map<String, Object> a, TextTemplate t, Optional<Object> sender, Optional<UUID> uuid) {
+		Text te = get(t, a);
+		te = TextUtils.vars(te, new ParsableData().setKnown(a));
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender, uuid);
+	}
+
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
+	protected boolean s(MessageReceiver target, ParsableData d, TextTemplate t, Optional<Object> sender, Optional<UUID> uuid) {
+		Text te = get(t, d);
+		te = TextUtils.vars(te, d);
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender, uuid);
+	}
+
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
+	protected boolean s(MessageReceiver target, Map<String, Object> a, Text te, Optional<Object> sender, Optional<UUID> uuid) {
+		te = TextUtils.vars(te, new ParsableData().setKnown(a));
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender, uuid);
+	}
+
+	/**
+	 * Provided send method in case all that needs to be done is send a text
+	 * object to the location.
+	 */
+	protected boolean s(MessageReceiver target, ParsableData d, Text te, Optional<Object> sender, Optional<UUID> uuid) {
+		te = TextUtils.vars(te, d);
+		te = TextUtils.urls(te);
+		return loc.send(te, target, this, sender, uuid);
+	}
+	
 	/**
 	 * Provided send method in case all that needs to be done is send a text
 	 * object to the location.

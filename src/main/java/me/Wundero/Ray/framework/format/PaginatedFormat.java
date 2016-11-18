@@ -27,6 +27,7 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -150,21 +151,21 @@ public class PaginatedFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender) {
+	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u) {
 		int i = (Integer) Utils.wrap(args.get("page")).orElse(0);
 		if (i < 0 || i >= pages.size()) {
 			return false;
 		}
-		return pages.get(i).send(target, args, sender);
+		return pages.get(i).send(target, args, sender, u);
 	}
 
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender) {
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u) {
 		int i = data.getPage().orElse(0);
 		if (i < 0 || i >= pages.size()) {
 			return false;
 		}
-		return pages.get(i).send(target, data, sender);
+		return pages.get(i).send(target, data, sender, u);
 	}
 
 }

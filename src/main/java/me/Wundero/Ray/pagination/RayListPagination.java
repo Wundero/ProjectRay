@@ -41,8 +41,8 @@ class RayListPagination extends RayActivePagination {
 	private final List<List<Text>> pages;
 
 	public RayListPagination(MessageReceiver src, List<Map.Entry<Text, Integer>> lines, Text title, Text header,
-			Text footer, Text padding, int linesPerPage, boolean scroll) {
-		super(src, title, header, footer, padding, linesPerPage, scroll);
+			Text footer, Text padding, int linesPerPage, boolean scroll, boolean clear) {
+		super(src, title, header, footer, padding, linesPerPage, scroll, clear);
 
 		this.pages = buildPages(lines);
 	}

@@ -97,6 +97,7 @@ public class ChatMenu extends Menu {
 
 	// NOTE: UNORDERED LIST
 	private List<TextHolder> messages = Utils.sl();
+	private List<TextHolder> removed = Utils.sl();
 	private Map<UUID, Text> replaced = Utils.sm();
 	private boolean active = false;
 	private ChatMenu toUpdate = null;
@@ -110,6 +111,7 @@ public class ChatMenu extends Menu {
 	public ChatMenu(Player player, Menu from, String name, ChatChannel src) {
 		super(player, from);
 		this.fillSpacesFromTop = true;
+		this.clear = true;
 		this.scrolling = true;
 		this.title = createTitle(name);
 		this.srcChannel = src;
@@ -119,6 +121,7 @@ public class ChatMenu extends Menu {
 		super(player);
 		this.srcChannel = src;
 		this.fillSpacesFromTop = true;
+		this.clear = true;
 		this.scrolling = true;
 		this.title = createTitle(name);
 	}
@@ -126,6 +129,12 @@ public class ChatMenu extends Menu {
 	protected void modIndices(int by) {
 		synchronized (messages) {
 			messages = messages.stream().map(holder -> {
+				holder = holder.id(holder.id + by);
+				return holder;
+			}).collect(RayCollectors.syncList());
+		}
+		synchronized (removed) {
+			removed = removed.stream().map(holder -> {
 				holder = holder.id(holder.id + by);
 				return holder;
 			}).collect(RayCollectors.syncList());
@@ -141,11 +150,43 @@ public class ChatMenu extends Menu {
 	}
 
 	protected Text restore(UUID original) {
-		return replace(original, replaced.get(original));
+		if (replaced.containsKey(original)) {
+			return replace(original, replaced.get(original));
+		} else {
+			TextHolder tr = null;
+			for (TextHolder h : removed) {
+				if (h.uuid.equals(original)) {
+					insert(h);
+					tr = h;
+					break;
+				}
+			}
+			removed.remove(tr);
+			return tr == null ? null : tr.text;
+		}
+	}
+
+	protected void insert(TextHolder h) {
+		synchronized (messages) {
+			messages.add(h.id, h);
+			final int id = h.id();
+			messages = messages.stream().map(holder -> {
+				if (h.uuid.equals(holder.uuid)) {
+					return holder;
+				}
+				if (holder.id >= id) {
+					holder = holder.id(holder.id + 1);
+					return holder;
+				} else {
+					return holder;
+				}
+			}).collect(RayCollectors.syncList());
+			addSpace();
+		}
 	}
 
 	protected Text replace(UUID original, Text with) {
-		int index = messages.indexOf(original);
+		int index = indexOf(original);
 		Text out = messages.get(index).text;
 		TextHolder h = messages.get(index);
 		h.text = with;
@@ -157,13 +198,24 @@ public class ChatMenu extends Menu {
 		return out;
 	}
 
+	private int indexOf(UUID u) {
+		synchronized (messages) {
+			for (int i = 0; i < messages.size(); i++) {
+				if (messages.get(i).uuid.equals(u)) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
 	protected TextHolder remove(UUID u) {
 		if (!getPlayer().isPresent()) {
 			return null;
 		}
-		TextHolder h = messages.get(messages.indexOf(u));
+		TextHolder h = messages.get(indexOf(u));
 		if (getPlayer().get().hasPermission("ray.removemessage")) {
-			replace(u, Text.of(TextColors.RED, restoreAction(u), restoreHover(), "Message has been removed."));
+			replace(u, TextUtils.of(TextColors.RED, restoreAction(u), restoreHover(), "Message has been removed."));
 			return h;
 		}
 		synchronized (messages) {
@@ -178,6 +230,7 @@ public class ChatMenu extends Menu {
 			}).collect(RayCollectors.syncList());
 			addSpace();
 		}
+		removed.add(h);
 		return h;
 	}
 
@@ -206,8 +259,10 @@ public class ChatMenu extends Menu {
 	protected ClickAction<?> restoreAction(UUID u) {
 		return TextActions.executeCallback(source -> {
 			if (source.hasPermission("ray.removemessage")) {
-				restore(u);
-				sendOrUnread();
+				for (ChatMenu m : this.srcChannel.getMenus().values()) {
+					m.restore(u);
+					m.sendOrUnread();
+				}
 			} else {
 				source.sendMessage(Text.of(TextColors.RED, "You are not allowed to do that!"));
 			}
@@ -221,8 +276,10 @@ public class ChatMenu extends Menu {
 	protected ClickAction<?> removeAction(UUID u) {
 		return TextActions.executeCallback(source -> {
 			if (source.hasPermission("ray.removemessage")) {
-				remove(u);
-				sendOrUnread();
+				for (ChatMenu m : this.srcChannel.getMenus().values()) {
+					m.remove(u);
+					m.sendOrUnread();
+				}
 			} else {
 				source.sendMessage(Text.of(TextColors.RED, "You are not allowed to do that!"));
 			}
@@ -261,7 +318,7 @@ public class ChatMenu extends Menu {
 	}
 
 	protected Text removeButton(UUID u) {
-		return Text.of(TextColors.RED, removeAction(u), removeHover(), "[X]");
+		return TextUtils.of(TextColors.RED, removeAction(u), removeHover(), "[X]");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -292,9 +349,16 @@ public class ChatMenu extends Menu {
 		}
 	}
 
+	private boolean hasPerm(String s) {
+		if (!getPlayer().isPresent()) {
+			return false;
+		}
+		return getPlayer().get().hasPermission(s);
+	}
+
 	public void addMessage(CommandSource sender, Text message, UUID uuid) {
 		incIndices();
-		if (sender.hasPermission("ray.removemessage.exempt")) {
+		if (sender.hasPermission("ray.removemessage.exempt") || !hasPerm("ray.removemessage")) {
 			messages.add(0, new TextHolder(message, uuid, 0));
 			fixSize();
 		} else {

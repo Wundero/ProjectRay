@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -117,13 +118,13 @@ public class CommandFormat extends Format {
 					if (cancel) {
 						event.setCancelled(true);
 					}
-					send(s, d, Optional.of(s));
+					send(s, d, Optional.of(s), Utils.wrap(UUID.randomUUID()));
 				}
 			} else {
 				if (cancel) {
 					event.setCancelled(true);
 				}
-				send(s, d, Optional.of(s));
+				send(s, d, Optional.of(s), Utils.wrap(UUID.randomUUID()));
 			}
 		}
 	}
@@ -177,16 +178,16 @@ public class CommandFormat extends Format {
 	 * Send the message to the internal format.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> opt) {
-		return format.send(target, args, opt);
+	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u) {
+		return format.send(target, args, opt, u);
 	}
 
 	/**
 	 * Send the message to the internal format.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> opt) {
-		return format.send(target, data, opt);
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> opt, Optional<UUID> u) {
+		return format.send(target, data, opt, u);
 	}
 
 	/**

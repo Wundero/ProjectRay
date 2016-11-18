@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -161,19 +162,21 @@ public class EventFormat extends Format {
 			if (needsDelay(e.getClass())) {
 				Task.builder().delayTicks(20).execute(() -> {
 					if (data.getRecipient().isPresent()) {
-						send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)));
+						send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)),
+								Utils.presentUUID());
 					} else {
 						for (Player p : Sponge.getServer().getOnlinePlayers()) {
-							send(p, data, Utils.wrap(data.getSender().orElse(null)));
+							send(p, data, Utils.wrap(data.getSender().orElse(null)), Utils.presentUUID());
 						}
 					}
 				}).submit(Ray.get().getPlugin());
 			} else {
 				if (data.getRecipient().isPresent()) {
-					send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)));
+					send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)),
+							Utils.presentUUID());
 				} else {
 					for (Player p : Sponge.getServer().getOnlinePlayers()) {
-						send(p, data, Utils.wrap(data.getSender().orElse(null)));
+						send(p, data, Utils.wrap(data.getSender().orElse(null)), Utils.wrap(UUID.randomUUID()));
 					}
 				}
 			}
@@ -181,13 +184,13 @@ public class EventFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o) {
-		return internal.send(f, args, o);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u) {
+		return internal.send(f, args, o, u);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o) {
-		return internal.send(f, data, o);
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u) {
+		return internal.send(f, data, o, u);
 	}
 
 	@Override

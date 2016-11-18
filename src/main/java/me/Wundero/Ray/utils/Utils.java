@@ -111,6 +111,13 @@ public class Utils {
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
 	}
+	
+	/**
+	 * Random optional uuid.
+	 */
+	public static Optional<UUID> presentUUID() {
+		return wrap(UUID.randomUUID());
+	}
 
 	/**
 	 * Remove non-null elements from a collection

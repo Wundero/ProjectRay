@@ -198,7 +198,7 @@ public class ExecutingFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u) {
 		if (f instanceof CommandSource) {
 			for (Map.Entry<String, Boolean> entry : cmds.entrySet()) {
 				if (!entry.getValue()) {
@@ -206,11 +206,11 @@ public class ExecutingFormat extends Format {
 				}
 			}
 		}
-		return wrapped.send(f, args, opt);
+		return wrapped.send(f, args, opt, u);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt) {
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt, Optional<UUID> u) {
 		if (f instanceof CommandSource) {
 			for (Map.Entry<String, Boolean> entry : cmds.entrySet()) {
 				if (!entry.getValue()) {
@@ -218,7 +218,7 @@ public class ExecutingFormat extends Format {
 				}
 			}
 		}
-		return wrapped.send(f, data, opt);
+		return wrapped.send(f, data, opt, u);
 	}
 
 	@SuppressWarnings("unchecked")
