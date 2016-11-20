@@ -33,8 +33,14 @@ import org.spongepowered.api.text.Text;
  */
 public interface Prefixable extends Changeable {
 
+	/**
+	 * Set the prefix.
+	 */
 	boolean prefix(Text prefix);
 
+	/**
+	 * Get the prefix if it has been successfully set.
+	 */
 	Optional<Text> prefix();
 
 }

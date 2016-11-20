@@ -61,6 +61,21 @@ public class ChatChannels {
 	}
 
 	/**
+	 * Save channels to a node.
+	 */
+	public void save() {
+		if (node == null || !useChannels) {
+			return;
+		}
+		for (ChatChannel ch : channels.values()) {
+			try {
+				node.getNode(ch.getName()).setValue(TypeToken.of(ChatChannel.class), ch);
+			} catch (ObjectMappingException e) {
+			}
+		}
+	}
+
+	/**
 	 * Get channels matching names.
 	 */
 	public List<ChatChannel> getChannels(Collection<String> names, boolean startWith) {

@@ -313,6 +313,9 @@ public class TextUtils {
 		return (int) Math.ceil((double) getWidth(text, false) / LINE_WIDTH);
 	}
 
+	/**
+	 * Pattern to match against color codes.
+	 */
 	public static final Pattern COLOR_PATTERN = Utils.compile("\\&[a-f0-9]", Pattern.CASE_INSENSITIVE);
 
 	/**
@@ -350,34 +353,59 @@ public class TextUtils {
 		return b.build();
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of() {
 		return Text.of();
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of(char character) {
 		return Text.of(character);
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of(Translation t, Object... args) {
 		return Text.of("").concat(Text.of(t, args));
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of(Translatable t, Object... args) {
 		return Text.of("").concat(Text.of(t, args));
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of(Selector sel) {
 		return Text.of(sel);
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of(Score score) {
 		return Text.of(score);
 	}
 
+	/**
+	 * Create a new text object. Unlike normal creation, TextActions will not be
+	 * applied to children.
+	 */
 	public static Text of(Object... contents) {
 		return Text.of("").concat(Text.of(contents));
 	}
 
+	/**
+	 * Create a new text object.
+	 */
 	public static Text of(String s) {
 		return Text.of(s);
 	}
@@ -1711,7 +1739,7 @@ public class TextUtils {
 	}
 
 	/**
-	 * check to see if a text has string content
+	 * Check to see if a text has string content.
 	 */
 	public static boolean hasContent(final Text text) {
 		if (text.isEmpty()) {
@@ -1732,7 +1760,7 @@ public class TextUtils {
 	}
 
 	/**
-	 * Merge the content of two texts into one text object
+	 * Merge the content of two texts into one text object.
 	 */
 	public static Text merge(Text one, Text two) {
 		if (one == null || two == null) {

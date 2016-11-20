@@ -47,6 +47,9 @@ import me.Wundero.Ray.utils.Utils;
  SOFTWARE.
  */
 
+/**
+ * Textual chat interface class. Holds bordered text in a tab-esque format.
+ */
 public abstract class Menu {
 
 	protected static final int MAX_LINES = 18;
@@ -60,20 +63,38 @@ public abstract class Menu {
 	protected Text title = null;
 	protected Text pathTitle = Text.of();
 
+	/**
+	 * Set the title of this menu.
+	 */
 	public void setTitle(Text title) {
 		this.title = title;
 	}
 
+	/**
+	 * Get the UUID of the player for whom this menu exists.
+	 */
 	public UUID getHolderUUID() {
 		return holderUUID;
 	}
 
+	/**
+	 * Render the main section of text.
+	 */
 	public abstract List<Text> renderBody();
 
+	/**
+	 * Render the header of text.
+	 */
 	public abstract List<Text> renderHeader();
 
+	/**
+	 * Render the footer of text.
+	 */
 	public abstract List<Text> renderFooter();
 
+	/**
+	 * Create a new menu.
+	 */
 	public Menu(Player player) {
 		this.holder = new WeakReference<Player>(player);
 		this.holderUUID = player.getUniqueId();
@@ -81,6 +102,9 @@ public abstract class Menu {
 		this.source = Optional.empty();
 	}
 
+	/**
+	 * Create a new menu.
+	 */
 	public Menu(Player player, Menu from) {
 		this(player);
 		this.source = Optional.of(from);
@@ -110,14 +134,20 @@ public abstract class Menu {
 		builder.sendTo(getPlayer().orElseThrow(() -> new IllegalArgumentException("Player must be online!")));
 	}
 
+	/**
+	 * Reload the weak reference player to the new object.
+	 */
 	public void updatePlayer(Player p) {
 		if (p.getUniqueId().equals(this.holderUUID)) {
 			this.holder = new WeakReference<Player>(p);
 		}
 	}
 
+	/**
+	 * Get the holder, if present.
+	 */
 	public Optional<Player> getPlayer() {
-		if (holder.get() == null) {
+		if (holder == null || holder.get() == null) {
 			Optional<User> u = Utils.getUser(holderUUID);
 			if (!u.isPresent()) {
 				return Optional.empty();
@@ -203,6 +233,9 @@ public abstract class Menu {
 		send();
 	}
 
+	/**
+	 * Send rendered content to the holder.
+	 */
 	public void send() {
 		List<Text> header = renderHeader();
 		List<Text> body = renderBody();

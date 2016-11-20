@@ -43,6 +43,9 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 
+/**
+ * Execute the "info" format context.
+ */
 public class InfoCommand implements CommandExecutor {
 
 	@Override

@@ -34,6 +34,9 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.framework.player.RayPlayer;
 
+/**
+ * Toggle whether or not you are spying on messages.
+ */
 public class SpyCommand implements CommandExecutor {
 
 	@Override

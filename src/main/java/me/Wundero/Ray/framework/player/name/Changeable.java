@@ -28,6 +28,9 @@ package me.Wundero.Ray.framework.player.name;
  */
 public interface Changeable {
 
+	/**
+	 * Reset changes.
+	 */
 	void clear();
 
 }

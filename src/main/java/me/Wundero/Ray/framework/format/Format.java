@@ -59,6 +59,9 @@ public abstract class Format {
 	protected FormatLocation loc = FormatLocations.CHAT;
 	private Optional<ConfigurationNode> node;
 
+	/**
+	 * Compare formats.
+	 */
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof Format && ((Format) o).name.equals(this.name);
@@ -233,7 +236,8 @@ public abstract class Format {
 	 * Provided send method in case all that needs to be done is send a text
 	 * object to the location.
 	 */
-	protected boolean s(MessageReceiver target, Map<String, Object> a, TextTemplate t, Optional<Object> sender, Optional<UUID> uuid) {
+	protected boolean s(MessageReceiver target, Map<String, Object> a, TextTemplate t, Optional<Object> sender,
+			Optional<UUID> uuid) {
 		Text te = get(t, a);
 		te = TextUtils.vars(te, new ParsableData().setKnown(a));
 		te = TextUtils.urls(te);
@@ -244,7 +248,8 @@ public abstract class Format {
 	 * Provided send method in case all that needs to be done is send a text
 	 * object to the location.
 	 */
-	protected boolean s(MessageReceiver target, ParsableData d, TextTemplate t, Optional<Object> sender, Optional<UUID> uuid) {
+	protected boolean s(MessageReceiver target, ParsableData d, TextTemplate t, Optional<Object> sender,
+			Optional<UUID> uuid) {
 		Text te = get(t, d);
 		te = TextUtils.vars(te, d);
 		te = TextUtils.urls(te);
@@ -255,7 +260,8 @@ public abstract class Format {
 	 * Provided send method in case all that needs to be done is send a text
 	 * object to the location.
 	 */
-	protected boolean s(MessageReceiver target, Map<String, Object> a, Text te, Optional<Object> sender, Optional<UUID> uuid) {
+	protected boolean s(MessageReceiver target, Map<String, Object> a, Text te, Optional<Object> sender,
+			Optional<UUID> uuid) {
 		te = TextUtils.vars(te, new ParsableData().setKnown(a));
 		te = TextUtils.urls(te);
 		return loc.send(te, target, this, sender, uuid);
@@ -270,7 +276,7 @@ public abstract class Format {
 		te = TextUtils.urls(te);
 		return loc.send(te, target, this, sender, uuid);
 	}
-	
+
 	/**
 	 * Provided send method in case all that needs to be done is send a text
 	 * object to the location.
@@ -372,6 +378,9 @@ public abstract class Format {
 		return buildFormat(node, new StaticFormat(node), event, cmd, ex);
 	}
 
+	/**
+	 * Note: recursive
+	 */
 	private static Format buildFormat(ConfigurationNode node, Format towrap, boolean event, boolean command,
 			boolean ex) {
 		Format out = towrap;

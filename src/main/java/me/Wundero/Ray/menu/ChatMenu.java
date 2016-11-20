@@ -44,8 +44,14 @@ import me.Wundero.Ray.utils.RayCollectors;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
+/**
+ * Represents a menu to which chat messages can be sent.
+ */
 public class ChatMenu extends Menu {
 
+	/**
+	 * Holds a text object in memory for the chat menu.
+	 */
 	private static class TextHolder implements Comparable<TextHolder> {
 		private Text text;
 		private UUID uuid;
@@ -86,16 +92,22 @@ public class ChatMenu extends Menu {
 		}
 	}
 
+	/**
+	 * Set this as an inactive menu.
+	 */
 	public void deactive() {
 		this.active = false;
 	}
 
+	/**
+	 * Set this as an active menu.
+	 */
 	public void activate() {
 		this.active = true;
 		this.unread = 0;
 	}
 
-	// NOTE: UNORDERED LIST
+	// NOTE: UNORDERED LISTS
 	private List<TextHolder> messages = Utils.sl();
 	private List<TextHolder> removed = Utils.sl();
 	private Map<UUID, Text> replaced = Utils.sm();
@@ -104,10 +116,16 @@ public class ChatMenu extends Menu {
 	private ChatChannel srcChannel = null;
 	private int unread = 0;
 
+	/**
+	 * @return the channel this menu holds messages for.
+	 */
 	public ChatChannel getChannel() {
 		return srcChannel;
 	}
 
+	/**
+	 * Create a new chat menu.
+	 */
 	public ChatMenu(Player player, Menu from, String name, ChatChannel src) {
 		super(player, from);
 		this.fillSpacesFromTop = true;
@@ -117,6 +135,9 @@ public class ChatMenu extends Menu {
 		this.srcChannel = src;
 	}
 
+	/**
+	 * Create a new chat menu.
+	 */
 	public ChatMenu(Player player, String name, ChatChannel src) {
 		super(player);
 		this.srcChannel = src;
@@ -234,6 +255,9 @@ public class ChatMenu extends Menu {
 		return h;
 	}
 
+	/**
+	 * Get the list of texts to display, in order.
+	 */
 	public List<Text> getSorted() {
 		List<TextHolder> other = Utils.al();
 		synchronized (messages) {
@@ -356,6 +380,9 @@ public class ChatMenu extends Menu {
 		return getPlayer().get().hasPermission(s);
 	}
 
+	/**
+	 * Add a message to the menu.
+	 */
 	public void addMessage(CommandSource sender, Text message, UUID uuid) {
 		incIndices();
 		if (sender.hasPermission("ray.removemessage.exempt") || !hasPerm("ray.removemessage")) {
@@ -370,6 +397,9 @@ public class ChatMenu extends Menu {
 		sendOrUnread();
 	}
 
+	/**
+	 * @return whether the menu is active.
+	 */
 	public boolean isActive() {
 		return active;
 	}
@@ -382,6 +412,9 @@ public class ChatMenu extends Menu {
 		}
 	}
 
+	/**
+	 * Send the messages to a player.
+	 */
 	@Override
 	public void send() {
 		if (!active) {

@@ -43,6 +43,9 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.utils.TextUtils;
 
+/**
+ * Execute the "broadcast" format context.
+ */
 public class BroadcastCommand implements CommandExecutor {
 
 	@Override

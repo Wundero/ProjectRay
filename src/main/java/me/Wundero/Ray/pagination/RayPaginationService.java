@@ -62,6 +62,11 @@ import me.Wundero.Ray.Ray;
  SOFTWARE.
  */
 
+/**
+ * Replacement for SpongePaginationService. Enhancements over the original
+ * include scrolling pages and \n character support. For documentation see
+ * SpongeCommon.
+ */
 public class RayPaginationService implements PaginationService {
 
 	static class SourcePaginations {

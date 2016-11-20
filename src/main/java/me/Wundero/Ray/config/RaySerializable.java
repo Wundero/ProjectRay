@@ -32,8 +32,14 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  */
 public interface RaySerializable {
 
+	/**
+	 * Save the current object onto a node.
+	 */
 	public void serialize(ConfigurationNode onto) throws ObjectMappingException;
 
+	/**
+	 * Load the current object from a node.
+	 */
 	public void deserialize(ConfigurationNode from) throws ObjectMappingException;
 
 }

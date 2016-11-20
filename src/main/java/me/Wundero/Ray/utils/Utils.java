@@ -111,12 +111,19 @@ public class Utils {
 	public static ConfigurationNode load(File config) {
 		return load(config.toPath());
 	}
-	
+
 	/**
 	 * Random optional uuid.
 	 */
 	public static Optional<UUID> presentUUID() {
 		return wrap(UUID.randomUUID());
+	}
+
+	/**
+	 * Apply a function to all objects in a list.
+	 */
+	public static <T> List<T> applyToAll(List<T> original, Function<T, T> function) {
+		return original.stream().map(function).collect(RayCollectors.rayList());
 	}
 
 	/**
@@ -1398,6 +1405,9 @@ public class Utils {
 		return u2;
 	}
 
+	/**
+	 * Create a mapping of indices to objects from a list of objects.
+	 */
 	public static <T> Map<Integer, T> from(List<T> list) {
 		Map<Integer, T> out = hm();
 		for (int i = 0; i < list.size(); i++) {
@@ -1406,6 +1416,12 @@ public class Utils {
 		return out;
 	}
 
+	/**
+	 * Create a list of objects from a mapping of indices to objects. all
+	 * integer values are allowed, but only sensible ones will be added. If the
+	 * indices are not incremental, a sparse list will be returned. That is,
+	 * values without index mappings will be null.
+	 */
 	public static <T> List<T> from(Map<Integer, T> map) {
 		List<T> out = al();
 		List<Integer> order = al(map.keySet(), true);
@@ -1437,6 +1453,9 @@ public class Utils {
 		return out;
 	}
 
+	/**
+	 * Turn a list of lists into a singular list.
+	 */
 	public static <T> List<T> flatten(List<List<T>> list) {
 		List<T> out = al();
 		for (List<T> l : list) {

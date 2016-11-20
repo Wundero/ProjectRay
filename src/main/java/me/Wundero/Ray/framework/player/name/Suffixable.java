@@ -32,7 +32,13 @@ import org.spongepowered.api.text.Text;
  */
 public interface Suffixable extends Changeable {
 
+	/**
+	 * Set the suffix.
+	 */
 	boolean suffix(Text suffix);
 
+	/**
+	 * Get the suffix if it has been successfully set.
+	 */
 	Optional<Text> suffix();
 }

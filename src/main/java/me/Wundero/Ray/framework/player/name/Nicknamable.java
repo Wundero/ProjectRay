@@ -32,9 +32,18 @@ import org.spongepowered.api.text.Text;
  */
 public interface Nicknamable extends Changeable {
 
+	/**
+	 * Set a nickname.
+	 */
 	boolean nickname(Text nickname);
 
+	/**
+	 * Get the original text.
+	 */
 	Text original();
 
+	/**
+	 * Get the nickname if it has been successfully set.
+	 */
 	Optional<Text> nickname();
 }

@@ -3,7 +3,7 @@ package me.Wundero.Ray.translation;
 import java.util.Locale;
 import java.util.Map;
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
@@ -44,7 +44,7 @@ public class Translator {
 	/**
 	 * Create a new, player-specific translator.
 	 */
-	public Translator(Player p) {
+	public Translator(CommandSource p) {
 		l = p.getLocale();
 		messages = I18n.get(l, true);
 	}

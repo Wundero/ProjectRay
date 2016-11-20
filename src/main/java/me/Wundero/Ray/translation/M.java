@@ -23,23 +23,29 @@ package me.Wundero.Ray.translation;
  SOFTWARE.
  */
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 
 public class M {
 
-	public static void sm(Player p, String key, Object... args) {
+	/**
+	 * Send a message to the source.
+	 */
+	public static void sm(CommandSource p, String key, Object... args) {
 		Translator t = new Translator(p);
 		Text prefix = t.t("plugin.prefix");
 		m(prefix, t, p, key, args);
 	}
 
-	private static void m(Text m, Translator t, Player p, String k, Object... args) {
+	private static void m(Text m, Translator t, CommandSource p, String k, Object... args) {
 		Text b = t.t(k, args);
 		p.sendMessage(m.toBuilder().append(b).build());
 	}
 
-	public static void pm(Player p, Text prefix, String key, Object... args) {
+	/**
+	 * Send a message to the source with the given prefix.
+	 */
+	public static void pm(CommandSource p, Text prefix, String key, Object... args) {
 		m(prefix, new Translator(p), p, key, args);
 	}
 

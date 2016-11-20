@@ -43,6 +43,9 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 
+/**
+ * Execute the "rules" format context.
+ */
 public class RulesCommand implements CommandExecutor {
 
 	@Override

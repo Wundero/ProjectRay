@@ -35,9 +35,9 @@ import java.util.function.Consumer;
 
 /**
  * Immutable implementation of Deque. Used only for ArRayDeque to allow for
- * proper iter
+ * proper iteration.
  */
-public class ImmutableDeque<E> implements Deque<E> {
+class ImmutableDeque<E> implements Deque<E> {
 
 	private Deque<E> wrapped;
 	Object[] elements;

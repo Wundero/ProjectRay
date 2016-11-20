@@ -67,6 +67,9 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	private ConfigurationNode node;
 	private Role defRole = Role.GUEST;
 
+	/**
+	 * Returns a collection of members currently in the channel.
+	 */
 	@Override
 	public Collection<MessageReceiver> getMembers() {
 		return members;
@@ -175,6 +178,9 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 				.map((r) -> ((Player) r).getUniqueId()).distinct().count();
 	}
 
+	/**
+	 * Remove a member with the specified uuid.
+	 */
 	public boolean removeMember(UUID u) {
 		Optional<User> ou = Utils.getUser(u);
 		if (!ou.isPresent()) {
@@ -188,6 +194,9 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		return false;
 	}
 
+	/**
+	 * Add a member to the channel.
+	 */
 	public boolean addMember(MessageReceiver member, Optional<String> password) {
 		if (!this.password.isPresent() || this.password.get().isEmpty()) {
 			return addMember(member);
@@ -204,9 +213,15 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		}
 	}
 
+	/**
+	 * Check to see if the member is already joined. On leave and join, new
+	 * MessageReceiver objs are created for players, so uuids are also checked.
+	 * Return TRUE if .equals is true. Return UNDEFINED if uuids are equal.
+	 * Return FALSE otherwise.
+	 */
 	private Tristate containsMember(MessageReceiver r) {
 		for (MessageReceiver re : members) {
-			if (re == r) {
+			if (re.equals(r)) {
 				return Tristate.TRUE;
 			}
 			if (re instanceof Player && r instanceof Player) {
@@ -220,6 +235,10 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		return Tristate.FALSE;
 	}
 
+	/**
+	 * Deprecated because password method is preferred. Add member to the
+	 * channel.
+	 */
 	@Deprecated
 	@Override
 	public boolean addMember(MessageReceiver member) {
@@ -227,6 +246,7 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 		if (cm == Tristate.TRUE) {
 			return false;
 		} else if (cm == Tristate.UNDEFINED) {
+			// undefined means the member is definitely a player.
 			UUID u = ((Player) member).getUniqueId();
 			MessageReceiver old = null;
 			for (MessageReceiver r : members) {

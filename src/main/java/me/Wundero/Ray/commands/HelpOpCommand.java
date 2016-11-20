@@ -46,6 +46,9 @@ import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.utils.RayCollectors;
 import me.Wundero.Ray.utils.TextUtils;
 
+/**
+ * Execute the "helpop" format context.
+ */
 public class HelpOpCommand implements CommandExecutor {
 
 	@Override

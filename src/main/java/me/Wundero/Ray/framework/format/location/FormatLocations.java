@@ -106,6 +106,10 @@ public class FormatLocations {
 		}
 	}
 
+	/**
+	 * Send a message to the chat. If chat menus are being used, try to put the
+	 * message in a menu.
+	 */
 	public static final FormatLocation CHAT = new FormatLocation("chat") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
@@ -150,6 +154,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text to the scoreboard.
+	 */
 	public static final FormatLocation SCOREBOARD = new FormatLocation("scoreboard") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
@@ -158,8 +165,10 @@ public class FormatLocations {
 		}
 	};
 
-	/***
-	 * Requires '\n' to be in the text object at some point.
+	/**
+	 * Send a title/subtitle combo. NOTE: Requires '\n' to be present. If more
+	 * than one is present, anything beyond and including the second one will be
+	 * ignored.
 	 */
 	public static final FormatLocation TITLE_SUBTITLE = new FormatLocation("title_subtitle") {
 		@Override
@@ -172,7 +181,9 @@ public class FormatLocations {
 				return false;
 			}
 			if (f == null || !f.getNode().isPresent()) {
-				return false;
+				Player p = (Player) target;
+				p.sendTitle(Title.builder().title(tx.get(0)).subtitle(tx.get(1)).fadeIn(0).stay(10).fadeOut(0).build());
+				return true;
 			}
 			ConfigurationNode n = f.getNode().get().getNode("location-data");
 			int i = n.getNode("fade-in").getInt(0);
@@ -183,6 +194,10 @@ public class FormatLocations {
 			return true;
 		}
 	};
+
+	/**
+	 * Send a text as a subtitle.
+	 */
 	public static final FormatLocation SUBTITLE = new FormatLocation("subtitle") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
@@ -190,7 +205,9 @@ public class FormatLocations {
 				return false;
 			}
 			if (f == null || !f.getNode().isPresent()) {
-				return false;
+				Player p = (Player) target;
+				p.sendTitle(Title.builder().subtitle(text).fadeIn(0).stay(10).fadeOut(0).build());
+				return true;
 			}
 			ConfigurationNode n = f.getNode().get().getNode("location-data");
 			int i = n.getNode("fade-in").getInt(0);
@@ -202,6 +219,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text as a title.
+	 */
 	public static final FormatLocation TITLE = new FormatLocation("title") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
@@ -209,7 +229,9 @@ public class FormatLocations {
 				return false;
 			}
 			if (f == null || !f.getNode().isPresent()) {
-				return false;
+				Player p = (Player) target;
+				p.sendTitle(Title.builder().title(text).fadeIn(0).stay(10).fadeOut(0).build());
+				return true;
 			}
 			ConfigurationNode n = f.getNode().get().getNode("location-data");
 			int i = n.getNode("fade-in").getInt(0);
@@ -221,6 +243,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text to the bossbar.
+	 */
 	public static final FormatLocation BOSSBAR = new FormatLocation("bossbar") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
@@ -288,6 +313,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text to the actionbar.
+	 */
 	public static final FormatLocation ACTIONBAR = new FormatLocation("actionbar") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> operatable,
@@ -301,6 +329,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text as a player name. Requires Optional<Object> to be present.
+	 */
 	public static final FormatLocation TAB_ENTRY = new FormatLocation("tab_entry") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u) {
@@ -322,6 +353,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text to the footer.
+	 */
 	public static final FormatLocation TAB_FOOTER = new FormatLocation("tab_footer") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
@@ -334,6 +368,9 @@ public class FormatLocations {
 		}
 	};
 
+	/**
+	 * Send a text to the header.
+	 */
 	public static final FormatLocation TAB_HEADER = new FormatLocation("tab_header") {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {

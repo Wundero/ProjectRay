@@ -44,6 +44,9 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.utils.TextUtils;
 
+/**
+ * Execute the "action" context.
+ */
 public class ActionCommand implements CommandExecutor {
 
 	@Override

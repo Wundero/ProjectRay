@@ -152,11 +152,6 @@ public class Ray {
 		this.setConfig(plugin.getConfig());
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
-		if (channels.useChannels()) {
-			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
-		} else {
-			this.setUseChatMenus(false);
-		}
 		this.setTags(new TagStore());
 		this.setCache(new UserCache());
 		this.setPaginationService(new RayPaginationService());
@@ -172,6 +167,11 @@ public class Ray {
 			channels.load(Utils.load(f));
 		} catch (Exception e) {
 			Utils.printError(e);
+		}
+		if (channels.useChannels()) {
+			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
+		} else {
+			this.setUseChatMenus(false);
 		}
 		try {
 			this.setEcon(Sponge.getServiceManager().provide(EconomyService.class)
@@ -211,6 +211,7 @@ public class Ray {
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
+		this.getChannels().save();
 		for (ConfigurationLoader<?> loader : toSave.keySet()) {
 			try {
 				ConfigurationNode node = toSave.get(loader);
@@ -514,7 +515,7 @@ public class Ray {
 	}
 
 	/**
-	 * @return the useChatMenus
+	 * @return whether to use chat menus
 	 */
 	public boolean isUseChatMenus() {
 		return useChatMenus;
@@ -522,7 +523,7 @@ public class Ray {
 
 	/**
 	 * @param useChatMenus
-	 *            the useChatMenus to set
+	 *            set whether to use chat menus
 	 */
 	private void setUseChatMenus(boolean useChatMenus) {
 		this.useChatMenus = useChatMenus;
