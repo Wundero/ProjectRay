@@ -47,6 +47,7 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
@@ -122,8 +123,9 @@ public class Utils {
 	/**
 	 * Apply a function to all objects in a list.
 	 */
-	public static <T> List<T> applyToAll(List<T> original, Function<T, T> function) {
-		return original.stream().map(function).collect(RayCollectors.rayList());
+	public static <T, C extends Collection<T>> Collection<T> applyToAll(Collection<T> original, Function<T, T> function,
+			Supplier<C> factory) {
+		return original.stream().map(function).collect(Collectors.toCollection(factory));
 	}
 
 	/**
@@ -282,6 +284,20 @@ public class Utils {
 			b.async();
 		}
 		return b.submit(Ray.get().getPlugin());
+	}
+
+	/**
+	 * Get the permissionservice set option for a player.
+	 */
+	public static String getOption(Player p, String opt) {
+		return p.getOption(opt).orElse(null);
+	}
+
+	/**
+	 * Get the permissionservice set option for a player as a text object.
+	 */
+	public static Text getOption(Player p, String opt, boolean text) {
+		return TextSerializers.FORMATTING_CODE.deserialize(p.getOption(opt).orElse(""));
 	}
 
 	/**

@@ -641,6 +641,14 @@ public class RayPlayer implements Socialable {
 			}
 			return c && s;
 		}, " ");
+		if (Utils.wrap2(Utils.getOption(getPlayer().get(), "prefix"), s -> s.isPresent() && !s.get().isEmpty())
+				.isPresent()) {
+			this.setPrefix(Utils.getOption(getPlayer().get(), "prefix", true));
+		}
+		if (Utils.wrap2(Utils.getOption(getPlayer().get(), "suffix"), s -> s.isPresent() && !s.get().isEmpty())
+				.isPresent()) {
+			this.setSuffix(Utils.getOption(getPlayer().get(), "suffix", true));
+		}
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
 		File f = new File(p, u.getUniqueId() + ".conf");
 		if (!p.exists()) {
