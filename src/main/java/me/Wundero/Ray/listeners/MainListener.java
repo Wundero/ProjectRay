@@ -23,12 +23,16 @@ package me.Wundero.Ray.listeners;
  SOFTWARE.
  */
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -49,8 +53,10 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.channel.impl.DelegateMessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
@@ -67,6 +73,7 @@ import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.menu.ChatMenu;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -76,6 +83,60 @@ import me.Wundero.Ray.variables.ParsableData;
  */
 public class MainListener {
 
+	/**
+	 * Send event messages to a menu if present.
+	 */
+	private static class MenuWrapperChannel extends DelegateMessageChannel {
+
+		public MenuWrapperChannel(MessageChannel delegate) {
+			super(delegate);
+		}
+
+		@Override
+		public void send(@Nullable Object sender, Text original, ChatType type) {
+			checkNotNull(original, "original text");
+			checkNotNull(type, "type");
+			UUID randUUID = UUID.randomUUID();
+			for (MessageReceiver member : this.getMembers()) {
+				if (member instanceof Player && sender != null && sender instanceof CommandSource
+						&& Ray.get().isUseChatMenus()) {
+					Optional<Text> msg = this.transformMessage(sender, member, original, type);
+					if (msg.isPresent()) {
+						if (sender instanceof Player) {
+							ChatMenu menu = RayPlayer.get((Player) sender).getActiveChannel().getMenus()
+									.get(((Player) member).getUniqueId());
+							if (menu != null) {
+								menu.addMessage((Player) sender, msg.get(), randUUID);
+							} else {
+								RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender,
+										msg.get(), randUUID);
+							}
+						} else if (sender instanceof UUID) {
+							ChatMenu menu = RayPlayer.get((UUID) sender).getActiveChannel().getMenus()
+									.get(((Player) member).getUniqueId());
+							if (menu != null) {
+								menu.addMessage((Player) sender, msg.get(), randUUID);
+							} else {
+								RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender,
+										msg.get(), randUUID);
+							}
+						} else {
+							RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender, msg.get(),
+									randUUID);
+						}
+					}
+				} else {
+					if (member instanceof ChatTypeMessageReceiver) {
+						this.transformMessage(sender, member, original, type)
+								.ifPresent(text -> ((ChatTypeMessageReceiver) member).sendMessage(type, text));
+					} else {
+						this.transformMessage(sender, member, original, type).ifPresent(member::sendMessage);
+					}
+				}
+			}
+		}
+	}
+
 	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel) {
 		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
@@ -84,12 +145,17 @@ public class MainListener {
 	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip, Optional<String> formatName,
 			Optional<Player> observer) {
+		if (e == null) {
+			return Tristate.TRUE;
+		}
 		if (p == null) {
+			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel())));
 			return Tristate.UNDEFINED;
 		}
 		RayPlayer r = RayPlayer.getRay(p);
 		Group g = r.getActiveGroup();
 		if (g == null) {
+			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel())));
 			return Tristate.UNDEFINED;
 		}
 		FormatCollection fx;
@@ -99,6 +165,7 @@ public class MainListener {
 			fx = g.getFormats(t);
 		}
 		if (fx == null || fx.isEmpty()) {
+			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel())));
 			return Tristate.UNDEFINED;
 		}
 		final FormatCollection f = fx;
@@ -118,7 +185,6 @@ public class MainListener {
 			@Override
 			public Optional<Text> transformMessage(Object sender, MessageReceiver recipient, Text original,
 					ChatType type) {
-				System.out.println("parsing");
 				Map<String, Object> mc = Utils.hm(args);
 				if (recipient instanceof Player && sender instanceof Player) {
 					Player s = (Player) sender;
@@ -171,7 +237,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires chat context unless cause contains a separate context
+	 * Fires chat context unless cause contains a separate context.
 	 */
 	@Listener
 	public void onChat(MessageChannelEvent.Chat event) {
@@ -231,7 +297,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires AFK context
+	 * Fires AFK context.
 	 */
 	@Listener(order = Order.POST)
 	public void onAFK(AfkEvent event) {
@@ -258,7 +324,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires join, motd, welcome and tab based contexts
+	 * Fires join, motd, welcome and tab based contexts.
 	 */
 	@Listener(order = Order.LATE)
 	public void onJoin(ClientConnectionEvent.Join event) {
@@ -412,7 +478,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires the leave context
+	 * Fires the leave context.
 	 */
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
@@ -427,7 +493,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires the kick context
+	 * Fires the kick context. -Sponge has not implemented this yet.
 	 */
 	@Listener
 	public void onKick(KickPlayerEvent event) {
@@ -442,7 +508,7 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires the achievement context
+	 * Fires the achievement context. -Sponge has not implemented this yet.
 	 */
 	@Listener
 	public void onAch(GrantAchievementEvent.TargetPlayer event) {

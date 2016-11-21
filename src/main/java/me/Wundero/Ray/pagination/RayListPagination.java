@@ -114,6 +114,7 @@ class RayListPagination extends RayActivePagination {
 			List<Text> c1 = mod.get(i);
 			List<Text> c2 = mod.get(i - 1);
 			while (x > 0) {
+				// somehow this works for all cases
 				c1.add(0, c2.remove(c2.size() - 1));
 				x--;
 			}
