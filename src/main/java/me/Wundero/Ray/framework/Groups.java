@@ -66,6 +66,13 @@ public class Groups {
 	}
 
 	/**
+	 * Clear all group references.
+	 */
+	public void terminate() {
+		groups.clear();
+	}
+
+	/**
 	 * Loads groups into memory from file.
 	 */
 	public Group load(ConfigurationNode groupNode) {

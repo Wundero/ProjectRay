@@ -144,6 +144,41 @@ public class Ray {
 	}
 
 	/**
+	 * Reload singleton instances.
+	 */
+	public void reload(ProjectRay plugin) {
+		this.setConfig(plugin.getConfig());
+		this.getGroups().terminate();
+		this.setGroups(null);
+		try {
+			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
+			if (!f.exists()) {
+				f.getParentFile().mkdirs();
+				f.createNewFile();
+			} else if (f.isDirectory()) {
+				f.delete();
+				f.createNewFile();
+			}
+			channels.load(Utils.load(f));
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
+		if (channels.useChannels()) {
+			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
+		} else {
+			this.setUseChatMenus(false);
+		}
+		try {
+			this.setEcon(Sponge.getServiceManager().provide(EconomyService.class)
+					.orElseThrow(() -> new NullPointerException("Escape")));
+		} catch (Exception e) {
+			this.setEcon(null);
+		}
+		new AfkListener(config.getNode("afk", "timer").getInt(-1), config.getNode("afk", "kick").getInt(-1),
+				config.getNode("afk", "cancel-movement").getBoolean(false));
+	}
+	
+	/**
 	 * Load singleton instances from the main plugin class
 	 */
 	public void load(ProjectRay plugin) {

@@ -11,8 +11,8 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -53,7 +53,6 @@ import me.Wundero.Ray.config.Template;
 import me.Wundero.Ray.config.Templates;
 import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.framework.channel.ChatChannel;
-import me.Wundero.Ray.listeners.AfkListener;
 import me.Wundero.Ray.listeners.ChatChannelListener;
 import me.Wundero.Ray.listeners.MainListener;
 import me.Wundero.Ray.utils.Utils;
@@ -242,11 +241,21 @@ public class ProjectRay {
 	public void onStart(GameInitializationEvent event) {
 		// registering listeners and loading singleton classes (safely-ish)
 		loadConfig();
-		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().load(this);
 		Ray.get().setGroups(new Groups(config.getNode("worlds")));
+	}
+
+	/**
+	 * Fired when the command /reload is fired.
+	 */
+	@Listener
+	public void onReload(GameReloadEvent event) {
+		Sponge.getEventManager().unregisterPluginListeners(this);
+		loadConfig();
+		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
-		new AfkListener(300, -1, false);// TODO load values
+		Ray.get().reload(this);
+		Ray.get().setGroups(new Groups(config.getNode("worlds")));
 	}
 
 	/**
@@ -260,10 +269,12 @@ public class ProjectRay {
 	}
 
 	/**
-	 * Register all commands
+	 * Register all commands & listeners
 	 */
 	@Listener
-	public void registerCommandEvent(GameStartingServerEvent event) {
+	public void registerEvent(GameInitializationEvent event) {
+		Sponge.getEventManager().registerListeners(this, new MainListener());
+		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
 		// register all commands. Might make this neater in the future.
 		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
 				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();
