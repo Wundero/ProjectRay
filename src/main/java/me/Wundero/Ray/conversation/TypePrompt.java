@@ -164,13 +164,19 @@ public abstract class TypePrompt<T> extends Prompt {
 	public abstract Prompt onTypeInput(T object, String text, ConversationContext context);
 
 	/**
+	 * Return the type class from a string.
+	 */
+	protected T get(Optional<Option> selected) {
+		return type.isPresent() && selected.isPresent() ? type.get().cast(selected.get().getValue()) : null;
+	}
+
+	/**
 	 * Parse the input and have the extending classes handle the object based
 	 * input.
 	 */
 	@Override
 	public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-		return onTypeInput(type.isPresent() && selected.isPresent() ? type.get().cast(selected.get().getValue()) : null,
-				text, context);
+		return onTypeInput(get(selected), text, context);
 	}
 
 }
