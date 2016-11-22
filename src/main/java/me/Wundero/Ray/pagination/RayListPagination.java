@@ -104,6 +104,14 @@ class RayListPagination extends RayActivePagination {
 		}
 		int lineDiff = this.getMaxContentLinesPerPage() - currentPageLines;
 		List<List<Text>> mod = Utils.al(pages, true);
+		/*
+		 * Note to self: This works like this:
+		 * 
+		 * 876/543/21-----------------------------------------------------------------
+		 * 876/54/321-----------------------------------------------------------------
+		 * 87/654/321-----------------------------------------------------------------
+		 * x87/654/321----------------------------------------------------------------
+		 */
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			if (i == 0) {
 				List<Text> c = mod.get(i);
@@ -114,7 +122,6 @@ class RayListPagination extends RayActivePagination {
 			List<Text> c1 = mod.get(i);
 			List<Text> c2 = mod.get(i - 1);
 			while (x > 0) {
-				// somehow this works for all cases
 				c1.add(0, c2.remove(c2.size() - 1));
 				x--;
 			}
