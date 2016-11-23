@@ -70,6 +70,13 @@ public abstract class Menu {
 		this.title = title;
 	}
 
+	protected boolean hasPerm(String s) {
+		if (!getPlayer().isPresent()) {
+			return false;
+		}
+		return getPlayer().get().hasPermission(s);
+	}
+	
 	/**
 	 * Get the UUID of the player for whom this menu exists.
 	 */

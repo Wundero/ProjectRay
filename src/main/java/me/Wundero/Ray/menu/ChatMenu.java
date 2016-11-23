@@ -26,8 +26,11 @@ package me.Wundero.Ray.menu;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -56,11 +59,13 @@ public class ChatMenu extends Menu {
 		private Text text;
 		private UUID uuid;
 		private int id;
+		private final Optional<CommandSource> source;
 
-		public TextHolder(Text message, UUID uuid, int id) {
+		public TextHolder(Text message, UUID uuid, int id, @Nullable CommandSource src) {
 			this.text = message;
 			this.uuid = uuid;
 			this.id = id;
+			this.source = Utils.wrap(src, src instanceof Player);
 		}
 
 		public Text getText() {
@@ -170,7 +175,7 @@ public class ChatMenu extends Menu {
 		modIndices(-1);
 	}
 
-	protected Text restore(UUID original) {
+	public Text restore(UUID original) {
 		if (replaced.containsKey(original)) {
 			return replace(original, replaced.get(original));
 		} else {
@@ -187,7 +192,7 @@ public class ChatMenu extends Menu {
 		}
 	}
 
-	protected void insert(TextHolder h) {
+	public void insert(TextHolder h) {
 		synchronized (messages) {
 			messages.add(h.id, h);
 			final int id = h.id();
@@ -206,7 +211,7 @@ public class ChatMenu extends Menu {
 		}
 	}
 
-	protected Text replace(UUID original, Text with) {
+	public Text replace(UUID original, Text with) {
 		int index = indexOf(original);
 		Text out = messages.get(index).text;
 		TextHolder h = messages.get(index);
@@ -230,7 +235,16 @@ public class ChatMenu extends Menu {
 		return -1;
 	}
 
-	protected TextHolder remove(UUID u) {
+	protected TextHolder get(UUID u) {
+		int i = indexOf(u);
+		if (i >= 0) {
+			return messages.get(i);
+		} else {
+			return null;
+		}
+	}
+
+	public TextHolder remove(UUID u) {
 		if (!getPlayer().isPresent()) {
 			return null;
 		}
@@ -250,6 +264,7 @@ public class ChatMenu extends Menu {
 				}
 			}).collect(RayCollectors.syncList());
 			addSpace();
+			sendOrUnread();
 		}
 		removed.add(h);
 		return h;
@@ -276,7 +291,7 @@ public class ChatMenu extends Menu {
 
 	protected void addSpace() {
 		synchronized (messages) {
-			messages.add(new TextHolder(TextUtils.SPACE(), UUID.randomUUID(), 99));
+			messages.add(new TextHolder(TextUtils.SPACE(), UUID.randomUUID(), 99, null));
 		}
 	}
 
@@ -341,6 +356,25 @@ public class ChatMenu extends Menu {
 		}
 	}
 
+	protected Text manageButton(UUID u) {
+		return Text.of("")
+				.concat(Text.of(TextColors.YELLOW,
+						TextActions.showText(Text.of(TextColors.AQUA, "Click to manage this message!")),
+						TextActions.executeCallback(src -> {
+							if (src instanceof Player) {
+								TextHolder h = get(u);
+								if (h.source.isPresent()) {
+									this.deactive();
+									new MessageOptionsMenu((Player) src, this, h.text, u, (Player) h.source.get(),
+											this.srcChannel).send();
+								}
+
+							} else {
+								src.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
+							}
+						}), "[*]"));
+	}
+
 	protected Text removeButton(UUID u) {
 		return TextUtils.of(TextColors.RED, removeAction(u), removeHover(), "[X]");
 	}
@@ -373,25 +407,18 @@ public class ChatMenu extends Menu {
 		}
 	}
 
-	private boolean hasPerm(String s) {
-		if (!getPlayer().isPresent()) {
-			return false;
-		}
-		return getPlayer().get().hasPermission(s);
-	}
-
 	/**
 	 * Add a message to the menu.
 	 */
 	public void addMessage(CommandSource sender, Text message, UUID uuid) {
 		incIndices();
-		if (sender.hasPermission("ray.removemessage.exempt") || !hasPerm("ray.removemessage")) {
-			messages.add(0, new TextHolder(message, uuid, 0));
+		if (sender != null && (sender.hasPermission("ray.manage.exempt") || !hasPerm("ray.manage"))) {
+			messages.add(0, new TextHolder(message, uuid, 0, sender));
 			fixSize();
 		} else {
-			Text rb = removeButton(uuid);
-			Text text = rb.concat(TextUtils.SPACE()).concat(message);
-			messages.add(0, new TextHolder(text, uuid, 0));
+			Text rb = manageButton(uuid);
+			Text text = Text.of("").concat(rb).concat(TextUtils.SPACE()).concat(message);
+			messages.add(0, new TextHolder(text, uuid, 0, sender));
 			fixSize();
 		}
 		sendOrUnread();
