@@ -23,6 +23,7 @@ package me.Wundero.Ray.tag;
  SOFTWARE.
  */
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,6 +53,25 @@ public class TagStore {
 	 */
 	public boolean has(String name) {
 		return tags.containsKey(name);
+	}
+
+	/**
+	 * Get all tags of a type if they exist
+	 */
+	public <T, R extends Tag<T>> List<R> getAll(T verifiable, Class<R> tagClass) {
+		List<R> out = Utils.al();
+		for (Tag<?> t : tags.values()) {
+			if (t == null) {
+				continue;
+			}
+			if (tagClass.isAssignableFrom(t.getClass())) {
+				if (!t.verify(verifiable)) {
+					continue;
+				}
+				Utils.wrap(Utils.cast(t, tagClass)).ifPresent(s -> s.ifPresent(s2 -> out.add(s2)));
+			}
+		}
+		return out;
 	}
 
 	/**

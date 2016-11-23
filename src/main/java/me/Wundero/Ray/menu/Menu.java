@@ -76,7 +76,7 @@ public abstract class Menu {
 		}
 		return getPlayer().get().hasPermission(s);
 	}
-	
+
 	/**
 	 * Get the UUID of the player for whom this menu exists.
 	 */
@@ -207,6 +207,14 @@ public abstract class Menu {
 		}
 	}
 
+	protected final void sendSourceOrThis() {
+		if (source.isPresent()) {
+			source.get().sendSourceOrThis();
+		} else {
+			send();
+		}
+	}
+
 	protected final ClickAction<?> resend() {
 		return TextActions.executeCallback(source -> {
 			send();
@@ -240,13 +248,17 @@ public abstract class Menu {
 		send();
 	}
 
+	private final List<Text> or(List<Text> nullable) {
+		return nullable == null ? Utils.al() : nullable;
+	}
+
 	/**
 	 * Send rendered content to the holder.
 	 */
 	public void send() {
-		List<Text> header = renderHeader();
-		List<Text> body = renderBody();
-		List<Text> footer = renderFooter();
+		List<Text> header = or(renderHeader());
+		List<Text> body = or(renderBody());
+		List<Text> footer = or(renderFooter());
 		int lb = MAX_LINES - header.size() - footer.size();
 		if (lb <= 0) {
 			throw new IllegalArgumentException("Header and footer must not be larger than the page!");
