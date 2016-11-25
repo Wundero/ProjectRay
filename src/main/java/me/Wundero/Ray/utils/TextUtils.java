@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -54,6 +55,7 @@ import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.LiteralText.Builder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.TextTemplate.Arg;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.ShiftClickAction;
@@ -1851,6 +1853,31 @@ public class TextUtils {
 			List<Text> children = out.getChildren();
 			return out.toBuilder().removeAll()
 					.append(children.stream().filter(tex -> !tex.isEmpty()).collect(RayCollectors.rayList())).build();
+		}
+	}
+
+	/**
+	 * Apply some arguments to a text template.
+	 */
+	public static TextTemplate applySome(TextTemplate template, Map<String, ?> args) {
+		try {
+			template.apply(args);
+			return TextTemplate.of(template.apply(args));
+		} catch (Exception e) {
+			List<Object> parts = template.getElements();
+			parts = parts.stream().map(obj -> {
+				if (obj instanceof TextTemplate.Arg) {
+					TextTemplate.Arg a = (Arg) obj;
+					if (args.containsKey(a.getName())) {
+						return args.get(a.getName());
+					} else {
+						return (Object) a;
+					}
+				} else {
+					return obj;
+				}
+			}).collect(RayCollectors.rayList());
+			return TextTemplate.of(TextTemplate.DEFAULT_OPEN_ARG, TextTemplate.DEFAULT_CLOSE_ARG, parts.toArray());
 		}
 	}
 
