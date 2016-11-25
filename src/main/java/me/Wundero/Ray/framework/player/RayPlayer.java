@@ -828,6 +828,7 @@ public class RayPlayer implements Socialable {
 		} else {
 			this.activeMenu.deactive();
 			menu.insertSource(true, activeMenu);
+			menu.send();
 		}
 	}
 
