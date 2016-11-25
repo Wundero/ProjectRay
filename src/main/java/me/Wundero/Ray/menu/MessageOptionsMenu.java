@@ -27,8 +27,10 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -64,6 +66,9 @@ public class MessageOptionsMenu extends Menu {
 						removeMessage();
 					} else {
 						src.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
+						if (this.source != null && this.source.isPresent()) {
+							this.source.get().send();
+						}
 					}
 				}));
 	}
@@ -74,6 +79,8 @@ public class MessageOptionsMenu extends Menu {
 			ChatMenu m = (ChatMenu) this.source.get();
 			m.remove(messageUUID);
 			m.send();
+		} else if (this.source != null && this.source.isPresent()) {
+			this.source.get().send();
 		}
 	}
 
@@ -83,6 +90,8 @@ public class MessageOptionsMenu extends Menu {
 			ChatMenu m = (ChatMenu) this.source.get();
 			m.replace(this.messageUUID, this.message);
 			m.send();
+		} else if (this.source != null && this.source.isPresent()) {
+			this.source.get().send();
 		}
 	}
 
@@ -93,6 +102,9 @@ public class MessageOptionsMenu extends Menu {
 						TextEditConversation.start((Player) src, originalMessage, t -> setMessage(t));
 					} else {
 						src.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
+						if (this.source != null && this.source.isPresent()) {
+							this.source.get().send();
+						}
 					}
 				}));
 	}
@@ -100,38 +112,38 @@ public class MessageOptionsMenu extends Menu {
 	protected Text ignoreOption() {
 		return this.createOption("ignore",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to ignore " + playerName + "!")),
-				TextActions.runCommand("/ignore " + playerName));
+				runCommandAndSource("/ignore " + playerName));
 	}
 
 	protected Text tpOption() {
 		return this.createOption("teleport",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to teleport to " + playerName + "!")),
-				TextActions.runCommand("/tp " + playerName));
+				runCommandAndSource("/tp " + playerName));
 	}
 
 	protected Text muteOption() {
 		return this.createOption("mute",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to mute " + playerName + "!")),
-				TextActions.runCommand("/mute " + playerName));
+				runCommandAndSource("/mute " + playerName));
 	}
 
 	protected Text kickOption() {
 		return this.createOption("kick",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to kick " + playerName + "!")),
-				TextActions.runCommand("/mute " + playerName));
+				runCommandAndSource("/mute " + playerName));
 	}
 
 	protected Text messageOption() {
 		return this.createOption("message",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to message " + playerName + "!")),
-				TextActions.suggestCommand("/msg " + playerName + " "));
+				runCommandAndSource("/msg " + playerName + " "));
 	}
 
 	protected Text channelBanOption() {
 		return this.createOption("channel ban",
 				TextActions.showText(
 						Text.of(TextColors.AQUA, "Click to ban " + playerName + " from " + channel.getName() + "!")),
-				TextActions.runCommand("/ch ban " + playerName + " " + channel.getName()));
+				runCommandAndSource("/ch ban " + playerName + " " + channel.getName()));
 
 	}
 
@@ -139,14 +151,22 @@ public class MessageOptionsMenu extends Menu {
 		return this.createOption("channel mute",
 				TextActions.showText(
 						Text.of(TextColors.AQUA, "Click to mute " + playerName + " in " + channel.getName() + "!")),
-				TextActions.runCommand("/ch mute " + playerName));
+				runCommandAndSource("/ch mute " + playerName));
 	}
 
 	protected Text banOption() {
 		return this.createOption("ban",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to ban " + playerName + "!")),
-				TextActions.runCommand("/ban " + playerName));
+				runCommandAndSource("/ban " + playerName));
+	}
 
+	protected TextAction<?> runCommandAndSource(String cmd) {
+		return TextActions.executeCallback(src -> {
+			Sponge.getCommandManager().process(src, cmd);
+			if (this.source != null && this.source.isPresent()) {
+				this.source.get().send();
+			}
+		});
 	}
 
 	@Override

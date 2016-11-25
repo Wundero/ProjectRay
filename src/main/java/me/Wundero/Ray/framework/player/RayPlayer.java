@@ -56,6 +56,7 @@ import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.framework.player.name.InstantDisplayName;
 import me.Wundero.Ray.menu.ChatMenu;
+import me.Wundero.Ray.menu.Menu;
 import me.Wundero.Ray.tag.SelectableTag;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -819,6 +820,15 @@ public class RayPlayer implements Socialable {
 			return medium.apply(name);
 		}
 		return null;
+	}
+
+	public void open(Menu menu) {
+		if (menu instanceof ChatMenu) {
+			setActiveMenu((ChatMenu) menu);
+		} else {
+			this.activeMenu.deactive();
+			menu.insertSource(true, activeMenu);
+		}
 	}
 
 	/**

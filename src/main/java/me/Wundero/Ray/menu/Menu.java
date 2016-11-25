@@ -114,7 +114,7 @@ public abstract class Menu {
 	 */
 	public Menu(Player player, Menu from) {
 		this(player);
-		this.source = Optional.of(from);
+		this.source = Utils.wrap(from);
 	}
 
 	private final void paginate(List<Text> h, List<Text> b, List<Text> f, boolean scroll, boolean clear) {
@@ -139,6 +139,21 @@ public abstract class Menu {
 			builder = ((RayPaginationListBuilder) builder).scroll(scroll).clear(clear);
 		}
 		builder.sendTo(getPlayer().orElseThrow(() -> new IllegalArgumentException("Player must be online!")));
+	}
+
+	/**
+	 * Add source to source chain.
+	 */
+	public void insertSource(boolean front, Menu source) {
+		if (!front) {
+			this.source = Utils.wrap(source);
+		} else {
+			if (this.source.isPresent()) {
+				this.source.get().insertSource(front, source);
+			} else {
+				this.source = Utils.wrap(source);
+			}
+		}
 	}
 
 	/**

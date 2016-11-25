@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -379,21 +378,13 @@ public class ChatMenu extends Menu {
 		return TextUtils.of(TextColors.RED, removeAction(u), removeHover(), "[X]");
 	}
 
-	@SuppressWarnings("unchecked")
 	protected Text nameButton(ChatMenu caller) {
 		Text t = this.title;
-		if (this.title.getClickAction().isPresent()) {
-			ClickAction<?> c = this.title.getClickAction().get();
-			if (c.getResult() instanceof Consumer) {
-				t = t.toBuilder().onClick(TextActions.executeCallback(src -> {
-					if (src instanceof Player) {
-						RayPlayer.get((Player) src).setActiveChannel(getChannel());
-					}
-					((Consumer<CommandSource>) c.getResult()).accept(src);
-				})).build();
+		t = t.toBuilder().onClick(TextActions.executeCallback(src -> {
+			if (src instanceof Player) {
+				RayPlayer.get((Player) src).setActiveChannel(getChannel());
 			}
-		}
-		t = t.toBuilder().onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to switch channels!"))).build();
+		})).onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to switch channels!"))).build();
 		this.toUpdate = caller;
 		if (unread > 0) {
 			t = t.concat(TextUtils.SPACE()).concat(Text.of(TextColors.RED, "(" + unread + ")"));
