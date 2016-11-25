@@ -30,6 +30,8 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 import me.Wundero.Ray.utils.Utils;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /**
  * Storage for all tags.
@@ -37,6 +39,37 @@ import me.Wundero.Ray.utils.Utils;
 public class TagStore {
 
 	private Map<String, Tag<?>> tags = Utils.sm();
+	private ConfigurationNode node;
+
+	public void load(ConfigurationNode node) {
+		this.node = node;
+		ConfigurationNode propNode = node.getNode("tags");
+		if (propNode.isVirtual()) {
+			loadDefaults(node);
+		} else {
+			for (ConfigurationNode child : propNode.getChildrenMap().values()) {
+				String clasNam = child.getNode("type").getString();
+				try {
+					Tag<?> t = (Tag<?>) Class.forName(clasNam).getConstructor(ConfigurationNode.class)
+							.newInstance(child);
+					register(t);
+				} catch (Exception e) {
+				}
+			}
+		}
+	}
+
+	public void loadDefaults(ConfigurationNode node) {
+		DefaultTags.applyAll(node);
+	}
+
+	public void save() throws ObjectMappingException {
+		ConfigurationNode propNode = node.getNode("tags");
+		for (String s : tags.keySet()) {
+			tags.get(s).save(propNode);
+			propNode.getNode(s, "type").setValue(tags.get(s).getClass().getName());
+		}
+	}
 
 	/**
 	 * Register a new tag

@@ -163,6 +163,19 @@ public class Ray {
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
+		try {
+			File f = new File(plugin.getConfigDir().toFile(), "tags.conf");
+			if (!f.exists()) {
+				f.getParentFile().mkdirs();
+				f.createNewFile();
+			} else if (f.isDirectory()) {
+				f.delete();
+				f.createNewFile();
+			}
+			tags.load(Utils.load(f));
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
 		if (channels.useChannels()) {
 			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
 		} else {
@@ -177,7 +190,7 @@ public class Ray {
 		new AfkListener(config.getNode("afk", "timer").getInt(-1), config.getNode("afk", "kick").getInt(-1),
 				config.getNode("afk", "cancel-movement").getBoolean(false));
 	}
-	
+
 	/**
 	 * Load singleton instances from the main plugin class
 	 */
@@ -200,6 +213,19 @@ public class Ray {
 				f.createNewFile();
 			}
 			channels.load(Utils.load(f));
+		} catch (Exception e) {
+			Utils.printError(e);
+		}
+		try {
+			File f = new File(plugin.getConfigDir().toFile(), "tags.conf");
+			if (!f.exists()) {
+				f.getParentFile().mkdirs();
+				f.createNewFile();
+			} else if (f.isDirectory()) {
+				f.delete();
+				f.createNewFile();
+			}
+			tags.load(Utils.load(f));
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
@@ -247,6 +273,11 @@ public class Ray {
 			Utils.printError(e);
 		}
 		this.getChannels().save();
+		try {
+			this.getTags().save();
+		} catch (ObjectMappingException e1) {
+			Utils.printError(e1);
+		}
 		for (ConfigurationLoader<?> loader : toSave.keySet()) {
 			try {
 				ConfigurationNode node = toSave.get(loader);

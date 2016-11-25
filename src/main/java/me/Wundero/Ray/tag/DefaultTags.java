@@ -23,12 +23,42 @@ package me.Wundero.Ray.tag;
  SOFTWARE.
  */
 
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
+
+import me.Wundero.Ray.framework.player.SocialMedia;
+import ninja.leaping.configurate.ConfigurationNode;
+
 /**
  * Pseudo-enum list of all default tags
  */
 public class DefaultTags {
+	public static final DefaultTag SELECT_TAG = new DefaultTag().withSelectable("chat").with("default",
+			Text.of(TextColors.BLACK, TextActions.showText(Text.of(TextColors.AQUA, "This is the default chat tag!")),
+					"[", TextColors.AQUA, "Default", TextColors.BLACK, "]"))
+			.with("admin",
+					Text.of(TextColors.BLACK,
+							TextActions.showText(Text.of(TextColors.AQUA, "This is the admin chat tag!")), "[",
+							TextColors.DARK_RED, "Default", TextColors.BLACK, "]"))
+			.build();
+	// TODO the remaining social media in the enum
+	public static final DefaultTag YOUTUBE_TAG = new DefaultTag()
+			.withTag(new SocialMediaTag("youtube", SocialMedia.YOUTUBE));
+	public static final DefaultTag TWITTER_TAG = new DefaultTag()
+			.withTag(new SocialMediaTag("youtube", SocialMedia.TWITTER));
 
-	// TODO impl the tag onto this
-	public static final DefaultTag SELECT_TAG = new DefaultTag();
+	public static void applyAll(ConfigurationNode node) {
+		apply(node, SELECT_TAG, YOUTUBE_TAG, TWITTER_TAG);
+	}
+
+	public static void apply(ConfigurationNode node, DefaultTag... tags) {
+		ConfigurationNode n = node.getNode("tags");
+		for (DefaultTag t : tags) {
+			Tag<?> tag = t.getTag();
+			tag.save(n);
+			n.getNode(tag.getName(), "type").setValue(tag.getClass().getName());
+		}
+	}
 
 }

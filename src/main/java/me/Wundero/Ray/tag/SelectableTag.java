@@ -46,8 +46,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  */
 public class SelectableTag extends Tag<Map<String, TextTemplate>> implements RaySerializable {
 
-	// TODO gui & cmd for selecting this
-
 	/**
 	 * Create a new SelectableTag
 	 */

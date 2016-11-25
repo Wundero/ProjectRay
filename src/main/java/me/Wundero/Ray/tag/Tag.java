@@ -7,6 +7,7 @@ import org.spongepowered.api.text.Text;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.config.RaySerializable;
 import me.Wundero.Ray.variables.ParsableData;
+import ninja.leaping.configurate.ConfigurationNode;
 
 /*
  The MIT License (MIT)
@@ -44,6 +45,31 @@ public abstract class Tag<T> implements RaySerializable {
 		this.setObject(object);
 		this.name = name;
 		Ray.get().getTags().register(this);
+	}
+
+	public Tag(ConfigurationNode node) {
+		this.name = node.getKey().toString();
+		load(node);
+	}
+
+	public void save(ConfigurationNode node) {
+		node = node.getNode(name);
+		try {
+			deserialize(node.getNode("tag"));
+		} catch (Exception e) {
+		}
+		this.permissionUse = node.getNode("permission-use").getString();
+		this.permissionView = node.getNode("permission-view").getString();
+	}
+
+	public void load(ConfigurationNode node) {
+		node = node.getNode(name);
+		try {
+			serialize(node.getNode("tag"));
+		} catch (Exception e) {
+		}
+		node.getNode("permission-use").setValue(permissionUse);
+		node.getNode("permission-view").setValue(permissionView);
 	}
 
 	/**

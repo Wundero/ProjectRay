@@ -23,6 +23,12 @@ package me.Wundero.Ray.tag;
  SOFTWARE.
  */
 
+import java.util.Map;
+
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
+
+import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 
 /**
@@ -42,7 +48,43 @@ public class DefaultTag {
 		this.tag = t;
 		return this;
 	}
+	
+	public Tag<?> getTag() {
+		return tag;
+	}
+	
+	/**
+	 * Add a selectable tag
+	 */
+	public SelectableBuilder withSelectable(String name) {
+		return new SelectableBuilder(this, name);
+	}
 
+	public static class SelectableBuilder {
+		
+		private DefaultTag tag;
+		private String name;
+		private Map<String, TextTemplate> map = Utils.hm();
+		
+		public SelectableBuilder(DefaultTag tag, String name) {
+			this.tag = tag;
+		}
+		
+		public DefaultTag build() {
+			return tag.withTag(new SelectableTag(name, map));
+		}
+		
+		public SelectableBuilder with(String key, TextTemplate template) {
+			this.map.put(key, template);
+			return this;
+		}
+		
+		public SelectableBuilder with(String key, Text arg) {
+			this.map.put(key, TextTemplate.of(arg));
+			return this;
+		}
+	}
+	
 	/**
 	 * Serialize into a config file
 	 */
