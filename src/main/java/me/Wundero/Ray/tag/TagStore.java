@@ -71,10 +71,16 @@ public class TagStore {
 		}
 	}
 
+	public void deregister(String name) {
+		if (has(name)) {
+			this.tags.remove(name);
+		}
+	}
+
 	/**
 	 * Register a new tag
 	 */
-	void register(Tag<?> t) {
+	public void register(Tag<?> t) {
 		if (has(t.getName())) {
 			return;
 		}
