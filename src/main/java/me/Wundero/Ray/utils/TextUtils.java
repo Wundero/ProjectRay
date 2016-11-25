@@ -921,16 +921,25 @@ public class TextUtils {
 	}
 
 	/**
-	 * Split the text object at a character reference.
+	 * Split the text object at a character reference. If skip, char will be
+	 * skipped.
 	 */
 	public static List<Text> split(Text t, char c, boolean skip) {
 		return split(t, String.valueOf(c), skip);
 	}
 
 	/**
-	 * Split the text object at a string reference.
+	 * Split the text object at a string reference. If skip, string will be
+	 * skipped.
 	 */
-	public static List<Text> split(Text t, String c, boolean skip) {
+	public static List<Text> split(Text t, String s, boolean skip) {
+		return split(t, Utils.compile(s, Pattern.LITERAL), skip);
+	}
+
+	/**
+	 * Split the text at a regular expression. If skip, pattern will be skipped.
+	 */
+	public static List<Text> split(Text t, Pattern p, boolean skip) {
 		if (!lit(t)) {
 			return Utils.al(t);
 		}
@@ -938,13 +947,12 @@ public class TextUtils {
 		List<Text> children = t.getChildren();
 		LiteralText.Builder text = ((LiteralText) t).toBuilder();
 		String content = text.getContent();
-		if (!content.contains(c)) {
+		if (!p.matcher(content).find()) {
 			return Utils.al(t);
 		}
-		if (content.equals(c)) {
+		if (p.matcher(content).matches()) {
 			return skip ? Utils.al() : Utils.al(t);
 		}
-		Pattern p = Pattern.compile(c, Pattern.LITERAL);
 		Matcher m = p.matcher(content);
 		while ((m = m.reset(content)).find()) {
 			int s = m.start();
@@ -967,7 +975,7 @@ public class TextUtils {
 		Text.Builder tx = out.get(out.size() - 1).toBuilder();
 		out.remove(out.size() - 1);
 		for (Text child : children) {
-			List<Text> lt = split(child, c, skip);
+			List<Text> lt = split(child, p, skip);
 			if (lt.isEmpty()) {
 				out.add(tx.build());
 				tx = null;
@@ -988,24 +996,10 @@ public class TextUtils {
 	}
 
 	/**
-	 * Split the text at a string reference
-	 */
-	public static Text[] split(Text t, String c, boolean skip, boolean arr) {
-		return split(t, c, skip).stream().toArray(in -> new Text[in]);
-	}
-
-	/**
-	 * Split the text at a character reference
-	 */
-	public static Text[] split(Text t, char c, boolean skip, boolean arr) {
-		return split(t, c + "", skip, arr);
-	}
-
-	/**
 	 * Split the text at all newline characters.
 	 */
 	public static List<Text> newlines(Text t) {
-		return split(t, '\n', false);
+		return split(t, '\n', true);
 	}
 
 	private static Text s(List<Text> tx, int start, int finish) {
@@ -1520,6 +1514,38 @@ public class TextUtils {
 				return t.toPlain();
 			}
 		}
+	}
+
+	/**
+	 * Convert a template to a text with vars.
+	 */
+	public static Text convertToText(TextTemplate template) {
+		Map<String, Object> toApply = Utils.hm();
+		for (String s : template.getArguments().keySet()) {
+			toApply.put(s, "{" + s + "}");
+		}
+		return template.apply(toApply).build();
+	}
+
+	/**
+	 * Parse but do not replace vars in a text.
+	 */
+	public static TextTemplate getVars(Text t) {
+		List<Text> all = split(t, Utils.VAR_PATTERN, false);
+		List<Object> trans = all.stream().map(text -> {
+			if (lit(text)) {
+				String content = getContent(text, true);
+				if (Utils.VAR_PATTERN.matcher(content).matches()) {
+					String proper = content.replace("{", "").replace("}", "");
+					return (Object) TextTemplate.arg(proper).defaultValue(text).format(text.getFormat());
+				} else {
+					return (Object) text;
+				}
+			} else {
+				return (Object) text;
+			}
+		}).collect(RayCollectors.rayList());
+		return TextTemplate.of(TextTemplate.DEFAULT_OPEN_ARG, TextTemplate.DEFAULT_CLOSE_ARG, trans.toArray());
 	}
 
 	/**
