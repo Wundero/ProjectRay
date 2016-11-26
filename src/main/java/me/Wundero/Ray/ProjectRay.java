@@ -47,6 +47,7 @@ import me.Wundero.Ray.commands.channel.ChannelQMCommand;
 import me.Wundero.Ray.commands.channel.ChannelRoleCommand;
 import me.Wundero.Ray.commands.channel.ChannelSetupCommand;
 import me.Wundero.Ray.commands.channel.ChannelWhoCommand;
+import me.Wundero.Ray.commands.tags.TagCommand;
 import me.Wundero.Ray.config.InternalClickAction;
 import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.config.Template;
@@ -275,6 +276,10 @@ public class ProjectRay {
 	public void registerEvent(GameInitializationEvent event) {
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new TagCommand()).children(TagCommand.getChildren())
+						.description(Text.of("Base tag command.")).permission("ray.tags").build(),
+				"tag");
 		// register all commands. Might make this neater in the future.
 		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
 				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();

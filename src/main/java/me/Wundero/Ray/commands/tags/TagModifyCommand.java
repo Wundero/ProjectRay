@@ -32,53 +32,44 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
-import me.Wundero.Ray.framework.player.RayPlayer;
-import me.Wundero.Ray.menu.AllTagsMenu;
-import me.Wundero.Ray.menu.TagMenu;
+import me.Wundero.Ray.conversation.TextEditConversation;
 import me.Wundero.Ray.tag.SelectableTag;
+import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
 /**
- * Select a tag.
+ * Command to modify the text of a tag.
  */
-public class TagSelectCommand implements CommandExecutor {
+public class TagModifyCommand implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (!src.hasPermission("ray.tag.select")) {
+		if (!src.hasPermission("ray.tags.modify")) {
 			throw new CommandException(Text.of(TextColors.RED, "You are not allowed to do that!"));
 		}
 		if (!(src instanceof Player)) {
-			throw new CommandException(Text.of(TextColors.RED, "You must be a player to do that!"));
+			throw new CommandException(Text.of(TextColors.RED, "You must be a player to do this!"));
 		}
-		if (args.hasAny("tag")) {
-			if (args.hasAny("name")) {
-				Optional<SelectableTag> ot = Ray.get().getTags().get(((String) args.getOne("tag").get()).toLowerCase(),
-						Utils.hm(), SelectableTag.class);
-				if (!ot.isPresent()) {
-					throw new CommandException(Text.of(TextColors.RED, "That is not a valid tag!"));
-				}
-				String name = ((String) args.getOne("name").get()).toLowerCase();
-				SelectableTag tag = ot.get();
-				if (!tag.getObject().containsKey(name)) {
-					throw new CommandException(Text.of(TextColors.RED, "That is not a valid tag name!"));
-				}
-				RayPlayer.get((Player) src).select(tag, name);
-				src.sendMessage(Text.of(TextColors.AQUA, "Tag " + name + " selected!"));
-			} else {
-				Optional<SelectableTag> ot = Ray.get().getTags().get(((String) args.getOne("tag").get()).toLowerCase(),
-						Utils.hm(), SelectableTag.class);
-				if (!ot.isPresent()) {
-					throw new CommandException(Text.of(TextColors.RED, "That is not a valid tag!"));
-				}
-				RayPlayer.get((Player) src).open(new TagMenu((Player) src, null, ot.get()));
-			}
-		} else {
-			RayPlayer.get((Player) src).open(new AllTagsMenu((Player) src));
+		String t = args.getOne("tag").get().toString().toLowerCase();
+		final String n = args.getOne("name").get().toString().toLowerCase();
+		Optional<SelectableTag> ta = Ray.get().getTags().get(t, Utils.hm(), SelectableTag.class);
+		if (!ta.isPresent()) {
+			throw new CommandException(Text.of(TextColors.RED, "That is not a valid tag!"));
 		}
+		final SelectableTag tag = ta.get();
+		if (!tag.getObject().containsKey(n)) {
+			throw new CommandException(Text.of(TextColors.RED, "That is not a valid tag!"));
+		}
+		TextTemplate templ = tag.getObject().get(n);
+		Text modifiable = TextUtils.convertToText(templ);
+		TextEditConversation.start((Player) src, modifiable, text -> {
+			TextTemplate to = TextUtils.getVars(text);
+			tag.getObject().put(n, to);
+		});
 		return CommandResult.success();
 	}
 

@@ -84,7 +84,7 @@ public class TagStore {
 		if (has(t.getName())) {
 			return;
 		}
-		this.tags.put(t.getName(), t);
+		this.tags.put(t.getName().toLowerCase(), t);
 	}
 
 	/**

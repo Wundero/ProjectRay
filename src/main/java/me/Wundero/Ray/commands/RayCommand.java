@@ -26,7 +26,6 @@ package me.Wundero.Ray.commands;
 import java.util.List;
 import java.util.Optional;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -40,6 +39,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
+import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
 /**
@@ -55,7 +55,7 @@ public class RayCommand implements CommandExecutor {
 		for (List<String> o : Commands.getChildren().keySet()) {
 			texts.add(buildTextForCmd(src, Commands.getChildren().get(o), o));
 		}
-		PaginationService ps = Sponge.getServiceManager().provide(PaginationService.class).get();
+		PaginationService ps = Ray.get().getPaginationService();
 		PaginationList.Builder b = ps.builder();
 		b.contents(texts);
 		b.title(Text.of(TextColors.AQUA, TextStyles.BOLD, "Ray", TextColors.GREEN));

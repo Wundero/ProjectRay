@@ -43,12 +43,12 @@ public abstract class Tag<T> implements RaySerializable {
 
 	public Tag(String name, T object) {
 		this.setObject(object);
-		this.name = name;
+		this.name = name.toLowerCase();
 		Ray.get().getTags().register(this);
 	}
 
 	public Tag(ConfigurationNode node) {
-		this.name = node.getKey().toString();
+		this.name = node.getKey().toString().toLowerCase();
 		load(node);
 	}
 
