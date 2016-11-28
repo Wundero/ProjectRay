@@ -176,7 +176,7 @@ public class ChatMenu extends Menu {
 
 	public Text restore(UUID original) {
 		if (replaced.containsKey(original)) {
-			return replace(original, replaced.get(original));
+			return replace(original, replaced.get(original), true);
 		} else {
 			TextHolder tr = null;
 			for (TextHolder h : removed) {
@@ -210,7 +210,7 @@ public class ChatMenu extends Menu {
 		}
 	}
 
-	public Text replace(UUID original, Text with) {
+	public Text replace(UUID original, Text with, boolean inc) {
 		int index = indexOf(original);
 		Text out = messages.get(index).text;
 		TextHolder h = messages.get(index);
@@ -219,7 +219,7 @@ public class ChatMenu extends Menu {
 			messages.set(index, h);
 		}
 		this.replaced.put(original, out);
-		sendOrUnread();
+		sendOrUnread(inc);
 		return out;
 	}
 
@@ -249,7 +249,8 @@ public class ChatMenu extends Menu {
 		}
 		TextHolder h = messages.get(indexOf(u));
 		if (getPlayer().get().hasPermission("ray.removemessage")) {
-			replace(u, TextUtils.of(TextColors.RED, restoreAction(u), restoreHover(), "Message has been removed."));
+			replace(u, TextUtils.of(TextColors.RED, restoreAction(u), restoreHover(), "Message has been removed."),
+					true);
 			return h;
 		}
 		synchronized (messages) {
@@ -408,11 +409,19 @@ public class ChatMenu extends Menu {
 		addMessage(source, message, uuid, true);
 	}
 
+	protected boolean contains(UUID u) {
+		return messages.stream().map(holder -> holder.getUUID()).collect(RayCollectors.rayList()).contains(u);
+	}
+
 	/**
 	 * Add a message to the menu. Boolean as to whether to increment unread
 	 * messages.
 	 */
 	public void addMessage(CommandSource sender, Text message, UUID uuid, boolean inc) {
+		if (contains(uuid)) {
+			replace(uuid, message, inc);
+			return;
+		}
 		incIndices();
 		if (sender != null && (sender.hasPermission("ray.manage.exempt") || !hasPerm("ray.manage"))) {
 			messages.add(0, new TextHolder(message, uuid, 0, sender));

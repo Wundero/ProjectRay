@@ -88,7 +88,7 @@ public class MessageOptionsMenu extends Menu {
 		this.message = t;
 		if (this.source != null && this.source.isPresent() && this.source.get() instanceof ChatMenu) {
 			ChatMenu m = (ChatMenu) this.source.get();
-			m.replace(this.messageUUID, this.message);
+			m.replace(this.messageUUID, this.message, true);
 			m.send();
 		} else if (this.source != null && this.source.isPresent()) {
 			this.source.get().send();
