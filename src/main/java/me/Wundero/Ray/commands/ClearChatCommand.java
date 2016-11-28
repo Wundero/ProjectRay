@@ -63,13 +63,13 @@ public class ClearChatCommand implements CommandExecutor {
 				}
 			} else {
 				for (Player p : Sponge.getServer().getOnlinePlayers()) {
-					Utils.fill(Text.of(" "), (t, i) -> t, 100, true).forEach(m -> p.getMessageChannel().send(m));
+					Utils.fill(Text.of(" "), (t, i) -> t, 100, true).forEach(m -> Utils.send(p, m));
 				}
 			}
 			return CommandResult.success();
 		}
 		for (Player p : Sponge.getServer().getOnlinePlayers()) {
-			Utils.fill(Text.of(" "), (t, i) -> t, 100, true).forEach(m -> p.getMessageChannel().send(m));
+			Utils.fill(Text.of(" "), (t, i) -> t, 100, true).forEach(m -> Utils.send(p, m));
 		}
 		return CommandResult.success();
 	}
