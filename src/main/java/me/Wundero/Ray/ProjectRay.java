@@ -305,7 +305,7 @@ public class ProjectRay {
 						CommandSpec.builder().executor(new ClearChatCommand()).description(Text.of("Clear the chat."))
 								.permission("ray.clearchat")
 								.arguments(GenericArguments
-										.optional(GenericArguments.remainingJoinedStrings(Text.of("clear"))))
+										.optional(GenericArguments.remainingJoinedStrings(Text.of("channel"))))
 								.build(),
 						"clearchat", "chatclear", "cc");
 		Sponge.getCommandManager()
@@ -401,8 +401,8 @@ public class ProjectRay {
 										.description(Text.of("List channel commands.")).build(), "help", "h")
 								.child(CommandSpec.builder().executor(new ChannelSetupCommand())
 										.permission("ray.channel.setup").description(Text.of("Create a new channel."))
-										.arguments(GenericArguments
-												.optional(GenericArguments.remainingJoinedStrings(Text.of("type"))))
+										.arguments(GenericArguments.optional(GenericArguments.choices(Text.of("type"),
+												() -> Utils.al("advanced", "leveled", "simple"), s -> s)))
 										.build(), "setup")
 								.child(CommandSpec.builder().executor(new ChannelModifyCommand())
 										.arguments(GenericArguments.string(Text.of("channel")),

@@ -23,16 +23,22 @@ package me.Wundero.Ray.framework.channel;
  SOFTWARE.
  */
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.AbstractMutableMessageChannel;
+import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
@@ -66,6 +72,35 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	private boolean obfuscateRanged = false;
 	private ConfigurationNode node;
 	private Role defRole = Role.GUEST;
+
+	@Override
+	public void send(@Nullable Object sender, Text original, ChatType type) {
+		checkNotNull(original, "original text");
+		checkNotNull(type, "type");
+		for (MessageReceiver member : this.getMembers()) {
+			if (member instanceof Player && (sender instanceof CommandSource || sender == null)) {
+				UUID u = ((Player) member).getUniqueId();
+				UUID rand = UUID.randomUUID();
+				if (menus.containsKey(u) && menus.get(u) != null) {
+					final ChatMenu m = menus.get(u);
+					this.transformMessage(sender, member, original, type)
+							.ifPresent(text -> m.addMessage((CommandSource) sender, text, rand));
+				} else {
+					if (member instanceof ChatTypeMessageReceiver) {
+						this.transformMessage(sender, member, original, type)
+								.ifPresent(text -> ((ChatTypeMessageReceiver) member).sendMessage(type, text));
+					} else {
+						this.transformMessage(sender, member, original, type).ifPresent(member::sendMessage);
+					}
+				}
+			} else if (member instanceof ChatTypeMessageReceiver) {
+				this.transformMessage(sender, member, original, type)
+						.ifPresent(text -> ((ChatTypeMessageReceiver) member).sendMessage(type, text));
+			} else {
+				this.transformMessage(sender, member, original, type).ifPresent(member::sendMessage);
+			}
+		}
+	}
 
 	@Override
 	public boolean equals(Object o) {

@@ -273,6 +273,9 @@ public class ChatMenu extends Menu {
 	 * Get the list of texts to display, in order.
 	 */
 	public List<Text> getSorted() {
+		if (messages.isEmpty()) {
+			return Utils.al();
+		}
 		List<TextHolder> other = Utils.al();
 		synchronized (messages) {
 			other = Utils.al(messages, true);
@@ -404,9 +407,10 @@ public class ChatMenu extends Menu {
 	public void addMessage(CommandSource source, Text message, UUID uuid) {
 		addMessage(source, message, uuid, true);
 	}
-	
+
 	/**
-	 * Add a message to the menu. Boolean as to whether to increment unread messages.
+	 * Add a message to the menu. Boolean as to whether to increment unread
+	 * messages.
 	 */
 	public void addMessage(CommandSource sender, Text message, UUID uuid, boolean inc) {
 		incIndices();
@@ -423,12 +427,20 @@ public class ChatMenu extends Menu {
 	}
 
 	/**
+	 * Clear the chat
+	 */
+	public void clear() {
+		this.messages.clear();
+		sendOrUnread(false);
+	}
+
+	/**
 	 * @return whether the menu is active.
 	 */
 	public boolean isActive() {
 		return active;
 	}
-	
+
 	protected void sendOrUnread() {
 		sendOrUnread(true);
 	}

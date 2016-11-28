@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -48,6 +50,7 @@ import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
@@ -143,6 +146,24 @@ public class Utils {
 		tl.add(value);
 		map.put(key, tl);
 		return map;
+	}
+
+	/**
+	 * Send a message to, if available, the message channel, if not the receiver.
+	 */
+	public static void send(MessageReceiver r, Text message) {
+		send(r, message, null);
+	}
+	
+	/**
+	 * Send a message to, if available, the message channel, if not the receiver.
+	 */
+	public static void send(MessageReceiver r, Text message, @Nullable Object sender) {
+		if (r.getMessageChannel() != null) {
+			r.getMessageChannel().send(sender, message);
+		} else {
+			r.sendMessage(message);
+		}
 	}
 
 	/**

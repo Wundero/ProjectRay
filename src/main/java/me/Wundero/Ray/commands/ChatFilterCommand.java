@@ -12,6 +12,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.features.ChatFilter;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)
@@ -60,7 +61,7 @@ public class ChatFilterCommand implements CommandExecutor {
 		} else {
 			f.toggle();
 		}
-		src.sendMessage(Text.of(TextColors.AQUA, "Chat is no" + (f.isFilter() ? "w" : " longer") + " being filtered!"));
+		Utils.send(src, Text.of(TextColors.AQUA, "Chat is no" + (f.isFilter() ? "w" : " longer") + " being filtered!"));
 		return CommandResult.success();
 	}
 

@@ -33,6 +33,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.conversation.announcement.AnnouncementConversation;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Start the announcement creation conversation
@@ -42,7 +43,7 @@ public class AnnouncementConversationCommand implements CommandExecutor {
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext arguments) throws CommandException {
 		if (!(source instanceof Player)) {
-			source.sendMessage(Text.of(TextColors.RED, "You must be a player to do this!"));
+			Utils.send(source, Text.of(TextColors.RED, "You must be a player to do this!"));
 			return CommandResult.success();
 		}
 		// start conversation
