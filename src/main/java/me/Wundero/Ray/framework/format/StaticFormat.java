@@ -101,19 +101,19 @@ public class StaticFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u, boolean broadcast) {
 		if (!getTemplate().isPresent()) {
 			return false;
 		}
-		return this.s(f, args, getTemplate().get(), o, u);
+		return this.s(f, args, getTemplate().get(), o, u, broadcast);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u) {
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u, boolean broadcast) {
 		if (!getTemplate().isPresent()) {
 			return false;
 		}
-		return this.s(f, data, getTemplate().get(), o, u);
+		return this.s(f, data, getTemplate().get(), o, u, broadcast);
 	}
 
 	private static class TemplateBuilderTypePrompt extends Prompt {

@@ -492,6 +492,10 @@ public class RayPlayer implements Socialable {
 	 * Set the active chanel as the messagechannel of the player
 	 */
 	public void applyChannel() {
+		applyChannel(false);
+	}
+
+	private void applyChannel(boolean init) {
 		if (activeChannel != null) {
 			if (isOnline()) {
 				getPlayer().get().setMessageChannel(activeChannel);
@@ -502,7 +506,9 @@ public class RayPlayer implements Socialable {
 					}
 					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
 					this.getActiveMenu().activate();
-					activeChannel.getMenus().get(this.uuid).send();
+					if (!init) {
+						this.getActiveMenu().send();
+					}
 				}
 			}
 		}
@@ -514,6 +520,10 @@ public class RayPlayer implements Socialable {
 	 * Set the channel this user speaks into
 	 */
 	public void setActiveChannel(ChatChannel channel) {
+		setActiveChannel(channel, false);
+	}
+
+	private void setActiveChannel(ChatChannel channel, boolean init) {
 		if (channel == null) {
 			return;
 		}
@@ -522,9 +532,12 @@ public class RayPlayer implements Socialable {
 			getPlayer().get().setMessageChannel(activeChannel);
 			if (Ray.get().isUseChatMenus()) {
 				try {
-					activeChannel.getMenus().get(this.uuid).activate();
-					this.activeMenu.deactive();
+					this.getActiveMenu().deactive();
 					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
+					this.getActiveMenu().activate();
+					if (!init) {
+						this.getActiveMenu().send();
+					}
 				} catch (Exception e) {
 				}
 			}
@@ -540,7 +553,7 @@ public class RayPlayer implements Socialable {
 		}
 		ConfigurationNode i = config.getNode("ignoring");
 		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)), true);
-		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()));
+		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()), true);
 		this.spy = config.getNode("spy").getBoolean(false);
 		loadTags(config.getNode("tags"));
 		this.quote = Utils.wrap(config.getNode("quote").getString());
@@ -824,7 +837,7 @@ public class RayPlayer implements Socialable {
 
 	public void open(Menu menu) {
 		if (menu instanceof ChatMenu) {
-			setActiveMenu((ChatMenu) menu);
+			menu.send();
 		} else {
 			this.activeMenu.deactive();
 			menu.insertSource(true, activeMenu);
@@ -845,9 +858,6 @@ public class RayPlayer implements Socialable {
 	 */
 	public void setActiveMenu(ChatMenu activeMenu) {
 		this.activeMenu = activeMenu;
-		if (!activeMenu.isActive()) {
-			activeMenu.send();
-		}
 	}
 
 }

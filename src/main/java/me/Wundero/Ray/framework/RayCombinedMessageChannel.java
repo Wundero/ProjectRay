@@ -47,10 +47,10 @@ public class RayCombinedMessageChannel implements MessageChannel {
 	protected final Collection<MessageChannel> channels;
 
 	public RayCombinedMessageChannel(MessageChannel... channels) {
-		this(Arrays.asList(channels));
+		this(Arrays.asList(channels), true);
 	}
 
-	public RayCombinedMessageChannel(Collection<MessageChannel> channels) {
+	public RayCombinedMessageChannel(Collection<? extends MessageChannel> channels, boolean collection) {
 		this.channels = ImmutableSet.copyOf(channels);
 	}
 

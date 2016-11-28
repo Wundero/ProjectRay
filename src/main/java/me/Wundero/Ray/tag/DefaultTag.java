@@ -48,11 +48,11 @@ public class DefaultTag {
 		this.tag = t;
 		return this;
 	}
-	
+
 	public Tag<?> getTag() {
 		return tag;
 	}
-	
+
 	/**
 	 * Add a selectable tag
 	 */
@@ -61,30 +61,31 @@ public class DefaultTag {
 	}
 
 	public static class SelectableBuilder {
-		
+
 		private DefaultTag tag;
 		private String name;
 		private Map<String, TextTemplate> map = Utils.hm();
-		
+
 		public SelectableBuilder(DefaultTag tag, String name) {
 			this.tag = tag;
+			this.name = name;
 		}
-		
+
 		public DefaultTag build() {
 			return tag.withTag(new SelectableTag(name, map));
 		}
-		
+
 		public SelectableBuilder with(String key, TextTemplate template) {
 			this.map.put(key, template);
 			return this;
 		}
-		
+
 		public SelectableBuilder with(String key, Text arg) {
 			this.map.put(key, TextTemplate.of(arg));
 			return this;
 		}
 	}
-	
+
 	/**
 	 * Serialize into a config file
 	 */

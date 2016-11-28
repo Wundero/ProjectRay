@@ -168,6 +168,69 @@ public class Utils {
 	 * Combine multiple lists into one. Boolean to filter unique items.
 	 */
 	@SafeVarargs
+	public static <T> List<T> intersect(List<T>... lists) {
+		if (lists == null || lists.length == 0) {
+			return al();
+		}
+		List<T> l = lists[0];
+		List<T> mod = l;
+		boolean f = true;
+		for (List<T> l2 : lists) {
+			if (f) {
+				f = false;
+				// skip first list to increase efficiency
+			} else {
+				for (T t : l) {
+					if (!l2.contains(t)) {
+						mod.remove(mod.indexOf(t));
+					}
+				}
+				l = mod;
+			}
+		}
+		return l;
+	}
+
+	/**
+	 * Combine multiple arrays into one. Boolean to filter unique items.
+	 */
+	@SuppressWarnings("unchecked")
+	@SafeVarargs
+	public static <T> T[] intersect(T[]... arrs) {
+		if (arrs == null || arrs.length == 0) {
+			return (T[]) new Object[0];
+		}
+		List<T> l = al(arrs[0]);
+		List<T> mod = l;
+		boolean f = true;
+		for (T[] a2 : arrs) {
+			if (f) {
+				f = false;
+				// skip first list to increase efficiency
+			} else {
+				List<T> l2 = al(a2);
+				for (T t : l) {
+					if (!l2.contains(t)) {
+						mod.remove(mod.indexOf(t));
+					}
+				}
+				l = mod;
+			}
+		}
+		if (l.isEmpty()) {
+			return (T[]) new Object[0];
+		}
+		T[] out = (T[]) new Object[l.size()];
+		for (int i = 0; i < l.size(); i++) {
+			out[i] = l.get(i);
+		}
+		return out;
+	}
+
+	/**
+	 * Combine multiple lists into one. Boolean to filter unique items.
+	 */
+	@SafeVarargs
 	public static <T> List<T> combine(boolean distinct, List<T>... lists) {
 		List<T> out = al();
 		for (List<T> l : lists) {

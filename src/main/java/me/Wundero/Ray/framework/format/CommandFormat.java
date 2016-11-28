@@ -50,7 +50,7 @@ import ninja.leaping.configurate.ConfigurationNode;
  * This format type represents a type which will be called when a command is
  * fired by a player.
  * 
- * TODO move variables in onCommand
+ * TODO move variables in onCommand, broadcast togglable
  */
 public class CommandFormat extends Format {
 
@@ -118,13 +118,13 @@ public class CommandFormat extends Format {
 					if (cancel) {
 						event.setCancelled(true);
 					}
-					send(s, d, Optional.of(s), Utils.wrap(UUID.randomUUID()));
+					send(s, d, Optional.of(s), Utils.wrap(UUID.randomUUID()), false);
 				}
 			} else {
 				if (cancel) {
 					event.setCancelled(true);
 				}
-				send(s, d, Optional.of(s), Utils.wrap(UUID.randomUUID()));
+				send(s, d, Optional.of(s), Utils.wrap(UUID.randomUUID()), false);
 			}
 		}
 	}
@@ -178,16 +178,17 @@ public class CommandFormat extends Format {
 	 * Send the message to the internal format.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u) {
-		return format.send(target, args, opt, u);
+	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u,
+			boolean b) {
+		return format.send(target, args, opt, u, b);
 	}
 
 	/**
 	 * Send the message to the internal format.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> opt, Optional<UUID> u) {
-		return format.send(target, data, opt, u);
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> opt, Optional<UUID> u, boolean b) {
+		return format.send(target, data, opt, u, b);
 	}
 
 	/**

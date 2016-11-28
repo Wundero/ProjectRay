@@ -54,13 +54,13 @@ public abstract class FormatLocation {
 	 * Send a message to the location.
 	 */
 	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender,
-			Optional<UUID> textId);
+			Optional<UUID> textId, boolean broadcast);
 
 	/**
 	 * Send a message to the location.
 	 */
 	public boolean send(Text text, MessageReceiver target, Format format, Optional<Object> sender) {
-		return send(text, target, format, sender, Optional.empty());
+		return send(text, target, format, sender, Optional.empty(), false);
 	}
 
 }

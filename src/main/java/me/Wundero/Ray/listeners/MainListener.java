@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.Listener;
@@ -88,8 +89,11 @@ public class MainListener {
 	 */
 	private static class MenuWrapperChannel extends DelegateMessageChannel {
 
-		public MenuWrapperChannel(MessageChannel delegate) {
+		private boolean bc;
+
+		public MenuWrapperChannel(MessageChannel delegate, boolean bc) {
 			super(delegate);
+			this.bc = bc;
 		}
 
 		@Override
@@ -103,26 +107,76 @@ public class MainListener {
 					Optional<Text> msg = this.transformMessage(sender, member, original, type);
 					if (msg.isPresent()) {
 						if (sender instanceof Player) {
-							ChatMenu menu = RayPlayer.get((Player) sender).getActiveChannel().getMenus()
-									.get(((Player) member).getUniqueId());
-							if (menu != null) {
-								menu.addMessage((Player) sender, msg.get(), randUUID);
+							if (bc) {
+								Player pl = (Player) sender;
+								List<ChatChannel> l1 = Ray.get().getChannels().getJoinableChannels((Player) member,
+										false);
+								List<ChatChannel> l2 = Ray.get().getChannels().getJoinableChannels(pl, false);
+								Utils.intersect(l1, l2).stream()
+										.filter(ch -> ch.getMenus().containsKey(((Player) member).getUniqueId())
+												&& ch.getMenus().get(((Player) member).getUniqueId()) != null)
+										.map(ch -> ch.getMenus().get(((Player) member).getUniqueId()))
+										.forEach(ch -> ch.addMessage(pl, msg.get(), randUUID, !bc));
 							} else {
-								RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender,
-										msg.get(), randUUID);
+								ChatMenu menu = RayPlayer.get((Player) sender).getActiveChannel().getMenus()
+										.get(((Player) member).getUniqueId());
+								if (menu != null) {
+									menu.addMessage((Player) sender, msg.get(), randUUID);
+								} else {
+									RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender,
+											msg.get(), randUUID);
+								}
 							}
 						} else if (sender instanceof UUID) {
-							ChatMenu menu = RayPlayer.get((UUID) sender).getActiveChannel().getMenus()
-									.get(((Player) member).getUniqueId());
-							if (menu != null) {
-								menu.addMessage((Player) sender, msg.get(), randUUID);
+							if (bc) {
+								Optional<User> optus = Utils.getUser((UUID) sender);
+								if (optus.isPresent() && optus.get().isOnline()) {
+									Optional<Player> p = optus.get().getPlayer();
+									if (p.isPresent()) {
+										Player pl = p.get();
+										List<ChatChannel> l1 = Ray.get().getChannels()
+												.getJoinableChannels((Player) member, false);
+										List<ChatChannel> l2 = Ray.get().getChannels().getJoinableChannels(pl, false);
+										Utils.intersect(l1, l2).stream()
+												.filter(ch -> ch.getMenus().containsKey(((Player) member).getUniqueId())
+														&& ch.getMenus().get(((Player) member).getUniqueId()) != null)
+												.map(ch -> ch.getMenus().get(((Player) member).getUniqueId()))
+												.forEach(ch -> ch.addMessage(pl, msg.get(), randUUID, !bc));
+									} else {
+										Ray.get().getChannels().getJoinableChannels((Player) member, true).stream()
+												.filter(ch -> ch.getMenus().containsKey(((Player) member).getUniqueId())
+														&& ch.getMenus().get(((Player) member).getUniqueId()) != null)
+												.map(ch -> ch.getMenus().get(((Player) member).getUniqueId()))
+												.forEach(ch -> ch.addMessage(null, msg.get(), randUUID, !bc));
+									}
+								} else {
+									Ray.get().getChannels().getJoinableChannels((Player) member, true).stream()
+											.filter(ch -> ch.getMenus().containsKey(((Player) member).getUniqueId())
+													&& ch.getMenus().get(((Player) member).getUniqueId()) != null)
+											.map(ch -> ch.getMenus().get(((Player) member).getUniqueId()))
+											.forEach(ch -> ch.addMessage(null, msg.get(), randUUID, !bc));
+								}
+							} else {
+								ChatMenu menu = RayPlayer.get((UUID) sender).getActiveChannel().getMenus()
+										.get(((Player) member).getUniqueId());
+								if (menu != null) {
+									menu.addMessage((Player) sender, msg.get(), randUUID);
+								} else {
+									RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender,
+											msg.get(), randUUID);
+								}
+							}
+						} else {
+							if (bc) {
+								Ray.get().getChannels().getJoinableChannels((Player) member, true).stream()
+										.filter(ch -> ch.getMenus().containsKey(((Player) member).getUniqueId())
+												&& ch.getMenus().get(((Player) member).getUniqueId()) != null)
+										.map(ch -> ch.getMenus().get(((Player) member).getUniqueId()))
+										.forEach(ch -> ch.addMessage(null, msg.get(), randUUID, !bc));
 							} else {
 								RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender,
 										msg.get(), randUUID);
 							}
-						} else {
-							RayPlayer.get((Player) member).getActiveMenu().addMessage((CommandSource) sender, msg.get(),
-									randUUID);
 						}
 					}
 				} else {
@@ -138,24 +192,25 @@ public class MainListener {
 	}
 
 	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
-			MessageChannel channel) {
-		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+			MessageChannel channel, boolean broadcast) {
+		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+				broadcast);
 	}
 
 	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip, Optional<String> formatName,
-			Optional<Player> observer) {
+			Optional<Player> observer, boolean broadcast) {
 		if (e == null) {
 			return Tristate.TRUE;
 		}
 		if (p == null) {
-			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel())));
+			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel()), broadcast));
 			return Tristate.UNDEFINED;
 		}
 		RayPlayer r = RayPlayer.getRay(p);
 		Group g = r.getActiveGroup();
 		if (g == null) {
-			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel())));
+			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel()), broadcast));
 			return Tristate.UNDEFINED;
 		}
 		FormatCollection fx;
@@ -165,7 +220,7 @@ public class MainListener {
 			fx = g.getFormats(t);
 		}
 		if (fx == null || fx.isEmpty()) {
-			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel())));
+			e.setChannel(new MenuWrapperChannel(e.getChannel().orElse(e.getOriginalChannel()), broadcast));
 			return Tristate.UNDEFINED;
 		}
 		final FormatCollection f = fx;
@@ -220,7 +275,7 @@ public class MainListener {
 								.setObserver(observer.isPresent() ? observer
 										: recipient instanceof Player ? Optional.of((Player) recipient)
 												: Optional.empty()),
-						Optional.of(msgsender.orElse(p).getUniqueId()), Utils.wrap(locid)) == 0) {
+						Optional.of(msgsender.orElse(p).getUniqueId()), Utils.wrap(locid), broadcast) == 0) {
 					return Optional.of(original);
 				}
 				return Optional.empty();
@@ -257,6 +312,7 @@ public class MainListener {
 			Optional<Player> st = Optional.empty();
 			Optional<String> fn = Optional.empty();
 			Optional<Player> o = Optional.empty();
+			boolean broadcast = false;
 			if (event.getCause().containsNamed("sendfrom")) {
 				sf = event.getCause().get("sendfrom", Player.class);
 			}
@@ -275,8 +331,11 @@ public class MainListener {
 				Map<String, Object> v2 = (Map<String, Object>) event.getCause().get("vars", Map.class).get();
 				vars.putAll(v2);
 			}
+			if (event.getCause().containsNamed("broadcast")) {
+				broadcast = event.getCause().get("broadcast", Boolean.class).orElse(false);
+			}
 			Tristate hd = handle(event.getCause().get("formatcontext", FormatContext.class).get(), event, vars, p,
-					event.getChannel().get(), sf, st, fn, o);
+					event.getChannel().get(), sf, st, fn, o, broadcast);
 			if (hd == Tristate.TRUE || hd == Tristate.UNDEFINED) {
 				event.setCancelled(true);
 				event.setMessageCancelled(true);
@@ -285,7 +344,7 @@ public class MainListener {
 				event.setMessageCancelled(false);
 			}
 		} else {
-			Tristate hd = handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get());
+			Tristate hd = handle(FormatContexts.CHAT, event, vars, p, event.getChannel().get(), false);
 			if (hd == Tristate.TRUE) {
 				event.setCancelled(true);
 				event.setMessageCancelled(true);
@@ -312,13 +371,15 @@ public class MainListener {
 				v.put("afkmessage", "no" + s);
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.AFK)
-								.named("vars", v).build(),
+								.named("broadcast", Boolean.TRUE).named("vars", v).build(),
 						MessageChannel.TO_ALL, Utils.wrap(MessageChannel.TO_ALL), event.getFormatter(),
 						event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
 					ev2.getChannel().get().send(event.getAfkPlayer(), ev2.getMessage(), ChatTypes.CHAT);
 				}
+			} else {
+				event.setChannel(new MenuWrapperChannel(event.getChannel().orElse(event.getOriginalChannel()), true));
 			}
 		}
 	}
@@ -330,6 +391,9 @@ public class MainListener {
 	public void onJoin(ClientConnectionEvent.Join event) {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
+		MessageChannel original = Ray.get().isUseChatMenus()
+				? Ray.get().getChannels().getJoinableChannelsAsOne(event.getTargetEntity(), false)
+				: event.getChannel().orElse(event.getOriginalChannel());
 		p.setTabTask(() -> {
 			Player player = event.getTargetEntity();
 			final TabList list = player.getTabList();
@@ -358,7 +422,7 @@ public class MainListener {
 				}
 				new FormatCollection(fx).sendAll(player,
 						new ParsableData().setClickHover(false).setSender(pla).setRecipient(player),
-						Optional.of(pla.getUniqueId()), u);
+						Optional.of(pla.getUniqueId()), u, false);
 			}
 		});
 		Task.builder().delayTicks(20).execute(() -> RayPlayer.updateTabs()).submit(Ray.get().getPlugin());
@@ -372,31 +436,33 @@ public class MainListener {
 					h.sendAll(event.getTargetEntity(),
 							new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
 									.setRecipient(event.getTargetEntity()),
-							Optional.of(event.getTargetEntity()), Utils.presentUUID());
+							Optional.of(event.getTargetEntity()), Utils.presentUUID(), false);
 				}
 				if (f != null && !f.isEmpty()) {
 					f.sendAll(event.getTargetEntity(),
 							new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
 									.setRecipient(event.getTargetEntity()),
-							Optional.of(event.getTargetEntity()), Utils.presentUUID());
+							Optional.of(event.getTargetEntity()), Utils.presentUUID(), false);
 				}
 			}).submit(Ray.get().getPlugin());
 		}
 
+		// fire delayed task due to unloaded properties in player
 		if (event.getChannel().isPresent()) {
 			event.setMessageCancelled(true);
 			Task.builder().delayTicks(10).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
 						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.JOIN).build(),
-						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
+						original, event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
 				}
 			}).submit(Ray.get().getPlugin());
 			Task.builder().delayTicks(20).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.JOIN).build(),
-						event.getChannel().get(), event.getChannel(), event.getFormatter(), event.getMessage(), false);
+						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.JOIN)
+								.named("broadcast", Boolean.TRUE).build(),
+						original, event.getChannel(), event.getFormatter(), event.getMessage(), false);
 				Sponge.getEventManager().post(ev2);
 				if (!ev2.isCancelled()) {
 					ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
@@ -406,8 +472,9 @@ public class MainListener {
 		if (welcome) {
 			Task.builder().delayTicks(15).execute(() -> {
 				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.WELCOME).build(),
-						MessageChannel.TO_ALL, Optional.of(MessageChannel.TO_ALL),
+						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.WELCOME)
+								.named("broadcast", Boolean.TRUE).build(),
+						original, Optional.of(original),
 						new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE,
 								"Welcome " + event.getTargetEntity().getName() + " to the server!")),
 						event.getMessage(), false);
@@ -444,13 +511,8 @@ public class MainListener {
 		CommandSource trs = null;
 		if (event.getCause().containsType(CommandSource.class)) {
 			trs = Utils.getTrueSource(event.getCause().first(CommandSource.class).get());
-			player = trs.getName() + ": ";
-		} else {
-			Ray.get().getLogger().info(player + "/" + event.getCommand() + " " + event.getArguments());
-			return;
 		}
-		Ray.get().getLogger().info(player + "/" + event.getCommand() + " " + event.getArguments());
-		if (!(trs instanceof Player)) {
+		if (trs == null || !(trs instanceof Player)) {
 			return;
 		}
 		if (!Ray.get().getConfig().getNode("spy", event.getCommand()).getBoolean(false)) {
@@ -483,7 +545,8 @@ public class MainListener {
 	@Listener
 	public void onQuit(ClientConnectionEvent.Disconnect event) {
 		Map<String, Object> vars = Utils.hm();
-		Tristate hd = handle(FormatContexts.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get());
+		Tristate hd = handle(FormatContexts.LEAVE, event, vars, event.getTargetEntity(), event.getChannel().get(),
+				true);
 		if (hd == Tristate.TRUE) {
 			event.setMessageCancelled(true);
 		} else {
@@ -498,7 +561,7 @@ public class MainListener {
 	@Listener
 	public void onKick(KickPlayerEvent event) {
 		Map<String, Object> vars = Utils.hm();
-		Tristate hd = handle(FormatContexts.KICK, event, vars, event.getTargetEntity(), event.getChannel().get());
+		Tristate hd = handle(FormatContexts.KICK, event, vars, event.getTargetEntity(), event.getChannel().get(), true);
 		if (hd == Tristate.TRUE) {
 			event.setMessageCancelled(true);
 		} else {
@@ -516,8 +579,8 @@ public class MainListener {
 		Achievement ach = event.getAchievement();
 		vars.put("achievement",
 				Text.builder().append(Text.of(ach.getName())).onHover(TextActions.showAchievement(ach)).build());
-		Tristate hd = handle(FormatContexts.ACHIEVEMENT, event, vars, event.getTargetEntity(),
-				event.getChannel().get());
+		Tristate hd = handle(FormatContexts.ACHIEVEMENT, event, vars, event.getTargetEntity(), event.getChannel().get(),
+				true);
 		if (hd == Tristate.TRUE) {
 			event.setMessageCancelled(true);
 		} else {

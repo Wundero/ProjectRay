@@ -67,7 +67,9 @@ public class AllTagsMenu extends Menu {
 
 	@Override
 	public List<Text> renderBody() {
-		return getAllTags().stream().map(text -> Text.of(TextColors.GREEN, " - ").concat(text))
+		this.title = Text.of("All tags");
+		return getAllTags().stream()
+				.map(text -> Text.of(TextColors.GREEN, " - ").concat(text == null ? Text.of() : text))
 				.collect(RayCollectors.rayList());
 	}
 

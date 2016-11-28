@@ -141,6 +141,7 @@ public class EventFormat extends Format {
 			if (e.getCause().containsNamed("observer")) {
 				data.setObserver(e.getCause().get("observer", Player.class));
 			}
+			final boolean b = e.getCause().get("broadcast", Boolean.class).orElse(false);
 			data.setClickHover(true);
 			data.setPage(e.getCause().get("page", Integer.class).orElse(0));
 			Map<String, Object> map = Utils.hm();
@@ -163,20 +164,20 @@ public class EventFormat extends Format {
 				Task.builder().delayTicks(20).execute(() -> {
 					if (data.getRecipient().isPresent()) {
 						send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)),
-								Utils.presentUUID());
+								Utils.presentUUID(), b);
 					} else {
 						for (Player p : Sponge.getServer().getOnlinePlayers()) {
-							send(p, data, Utils.wrap(data.getSender().orElse(null)), Utils.presentUUID());
+							send(p, data, Utils.wrap(data.getSender().orElse(null)), Utils.presentUUID(), b);
 						}
 					}
 				}).submit(Ray.get().getPlugin());
 			} else {
 				if (data.getRecipient().isPresent()) {
 					send(data.getRecipient().get(), data, Utils.wrap(data.getSender().orElse(null)),
-							Utils.presentUUID());
+							Utils.presentUUID(), b);
 				} else {
 					for (Player p : Sponge.getServer().getOnlinePlayers()) {
-						send(p, data, Utils.wrap(data.getSender().orElse(null)), Utils.wrap(UUID.randomUUID()));
+						send(p, data, Utils.wrap(data.getSender().orElse(null)), Utils.wrap(UUID.randomUUID()), b);
 					}
 				}
 			}
@@ -184,13 +185,13 @@ public class EventFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u) {
-		return internal.send(f, args, o, u);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u, boolean b) {
+		return internal.send(f, args, o, u, b);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u) {
-		return internal.send(f, data, o, u);
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u, boolean b) {
+		return internal.send(f, data, o, u, b);
 	}
 
 	@Override

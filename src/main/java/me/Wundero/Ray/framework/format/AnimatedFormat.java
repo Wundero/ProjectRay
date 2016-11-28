@@ -140,13 +140,13 @@ public class AnimatedFormat extends Format {
 
 				@Override
 				public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender,
-						Optional<UUID> u) {
+						Optional<UUID> u, boolean b) {
 					return true;
 				}
 
 				@Override
 				public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender,
-						Optional<UUID> u) {
+						Optional<UUID> u, boolean b) {
 					return true;
 				}
 			};
@@ -160,9 +160,9 @@ public class AnimatedFormat extends Format {
 	 * Start the animation.
 	 */
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u, boolean b) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
-			if (!template.send(f, args, opt, u)) {
+			if (!template.send(f, args, opt, u, b)) {
 				return -1;
 			} else {
 				if (template instanceof ExecutingFormat
@@ -190,9 +190,9 @@ public class AnimatedFormat extends Format {
 	 * Start the animation.
 	 */
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt, Optional<UUID> u) {
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt, Optional<UUID> u, boolean b) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
-			if (!template.send(f, data, opt, u)) {
+			if (!template.send(f, data, opt, u, b)) {
 				return -1;
 			} else {
 				if (template instanceof ExecutingFormat

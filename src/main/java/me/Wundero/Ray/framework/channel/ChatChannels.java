@@ -29,9 +29,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import com.google.common.reflect.TypeToken;
 
+import me.Wundero.Ray.framework.RayCombinedMessageChannel;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -123,6 +125,14 @@ public class ChatChannels {
 			return null;
 		}
 		return channels.get(name);
+	}
+
+	/**
+	 * Return all channels a player can join as a combined channel.
+	 */
+	public MessageChannel getJoinableChannelsAsOne(Player player, boolean showHidden) {
+		return new RayCombinedMessageChannel(
+				getJoinableChannels(player, showHidden), true);
 	}
 
 	/**

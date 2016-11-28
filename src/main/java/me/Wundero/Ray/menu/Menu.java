@@ -115,6 +115,14 @@ public abstract class Menu {
 	public Menu(Player player, Menu from) {
 		this(player);
 		this.source = Utils.wrap(from);
+		if (this.source.isPresent()) {
+			if (this.source.get().pathTitle.isEmpty()) {
+				this.pathTitle = Utils.wrap(source.get().title).orElse(Text.of());
+			} else {
+				this.pathTitle = this.source.get().pathTitle.concat(Text.of(TextColors.GRAY, " / "))
+						.concat(source.get().title);
+			}
+		}
 	}
 
 	private final void paginate(List<Text> h, List<Text> b, List<Text> f, boolean scroll, boolean clear) {

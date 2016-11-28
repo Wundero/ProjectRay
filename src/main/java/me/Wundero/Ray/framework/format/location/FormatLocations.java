@@ -43,6 +43,7 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
@@ -112,7 +113,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation CHAT = new FormatLocation("chat") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
+				boolean broadcast) {
 			if (Ray.get().isUseChatMenus() && target instanceof Player && o.isPresent() && u.isPresent()) {
 				Object or = o.get();
 				if (or instanceof CommandSource || or instanceof UUID) {
@@ -120,33 +122,88 @@ public class FormatLocations {
 					if (or instanceof CommandSource) {
 						if (or instanceof Player) {
 							RayPlayer r2 = RayPlayer.get((Player) or);
-							if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
+							if (broadcast) {
+								UUID r23 = UUID.randomUUID();
+								List<ChatChannel> l1 = Ray.get().getChannels().getJoinableChannels((Player) target,
+										false);
+								List<ChatChannel> l2 = Ray.get().getChannels().getJoinableChannels((Player) or, false);
+								Utils.intersect(l1, l2).stream()
+										.filter(ch -> ch.getMenus().containsKey(((Player) target).getUniqueId())
+												&& ch.getMenus().get(((Player) target).getUniqueId()) != null)
+										.map(ch -> ch.getMenus().get(((Player) target).getUniqueId())).forEach(ch -> ch
+												.addMessage((CommandSource) or, text, u.orElse(r23), !broadcast));
+							} else if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
 									&& r2.getActiveChannel().getMenus().get(r.getUniqueId()) != null) {
 								r2.getActiveChannel().getMenus().get(r.getUniqueId()).addMessage((CommandSource) or,
-										text, u.orElse(UUID.randomUUID()));
+										text, u.orElse(UUID.randomUUID()), !broadcast);
 							} else {
-								r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()));
+								r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()),
+										!broadcast);
 							}
 							return true;
 						} else {
-							r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()));
+							if (broadcast) {
+								UUID r23 = UUID.randomUUID();
+								Ray.get().getChannels().getJoinableChannels((Player) target, false).stream()
+										.filter(ch -> ch.getMenus().containsKey(((Player) target).getUniqueId())
+												&& ch.getMenus().get(((Player) target).getUniqueId()) != null)
+										.map(ch -> ch.getMenus().get(((Player) target).getUniqueId())).forEach(ch -> ch
+												.addMessage((CommandSource) or, text, u.orElse(r23), !broadcast));
+							} else {
+								r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()),
+										!broadcast);
+							}
 						}
 						return true;
 					} else {
 						Optional<User> ou = Utils.getUser((UUID) or);
 						if (ou.isPresent() && ou.get().getPlayer().isPresent() && ou.get().isOnline()) {
-							RayPlayer r2 = RayPlayer.get(ou.get().getPlayer().get());
-							if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
+							Player pl = ou.get().getPlayer().get();
+							RayPlayer r2 = RayPlayer.get(pl);
+							if (broadcast) {
+								UUID r23 = UUID.randomUUID();
+								List<ChatChannel> l1 = Ray.get().getChannels().getJoinableChannels((Player) target,
+										false);
+								List<ChatChannel> l2 = Ray.get().getChannels().getJoinableChannels(pl, false);
+								Utils.intersect(l1, l2).stream()
+										.filter(ch -> ch.getMenus().containsKey(((Player) target).getUniqueId())
+												&& ch.getMenus().get(((Player) target).getUniqueId()) != null)
+										.map(ch -> ch.getMenus().get(((Player) target).getUniqueId()))
+										.forEach(ch -> ch.addMessage(pl, text, u.orElse(r23), !broadcast));
+							} else if (r2.getActiveChannel().getMenus().containsKey(r.getUniqueId())
 									&& r2.getActiveChannel().getMenus().get(r.getUniqueId()) != null) {
-								r2.getActiveChannel().getMenus().get(r.getUniqueId())
-										.addMessage((CommandSource) ou.get(), text, u.orElse(UUID.randomUUID()));
+								r2.getActiveChannel().getMenus().get(r.getUniqueId()).addMessage(pl, text,
+										u.orElse(UUID.randomUUID()), !broadcast);
 							} else {
-								r.getActiveMenu().addMessage((CommandSource) ou.get(), text,
-										u.orElse(UUID.randomUUID()));
+								r.getActiveMenu().addMessage(pl, text, u.orElse(UUID.randomUUID()), !broadcast);
 							}
 							return true;
 						}
 					}
+				} else {
+					RayPlayer r = RayPlayer.get((Player) target);
+					if (broadcast) {
+						UUID r23 = UUID.randomUUID();
+						Ray.get().getChannels().getJoinableChannels((Player) target, false).stream()
+								.filter(ch -> ch.getMenus().containsKey(((Player) target).getUniqueId())
+										&& ch.getMenus().get(((Player) target).getUniqueId()) != null)
+								.map(ch -> ch.getMenus().get(((Player) target).getUniqueId()))
+								.forEach(ch -> ch.addMessage((CommandSource) or, text, u.orElse(r23), !broadcast));
+					} else {
+						r.getActiveMenu().addMessage((CommandSource) or, text, u.orElse(UUID.randomUUID()), !broadcast);
+					}
+				}
+			} else if (Ray.get().isUseChatMenus() && target instanceof Player) {
+				RayPlayer r = RayPlayer.get((Player) target);
+				if (broadcast) {
+					UUID r23 = UUID.randomUUID();
+					Ray.get().getChannels().getJoinableChannels((Player) target, false).stream()
+							.filter(ch -> ch.getMenus().containsKey(((Player) target).getUniqueId())
+									&& ch.getMenus().get(((Player) target).getUniqueId()) != null)
+							.map(ch -> ch.getMenus().get(((Player) target).getUniqueId()))
+							.forEach(ch -> ch.addMessage(null, text, u.orElse(r23), !broadcast));
+				} else {
+					r.getActiveMenu().addMessage(null, text, u.orElse(UUID.randomUUID()), !broadcast);
 				}
 			}
 			target.sendMessage(text);
@@ -159,7 +216,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation SCOREBOARD = new FormatLocation("scoreboard") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
+				boolean broadcast) {
 			// TODO this
 			return false;
 		}
@@ -172,7 +230,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TITLE_SUBTITLE = new FormatLocation("title_subtitle") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -200,7 +259,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation SUBTITLE = new FormatLocation("subtitle") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -224,7 +284,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TITLE = new FormatLocation("title") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -248,7 +309,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation BOSSBAR = new FormatLocation("bossbar") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -318,8 +380,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation ACTIONBAR = new FormatLocation("actionbar") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> operatable,
-				Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> operatable, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof ChatTypeMessageReceiver)) {
 				return false;
 			}
@@ -334,7 +396,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TAB_ENTRY = new FormatLocation("tab_entry") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u,
+				boolean broadcast) {
 			if (p == null || !p.isPresent() || !(target instanceof Player)) {
 				return false;
 			}
@@ -358,7 +421,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TAB_FOOTER = new FormatLocation("tab_footer") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof Player)) {
 				return false;
 			}
@@ -373,7 +437,8 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TAB_HEADER = new FormatLocation("tab_header") {
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u) {
+		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
+				boolean broadcast) {
 			if (!(target instanceof Player)) {
 				return false;
 			}

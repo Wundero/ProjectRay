@@ -107,13 +107,13 @@ public class MultiFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u) {
-		return getNext(true).send(f, args, o, u);
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u, boolean b) {
+		return getNext(true).send(f, args, o, u, b);
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u) {
-		return getNext(true).send(f, data, o, u);
+	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u, boolean b) {
+		return getNext(true).send(f, data, o, u, b);
 	}
 
 	private static class NamePrompt extends Prompt {

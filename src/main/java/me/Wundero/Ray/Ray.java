@@ -272,7 +272,10 @@ public class Ray {
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
-		this.getChannels().save();
+		try {
+			this.getChannels().save();
+		} catch (Exception e) {
+		}
 		try {
 			this.getTags().save();
 		} catch (ObjectMappingException e1) {

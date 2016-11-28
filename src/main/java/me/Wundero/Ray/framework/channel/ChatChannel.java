@@ -67,6 +67,11 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 	private ConfigurationNode node;
 	private Role defRole = Role.GUEST;
 
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof ChatChannel && ((ChatChannel) o).name.equals(this.name);
+	}
+
 	/**
 	 * Returns a collection of members currently in the channel.
 	 */

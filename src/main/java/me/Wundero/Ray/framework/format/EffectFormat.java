@@ -135,12 +135,13 @@ public class EffectFormat extends Format {
 	 * Play the effect.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> data, Optional<Object> sender, Optional<UUID> u) {
+	public boolean send(MessageReceiver target, Map<String, Object> data, Optional<Object> sender, Optional<UUID> u,
+			boolean broadcast) {
 		if (!(target instanceof Player)) {
 			return false;
 		}
 		effect.setupAnimation((Player) target, data, (text, player) -> {
-			return s(target, data, text, sender, u);
+			return s(target, data, text, sender, u, broadcast);
 		});
 		effect.start();
 		return true;
@@ -150,12 +151,13 @@ public class EffectFormat extends Format {
 	 * Play the effect.
 	 */
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u) {
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u,
+			boolean broadcast) {
 		if (!(target instanceof Player)) {
 			return false;
 		}
 		effect.setupAnimation((Player) target, data, (text, player) -> {
-			return s(target, data, text, sender, u);
+			return s(target, data, text, sender, u, broadcast);
 		});
 		effect.start();
 		return true;

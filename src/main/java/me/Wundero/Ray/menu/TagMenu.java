@@ -80,6 +80,7 @@ public class TagMenu extends Menu {
 
 	@Override
 	public List<Text> renderBody() {
+		this.title = Text.of("Tags");
 		return getOptions().stream().map(text -> Text.of(TextColors.GREEN, " - ").concat(text))
 				.collect(RayCollectors.rayList());
 	}

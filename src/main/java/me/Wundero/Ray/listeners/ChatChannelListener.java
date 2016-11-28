@@ -49,7 +49,7 @@ public class ChatChannelListener {
 		}
 		ChatChannel mostIn = null;
 		for (ChatChannel c : Ray.get().getChannels().getJoinableChannels(event.getTargetEntity(), true)) {
-			if (c.isAutojoin()) {
+			if (c.isAutojoin() || event.getTargetEntity().hasPermission(c.getPermission() + ".forcejoin")) {
 				if (c.canJoin(event.getTargetEntity(), Optional.empty())) {
 					c.addMember(event.getTargetEntity(), Optional.empty());
 					RayPlayer.get(event.getTargetEntity()).addListenChannel(c);

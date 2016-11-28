@@ -151,21 +151,21 @@ public class PaginatedFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u) {
+	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
 		int i = (Integer) Utils.wrap(args.get("page")).orElse(0);
 		if (i < 0 || i >= pages.size()) {
 			return false;
 		}
-		return pages.get(i).send(target, args, sender, u);
+		return pages.get(i).send(target, args, sender, u, broadcast);
 	}
 
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u) {
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
 		int i = data.getPage().orElse(0);
 		if (i < 0 || i >= pages.size()) {
 			return false;
 		}
-		return pages.get(i).send(target, data, sender, u);
+		return pages.get(i).send(target, data, sender, u, broadcast);
 	}
 
 }

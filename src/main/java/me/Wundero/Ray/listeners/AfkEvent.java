@@ -23,27 +23,34 @@ package me.Wundero.Ray.listeners;
  SOFTWARE.
  */
 
+import java.util.Optional;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractMessageEvent;
+import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Represents an event which changes the state of the player being AFK.
  */
-public class AfkEvent extends AbstractMessageEvent implements Cancellable {
+public class AfkEvent extends AbstractMessageEvent implements MessageChannelEvent, Cancellable {
 
 	private Cause cause;
 	private Player afker;
 	private boolean afk, mafk, cancelled = false, mcancelled = false;
+	private final MessageChannel original = MessageChannel.TO_ALL;
+	private Optional<MessageChannel> channel = Optional.of(MessageChannel.TO_ALL);
 
 	private AfkEvent(Cause c, Player a, boolean afk) {
 		this.cause = c;
@@ -78,9 +85,7 @@ public class AfkEvent extends AbstractMessageEvent implements Cancellable {
 				}
 			}
 			if (!e.mcancelled) {
-				for (Player px : Sponge.getServer().getOnlinePlayers()) {
-					px.sendMessage(msg);
-				}
+				e.getChannel().orElse(e.getOriginalChannel()).send(p, msg);
 			}
 		}
 	}
@@ -174,6 +179,30 @@ public class AfkEvent extends AbstractMessageEvent implements Cancellable {
 	@Override
 	public MessageFormatter getFormatter() {
 		return this.formatter;
+	}
+
+	/**
+	 * Get the original channel.
+	 */
+	@Override
+	public MessageChannel getOriginalChannel() {
+		return original;
+	}
+
+	/**
+	 * Get the current channel.
+	 */
+	@Override
+	public Optional<MessageChannel> getChannel() {
+		return channel;
+	}
+
+	/**
+	 * Set the current channel.
+	 */
+	@Override
+	public void setChannel(MessageChannel channel) {
+		this.channel = Utils.wrap(channel);
 	}
 
 }

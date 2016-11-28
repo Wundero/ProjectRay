@@ -401,7 +401,14 @@ public class ChatMenu extends Menu {
 	/**
 	 * Add a message to the menu.
 	 */
-	public void addMessage(CommandSource sender, Text message, UUID uuid) {
+	public void addMessage(CommandSource source, Text message, UUID uuid) {
+		addMessage(source, message, uuid, true);
+	}
+	
+	/**
+	 * Add a message to the menu. Boolean as to whether to increment unread messages.
+	 */
+	public void addMessage(CommandSource sender, Text message, UUID uuid, boolean inc) {
 		incIndices();
 		if (sender != null && (sender.hasPermission("ray.manage.exempt") || !hasPerm("ray.manage"))) {
 			messages.add(0, new TextHolder(message, uuid, 0, sender));
@@ -412,7 +419,7 @@ public class ChatMenu extends Menu {
 			messages.add(0, new TextHolder(text, uuid, 0, sender));
 			fixSize();
 		}
-		sendOrUnread();
+		sendOrUnread(inc);
 	}
 
 	/**
@@ -421,11 +428,15 @@ public class ChatMenu extends Menu {
 	public boolean isActive() {
 		return active;
 	}
-
+	
 	protected void sendOrUnread() {
+		sendOrUnread(true);
+	}
+
+	protected void sendOrUnread(boolean inc) {
 		if (active) {
 			send();
-		} else {
+		} else if (inc) {
 			incUnread();
 		}
 	}
@@ -436,7 +447,10 @@ public class ChatMenu extends Menu {
 	@Override
 	public void send() {
 		if (!active) {
-			RayPlayer.get(holderUUID).getActiveMenu().active = false;
+			try {
+				RayPlayer.get(holderUUID).getActiveMenu().deactive();
+			} catch (Exception e) {
+			}
 			active = true;
 			RayPlayer.get(holderUUID).setActiveMenu(this);
 			unread = 0;

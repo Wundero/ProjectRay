@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -40,18 +39,12 @@ import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
 
 /**
  * Mute a player.
  */
 public class MuteCommand implements CommandExecutor {
-
-	public MuteCommand() {
-		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
-	}
-
 	@Listener
 	public void onChat(MessageChannelEvent.Chat e) {
 		Cause c = e.getCause();

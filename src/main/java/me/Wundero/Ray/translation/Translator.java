@@ -6,6 +6,7 @@ import java.util.Map;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.translation.locale.Locales;
 
 import me.Wundero.Ray.utils.TextUtils;
 
@@ -45,7 +46,11 @@ public class Translator {
 	 * Create a new, player-specific translator.
 	 */
 	public Translator(CommandSource p) {
-		l = p.getLocale();
+		try {
+			l = p.getLocale();
+		} catch (Exception e) {
+			l = Locales.DEFAULT;
+		}
 		messages = I18n.get(l, true);
 	}
 

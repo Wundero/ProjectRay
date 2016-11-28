@@ -138,24 +138,24 @@ public class FormatCollection {
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, UUID u, boolean irrelevant) {
-		return sendAll(target, args, Utils.wrap(o), Utils.wrap(u));
+	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, UUID u, boolean broadcast, boolean irrelevant) {
+		return sendAll(target, args, Utils.wrap(o), Utils.wrap(u), broadcast);
 	}
 
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, ParsableData data, Object o, UUID u, boolean irrelevant) {
-		return sendAll(target, data, Utils.wrap(o), Utils.wrap(u));
+	public int sendAll(MessageReceiver target, ParsableData data, Object o, UUID u, boolean broadcast, boolean irrelevant) {
+		return sendAll(target, data, Utils.wrap(o), Utils.wrap(u), broadcast);
 	}
 
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u) {
+	public int sendAll(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
 		int count = 0;
 		for (Format f : this.formats) {
-			if (f.send(target, args, sender, u)) {
+			if (f.send(target, args, sender, u, broadcast)) {
 				count++;
 			}
 		}
@@ -165,10 +165,10 @@ public class FormatCollection {
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u) {
+	public int sendAll(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
 		int count = 0;
 		for (Format f : this.formats) {
-			if (f.send(target, data, sender, u)) {
+			if (f.send(target, data, sender, u, broadcast)) {
 				count++;
 			}
 		}
