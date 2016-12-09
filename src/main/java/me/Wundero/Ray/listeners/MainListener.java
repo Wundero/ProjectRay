@@ -302,9 +302,9 @@ public class MainListener {
 			p = (Player) event.getCause().first(Player.class).get();
 		}
 		Text msg = event.getRawMessage();
-		if (TextUtils.COLOR_PATTERN.matcher(TextUtils.getContent(msg, false)).find()) {
+		if (TextUtils.COLOR_PATTERN.matcher(TextUtils.getContent(msg)).find()) {
 			// safe parse colors
-			msg = TextUtils.transIf(TextUtils.getContent(event.getRawMessage(), false), p);
+			msg = TextUtils.transIf(TextUtils.getContent(event.getRawMessage()), p);
 		}
 		vars.put("message", msg);
 		if (event.getCause().containsNamed("formatcontext")) {

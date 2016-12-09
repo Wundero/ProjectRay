@@ -149,14 +149,16 @@ public class Utils {
 	}
 
 	/**
-	 * Send a message to, if available, the message channel, if not the receiver.
+	 * Send a message to, if available, the message channel, if not the
+	 * receiver.
 	 */
 	public static void send(MessageReceiver r, Text message) {
 		send(r, message, null);
 	}
-	
+
 	/**
-	 * Send a message to, if available, the message channel, if not the receiver.
+	 * Send a message to, if available, the message channel, if not the
+	 * receiver.
 	 */
 	public static void send(MessageReceiver r, Text message, @Nullable Object sender) {
 		if (r.getMessageChannel() != null) {

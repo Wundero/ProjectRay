@@ -99,7 +99,7 @@ public class RainbowEffect extends Effect<Text> {
 	 * Create a new RainbowEffect for the text
 	 */
 	public static RainbowEffect create(Text t, TextColor main, Optional<TextColor> secondary, Optional<Integer> delay) {
-		return create(TextUtils.getContent(t, false), t.getColor(), main, secondary, delay);
+		return create(TextUtils.getContent(t), t.getColor(), main, secondary, delay);
 	}
 
 	private RainbowEffect(Text obj, BiFunction<Text, Integer, Text> mod, int f, int d) {

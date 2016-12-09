@@ -279,14 +279,18 @@ public abstract class Menu {
 	 * Send rendered content to the holder.
 	 */
 	public void send() {
-		List<Text> header = or(renderHeader());
-		List<Text> body = or(renderBody());
-		List<Text> footer = or(renderFooter());
-		int lb = MAX_LINES - header.size() - footer.size();
+		List<Text> h = or(renderHeader());
+		List<Text> b = or(renderBody());
+		List<Text> f = or(renderFooter());
+		List<Text> body = Utils.al();
+		b.forEach(t -> body.addAll(TextUtils.splitIntoLines(t)));
+		Text header = TextUtils.join(h, Text.of("\n"));
+		Text footer = TextUtils.join(f, Text.of("\n"));
+		int lb = MAX_LINES - TextUtils.getLines(header) - TextUtils.getLines(footer);
 		if (lb <= 0) {
 			throw new IllegalArgumentException("Header and footer must not be larger than the page!");
 		}
-		int spaces = lb - body.size();
+		int spaces = lb - TextUtils.getLines(body);
 		while (spaces > 0) {
 			if (fillSpacesFromTop) {
 				body.add(0, Text.of(" "));
@@ -295,7 +299,7 @@ public abstract class Menu {
 			}
 			spaces--;
 		}
-		paginate(header, body, footer, scrolling, clear);
+		paginate(h, body, f, scrolling, clear);
 	}
 
 }

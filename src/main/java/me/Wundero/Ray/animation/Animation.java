@@ -7,6 +7,8 @@ import java.util.function.Function;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tristate;
 
+import com.google.common.base.Preconditions;
+
 import me.Wundero.Ray.utils.Utils;
 
 /*
@@ -54,6 +56,10 @@ public class Animation<T> {
 	 * Create a new animation
 	 */
 	public Animation(List<T> frames, Function<T, Integer> update, Function<T, Tristate> frameCheck) {
+		Preconditions.checkNotNull(update);
+		Preconditions.checkNotNull(frameCheck);
+		Preconditions.checkNotNull(frames);
+		Preconditions.checkArgument(!frames.isEmpty());
 		this.frames = frames;
 		this.update = update;
 		this.frameCheck = frameCheck;
@@ -98,7 +104,7 @@ public class Animation<T> {
 			return;
 		}
 		// apply frame
-		int delayTicks = update.apply(frame);
+		int delayTicks = Utils.wrap(update.apply(frame)).orElse(-1);
 		if (delayTicks < 0) {
 			// if no more frames or frame display went wrong
 			stop();
@@ -158,7 +164,9 @@ public class Animation<T> {
 							// resume
 		if (running) {
 			running = false;
-			cancellable.cancel();
+			if (cancellable != null) {
+				cancellable.cancel();
+			}
 		}
 	}
 
@@ -169,7 +177,9 @@ public class Animation<T> {
 	public void stop() {// if playing, cancel task and also run onStop() method
 		if (running) {
 			running = false;
-			cancellable.cancel();
+			if (cancellable != null) {
+				cancellable.cancel();
+			}
 			if (stop != null) {
 				stop.run();
 			}

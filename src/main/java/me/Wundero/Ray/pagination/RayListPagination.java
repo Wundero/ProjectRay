@@ -12,6 +12,7 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 
 import com.google.common.collect.ImmutableList;
 
+import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 /*
  The MIT License (MIT)
@@ -89,7 +90,7 @@ class RayListPagination extends RayActivePagination {
 			final boolean currentPageNotEmpty = currentPageLines != 0;
 			final boolean spillToNextPage = finiteLinesPerPage && willExceedPageLength && currentPageNotEmpty;
 			if (spillToNextPage) {
-				padPage(currentPage, currentPageLines, true, false);
+				padPage(currentPage, currentPageLines, false, false);
 				currentPageLines = 0;
 				pages.add(currentPage);
 				currentPage = new ArrayList<>();
@@ -107,10 +108,10 @@ class RayListPagination extends RayActivePagination {
 		/*
 		 * Note to self: This works like this:
 		 * 
-		 * 876/543/21-----------------------------------------------------------------
-		 * 876/54/321-----------------------------------------------------------------
-		 * 87/654/321-----------------------------------------------------------------
-		 * x87/654/321----------------------------------------------------------------
+		 * 876/543/21-----------------------------------------------------------
+		 * 876/54/321-----------------------------------------------------------
+		 * 87/654/321-----------------------------------------------------------
+		 * x87/654/321----------------------------------------------------------
 		 */
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			if (i == 0) {
@@ -122,8 +123,10 @@ class RayListPagination extends RayActivePagination {
 			List<Text> c1 = mod.get(i);
 			List<Text> c2 = mod.get(i - 1);
 			while (x > 0) {
-				c1.add(0, c2.remove(c2.size() - 1));
-				x--;
+				Text t = c2.remove(c2.size() - 1);
+				int lu = TextUtils.getLines(t);
+				c1.add(0, t);
+				x -= lu;
 			}
 			mod.set(i, c1);
 			mod.set(i - 1, c2);

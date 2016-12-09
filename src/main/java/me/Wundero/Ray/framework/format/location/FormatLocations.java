@@ -344,7 +344,6 @@ public class FormatLocations {
 			default:
 				c = BossBarColors.WHITE;
 				break;
-
 			}
 			BossBarOverlay ov = BossBarOverlays.PROGRESS;
 			switch (notchScale) {
@@ -364,7 +363,6 @@ public class FormatLocations {
 			case 4:
 				ov = BossBarOverlays.NOTCHED_20;
 				break;
-			case 0:
 			default:
 				ov = BossBarOverlays.PROGRESS;
 				break;

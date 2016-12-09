@@ -153,15 +153,19 @@ public class AnimatedFormat extends Format {
 			inOrder.add(0, f);
 			frameWithDelay.put(f, delay);
 		});
-		frameWithDelay = t;
+		framez.forEach(f -> frameWithDelay.put(f.getV(), f.getO()));
 	}
 
 	/**
 	 * Start the animation.
 	 */
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u, boolean b) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u,
+			boolean b) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
+			if (template == null) {
+				return -1;
+			}
 			if (!template.send(f, args, opt, u, b)) {
 				return -1;
 			} else {
@@ -192,6 +196,9 @@ public class AnimatedFormat extends Format {
 	@Override
 	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt, Optional<UUID> u, boolean b) {
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
+			if (template == null) {
+				return -1;
+			}
 			if (!template.send(f, data, opt, u, b)) {
 				return -1;
 			} else {

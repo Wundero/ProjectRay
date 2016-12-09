@@ -52,7 +52,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.LiteralText;
-import org.spongepowered.api.text.LiteralText.Builder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.TextTemplate.Arg;
@@ -69,6 +68,7 @@ import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.text.translation.locale.Locales;
 
 import com.flowpowered.math.GenericMath;
 
@@ -312,7 +312,37 @@ public class TextUtils {
 			}
 			return total;
 		}
-		return (int) Math.ceil((double) getWidth(text, false) / LINE_WIDTH);
+		int val = (int) Math.ceil((double) getWidth(text, false) / LINE_WIDTH);
+		return val;
+	}
+
+	private static List<Text> splitLines(Text original, int maxWidth, Locale locale, boolean forceUnicode) {
+		List<Text> output = Utils.al();
+		TextSplitter.splitLines(original, output, maxWidth, locale, forceUnicode);
+		return output;
+	}
+
+	/**
+	 * Split a text after every line. Credit to simon816 for proper function of
+	 * this algorithm.
+	 */
+	public static List<Text> splitIntoLines(Text t) {
+		if (getLines(t) > 1) {
+			return splitLines(t, LINE_WIDTH, Locales.DEFAULT, false);
+		} else {
+			return Utils.al(t);
+		}
+	}
+
+	/**
+	 * Get total number of lines for a list of text objects.
+	 */
+	public static int getLines(List<Text> texts) {
+		int i = 0;
+		for (Text t : texts) {
+			i += getLines(t);
+		}
+		return i;
 	}
 
 	/**
@@ -438,7 +468,7 @@ public class TextUtils {
 		if (t.getChildren().isEmpty()) {
 			return Utils.al(t);
 		}
-		List<Text> children = t.getChildren();
+		List<Text> children = Utils.al(t.getChildren(), true);
 		children.add(0, t.toBuilder().removeAll().build());
 		return children;
 	}
@@ -455,9 +485,9 @@ public class TextUtils {
 		if (!recursive) {
 			return flatten(t);
 		}
-		List<Text> f = flatten(t);
+		List<Text> f = Utils.al(t.getChildren(), true);
 		List<Text> out = Utils.al(t.toBuilder().removeAll().build());
-		f.stream().forEach(text -> out.addAll(flatten(t, recursive)));
+		f.stream().forEach(text -> out.addAll(flatten(text, recursive)));
 		return out;
 	}
 
@@ -482,7 +512,7 @@ public class TextUtils {
 		List<Text> children = original.getChildren();
 		original = original.toBuilder().removeAll().build();
 		Text.Builder out = Text.builder().color(original.getColor());
-		char[] chars = getContent(original, false).toCharArray();
+		char[] chars = getContent(original).toCharArray();
 		Integer obC = percentDiscoloration.intValue();
 		Integer obS = percentObfuscation.intValue();
 		List<Text> cs = Utils.al();
@@ -1002,46 +1032,6 @@ public class TextUtils {
 		return split(t, '\n', true);
 	}
 
-	private static Text s(List<Text> tx, int start, int finish) {
-		if (start < 0) {
-			throw new IllegalArgumentException("Cannot start below 0!");
-		}
-		if (finish < start) {
-			throw new IllegalArgumentException("End must be after start!");
-		}
-		if (finish == start) {
-			return Text.of();
-		}
-		if (tx.isEmpty()) {
-			throw new IllegalArgumentException("Text must be present!");
-		}
-		Text t = tx.get(0);
-		if (!lit(t)) {
-			return t;
-		}
-		String c = getContent(t, true);
-		if (finish > c.length()) {
-			if (tx.size() == 1) {
-				return t;
-			}
-			LiteralText.Builder b = (Builder) LiteralText.builder();
-			b.format(t.getFormat());
-			t.getClickAction().ifPresent((a) -> b.onClick(a));
-			t.getHoverAction().ifPresent((a) -> b.onHover(a));
-			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
-			int offset = c.substring(start).length();
-			b.content(c.substring(start));
-			b.append(s(tx.stream().skip(1).collect(RayCollectors.rayList()), 0, finish - offset));
-			return b.build();
-		} else {
-			Text.Builder b = Text.of(c.substring(start, finish)).toBuilder().format(t.getFormat());
-			t.getClickAction().ifPresent((a) -> b.onClick(a));
-			t.getHoverAction().ifPresent((a) -> b.onHover(a));
-			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
-			return b.build();
-		}
-	}
-
 	/**
 	 * Split the text after a certain number of content characters has been
 	 * passed. Good for preventing packet overflow of texts with more than
@@ -1078,7 +1068,7 @@ public class TextUtils {
 	}
 
 	/**
-	 * Substring a text starting at an index. Follows String.substring(a,b).
+	 * Substring a text starting at an index. Follows String.substring(a).
 	 */
 	public static Text substring(Text t, int start) {
 		return substring(t, start, length(t));
@@ -1101,35 +1091,63 @@ public class TextUtils {
 		if (finish == start) {
 			return Text.of();
 		}
-		String c = getContent(t, true);
-		if (start > c.length()) {
-			if (t.getChildren().isEmpty()) {
-				throw new IllegalArgumentException("Cannot start after text ends!");
-			} else {
-				LiteralText.Builder b = (Builder) LiteralText.builder();
-				int offset = start - c.length();
-				b.append(s(t.getChildren(), 0, finish - offset));
-				return b.build();
+		String c = getContent(t);
+		if (finish > c.length()) {
+			throw new IllegalArgumentException("End must be within text!");
+		}
+		Text t2 = t;
+		if (start > 0) {
+			List<Map.Entry<String, Boolean>> lens = getUpTo(t2, start);
+			int len = 0;
+			for (Map.Entry<String, Boolean> e : lens) {
+				len += getStringWidth(e.getKey(), e.getValue(), false);
 			}
-		} else if (finish > c.length()) {
-			if (t.getChildren().isEmpty()) {
-				return t;
-			}
-			LiteralText.Builder b = (Builder) LiteralText.builder();
-			b.format(t.getFormat());
-			t.getClickAction().ifPresent((a) -> b.onClick(a));
-			t.getHoverAction().ifPresent((a) -> b.onHover(a));
-			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
-			int offset = c.substring(start).length();
-			b.content(c.substring(start));
-			b.append(s(t.getChildren(), 0, finish - offset));
-			return b.build();
+			List<Text> texts = Utils.al();
+			TextSplitter.splitLines(t2, texts, len, Locales.DEFAULT, false);
+			t2 = Text.join(texts.stream().skip(1).collect(RayCollectors.rayList()));
+		}
+		List<Map.Entry<String, Boolean>> lens = getUpTo(t2, finish);
+		int len = 0;
+		for (Map.Entry<String, Boolean> e : lens) {
+			len += getStringWidth(e.getKey(), e.getValue(), false);
+		}
+		List<Text> texts = Utils.al();
+		TextSplitter.splitLines(t2, texts, len, Locales.DEFAULT, false);
+		return texts.get(0);
+	}
+
+	private static int getl(List<Map.Entry<String, Boolean>> l) {
+		int i = 0;
+		for (Map.Entry<String, Boolean> e : l) {
+			i += e.getKey().length();
+		}
+		return i;
+	}
+
+	private static List<Map.Entry<String, Boolean>> getUpTo(Text t, int ind) {
+		List<Text> c = Utils.al(t.getChildren(), true);
+		Text t2 = t.toBuilder().removeAll().build();
+		String s = getContent(t2);
+		if (s.length() >= ind) {
+			String s2 = s.substring(0, ind);
+			Map<String, Boolean> ent = Utils.hm();
+			ent.put(s2, t2.getStyle().isBold().orElse(false));
+			return Utils.al(ent.entrySet(), true);
 		} else {
-			Text.Builder b = Text.of(c.substring(start, finish)).toBuilder().format(t.getFormat());
-			t.getClickAction().ifPresent((a) -> b.onClick(a));
-			t.getHoverAction().ifPresent((a) -> b.onHover(a));
-			t.getShiftClickAction().ifPresent((a) -> b.onShiftClick(a));
-			return b.build();
+			Map<String, Boolean> ent = Utils.hm();
+			ent.put(s, t2.getStyle().isBold().orElse(false));
+			List<Map.Entry<String, Boolean>> out = Utils.al(ent.entrySet(), true);
+			int i2 = ind - s.length();
+			for (Text t3 : c) {
+				List<Map.Entry<String, Boolean>> c2 = getUpTo(t3, i2);
+				out.addAll(c2);
+				int l = getl(c2);
+				i2 -= l;
+				if (i2 == 0) {
+					return out;
+				}
+			}
+			return out;
 		}
 	}
 
@@ -1137,7 +1155,7 @@ public class TextUtils {
 	 * Return the character at a certain point in the text.
 	 */
 	public static char charAt(Text t, int i) {
-		return getContent(t, false).charAt(i);
+		return getContent(t).charAt(i);
 	}
 
 	/**
@@ -1159,8 +1177,8 @@ public class TextUtils {
 	 * Check to see if the string contents of two texts are equal.
 	 */
 	public static boolean contentsEqual(Text one, Text two, boolean ignoreCase) {
-		String o = getContent(one, false);
-		String t = getContent(two, false);
+		String o = getContent(one);
+		String t = getContent(two);
 		return ignoreCase ? o.equalsIgnoreCase(t) : o.equals(t);
 	}
 
@@ -1328,7 +1346,7 @@ public class TextUtils {
 	 * Compare the string contents of two texts.
 	 */
 	public static int compare(Text one, Text two) {
-		return getContent(one, false).compareTo(getContent(two, false));
+		return getContent(one).compareTo(getContent(two));
 	}
 
 	/**
@@ -1342,7 +1360,7 @@ public class TextUtils {
 	 * Check to see if a text ends with a string.
 	 */
 	public static boolean endsWith(Text in, String part) {
-		return getContent(in, false).endsWith(part);
+		return getContent(in).endsWith(part);
 	}
 
 	/**
@@ -1356,7 +1374,7 @@ public class TextUtils {
 	 * Check to see if a text starts with a string.
 	 */
 	public static boolean startsWith(Text in, String part) {
-		return getContent(in, false).startsWith(part);
+		return getContent(in).startsWith(part);
 	}
 
 	/**
@@ -1480,40 +1498,17 @@ public class TextUtils {
 	}
 
 	private static boolean capequalsnorm(Text t) {
-		if (!lit(t)) {
-			return true;
-		}
-		LiteralText t1 = (LiteralText) t;
-		String content = t1.getContent();
+		String content = getContent(t);
 		String capped = Utils.capitalize(content);
-		if (t1.getChildren().isEmpty()) {
-			return content.equals(capped);
-		} else {
-			if (content.equals(capped)) {
-				return true;
-			}
-			boolean b = false;
-			for (Text c : t1.getChildren()) {
-				b = b || capequalsnorm(c);
-			}
-			return b;
-		}
+		return content.equals(capped);
 	}
 
 	/**
 	 * Return the string content of a text. If it's a LiteralText, just
 	 * content(). If not, it will return toPlain().
 	 */
-	public static String getContent(Text t, boolean strict) {
-		if (lit(t)) {
-			return ((LiteralText) t).getContent();
-		} else {
-			if (strict) {
-				throw new IllegalArgumentException("Unsupported text " + t);
-			} else {
-				return t.toPlain();
-			}
-		}
+	public static String getContent(Text t) {
+		return t.toPlain();
 	}
 
 	/**
@@ -1534,7 +1529,7 @@ public class TextUtils {
 		List<Text> all = split(t, Utils.VAR_PATTERN, false);
 		List<Object> trans = all.stream().map(text -> {
 			if (lit(text)) {
-				String content = getContent(text, true);
+				String content = getContent(text);
 				if (Utils.VAR_PATTERN.matcher(content).matches()) {
 					String proper = content.replace("{", "").replace("}", "");
 					return (Object) TextTemplate.arg(proper).defaultValue(text).format(text.getFormat());
@@ -1580,7 +1575,7 @@ public class TextUtils {
 
 	private static LiteralText makeURLUnclickable(LiteralText text) {
 		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (matchtext) -> {
-			String match = getContent(matchtext, false);
+			String match = getContent(matchtext);
 			return Optional.of((LiteralText) apply(Text.builder(match.replace(".", " ")).format(matchtext.getFormat()),
 					matchtext.toBuilder()).build());
 		}, true);
@@ -1598,7 +1593,7 @@ public class TextUtils {
 	 */
 	public static LiteralText makeURLClickable(LiteralText text) {
 		return TextUtils.replaceRegex(text, Utils.URL_PATTERN, (matchtext) -> {
-			String match = getContent(matchtext, true);
+			String match = getContent(matchtext);
 			if (!Utils.toUrlSafe(match).isPresent()) {
 				return Optional.of(matchtext);
 			}
@@ -1615,7 +1610,7 @@ public class TextUtils {
 	 */
 	public static LiteralText parseForVariables(LiteralText text, ParsableData data) {
 		return TextUtils.replaceRegex(text, Utils.VAR_PATTERN, (matchtext) -> {
-			String match = getContent(matchtext, true);
+			String match = getContent(matchtext);
 			String proper = match.replace("{", "").replace("}", "");
 			Object out = Ray.get().getVariables().get(proper, data, Optional.empty(), Optional.empty());
 			if (data.getKnown().isPresent() && data.getKnown().get().containsKey(proper)) {
@@ -1669,16 +1664,7 @@ public class TextUtils {
 	 * Return the length of the content of the text object.
 	 */
 	public static int length(Text t) {
-		if (!lit(t)) {
-			return 0;
-		}
-		List<Text> children = t.getChildren();
-		LiteralText lt = (LiteralText) t;
-		int l = lt.getContent().length();
-		for (Text f : children) {
-			l += length(f);
-		}
-		return l;
+		return getContent(t).length();
 	}
 
 	/**
