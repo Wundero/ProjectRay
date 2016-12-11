@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.spongepowered.api.command.CommandCallable;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
@@ -49,14 +48,6 @@ public class Commands {
 						.executor(new AnnouncementConversationCommand()).build());
 		children.put(Utils.al("channel"), CommandSpec.builder().permission("ray.channelbuilder")
 				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
-		children.put(Utils.al("lock"),
-				CommandSpec.builder().permission("ray.chatlock").executor(new ChatLockCommand())
-						.description(Text.of("Lock chat messages"))
-						.arguments(GenericArguments.optional(GenericArguments.bool(Text.of("value")))).build());
-		children.put(Utils.al("filter"),
-				CommandSpec.builder().arguments(GenericArguments.optional(GenericArguments.bool(Text.of("value"))))
-						.executor(new ChatFilterCommand()).permission("ray.chatfilter")
-						.description(Text.of("Filter chat messages")).build());
 	}
 
 	/**

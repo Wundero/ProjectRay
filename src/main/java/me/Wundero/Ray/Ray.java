@@ -19,8 +19,6 @@ import com.google.common.reflect.TypeToken;
 
 import me.Wundero.Ray.config.InternalClickAction;
 import me.Wundero.Ray.config.InternalHoverAction;
-import me.Wundero.Ray.features.ChatFilter;
-import me.Wundero.Ray.features.ChatLock;
 import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.framework.channel.ChatChannels;
 import me.Wundero.Ray.framework.format.Format;
@@ -117,8 +115,6 @@ public class Ray {
 	// cache
 	private UserCache cache;
 
-	private ChatFilter filter;
-	private ChatLock lock;
 	private boolean useChatMenus = false;
 
 	/**
@@ -240,8 +236,6 @@ public class Ray {
 		} catch (Exception e) {
 			this.setEcon(null);
 		}
-		this.setLock(new ChatLock());
-		this.setFilter(new ChatFilter());
 		new AfkListener(config.getNode("afk", "timer").getInt(-1), config.getNode("afk", "kick").getInt(-1),
 				config.getNode("afk", "cancel-movement").getBoolean(false));
 	}
@@ -521,36 +515,6 @@ public class Ray {
 	 */
 	public void setTags(TagStore tags) {
 		this.tags = tags;
-	}
-
-	/**
-	 * @return the filter
-	 */
-	public ChatFilter getFilter() {
-		return filter;
-	}
-
-	/**
-	 * @param filter
-	 *            the filter to set
-	 */
-	public void setFilter(ChatFilter filter) {
-		this.filter = filter;
-	}
-
-	/**
-	 * @return the lock
-	 */
-	public ChatLock getLock() {
-		return lock;
-	}
-
-	/**
-	 * @param lock
-	 *            the lock to set
-	 */
-	public void setLock(ChatLock lock) {
-		this.lock = lock;
 	}
 
 	/**
