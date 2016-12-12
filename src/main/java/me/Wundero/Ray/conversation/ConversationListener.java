@@ -37,6 +37,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 /**
  * Listener built around conversations - handles events
@@ -150,7 +151,8 @@ public abstract class ConversationListener {
 					input);
 			if (!Sponge.getEventManager().post(event1)) {
 				if (conversation.isEchoInputs()) {
-					p.sendMessage(conversation.getPrefix().concat(Text.of(TextColors.RESET, input)));
+					p.sendMessage(conversation.getPrefix().concat(
+							Text.of(TextColors.RESET).concat(TextSerializers.FORMATTING_CODE.deserialize(input))));
 				}
 				for (ConversationCanceller c : conversation.getCancellers()) {
 					if (c.checkCancel(conversation, input)) {

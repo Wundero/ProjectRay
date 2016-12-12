@@ -107,6 +107,10 @@ public class FormatLocations {
 		}
 	}
 
+	public static List<FormatLocation> values() {
+		return Utils.al(TITLE, SUBTITLE, ACTIONBAR, BOSSBAR, TITLE_SUBTITLE, TAB_ENTRY, TAB_FOOTER, TAB_HEADER, CHAT);
+	}
+
 	/**
 	 * Send a message to the chat. If chat menus are being used, try to put the
 	 * message in a menu.
@@ -319,6 +323,7 @@ public class FormatLocations {
 			}
 			ConfigurationNode n = f.getNode().get().getNode("location-data");
 			String col = n.getNode("color").getString("white");
+			int barIndex = n.getNode("bar-index").getInt(0);
 			double per = n.getNode("percent").getDouble(1);
 			int notchScale = n.getNode("notches").getInt(0);
 			BossBarColor c = BossBarColors.WHITE;
@@ -367,8 +372,9 @@ public class FormatLocations {
 				ov = BossBarOverlays.PROGRESS;
 				break;
 			}
-			ServerBossBar.builder().name(text).color(c).createFog(false).darkenSky(false).playEndBossMusic(false)
-					.visible(true).overlay(ov).percent((float) per).build().addPlayer((Player) target);
+			RayPlayer.get((Player) target).setBossbar(barIndex,
+					ServerBossBar.builder().name(text).color(c).createFog(false).darkenSky(false)
+							.playEndBossMusic(false).visible(true).overlay(ov).percent((float) per).build());
 			return true;
 		}
 	};

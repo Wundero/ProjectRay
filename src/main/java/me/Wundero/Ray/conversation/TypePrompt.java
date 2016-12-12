@@ -110,14 +110,8 @@ public abstract class TypePrompt<T> extends Prompt {
 	@Override
 	public Optional<Option> getSelected(ConversationContext context, String input) {
 		// same as above except returns values and not booleans
-		Optional<List<Option>> o = options(context);
-		if (o != null && o.isPresent()) {
-			List<Option> opts = options(context).get();
-			for (Option opt : opts) {
-				if (opt.works(input)) {
-					return Optional.of(opt);
-				}
-			}
+		if (super.getSelected(context, input).isPresent()) {
+			return super.getSelected(context, input);
 		} else if (type.isPresent()) {
 			Class<? extends T> t = type.get();
 			try {

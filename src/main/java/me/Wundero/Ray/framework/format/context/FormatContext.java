@@ -74,6 +74,11 @@ public class FormatContext {
 		return name;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof FormatContext && ((FormatContext) o).getName().equals(this.getName());
+	}
+
 	/**
 	 * Set the name.
 	 */

@@ -50,6 +50,10 @@ import me.Wundero.Ray.utils.TextUtils;
  */
 public class DefaultVariables {
 
+	private static long convertToMb(long input) {
+		return (input / 1024) / 1024;
+	}
+
 	/**
 	 * Register all default vars and wrappers
 	 */
@@ -69,6 +73,18 @@ public class DefaultVariables {
 				return Text.of();
 			}
 			return TextSerializers.FORMATTING_CODE.deserialize(quote.get());
+		});
+		v.registerVariable("freeram", () -> {
+			return Text.of(convertToMb(Runtime.getRuntime().freeMemory()) + " MB");
+		});
+		v.registerVariable("usedram", () -> {
+			return Text.of(convertToMb((Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory())) + " MB");
+		});
+		v.registerVariable("totalram", () -> {
+			return Text.of(convertToMb(Runtime.getRuntime().maxMemory()) + " MB");
+		});
+		v.registerVariable("processors", () -> {
+			return Text.of(Runtime.getRuntime().availableProcessors());
 		});
 		v.registerVariable("afk", (objects) -> {
 			Param playerToUse = Param.SENDER;

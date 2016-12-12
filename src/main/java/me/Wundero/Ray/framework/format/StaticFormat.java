@@ -43,6 +43,8 @@ import me.Wundero.Ray.conversation.Conversation;
 import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.framework.format.location.FormatLocation;
+import me.Wundero.Ray.framework.format.location.FormatLocations;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -101,7 +103,8 @@ public class StaticFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u, boolean broadcast) {
+	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u,
+			boolean broadcast) {
 		if (!getTemplate().isPresent()) {
 			return false;
 		}
@@ -114,6 +117,43 @@ public class StaticFormat extends Format {
 			return false;
 		}
 		return this.s(f, data, getTemplate().get(), o, u, broadcast);
+	}
+
+	private static class LocationPrompt extends Prompt {
+
+		private Prompt returnTo;
+
+		public LocationPrompt(Prompt returnTo) {
+			super(TextTemplate.of(TextColors.GRAY, "Please select a location: ", TextTemplate.arg("options")));
+			this.returnTo = returnTo;
+		}
+
+		@Override
+		public Text getQuestion(ConversationContext context) {
+			return formatTemplate(context);
+		}
+
+		@Override
+		public Optional<List<Option>> options(ConversationContext context) {
+			List<Option> opts = Utils.al();
+			for(FormatLocation f : FormatLocations.values()) {
+				opts.add(Option.build(f.getName(), f.getName()));
+			}
+			return Optional.of(opts);
+		}
+
+		@Override
+		public Text getFailedText(ConversationContext context, String failedInput) {
+			return Text.of(TextColors.RED, "That is not a valid location!");
+		}
+
+		@Override
+		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
+			ConfigurationNode n = context.getData("node");
+			n.getNode("location").setValue(text);
+			return new TemplateBuilderTypePrompt(true, context, returnTo);
+		}
+
 	}
 
 	private static class TemplateBuilderTypePrompt extends Prompt {
@@ -500,7 +540,7 @@ public class StaticFormat extends Format {
 
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		return new TemplateBuilderTypePrompt(true, context, returnTo);
+		return new LocationPrompt(returnTo);
 	}
 
 	@Override

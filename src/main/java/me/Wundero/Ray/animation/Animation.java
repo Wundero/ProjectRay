@@ -103,7 +103,7 @@ public class Animation<T> {
 		if (!running) {// if not running
 			return;
 		}
-		// apply frame
+		// apply frame - wrapped cause I was getting NPE?
 		int delayTicks = Utils.wrap(update.apply(frame)).orElse(-1);
 		if (delayTicks < 0) {
 			// if no more frames or frame display went wrong

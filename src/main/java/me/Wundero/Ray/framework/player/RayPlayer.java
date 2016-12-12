@@ -35,6 +35,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
@@ -159,6 +160,33 @@ public class RayPlayer implements Socialable {
 	private boolean spy = false;
 	private Optional<String> quote = Optional.empty();
 	private InstantDisplayName disp = null;
+	private List<ServerBossBar> bossbars = Utils.sl();
+
+	public boolean addBossbar(ServerBossBar bar) {
+		return setBossbar(bossbars.size(), bar);
+	}
+
+	public boolean setBossbar(int index, ServerBossBar bar) {
+		if (!this.getPlayer().isPresent()) {
+			return false;
+		}
+		if (index == bossbars.size()) {
+			bossbars.add(bar);
+			bar.addPlayer(this.getPlayer().get());
+			return true;
+		}
+		if (index > bossbars.size()) {
+			return false;
+		}
+		try {
+			Player p = this.getPlayer().get();
+			bossbars.set(index, bar).removePlayer(p);
+			bar.addPlayer(p);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 	/**
 	 * Get the prefix if available.

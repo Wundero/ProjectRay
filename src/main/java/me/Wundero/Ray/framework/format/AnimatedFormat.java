@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -153,7 +154,7 @@ public class AnimatedFormat extends Format {
 			inOrder.add(0, f);
 			frameWithDelay.put(f, delay);
 		});
-		framez.forEach(f -> frameWithDelay.put(f.getV(), f.getO()));
+		framez.forEach(f -> frameWithDelay.put(f.getV(), t.get(f.getV())));
 	}
 
 	/**
@@ -162,11 +163,15 @@ public class AnimatedFormat extends Format {
 	@Override
 	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> opt, Optional<UUID> u,
 			boolean b) {
+		if (!(f instanceof Player)) {
+			return false;
+		}
+		final Player p = (Player) f;
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
 			if (template == null) {
 				return -1;
 			}
-			if (!template.send(f, args, opt, u, b)) {
+			if (!template.send(p, args, opt, u, b)) {
 				return -1;
 			} else {
 				if (template instanceof ExecutingFormat
@@ -195,11 +200,15 @@ public class AnimatedFormat extends Format {
 	 */
 	@Override
 	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> opt, Optional<UUID> u, boolean b) {
+		if (!(f instanceof Player)) {
+			return false;
+		}
+		final Player p = (Player) f;
 		Animation<Format> anim = new Animation<Format>(inOrder, (template) -> {
 			if (template == null) {
 				return -1;
 			}
-			if (!template.send(f, data, opt, u, b)) {
+			if (!template.send(p, data, opt, u, b)) {
 				return -1;
 			} else {
 				if (template instanceof ExecutingFormat
@@ -327,13 +336,15 @@ public class AnimatedFormat extends Format {
 
 		@Override
 		public Prompt onTypeInput(Integer object, String text, ConversationContext context) {
-			ConfigurationNode n = context.getData("frame" + context.getData("framenumber"));
-			n.getNode("stay").setValue(object);
+			int num = context.getData("framenumber");
+			ConfigurationNode n = context.getData("frame" + num);
+			n.getNode("stay").setValue(text);
 			return new FramePrompt(p);
 		}
 
 		@Override
 		public Text getQuestion(ConversationContext context) {
+			System.out.println("Important prompt " + this.getClass().getName());
 			return formatTemplate(context);
 		}
 

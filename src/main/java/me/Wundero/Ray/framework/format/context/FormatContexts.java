@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import me.Wundero.Ray.utils.RayCollectors;
 import me.Wundero.Ray.utils.Utils;
 
 /**
@@ -92,7 +93,7 @@ public class FormatContexts {
 	 * Get all format contexts.
 	 */
 	public static List<FormatContext> values() {
-		return Utils.al(lookup.values(), true);
+		return Utils.al(lookup.values(), true).stream().distinct().collect(RayCollectors.rayList());
 	}
 
 	/**
