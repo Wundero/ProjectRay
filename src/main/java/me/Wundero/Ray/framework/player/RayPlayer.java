@@ -668,7 +668,7 @@ public class RayPlayer implements Socialable {
 		this.uuid = u.getUniqueId();
 		this.setGroups(Ray.get().getGroups().getGroups(u));
 		this.checkDisplayname();
-		this.disp = new InstantDisplayName(Text.of(u.getName()), (displayname) -> {
+		this.disp = new InstantDisplayName(Text.of(u.getName()), u, (displayname) -> {
 			if (!getPlayer().isPresent()) {
 				return false;
 			}

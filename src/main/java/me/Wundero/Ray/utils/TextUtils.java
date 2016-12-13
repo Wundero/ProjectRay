@@ -916,7 +916,7 @@ public class TextUtils {
 				}
 			}
 			if (builder.getHoverAction().isPresent()) {
-				Text hover = replaceRegexAction(builder.getClickAction().get(), (s) -> {
+				Text hover = replaceRegexAction(builder.getHoverAction().get(), (s) -> {
 					String a = TextSerializers.FORMATTING_CODE.serialize(s);
 					if (!matcher.matcher(a).find()) {
 						return s;

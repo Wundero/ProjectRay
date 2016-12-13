@@ -26,6 +26,7 @@ package me.Wundero.Ray.framework.player.name;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.Validate;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 
 /**
@@ -40,12 +41,12 @@ public class InstantDisplayName extends DisplayName {
 	/**
 	 * Create a displayname object that updates upon passing a displayname.
 	 */
-	public InstantDisplayName(Text original, Function<Text, Boolean> applicant, String separator) {
-		super(original);
+	public InstantDisplayName(Text original, User player, Function<Text, Boolean> applicant, String separator) {
+		super(original, player);
 		this.setApplier(Validate.notNull(applicant));
 		this.setSeparator(separator);
 	}
-	
+
 	/**
 	 * Get displayname.
 	 */

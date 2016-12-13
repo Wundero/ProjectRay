@@ -51,11 +51,11 @@ import me.Wundero.Ray.utils.TextUtils;
 public class DefaultVariables {
 
 	private static long convertToMb(long input) {
-		return (input / 1024) / 1024;
+		return input / 1048576;
 	}
 
 	/**
-	 * Register all default vars and wrappers
+	 * Register all default vars and wrappers TODO vars in separate classes?
 	 */
 	public static void register(Variables v) {
 		v.registerWrapper("stripped", (va, t) -> {
@@ -63,6 +63,86 @@ public class DefaultVariables {
 		});
 		v.registerWrapper("nourls", (va, t) -> {
 			return TextUtils.noUrls(t);
+		});
+		v.registerVariable("suffix", (objects) -> {
+			Param playerToUse = Param.SENDER;
+			Player player = null;
+			if (objects.containsKey(Param.DATA)) {
+				String data = (String) objects.get(Param.DATA);
+				switch (data) {
+				case "sender":
+					break;
+				case "recipient":
+				case "recip":
+					playerToUse = Param.RECIPIENT;
+					break;
+				case "observer":
+				case "killer":
+					playerToUse = Param.OBSERVER;
+					break;
+				default:
+					playerToUse = Param.DATA;
+					Optional<Player> po = Sponge.getServer().getPlayer(data);
+					if (!po.isPresent()) {
+						return Text.of();
+					}
+					player = po.get();
+				}
+			}
+			if (!objects.containsKey(playerToUse)) {
+				return Text.of();
+			}
+			if (player == null) {
+				player = (Player) objects.get(playerToUse);
+			}
+			if (player == null) {
+				return Text.of();
+			}
+			Optional<String> opt = player.getOption("suffix");
+			if (!opt.isPresent()) {
+				return Text.of();
+			}
+			return TextSerializers.FORMATTING_CODE.deserialize(opt.get());
+		});
+		v.registerVariable("prefix", (objects) -> {
+			Param playerToUse = Param.SENDER;
+			Player player = null;
+			if (objects.containsKey(Param.DATA)) {
+				String data = (String) objects.get(Param.DATA);
+				switch (data) {
+				case "sender":
+					break;
+				case "recipient":
+				case "recip":
+					playerToUse = Param.RECIPIENT;
+					break;
+				case "observer":
+				case "killer":
+					playerToUse = Param.OBSERVER;
+					break;
+				default:
+					playerToUse = Param.DATA;
+					Optional<Player> po = Sponge.getServer().getPlayer(data);
+					if (!po.isPresent()) {
+						return Text.of();
+					}
+					player = po.get();
+				}
+			}
+			if (!objects.containsKey(playerToUse)) {
+				return Text.of();
+			}
+			if (player == null) {
+				player = (Player) objects.get(playerToUse);
+			}
+			if (player == null) {
+				return Text.of();
+			}
+			Optional<String> opt = player.getOption("prefix");
+			if (!opt.isPresent()) {
+				return Text.of();
+			}
+			return TextSerializers.FORMATTING_CODE.deserialize(opt.get());
 		});
 		v.registerVariable("quote", (objects) -> {
 			if (!objects.containsKey(Param.SENDER)) {

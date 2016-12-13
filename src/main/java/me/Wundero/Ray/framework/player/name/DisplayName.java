@@ -3,6 +3,7 @@ package me.Wundero.Ray.framework.player.name;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 
 import me.Wundero.Ray.utils.Utils;
@@ -38,13 +39,13 @@ import me.Wundero.Ray.utils.Utils;
 public class DisplayName implements Nicknamable, Prefixable, Suffixable {
 
 	private final Text original;
-	private Optional<Text> nick, prefix, suffix;
+	private Optional<Text> nick = Optional.empty(), prefix = Optional.empty(), suffix = Optional.empty();
 
 	/**
 	 * Create a displayname handler with an original name
 	 */
-	public DisplayName(Text original) {
-		this.original = original;
+	public DisplayName(Text original, User p) {
+		this.original = Utils.wrap(original, !original.isEmpty()).orElse(Text.of(p.getName()));
 	}
 
 	/**
