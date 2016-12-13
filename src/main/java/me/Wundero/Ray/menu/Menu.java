@@ -126,8 +126,8 @@ public abstract class Menu {
 	}
 
 	private final void paginate(List<Text> h, List<Text> b, List<Text> f, boolean scroll, boolean clear) {
-		Text header = TextUtils.join(h, Text.of("\n"));
-		Text footer = TextUtils.join(f, Text.of("\n"));
+		Text header = Text.joinWith(Text.of("\n"), h);
+		Text footer = Text.joinWith(Text.of("\n"), f);
 		PaginationList.Builder builder = Ray.get().getPaginationService().builder().contents(b)
 				.padding(Text.of('\u2500'));
 		if (!h.isEmpty()) {
@@ -275,6 +275,10 @@ public abstract class Menu {
 		return nullable == null ? Utils.al() : nullable;
 	}
 
+	protected int getMaxLines() {
+		return MAX_LINES;
+	}
+	
 	/**
 	 * Send rendered content to the holder.
 	 */
@@ -284,9 +288,9 @@ public abstract class Menu {
 		List<Text> f = or(renderFooter());
 		List<Text> body = Utils.al();
 		b.forEach(t -> body.addAll(TextUtils.splitIntoLines(t)));
-		Text header = TextUtils.join(h, Text.of("\n"));
-		Text footer = TextUtils.join(f, Text.of("\n"));
-		int lb = MAX_LINES - TextUtils.getLines(header) - TextUtils.getLines(footer);
+		Text header = Text.joinWith(Text.of("\n"), h);
+		Text footer = Text.joinWith(Text.of("\n"), f);
+		int lb = getMaxLines() - TextUtils.getLines(header) - TextUtils.getLines(footer);
 		if (lb <= 0) {
 			throw new IllegalArgumentException("Header and footer must not be larger than the page!");
 		}

@@ -71,7 +71,7 @@ public class TextEditConversation {
 		List<Text> mod = (List<Text>) Utils.applyToAll(t, text -> {
 			return text.toBuilder().onClick(TextActions.runCommand("" + t.indexOf(text))).build();
 		}, () -> new ArrayList<Text>());
-		Text t2 = Text.of().toBuilder().append(mod).build();
+		Text t2 = Text.builder().append(mod).build();
 		return TextTemplate.of(TextColors.AQUA, "Now editing text: (Click on any part to edit it, or type ",
 				TextColors.GOLD, "done", TextColors.AQUA, "!)", Text.NEW_LINE, t2);
 	}
@@ -116,7 +116,7 @@ public class TextEditConversation {
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			if (text.equals("done")) {
-				finished.accept(TextUtils.join(this.text));
+				finished.accept(Text.join(this.text));
 				return null;
 			}
 			return onTypeInput(get(selected), text, context);

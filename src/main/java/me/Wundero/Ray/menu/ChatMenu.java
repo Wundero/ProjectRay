@@ -253,6 +253,9 @@ public class ChatMenu extends Menu {
 					true);
 			return h;
 		}
+		if (replaced.containsKey(u)) {
+			replaced.remove(u);
+		}
 		synchronized (messages) {
 			final int id = h.id();
 			messages = messages.stream().filter(holder -> !holder.getUUID().equals(u)).map(holder -> {
@@ -332,6 +335,13 @@ public class ChatMenu extends Menu {
 		return TextActions.showText(Text.of(TextColors.AQUA, "Click to remove this message!"));
 	}
 
+	public List<ChatMenu> getChannelMenus() {
+		if (this.srcChannel == null) {
+			return Utils.al();
+		}
+		return Utils.al(this.srcChannel.getMenus().values(), true);
+	}
+
 	protected List<ChatMenu> getChatMenus() {
 		if (!getPlayer().isPresent()) {
 			throw new IllegalArgumentException("Player must be online!");
@@ -359,7 +369,7 @@ public class ChatMenu extends Menu {
 		}
 	}
 
-	protected Text manageButton(UUID u) {
+	public Text manageButton(UUID u) {
 		return Text.of("")
 				.concat(Text.of(TextColors.YELLOW,
 						TextActions.showText(Text.of(TextColors.AQUA, "Click to manage this message!")),
@@ -368,8 +378,8 @@ public class ChatMenu extends Menu {
 								TextHolder h = get(u);
 								if (h.source.isPresent()) {
 									this.deactive();
-									new MessageOptionsMenu((Player) src, this, h.text, u, (Player) h.source.get(),
-											this.srcChannel).send();
+									new MessageOptionsMenu((Player) src, this, TextUtils.substring(h.text, 4), u,
+											(Player) h.source.get(), this.srcChannel).send();
 								}
 
 							} else {

@@ -27,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -478,7 +477,7 @@ public class TextUtils {
 	 * Will recurse over children as well, until no text in the list contains
 	 * children.
 	 */
-	public static List<Text> flatten(Text t, boolean recursive) {
+	public static List<Text> flatten(final Text t, boolean recursive) {
 		if (t.getChildren().isEmpty()) {
 			return Utils.al(t);
 		}
@@ -487,8 +486,29 @@ public class TextUtils {
 		}
 		List<Text> f = Utils.al(t.getChildren(), true);
 		List<Text> out = Utils.al(t.toBuilder().removeAll().build());
-		f.stream().forEach(text -> out.addAll(flatten(text, recursive)));
+		f.stream().forEach(text -> out.addAll(flatten(mergeOnto(t, text), recursive)));
 		return out;
+	}
+
+	/**
+	 * Merge text formats and on clicks from one text onto another without
+	 * overriding
+	 */
+	public static Text mergeOnto(Text from, Text onto) {
+		TextFormat one = from.getFormat();
+		TextFormat two = onto.getFormat();
+		TextFormat outformat = one.merge(two);
+		Text.Builder out = onto.toBuilder().format(outformat);
+		if (!onto.getClickAction().isPresent()) {
+			from.getClickAction().ifPresent(c -> out.onClick(c));
+		}
+		if (!onto.getShiftClickAction().isPresent()) {
+			from.getShiftClickAction().ifPresent(c -> out.onShiftClick(c));
+		}
+		if (!onto.getHoverAction().isPresent()) {
+			from.getHoverAction().ifPresent(c -> out.onHover(c));
+		}
+		return out.build();
 	}
 
 	/**
@@ -907,11 +927,9 @@ public class TextUtils {
 					List<Object> b = Utils.al();
 					while ((m = m.reset(st)).find()) {
 						String g = m.group();
-						b.add(TextSerializers.FORMATTING_CODE
-								.serialize(replacer
-										.apply((LiteralText) TextUtils
-												.apply(LiteralText.builder(g).format(f), cl, ho, sc).build())
-										.orElse(LiteralText.builder("").build())));
+						b.add(TextSerializers.FORMATTING_CODE.serialize(replacer.apply(
+								(LiteralText) TextUtils.apply(LiteralText.builder(g).format(f), cl, ho, sc).build())
+								.orElse(LiteralText.builder("").build())));
 						st = m.replaceFirst("");
 					}
 					out = format(out, b);
@@ -1246,50 +1264,6 @@ public class TextUtils {
 		LiteralText.Builder b = ((LiteralText) in).toBuilder();
 		b.content(b.getContent().toUpperCase());
 		return b.build();
-	}
-
-	/**
-	 * Join texts together.
-	 */
-	public static Text join(Collection<Text> texts, Text separator) {
-		if (texts.isEmpty()) {
-			return Text.EMPTY;
-		}
-		Text out = texts.iterator().next();
-		if (texts.size() == 1) {
-			return out;
-		}
-		boolean b = true;
-		for (Text t : texts) {
-			out = out.concat(separator);
-			if (b) {
-				b = false;
-				continue;
-			}
-			out.concat(t);
-		}
-		return out;
-	}
-
-	/**
-	 * Join texts together.
-	 */
-	public static Text join(Collection<Text> texts) {
-		return join(texts, Text.of(" "));
-	}
-
-	/**
-	 * Join texts together.
-	 */
-	public static Text join(Text[] texts, Text separator) {
-		return join(Utils.al(texts, true), separator);
-	}
-
-	/**
-	 * Join texts together.
-	 */
-	public static Text join(Text[] texts) {
-		return join(texts, Text.of(" "));
 	}
 
 	/**

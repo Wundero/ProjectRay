@@ -196,7 +196,7 @@ public class Utils {
 			return al();
 		}
 		List<T> l = lists[0];
-		List<T> mod = l;
+		List<T> mod = al(l, true);
 		boolean f = true;
 		for (List<T> l2 : lists) {
 			if (f) {
@@ -224,7 +224,7 @@ public class Utils {
 			return (T[]) new Object[0];
 		}
 		List<T> l = al(arrs[0]);
-		List<T> mod = l;
+		List<T> mod = al(l, true);
 		boolean f = true;
 		for (T[] a2 : arrs) {
 			if (f) {

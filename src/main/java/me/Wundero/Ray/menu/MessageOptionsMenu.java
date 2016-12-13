@@ -27,10 +27,8 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -40,7 +38,6 @@ import me.Wundero.Ray.utils.Utils;
 
 public class MessageOptionsMenu extends Menu {
 
-	private Text message;
 	private final Text originalMessage;
 	private final WeakReference<Player> sender;
 	private final UUID messageUUID;
@@ -50,12 +47,16 @@ public class MessageOptionsMenu extends Menu {
 	public MessageOptionsMenu(Player player, Menu from, Text message, UUID messageUUID, Player sender, ChatChannel ch) {
 		super(player, from);
 		this.channel = ch;
-		this.message = message;
 		this.originalMessage = message;
 		this.messageUUID = messageUUID;
 		this.sender = new WeakReference<>(sender);
 		this.playerName = sender.getName();
 		this.title = createTitle("Message");
+	}
+
+	@Override
+	protected int getMaxLines() {
+		return MAX_LINES - 1;
 	}
 
 	protected Text removeOption() {
@@ -74,22 +75,29 @@ public class MessageOptionsMenu extends Menu {
 	}
 
 	private void removeMessage() {
-		this.message = null;
 		if (this.source != null && this.source.isPresent() && this.source.get() instanceof ChatMenu) {
 			ChatMenu m = (ChatMenu) this.source.get();
-			m.remove(messageUUID);
-			m.send();
+			for (ChatMenu m2 : m.getChannelMenus()) {
+				m2.remove(this.messageUUID);
+				m2.send();
+			}
 		} else if (this.source != null && this.source.isPresent()) {
 			this.source.get().send();
 		}
 	}
 
-	private void setMessage(Text t) {
-		this.message = t;
+	private void setMessage(final Text t) {
 		if (this.source != null && this.source.isPresent() && this.source.get() instanceof ChatMenu) {
 			ChatMenu m = (ChatMenu) this.source.get();
-			m.replace(this.messageUUID, this.message, true);
-			m.send();
+			Text t2 = Text.of("").concat(m.manageButton(this.messageUUID)).concat(Text.of(" ")).concat(t);
+			for (ChatMenu m2 : m.getChannelMenus()) {
+				if (m2.hasPerm("ray.editmessage")) {
+					m2.replace(this.messageUUID, t2, true);
+				} else {
+					m2.replace(this.messageUUID, t, true);
+				}
+				m2.send();
+			}
 		} else if (this.source != null && this.source.isPresent()) {
 			this.source.get().send();
 		}
@@ -112,38 +120,38 @@ public class MessageOptionsMenu extends Menu {
 	protected Text ignoreOption() {
 		return this.createOption("ignore",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to ignore " + playerName + "!")),
-				runCommandAndSource("/ignore " + playerName));
+				TextActions.runCommand("/ignore " + playerName));
 	}
 
 	protected Text tpOption() {
 		return this.createOption("teleport",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to teleport to " + playerName + "!")),
-				runCommandAndSource("/tp " + playerName));
+				TextActions.runCommand("/tp " + playerName));
 	}
 
 	protected Text muteOption() {
 		return this.createOption("mute",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to mute " + playerName + "!")),
-				runCommandAndSource("/mute " + playerName));
+				TextActions.runCommand("/mute " + playerName));
 	}
 
 	protected Text kickOption() {
 		return this.createOption("kick",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to kick " + playerName + "!")),
-				runCommandAndSource("/mute " + playerName));
+				TextActions.runCommand("/mute " + playerName));
 	}
 
 	protected Text messageOption() {
 		return this.createOption("message",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to message " + playerName + "!")),
-				runCommandAndSource("/msg " + playerName + " "));
+				TextActions.suggestCommand("/msg " + playerName + " "));
 	}
 
 	protected Text channelBanOption() {
 		return this.createOption("channel ban",
 				TextActions.showText(
 						Text.of(TextColors.AQUA, "Click to ban " + playerName + " from " + channel.getName() + "!")),
-				runCommandAndSource("/ch ban " + playerName + " " + channel.getName()));
+				TextActions.runCommand("/ch ban " + playerName + " " + channel.getName()));
 
 	}
 
@@ -151,22 +159,13 @@ public class MessageOptionsMenu extends Menu {
 		return this.createOption("channel mute",
 				TextActions.showText(
 						Text.of(TextColors.AQUA, "Click to mute " + playerName + " in " + channel.getName() + "!")),
-				runCommandAndSource("/ch mute " + playerName));
+				TextActions.runCommand("/ch mute " + playerName));
 	}
 
 	protected Text banOption() {
 		return this.createOption("ban",
 				TextActions.showText(Text.of(TextColors.AQUA, "Click to ban " + playerName + "!")),
-				runCommandAndSource("/ban " + playerName));
-	}
-
-	protected TextAction<?> runCommandAndSource(String cmd) {
-		return TextActions.executeCallback(src -> {
-			Sponge.getCommandManager().process(src, cmd);
-			if (this.source != null && this.source.isPresent()) {
-				this.source.get().send();
-			}
-		});
+				TextActions.runCommand("/ban " + playerName));
 	}
 
 	@Override
@@ -174,17 +173,11 @@ public class MessageOptionsMenu extends Menu {
 		// TODO check against other plugins
 		Text begin = Text.of(TextColors.GREEN, " - ");
 		List<Text> out = Utils.al();
-		boolean b = false;
 		if (hasPerm("ray.removemessage")) {
 			out.add(begin.concat(removeOption()));
-			b = true;
 		}
 		if (hasPerm("ray.editmessage")) {
 			out.add(begin.concat(editOption()));
-			b = true;
-		}
-		if (b) {
-			out.add(Text.EMPTY);
 		}
 		out.add(begin.concat(messageOption()));
 		out.add(begin.concat(ignoreOption()));
