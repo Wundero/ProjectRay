@@ -36,9 +36,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.ServerBossBar;
-import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.tab.TabList;
@@ -55,7 +52,6 @@ import me.Wundero.Ray.animation.AnimationQueue;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
-import me.Wundero.Ray.framework.player.name.InstantDisplayName;
 import me.Wundero.Ray.menu.ChatMenu;
 import me.Wundero.Ray.menu.Menu;
 import me.Wundero.Ray.tag.SelectableTag;
@@ -159,7 +155,6 @@ public class RayPlayer implements Socialable {
 	private Map<SelectableTag, String> selectedTags = Utils.hm();
 	private boolean spy = false;
 	private Optional<String> quote = Optional.empty();
-	private InstantDisplayName disp = null;
 	private List<ServerBossBar> bossbars = Utils.sl();
 
 	public boolean addBossbar(ServerBossBar bar) {
@@ -186,69 +181,6 @@ public class RayPlayer implements Socialable {
 		} catch (Exception e) {
 			return false;
 		}
-	}
-
-	/**
-	 * Get the prefix if available.
-	 */
-	public Optional<Text> getPrefix() {
-		return disp.prefix();
-	}
-
-	/**
-	 * Get the suffix if available.
-	 */
-	public Optional<Text> getSuffix() {
-		return disp.suffix();
-	}
-
-	/**
-	 * Get the nickname
-	 */
-	public Text getNickname() {
-		return disp.nickname().orElse(disp.original());
-	}
-
-	/**
-	 * Get the displayname.
-	 */
-	public Text getDisplayname() {
-		return disp.getDisplayName();
-	}
-
-	/**
-	 * Set display name
-	 */
-	public boolean setDisplayname(Text text) {
-		return disp.offer(text);
-	}
-
-	/**
-	 * Set display name
-	 */
-	public boolean setDisplayname(Text prefix, Text nickname, Text suffix) {
-		return disp.offer(prefix, nickname, suffix);
-	}
-
-	/**
-	 * Set suffix
-	 */
-	public boolean setSuffix(Text suffix) {
-		return disp.suffix(suffix);
-	}
-
-	/**
-	 * Set nickname
-	 */
-	public boolean setNickname(Text nickname) {
-		return disp.nickname(nickname);
-	}
-
-	/**
-	 * Set prefix
-	 */
-	public boolean setPrefix(Text prefix) {
-		return disp.prefix(prefix);
 	}
 
 	/**
@@ -668,29 +600,6 @@ public class RayPlayer implements Socialable {
 		this.uuid = u.getUniqueId();
 		this.setGroups(Ray.get().getGroups().getGroups(u));
 		this.checkDisplayname();
-		this.disp = new InstantDisplayName(Text.of(u.getName()), u, (displayname) -> {
-			if (!getPlayer().isPresent()) {
-				return false;
-			}
-			DataTransactionResult result = getPlayer().get().tryOffer(Keys.DISPLAY_NAME, displayname);
-			boolean s = result.isSuccessful();
-			boolean c = false;
-			for (ImmutableValue<?> val : result.getSuccessfulData()) {
-				if (val.get() == displayname) {
-					c = true;
-					break;
-				}
-			}
-			return c && s;
-		}, " ");
-		if (Utils.wrap2(Utils.getOption(getPlayer().get(), "prefix"), s -> s.isPresent() && !s.get().isEmpty())
-				.isPresent()) {
-			this.setPrefix(Utils.getOption(getPlayer().get(), "prefix", true));
-		}
-		if (Utils.wrap2(Utils.getOption(getPlayer().get(), "suffix"), s -> s.isPresent() && !s.get().isEmpty())
-				.isPresent()) {
-			this.setSuffix(Utils.getOption(getPlayer().get(), "suffix", true));
-		}
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
 		File f = new File(p, u.getUniqueId() + ".conf");
 		if (!p.exists()) {

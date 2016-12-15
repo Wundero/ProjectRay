@@ -940,13 +940,9 @@ public class TextUtils {
 				}
 			}
 		}
-		for (Text child : children) {
-			Text o = child;
-			if (child instanceof LiteralText) {
-				o = replaceRegex((LiteralText) child, matcher, replacer, useClickHover);
-			}
-			builder.append(o);
-		}
+		builder.append(children.stream().filter(t -> lit(t))
+				.map(child -> replaceRegex((LiteralText) child, matcher, replacer, useClickHover))
+				.collect(RayCollectors.rayList()));
 		return builder.build();
 	}
 
