@@ -247,34 +247,36 @@ public class MainListener {
 					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
 						return Optional.empty();
 					}
-					if (obfuscate && !Utils.inRange(r.getLocation(), s.getLocation(), range)) {
-						double delta = Utils.difference(s.getLocation(), r.getLocation());
+					boolean ir = Utils.inRange(s.getLocation(), r.getLocation(), range);
+					if (obfuscate && !ir) {
+						double delta = s.getLocation().getPosition().distanceSquared(r.getLocation().getPosition());
 						// percent difference calc adjusted to make the percent
 						// larger but never above 100 (range is 10% smaller than
 						// normal)
 						// lim(delta->infinity) (func %dc) = 100
-						double percentDiscoloration = ((delta - (range / 1.1)) / delta) * 100;
-						double percentObfuscation = percentDiscoloration - percentDiscoloration * .2;
+						double r2 = range * range;
+						double decFactor = 1.1 * 1.1;
+						r2 = r2/decFactor;
+						double percentObfuscation = ((delta - r2) / (delta * (2 * (r2 / delta)))) * 100;
+						double percentDiscoloration = ((delta - r2) / delta) * 100;
 						if (percentObfuscation > 70) {
 							return Optional.empty();
 						}
 						Text m = TextUtils.obfuscate((Text) mc.get("message"), percentObfuscation,
 								percentDiscoloration);
 						mc.put("message", m);
-					} else if (!Utils.inRange(s.getLocation(), r.getLocation(), range)) {
+					} else if (!ir) {
 						return Optional.empty();
 					}
 				}
 				for (ExecutingFormat ftx : ef) {
 					ftx.execConsoles(exf, 1000);
 				}
-				if (f.sendAll(recipient,
-						new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
-								.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
-								.setClickHover(true)
-								.setObserver(observer.isPresent() ? observer
-										: recipient instanceof Player ? Optional.of((Player) recipient)
-												: Optional.empty()),
+				if (f.sendAll(recipient, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
+						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))
+						.setClickHover(true)
+						.setObserver(observer.isPresent() ? observer
+								: recipient instanceof Player ? Optional.of((Player) recipient) : Optional.empty()),
 						Optional.of(msgsender.orElse(p).getUniqueId()), Utils.wrap(locid), broadcast) == 0) {
 					return Optional.of(original);
 				}

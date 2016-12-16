@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ProxySource;
@@ -797,56 +796,6 @@ public class Utils {
 		return b ? b : classinstanceof(main, sub.getSuperclass());
 	}
 
-	private static double calcdelta(double... coord) {
-		double cx = 0;
-		for (int i = 0; i < coord.length; i++) {
-			cx += Math.pow(coord[i], 2);
-		}
-		return Math.sqrt(cx);
-	}
-
-	/**
-	 * Get the pythagorean difference between two sets of coordinates. This
-	 * gives you a scalar value for the distance between coordinates such that,
-	 * in any dimension, it follows Pythagorean theorum. Both coordinate arrays
-	 * must have the same number of dimensions.
-	 */
-	public static double pythrange(double[] coord1, double[] coord2) {
-		if (coord1.length < 2 || coord1.length != coord2.length) {
-			return -1.0d;
-		}
-		double[] dists = new double[coord1.length];
-		for (int i = 0; i < coord1.length; i++) {
-			dists[i] = coord1[i] - coord2[i];
-		}
-		return Math.abs(calcdelta(dists));
-	}
-
-	/**
-	 * Check to see if two coordinate values have a difference within a range.
-	 */
-	public static boolean inrange(double range, double[] coord1, double[] coord2) {
-		if (range == Double.MAX_VALUE || range < 0) {
-			return true;
-		}
-		if (range == 0) {
-			return false;
-		}
-		return pythrange(coord1, coord2) <= range;
-	}
-
-	/**
-	 * Pythagorean difference using a 3d location.
-	 */
-	public static double difference(Location<World> loc1, Location<World> loc2) {
-		Validate.isTrue(loc1.getExtent().equals(loc2.getExtent()), "different worlds");
-		double x1 = loc1.getX(), x2 = loc2.getX(), y1 = loc1.getY(), y2 = loc2.getY(), z1 = loc1.getZ(),
-				z2 = loc2.getZ();
-		double[] c1 = { x1, y1, z1 };
-		double[] c2 = { x2, y2, z2 };
-		return pythrange(c1, c2);
-	}
-
 	/**
 	 * Pythagorean range checker for 3d locations.
 	 */
@@ -860,7 +809,7 @@ public class Utils {
 		if (range == 0 || !loc1.getExtent().equals(loc2.getExtent())) {
 			return false;
 		}
-		return difference(loc1, loc2) <= range;
+		return loc2.getPosition().distanceSquared(loc1.getPosition()) <= range * range;
 	}
 
 	/**

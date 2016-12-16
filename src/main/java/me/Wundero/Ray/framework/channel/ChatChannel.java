@@ -623,12 +623,14 @@ public class ChatChannel extends AbstractMutableMessageChannel implements Compar
 			Player p = (Player) sender;
 			Player r = (Player) recipient;
 			boolean ir = Utils.inRange(p.getLocation(), r.getLocation(), range);
-			double delta = Utils.difference(p.getLocation(), r.getLocation());
+			double delta = p.getLocation().getPosition().distanceSquared(r.getLocation().getPosition());
 			if (!ir && !this.isObfuscateRanged()) {
 				return Optional.empty();
 			} else if (!ir) {
-				double percentObfuscation = ((delta - range) / (delta * (2 * (range / delta)))) * 100;
-				double percentDiscoloration = ((delta - range) / delta) * 100;
+				double r2 = range * range;
+				r2 = r2 / 1.21;
+				double percentObfuscation = ((delta - r2) / (delta * (2 * (r2 / delta)))) * 100;
+				double percentDiscoloration = ((delta - r2) / delta) * 100;
 				return Optional.of(TextUtils.obfuscate(original, percentObfuscation, percentDiscoloration));
 			}
 		}
