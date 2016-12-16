@@ -35,6 +35,7 @@ import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColors;
 
 import com.google.inject.Singleton;
 
@@ -127,7 +128,7 @@ public class Variables {
 			try {
 				return TextUtils.urls(v.parse(map));
 			} catch (Exception e) {
-				return Text.of();
+				return Text.of(TextColors.RED, "ERROR: " + e.getMessage());
 			}
 		} else if (store.getWrapper(key).isPresent() && data != null) {
 			VariableWrapper v = store.getWrapper(key).get();

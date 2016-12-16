@@ -54,8 +54,11 @@ public class DefaultVariables {
 		return input / 1048576;
 	}
 
+	// TODO separate vars into classes
+	// TODO add click/hover onto vars
+
 	/**
-	 * Register all default vars and wrappers TODO vars in separate classes?
+	 * Register all default vars and wrappers
 	 */
 	public static void register(Variables v) {
 		v.registerWrapper("stripped", (va, t) -> {

@@ -46,6 +46,7 @@ import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.scoreboard.Score;
@@ -1519,6 +1520,12 @@ public class TextUtils {
 	public static Text vars(Text t, ParsableData data) {
 		if (!(t instanceof LiteralText)) {
 			return t;
+		}
+		if(data.getSender().isPresent()) {
+			Player s = data.getSender().get();
+			if(!s.hasPermission("ray.vars")) {
+				return t;
+			}
 		}
 		return parseForVariables((LiteralText) t, data);
 	}
