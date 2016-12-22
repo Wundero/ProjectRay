@@ -2,7 +2,7 @@
     "modid": "ray",
     "name": "Ray",
     "description": "Open Source Sponge chat management",
-    "version": "1.0.2",
+    "version": "0.1.0",
     "url": "https://github.com/Wundero/Ray",
     "authors": ["Wundero"],
     "requiredMods": [
