@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 script:
-- ./gradlew check
+- gradle check
 deploy:
   provider: releases
   file: /home/travis/build/Wundero/Ray/target/Ray.jar
