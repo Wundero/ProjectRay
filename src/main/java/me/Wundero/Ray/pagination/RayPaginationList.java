@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 
 /*
  The MIT License (MIT)
@@ -146,7 +147,7 @@ public class RayPaginationList implements PaginationList {
 				pagination.specificPage(pagination.getTotalPages());
 			}
 		} catch (CommandException e) {
-			receiver.sendMessage(CommandMessageFormatting.error(e.getText()));
+			Utils.send(receiver, CommandMessageFormatting.error(e.getText()));
 		}
 	}
 }

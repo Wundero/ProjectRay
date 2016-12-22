@@ -50,7 +50,7 @@ public class ClearChatCommand implements CommandExecutor {
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (!src.hasPermission("ray.clearchat")) {
-			src.sendMessage(Text.of(TextColors.RED, "You are not allowed to do that!"));
+			Utils.send(src, Text.of(TextColors.RED, "You are not allowed to do that!"));
 			return CommandResult.success();
 		}
 		if (Ray.get().isUseChatMenus() && src instanceof Player) {

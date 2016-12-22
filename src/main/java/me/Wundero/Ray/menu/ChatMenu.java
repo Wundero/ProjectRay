@@ -423,17 +423,30 @@ public class ChatMenu extends Menu {
 		return messages.stream().map(holder -> holder.getUUID()).collect(RayCollectors.rayList()).contains(u);
 	}
 
+	private boolean isHolder(CommandSource sender) {
+		return sender instanceof Player && this.getPlayer().isPresent()
+				&& this.getPlayer().get().getName().equals(sender.getName());
+	}
+
 	/**
 	 * Add a message to the menu. Boolean as to whether to increment unread
 	 * messages.
 	 */
 	public void addMessage(CommandSource sender, Text message, UUID uuid, boolean inc) {
 		if (contains(uuid)) {
-			replace(uuid, message, inc);
+			if (sender != null
+					&& ((sender.hasPermission("ray.manage.exempt") && !isHolder(sender)) || !hasPerm("ray.manage"))) {
+				replace(uuid, message, inc);
+			} else {
+				Text rb = manageButton(uuid);
+				Text text = Text.of("").concat(rb).concat(TextUtils.SPACE()).concat(message);
+				replace(uuid, text, inc);
+			}
 			return;
 		}
 		incIndices();
-		if (sender != null && (sender.hasPermission("ray.manage.exempt") || !hasPerm("ray.manage"))) {
+		if (sender != null
+				&& ((sender.hasPermission("ray.manage.exempt") && !isHolder(sender)) || !hasPerm("ray.manage"))) {
 			messages.add(0, new TextHolder(message, uuid, 0, sender));
 			fixSize();
 		} else {

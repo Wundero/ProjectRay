@@ -39,7 +39,14 @@ public class M {
 
 	private static void m(Text m, Translator t, CommandSource p, String k, Object... args) {
 		Text b = t.t(k, args);
-		p.sendMessage(m.toBuilder().append(b).build());
+		if (b == null) {
+			return;
+		}
+		if (m != null) {
+			p.sendMessage(m.toBuilder().append(b).build());
+		} else {
+			p.sendMessage(b);
+		}
 	}
 
 	/**

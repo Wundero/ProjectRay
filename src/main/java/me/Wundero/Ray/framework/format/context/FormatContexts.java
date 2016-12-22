@@ -55,8 +55,6 @@ public class FormatContexts {
 	public static FormatContext TABLIST_FOOTER = new FormatContext("footer", new String[] { "f" });
 	public static FormatContext ANNOUNCEMENT = new FormatContext("announcement", new String[] { "a" });
 	public static FormatContext AFK = new FormatContext("afk");
-	public static FormatContext INFO = new FormatContext("info");
-	public static FormatContext RULES = new FormatContext("rules");
 	public static FormatContext BROADCAST = new FormatContext("broadcast");
 	public static FormatContext ACTION = new FormatContext("action", new String[] { "me" });
 	public static FormatContext HELPOP = new FormatContext("helpop", new String[] { "help-op", "help op" });

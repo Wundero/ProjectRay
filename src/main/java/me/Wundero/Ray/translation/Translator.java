@@ -43,7 +43,7 @@ public class Translator {
 	private I18n messages;
 
 	/**
-	 * Create a new, player-specific translator.
+	 * Create a new, source-specific translator.
 	 */
 	public Translator(CommandSource p) {
 		try {

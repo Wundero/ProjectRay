@@ -42,7 +42,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
-import me.Wundero.Ray.tag.Tag;
 import me.Wundero.Ray.utils.TextUtils;
 
 /**
@@ -328,19 +327,6 @@ public class DefaultVariables {
 				return Text.of();
 			}
 			return Text.of(c.getName());
-		});
-		v.registerVariable("tag", (objects) -> {
-			if (!objects.containsKey(Param.PARSABLE) || !objects.containsKey(Param.DATA)) {
-				return Text.EMPTY;
-			}
-			String tagname = objects.get(Param.DATA).toString();
-			ParsableData d = (ParsableData) objects.get(Param.PARSABLE);
-			// Tag type dec irrelevant because abstract method
-			Optional<Tag<?>> t = Ray.get().getTags().get(tagname);
-			if (t.isPresent()) {
-				return t.get().get(Optional.of(d)).orElse(Text.of());
-			}
-			return Text.of();
 		});
 		v.registerVariable("timestamp", () -> {
 			Date date = new Date();

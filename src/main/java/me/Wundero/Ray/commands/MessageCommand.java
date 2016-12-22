@@ -56,13 +56,13 @@ public class MessageCommand implements CommandExecutor {
 	@Override
 	public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
 		if (!sender.hasPermission("ray.message") || !(sender instanceof Player)) {
-			sender.sendMessage(Text.builder("You do not have permission to do that!").color(TextColors.RED).build());
+			Utils.send(sender, Text.builder("You do not have permission to do that!").color(TextColors.RED).build());
 			return CommandResult.success();
 		}
 		Player sendto = (Player) args.getOne("player").get();
 		Player sendfrom = (Player) sender;
 		if (sendto.getUniqueId().equals(sendfrom.getUniqueId())) {
-			sender.sendMessage(Text.of(TextColors.RED, "You cannot message yourself!"));
+			Utils.send(sender, Text.of(TextColors.RED, "You cannot message yourself!"));
 			return CommandResult.success();
 		}
 		String message = (String) args.getOne("message").get();

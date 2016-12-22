@@ -320,7 +320,7 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 			 *            The name of the entity
 			 */
 			public Ref(UUID uuid, String name) {
-				this(uuid, name, Optional.<EntityType> empty());
+				this(uuid, name, Optional.<EntityType>empty());
 			}
 
 			/**
@@ -398,7 +398,6 @@ public abstract class InternalHoverAction<R> extends TextAction<R> {
 				return Objects.hashCode(this.uuid, this.name, this.type);
 			}
 
-			@SuppressWarnings("deprecation")
 			@Override
 			public String toString() {
 				return Objects.toStringHelper(this).add("uuid", this.uuid).add("name", this.name).add("type", this.type)

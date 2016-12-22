@@ -73,12 +73,13 @@ abstract class RayActivePagination {
 		this.footer = footer;
 		this.padding = padding;
 		this.scroll = scroll;
-		this.nextPageText = t(scroll ? "Scroll down" : "»").toBuilder().color(TextColors.BLUE)
+		this.nextPageText = t(scroll ? "Scroll down" : "" + '\u00BB').toBuilder().color(TextColors.BLUE)
 				.style(TextStyles.UNDERLINE)
 				.onClick(TextActions.runCommand("/pagination " + this.id.toString() + " next"))
 				.onHover(TextActions.showText(Text.of("/page next"))).onShiftClick(TextActions.insertText("/page next"))
 				.build();
-		this.prevPageText = t(scroll ? "Scroll up" : "«").toBuilder().color(TextColors.BLUE).style(TextStyles.UNDERLINE)
+		this.prevPageText = t(scroll ? "Scroll up" : "" + '\u00ab').toBuilder().color(TextColors.BLUE)
+				.style(TextStyles.UNDERLINE)
 				.onClick(TextActions.runCommand("/pagination " + this.id.toString() + " prev"))
 				.onHover(TextActions.showText(Text.of("/page prev"))).onShiftClick(TextActions.insertText("/page prev"))
 				.build();
@@ -169,7 +170,7 @@ abstract class RayActivePagination {
 		if (hasPrevious) {
 			ret.append(this.prevPageText).append(DIVIDER_TEXT);
 		} else {
-			ret.append(Text.of("«")).append(DIVIDER_TEXT);
+			ret.append(Text.of("" + '\u00ab')).append(DIVIDER_TEXT);
 		}
 		boolean needsDiv = false;
 		int totalPages = getTotalPages();
@@ -192,7 +193,7 @@ abstract class RayActivePagination {
 			if (needsDiv) {
 				ret.append(DIVIDER_TEXT);
 			}
-			ret.append(Text.of("»"));
+			ret.append(Text.of("" + '\u00bb'));
 		}
 		if (this.title != null) {
 			ret.color(this.title.getColor());

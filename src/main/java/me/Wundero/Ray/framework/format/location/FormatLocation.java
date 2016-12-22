@@ -51,6 +51,11 @@ public abstract class FormatLocation {
 	}
 
 	/**
+	 * @return whether the location can have multiple formats at one time
+	 */
+	public abstract boolean isMulti();
+	
+	/**
 	 * Send a message to the location.
 	 */
 	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender,

@@ -37,6 +37,7 @@ import org.spongepowered.api.text.format.TextColors;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Start talking to a channel. If the channel is not being listened to, listen
@@ -53,18 +54,18 @@ public class ChannelJoinCommand implements CommandExecutor {
 		Player s = (Player) arg0;
 		Optional<Object> channelName = arg1.getOne("channel");
 		if (!channelName.isPresent()) {
-			s.sendMessage(Text.of(TextColors.RED, "You must choose a channel to join."));
+			Utils.send(s, Text.of(TextColors.RED, "You must choose a channel to join."));
 			return CommandResult.success();
 		}
 		String ch = (String) channelName.get();
 		ChatChannel c = Ray.get().getChannels().getChannel(ch, true);
 		if (c == null) {
-			s.sendMessage(Text.of(TextColors.RED, "That is not a valid channel!"));
+			Utils.send(s, Text.of(TextColors.RED, "That is not a valid channel!"));
 			return CommandResult.success();
 		}
 		Optional<String> password = arg1.getOne("password");
 		if (!c.canJoin(s, password)) {
-			s.sendMessage(Text.of(TextColors.RED, "That is not a valid password!"));
+			Utils.send(s, Text.of(TextColors.RED, "That is not a valid password!"));
 			return CommandResult.success();
 		}
 		if (!RayPlayer.get(s).listeningTo(c)) {
@@ -72,7 +73,7 @@ public class ChannelJoinCommand implements CommandExecutor {
 			RayPlayer.get(s).addListenChannel(c);
 		}
 		RayPlayer.get(s).setActiveChannel(c);
-		s.sendMessage(Text.of(TextColors.AQUA, "You are now speaking to channel " + c.getName() + "."));
+		Utils.send(s, Text.of(TextColors.AQUA, "You are now speaking to channel " + c.getName() + "."));
 		return CommandResult.success();
 	}
 

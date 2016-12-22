@@ -99,7 +99,7 @@ public class ChannelBanCommand implements CommandExecutor {
 		boolean cur = cc.isBanned(p);
 		String s = "no" + (cur ? "w" : " longer");
 		String x = " in channel " + (ch.isPresent() ? ch.get() : RayPlayer.get(p).getActiveChannel().getName());
-		src.sendMessage(Text.of(TextColors.RED, "" + p.getName() + " is " + s + " banned" + x + "!"));
+		Utils.send(src, Text.of(TextColors.RED, "" + p.getName() + " is " + s + " banned" + x + "!"));
 		return CommandResult.success();
 	}
 

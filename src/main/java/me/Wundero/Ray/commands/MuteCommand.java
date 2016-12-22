@@ -73,7 +73,7 @@ public class MuteCommand implements CommandExecutor {
 		}
 		boolean cur = toggle(name.get().getUniqueId());
 		String s = "no" + (cur ? "w" : " longer");
-		src.sendMessage(Text.of(TextColors.AQUA, name.get().getName() + " is " + s + " muted!"));
+		Utils.send(src, Text.of(TextColors.AQUA, name.get().getName() + " is " + s + " muted!"));
 		return CommandResult.success();
 	}
 

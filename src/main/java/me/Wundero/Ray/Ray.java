@@ -26,7 +26,6 @@ import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.listeners.AfkListener;
 import me.Wundero.Ray.pagination.RayPaginationService;
-import me.Wundero.Ray.tag.TagStore;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.UserCache;
 import me.Wundero.Ray.utils.Utils;
@@ -108,8 +107,6 @@ public class Ray {
 	private ChatChannels channels;
 	// all configs created/loaded by the plugin through Utils are saved here.
 	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
-	// tag store
-	private TagStore tags;
 	// econ
 	private EconomyService econ;
 	// cache
@@ -159,19 +156,6 @@ public class Ray {
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
-		try {
-			File f = new File(plugin.getConfigDir().toFile(), "tags.conf");
-			if (!f.exists()) {
-				f.getParentFile().mkdirs();
-				f.createNewFile();
-			} else if (f.isDirectory()) {
-				f.delete();
-				f.createNewFile();
-			}
-			tags.load(Utils.load(f));
-		} catch (Exception e) {
-			Utils.printError(e);
-		}
 		if (channels.useChannels()) {
 			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
 		} else {
@@ -196,7 +180,6 @@ public class Ray {
 		this.setConfig(plugin.getConfig());
 		this.setVariables(new Variables());
 		this.setChannels(new ChatChannels());
-		this.setTags(new TagStore());
 		this.setCache(new UserCache());
 		this.setPaginationService(new RayPaginationService());
 		try {
@@ -209,19 +192,6 @@ public class Ray {
 				f.createNewFile();
 			}
 			channels.load(Utils.load(f));
-		} catch (Exception e) {
-			Utils.printError(e);
-		}
-		try {
-			File f = new File(plugin.getConfigDir().toFile(), "tags.conf");
-			if (!f.exists()) {
-				f.getParentFile().mkdirs();
-				f.createNewFile();
-			} else if (f.isDirectory()) {
-				f.delete();
-				f.createNewFile();
-			}
-			tags.load(Utils.load(f));
 		} catch (Exception e) {
 			Utils.printError(e);
 		}
@@ -269,11 +239,6 @@ public class Ray {
 		try {
 			this.getChannels().save();
 		} catch (Exception e) {
-		}
-		try {
-			this.getTags().save();
-		} catch (ObjectMappingException e1) {
-			Utils.printError(e1);
 		}
 		for (ConfigurationLoader<?> loader : toSave.keySet()) {
 			try {
@@ -500,21 +465,6 @@ public class Ray {
 	 */
 	public void setChannels(ChatChannels channels) {
 		this.channels = channels;
-	}
-
-	/**
-	 * @return the tags
-	 */
-	public TagStore getTags() {
-		return tags;
-	}
-
-	/**
-	 * @param tags
-	 *            the tags to set
-	 */
-	public void setTags(TagStore tags) {
-		this.tags = tags;
 	}
 
 	/**

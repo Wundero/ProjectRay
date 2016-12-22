@@ -29,12 +29,10 @@ import me.Wundero.Ray.commands.ClearChatCommand;
 import me.Wundero.Ray.commands.Commands;
 import me.Wundero.Ray.commands.HelpOpCommand;
 import me.Wundero.Ray.commands.IgnoreCommand;
-import me.Wundero.Ray.commands.InfoCommand;
 import me.Wundero.Ray.commands.MessageCommand;
 import me.Wundero.Ray.commands.MuteCommand;
 import me.Wundero.Ray.commands.QuoteCommand;
 import me.Wundero.Ray.commands.ReplyCommand;
-import me.Wundero.Ray.commands.RulesCommand;
 import me.Wundero.Ray.commands.SpyCommand;
 import me.Wundero.Ray.commands.channel.ChannelBanCommand;
 import me.Wundero.Ray.commands.channel.ChannelCommand;
@@ -47,7 +45,6 @@ import me.Wundero.Ray.commands.channel.ChannelQMCommand;
 import me.Wundero.Ray.commands.channel.ChannelRoleCommand;
 import me.Wundero.Ray.commands.channel.ChannelSetupCommand;
 import me.Wundero.Ray.commands.channel.ChannelWhoCommand;
-import me.Wundero.Ray.commands.tags.TagCommand;
 import me.Wundero.Ray.config.InternalClickAction;
 import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.config.Template;
@@ -94,7 +91,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
  * This class is the main instance of the plugin, which stores much of Sponge's
  * plugin requisite information.
  */
-@Plugin(id = "ray", name = "Ray", version = "1.0.2", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = "ray", name = "Ray", version = "0.1.0", description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
 
@@ -276,10 +273,6 @@ public class ProjectRay {
 	public void registerEvent(GameInitializationEvent event) {
 		Sponge.getEventManager().registerListeners(this, new MainListener());
 		Sponge.getEventManager().registerListeners(this, new ChatChannelListener());
-		Sponge.getCommandManager().register(this,
-				CommandSpec.builder().executor(new TagCommand()).children(TagCommand.getChildren())
-						.description(Text.of("Base tag command.")).permission("ray.tags").build(),
-				"tag");
 		// register all commands. Might make this neater in the future.
 		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
 				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();
@@ -300,21 +293,18 @@ public class ProjectRay {
 						.arguments(GenericArguments.player(Text.of("player"))).description(Text.of("Ignore a player."))
 						.permission("ray.ignore").build(),
 				"ignore");
-		Sponge.getCommandManager()
-				.register(this,
-						CommandSpec.builder().executor(new ClearChatCommand()).description(Text.of("Clear the chat."))
-								.permission("ray.clearchat")
-								.arguments(GenericArguments
-										.optional(GenericArguments.remainingJoinedStrings(Text.of("channel"))))
-								.build(),
-						"clearchat", "chatclear", "cc");
-		Sponge.getCommandManager()
-				.register(this,
-						CommandSpec.builder().executor(new QuoteCommand())
-								.arguments(GenericArguments
-										.optional(GenericArguments.remainingJoinedStrings(Text.of("quote"))))
-								.permission("ray.quote").description(Text.of("Set your quote.")).build(),
-						"quote");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new ClearChatCommand()).description(Text.of("Clear the chat."))
+						.permission("ray.clearchat")
+						.arguments(
+								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("channel"))))
+						.build(),
+				"clearchat", "chatclear", "cc");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().executor(new QuoteCommand())
+						.arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("quote"))))
+						.permission("ray.quote").description(Text.of("Set your quote.")).build(),
+				"quote");
 		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new AfkCommand())
 				.description(Text.of("Toggle being AFK.")).permission("ray.afk").build(), "afk");
 		Sponge.getCommandManager().register(this,
@@ -336,83 +326,68 @@ public class ProjectRay {
 						.description(Text.of("Ask for help from staff members on the server."))
 						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message"))).build(),
 				"helpop");
-		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new RulesCommand())
-				.permission("ray.rules").description(Text.of("View the server rules.")).build(), "rules");
-		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new InfoCommand())
-				.description(Text.of("View the server info.")).permission("ray.info").build(), "info");
-		Sponge.getCommandManager().register(this,
-				CommandSpec.builder().executor(new SpyCommand()).permission("ray.spy")
-						.description(Text.of("Toggle whether you can see private messages between other players."))
-						.build(),
+		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new SpyCommand()).permission("ray.spy")
+				.description(Text.of("Toggle whether you can see private messages between other players.")).build(),
 				"spy", "socialspy");
-		Sponge.getCommandManager()
-				.register(this,
-						CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
-								.executor(
-										new ChannelCommand())
-								.child(CommandSpec.builder().executor(new ChannelQMCommand())
-										.arguments(GenericArguments.string(Text.of("channel")),
-												GenericArguments.remainingJoinedStrings(Text.of("message")))
-										.description(Text.of("Message a channel without joining it."))
-										.permission("ray.channel.quickmessage").build(), "quickmessage", "qm")
-								.child(CommandSpec.builder().executor(new ChannelRoleCommand())
-										.description(Text.of("View or set roles in a channel."))
-										.permission("ray.channel.role")
-										.arguments(
-												GenericArguments.optional(GenericArguments.player(Text.of("target"))),
-												GenericArguments.optional(GenericArguments
-														.seq(GenericArguments.literal(Text.of("set"), "set"),
-																GenericArguments
-																		.remainingJoinedStrings(Text.of("role")))))
-										.build(), "role", "r")
-								.child(CommandSpec.builder().executor(new ChannelJoinCommand())
-										.description(Text.of("Join a channel."))
-										.arguments(GenericArguments.string(Text.of("channel")),
-												GenericArguments.optional(
-														GenericArguments.remainingJoinedStrings(Text.of("password"))))
-										.build(), "join", "j")
-								.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
-										.description(Text.of("Leave a channel."))
-										.arguments(
-												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
-										.build(), "leave", "l")
-								.child(CommandSpec.builder().executor(new ChannelCommand())
-										.description(Text.of("List all channels.")).build(), "list")
-								.child(CommandSpec.builder().executor(new ChannelBanCommand())
-										.arguments(GenericArguments.player(Text.of("target")),
-												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
-										.permission("ray.channel.ban")
-										.description(
-												Text.of("Ban a player. Optionally provide what channel to mute them in."))
-										.build(), "ban")
-								.child(CommandSpec.builder().executor(new ChannelWhoCommand())
-										.description(Text.of("List the players in a channel."))
-										.arguments(
-												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
-										.build(), "who", "w")
-								.child(CommandSpec.builder().executor(new ChannelMuteCommand())
-										.arguments(GenericArguments.player(Text.of("target")),
-												GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
-										.permission("ray.channel.mute")
-										.description(
-												Text.of("Mute a player. Optionally provide what channel to mute them in."))
-										.build(), "mute")
-								.child(CommandSpec.builder().executor(new ChannelHelpCommand())
-										.description(Text.of("List channel commands.")).build(), "help", "h")
-								.child(CommandSpec.builder().executor(new ChannelSetupCommand())
-										.permission("ray.channel.setup").description(Text.of("Create a new channel."))
-										.arguments(GenericArguments.optional(GenericArguments.choices(Text.of("type"),
-												() -> Utils.al("advanced", "leveled", "simple"), s -> s)))
-										.build(), "setup")
-								.child(CommandSpec.builder().executor(new ChannelModifyCommand())
-										.arguments(GenericArguments.string(Text.of("channel")),
-												GenericArguments.string(Text.of("property")),
-												GenericArguments.optional(
-														GenericArguments.remainingJoinedStrings(Text.of("value"))))
-										.permission("ray.channel.modify")
-										.description(Text.of("Modify values for a channel.")).build(), "modify", "mod")
-								.build(),
-						"channel", "ch");
+		Sponge.getCommandManager().register(this,
+				CommandSpec.builder().permission("ray.channel").description(Text.of("Chat channels command."))
+						.executor(new ChannelCommand())
+						.child(CommandSpec.builder().executor(new ChannelQMCommand())
+								.arguments(GenericArguments.string(Text.of("channel")),
+										GenericArguments.remainingJoinedStrings(Text.of("message")))
+								.description(Text.of("Message a channel without joining it."))
+								.permission("ray.channel.quickmessage").build(), "quickmessage", "qm")
+						.child(CommandSpec.builder().executor(new ChannelRoleCommand())
+								.description(Text.of("View or set roles in a channel.")).permission("ray.channel.role")
+								.arguments(GenericArguments.optional(GenericArguments.player(Text.of("target"))),
+										GenericArguments.optional(
+												GenericArguments.seq(GenericArguments.literal(Text.of("set"), "set"),
+														GenericArguments.remainingJoinedStrings(Text.of("role")))))
+								.build(), "role", "r")
+						.child(CommandSpec.builder().executor(new ChannelJoinCommand())
+								.description(Text.of("Join a channel."))
+								.arguments(GenericArguments.string(Text.of("channel")),
+										GenericArguments
+												.optional(GenericArguments.remainingJoinedStrings(Text.of("password"))))
+								.build(), "join", "j")
+						.child(CommandSpec.builder().executor(new ChannelLeaveCommand())
+								.description(Text.of("Leave a channel."))
+								.arguments(GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+								.build(), "leave", "l")
+						.child(CommandSpec.builder().executor(new ChannelCommand())
+								.description(Text.of("List all channels.")).build(), "list")
+						.child(CommandSpec.builder().executor(new ChannelBanCommand())
+								.arguments(GenericArguments.player(Text.of("target")),
+										GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+								.permission("ray.channel.ban")
+								.description(Text.of("Ban a player. Optionally provide what channel to mute them in."))
+								.build(), "ban")
+						.child(CommandSpec.builder().executor(new ChannelWhoCommand())
+								.description(Text.of("List the players in a channel."))
+								.arguments(GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+								.build(), "who", "w")
+						.child(CommandSpec.builder().executor(new ChannelMuteCommand())
+								.arguments(GenericArguments.player(Text.of("target")),
+										GenericArguments.optional(GenericArguments.string(Text.of("channel"))))
+								.permission("ray.channel.mute")
+								.description(Text.of("Mute a player. Optionally provide what channel to mute them in."))
+								.build(), "mute")
+						.child(CommandSpec.builder().executor(new ChannelHelpCommand())
+								.description(Text.of("List channel commands.")).build(), "help", "h")
+						.child(CommandSpec.builder().executor(new ChannelSetupCommand())
+								.permission("ray.channel.setup").description(Text.of("Create a new channel."))
+								.arguments(GenericArguments.optional(GenericArguments.choices(Text.of("type"),
+										() -> Utils.al("advanced", "leveled", "simple"), s -> s)))
+								.build(), "setup")
+						.child(CommandSpec.builder().executor(new ChannelModifyCommand())
+								.arguments(GenericArguments.string(Text.of("channel")),
+										GenericArguments.string(Text.of("property")),
+										GenericArguments
+												.optional(GenericArguments.remainingJoinedStrings(Text.of("value"))))
+								.permission("ray.channel.modify").description(Text.of("Modify values for a channel."))
+								.build(), "modify", "mod")
+						.build(),
+				"channel", "ch");
 	}
 
 	/**

@@ -256,7 +256,7 @@ public class MainListener {
 						// lim(delta->infinity) (func %dc) = 100
 						double r2 = range * range;
 						double decFactor = 1.1 * 1.1;
-						r2 = r2/decFactor;
+						r2 = r2 / decFactor;
 						double percentObfuscation = ((delta - r2) / (delta * (2 * (r2 / delta)))) * 100;
 						double percentDiscoloration = ((delta - r2) / delta) * 100;
 						if (percentObfuscation > 70) {
@@ -390,7 +390,7 @@ public class MainListener {
 	 * Fires join, motd, welcome and tab based contexts.
 	 */
 	@Listener(order = Order.LATE)
-	public void onJoin(ClientConnectionEvent.Join event) {
+	public void onJoin(final ClientConnectionEvent.Join event) {
 		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
 		MessageChannel original = Ray.get().isUseChatMenus()

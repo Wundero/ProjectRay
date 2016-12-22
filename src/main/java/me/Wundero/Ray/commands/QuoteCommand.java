@@ -36,6 +36,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Set your quote.
@@ -52,7 +53,7 @@ public class QuoteCommand implements CommandExecutor {
 		}
 		Optional<String> q = args.getOne("quote");
 		RayPlayer.get(((Player) src).getUniqueId()).setQuote(q);
-		src.sendMessage(Text.of(TextColors.AQUA, "Your quote has been " + (q.isPresent() ? "set to " : "reset!"),
+		Utils.send(src, Text.of(TextColors.AQUA, "Your quote has been " + (q.isPresent() ? "set to " : "reset!"),
 				q.isPresent() ? TextSerializers.FORMATTING_CODE.deserialize(q.get()) : ""));
 		return CommandResult.success();
 	}

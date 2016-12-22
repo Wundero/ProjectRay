@@ -116,6 +116,12 @@ public class FormatLocations {
 	 * message in a menu.
 	 */
 	public static final FormatLocation CHAT = new FormatLocation("chat") {
+
+		@Override
+		public boolean isMulti() {
+			return true;
+		}
+
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {
@@ -219,6 +225,12 @@ public class FormatLocations {
 	 * Send a text to the scoreboard.
 	 */
 	public static final FormatLocation SCOREBOARD = new FormatLocation("scoreboard") {
+
+		@Override
+		public boolean isMulti() {
+			return true;
+		}
+
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {
@@ -233,6 +245,12 @@ public class FormatLocations {
 	 * ignored.
 	 */
 	public static final FormatLocation TITLE_SUBTITLE = new FormatLocation("title_subtitle") {
+
+		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u,
 				boolean broadcast) {
@@ -263,6 +281,11 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation SUBTITLE = new FormatLocation("subtitle") {
 		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
+		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u,
 				boolean broadcast) {
 			if (!(target instanceof Player)) {
@@ -288,6 +311,11 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TITLE = new FormatLocation("title") {
 		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
+		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> x, Optional<UUID> u,
 				boolean broadcast) {
 			if (!(target instanceof Player)) {
@@ -312,6 +340,11 @@ public class FormatLocations {
 	 * Send a text to the bossbar.
 	 */
 	public static final FormatLocation BOSSBAR = new FormatLocation("bossbar") {
+		@Override
+		public boolean isMulti() {
+			return true;
+		}
+
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {
@@ -384,6 +417,11 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation ACTIONBAR = new FormatLocation("actionbar") {
 		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
+		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> operatable, Optional<UUID> u,
 				boolean broadcast) {
 			if (!(target instanceof ChatTypeMessageReceiver)) {
@@ -399,6 +437,11 @@ public class FormatLocations {
 	 * Send a text as a player name. Requires Optional<Object> to be present.
 	 */
 	public static final FormatLocation TAB_ENTRY = new FormatLocation("tab_entry") {
+		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u,
 				boolean broadcast) {
@@ -425,6 +468,11 @@ public class FormatLocations {
 	 */
 	public static final FormatLocation TAB_FOOTER = new FormatLocation("tab_footer") {
 		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
+		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {
 			if (!(target instanceof Player)) {
@@ -440,6 +488,11 @@ public class FormatLocations {
 	 * Send a text to the header.
 	 */
 	public static final FormatLocation TAB_HEADER = new FormatLocation("tab_header") {
+		@Override
+		public boolean isMulti() {
+			return false;
+		}
+
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {

@@ -72,8 +72,10 @@ public class TextEditConversation {
 			return text.toBuilder().onClick(TextActions.runCommand("" + t.indexOf(text))).build();
 		}, () -> new ArrayList<Text>());
 		Text t2 = Text.builder().append(mod).build();
-		return TextTemplate.of(TextColors.AQUA, "Now editing text: (Click on any part to edit it, or type ",
-				TextColors.GOLD, "done", TextColors.AQUA, "!)", Text.NEW_LINE, t2);
+		return TextTemplate.of(Text.of(TextColors.WHITE)
+				.concat(Text.of(TextColors.AQUA, "Now editing text: (Click on any part to edit it, or type ",
+						TextColors.GOLD, "done", TextColors.AQUA, "!)", Text.NEW_LINE)),
+				(t2));
 	}
 
 	private static class TextEditPrompt extends TypePrompt<Integer> {

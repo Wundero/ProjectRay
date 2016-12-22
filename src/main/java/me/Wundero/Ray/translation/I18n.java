@@ -91,6 +91,9 @@ public class I18n {
 	 * Get mapping, or default mapping if unavailable.
 	 */
 	public static I18n get(Locale l, boolean useDefault) {
+		if (l == Locales.DEFAULT || l == Locales.EN_US) {
+			return get(l).orElse(null);
+		}
 		return get(l).orElse(get());
 	}
 

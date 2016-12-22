@@ -25,15 +25,12 @@ package me.Wundero.Ray.framework.player;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.entity.living.player.Player;
@@ -54,7 +51,6 @@ import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.menu.ChatMenu;
 import me.Wundero.Ray.menu.Menu;
-import me.Wundero.Ray.tag.SelectableTag;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -64,7 +60,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  * Player wrapper for the plugin. Holds information the plugin needs about the
  * player in memory, and saves some to disk.
  */
-public class RayPlayer implements Socialable {
+public class RayPlayer {
 
 	private static Map<UUID, RayPlayer> cache = Utils.sm();
 
@@ -152,7 +148,6 @@ public class RayPlayer implements Socialable {
 	private Deque<Text> headerQueue = Utils.sd(), footerQueue = Utils.sd();
 	private List<String> listenChannels = Utils.sl();
 	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
-	private Map<SelectableTag, String> selectedTags = Utils.hm();
 	private boolean spy = false;
 	private Optional<String> quote = Optional.empty();
 	private List<ServerBossBar> bossbars = Utils.sl();
@@ -267,40 +262,13 @@ public class RayPlayer implements Socialable {
 	}
 
 	/**
-	 * Choose a subtag for a tag
-	 */
-	public void select(SelectableTag tag, String sub) {
-		this.selectedTags.put(tag, sub);
-	}
-
-	/**
-	 * Get the subtag chosen for a tag
-	 */
-	public Optional<String> getSelected(SelectableTag tag) {
-		if (tag == null) {
-			return Optional.empty();
-		}
-		return Utils.wrap(selectedTags.get(tag));
-	}
-
-	/**
-	 * Get the subtag chosen for a tag with the name specified.
-	 */
-	public Optional<String> getSelected(String name) {
-		if (name == null) {
-			return Optional.empty();
-		}
-		if (Ray.get().getTags().get(name, Utils.hm(), SelectableTag.class).isPresent()) {
-			return Utils.wrap(selectedTags.get(Ray.get().getTags().get(name, Utils.hm(), SelectableTag.class).get()));
-		} else {
-			return Optional.empty();
-		}
-	}
-
-	/**
 	 * Queue an animation in a certain location
 	 */
 	public void queueAnimation(FormatLocation type, Animation<?> anim) {
+		if (type.isMulti()) {
+			anim.start();
+			return;
+		}
 		if (!animations.containsKey(type)) {
 			animations.put(type, new AnimationQueue());
 		}
@@ -515,26 +483,7 @@ public class RayPlayer implements Socialable {
 		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)), true);
 		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()), true);
 		this.spy = config.getNode("spy").getBoolean(false);
-		loadTags(config.getNode("tags"));
 		this.quote = Utils.wrap(config.getNode("quote").getString());
-	}
-
-	private static Map<SelectableTag, String> deconvert(Map<String, String> in) {
-		Map<SelectableTag, String> out = Utils.hm();
-		if (in != null) {
-			for (String t : in.keySet()) {
-				out.put(Ray.get().getTags().get(t, Utils.hm(), SelectableTag.class).get(), out.get(t));
-			}
-		}
-		return out;
-	}
-
-	private static Map<String, String> convert(Map<SelectableTag, String> in) {
-		Map<String, String> out = Utils.hm();
-		for (SelectableTag t : in.keySet()) {
-			out.put(t.getName(), in.get(t));
-		}
-		return out;
 	}
 
 	/**
@@ -547,28 +496,12 @@ public class RayPlayer implements Socialable {
 		config.getNode("ignoring").setValue(ignore);
 		config.getNode("channel")
 				.setValue(activeChannel == null ? config.getNode("channel").getString(null) : activeChannel.getName());
-		saveTags(config.getNode("tags"));
 		config.getNode("lastname").setValue(getUser().getName());
 		if (getDisplayName().isPresent()) {
 			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
 		}
 		config.getNode("spy").setValue(spy);
 		quote.ifPresent(q -> config.getNode("quote").setValue(q));
-	}
-
-	private void saveTags(ConfigurationNode node) {
-		Map<String, String> con = convert(selectedTags);
-		for (Map.Entry<String, String> e : con.entrySet()) {
-			node.getNode(e.getKey()).setValue(e.getValue());
-		}
-	}
-
-	private void loadTags(ConfigurationNode node) {
-		Map<String, String> o = Utils.hm();
-		for (Entry<Object, ? extends ConfigurationNode> e : node.getChildrenMap().entrySet()) {
-			o.put(e.getKey().toString(), e.getValue().getString());
-		}
-		this.selectedTags = deconvert(o);
 	}
 
 	/**
@@ -747,29 +680,6 @@ public class RayPlayer implements Socialable {
 	 */
 	public void setListenChannels(List<String> listenChannels) {
 		this.listenChannels = listenChannels;
-	}
-
-	private Map<SocialMedia, String> mediums = Utils.sm();
-
-	public void setMediaName(String name, SocialMedia medium) {
-		Validate.notNull(name);
-		Validate.isTrue(!name.isEmpty());
-		this.mediums.put(medium, name);
-	}
-
-	/**
-	 * Get the URL to link to this player's social media accounts
-	 */
-	@Override
-	public URL getMediaURL(SocialMedia medium) {
-		if (medium == null || !mediums.containsKey(medium)) {
-			return null;
-		}
-		String name = mediums.get(medium);
-		if (name != null) {
-			return medium.apply(name);
-		}
-		return null;
 	}
 
 	public void open(Menu menu) {

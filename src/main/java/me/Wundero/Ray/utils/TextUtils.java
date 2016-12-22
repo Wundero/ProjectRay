@@ -478,16 +478,17 @@ public class TextUtils {
 	 * Will recurse over children as well, until no text in the list contains
 	 * children.
 	 */
-	public static List<Text> flatten(final Text t, boolean recursive) {
-		if (t.getChildren().isEmpty()) {
-			return Utils.al(t);
+	public static List<Text> flatten(final Text text, boolean recursive) {
+		if (text.getChildren().isEmpty()) {
+			return Utils.al(text);
 		}
 		if (!recursive) {
-			return flatten(t);
+			return flatten(text);
 		}
+		Text t = TextUtils.condense(text);
 		List<Text> f = Utils.al(t.getChildren(), true);
 		List<Text> out = Utils.al(t.toBuilder().removeAll().build());
-		f.stream().forEach(text -> out.addAll(flatten(mergeOnto(t, text), recursive)));
+		f.stream().forEach(texte -> out.addAll(flatten(mergeOnto(t, texte), recursive)));
 		return out;
 	}
 
@@ -1521,9 +1522,9 @@ public class TextUtils {
 		if (!(t instanceof LiteralText)) {
 			return t;
 		}
-		if(data.getSender().isPresent()) {
+		if (data.getSender().isPresent()) {
 			Player s = data.getSender().get();
-			if(!s.hasPermission("ray.vars")) {
+			if (!s.hasPermission("ray.vars")) {
 				return t;
 			}
 		}
@@ -1733,21 +1734,7 @@ public class TextUtils {
 	 * Check to see if a text has string content.
 	 */
 	public static boolean hasContent(final Text text) {
-		if (text.isEmpty()) {
-			return false;
-		}
-		if (!(text instanceof LiteralText)) {
-			return true;
-		}
-		if (!((LiteralText) text).getContent().isEmpty()) {
-			return true;
-		}
-		for (final Text child : text.getChildren()) {
-			if (hasContent(child)) {
-				return true;
-			}
-		}
-		return false;
+		return !text.toPlain().isEmpty();
 	}
 
 	/**
@@ -1760,15 +1747,11 @@ public class TextUtils {
 		if (!extrasEqual(one, two) || !formatsEqual(one, two)) {
 			throw new IllegalArgumentException("Both texts must have matching formats and extras!");
 		}
-		if (!lit(one) || !lit(two)) {
-			throw new IllegalArgumentException("Both texts must have literal string content!");
-		}
 		if (!one.getChildren().isEmpty() || !two.getChildren().isEmpty()) {
 			throw new IllegalArgumentException("Texts cannot have children!");
 		}
-		LiteralText.Builder b = (LiteralText.Builder) one.toBuilder();
-		b.content(b.getContent() + "" + ((LiteralText) two).getContent());
-		return b.build();
+		String val = one.toPlain() + two.toPlain();
+		return mergeOnto(one, Text.of(val));
 	}
 
 	/**
@@ -1778,9 +1761,10 @@ public class TextUtils {
 		if (t.getChildren().isEmpty()) {
 			return t;
 		}
+		List<Text> children = t.getChildren();
 		Text cur = t.toBuilder().removeAll().build();
 		List<Text> texts = Utils.al();
-		for (Text child : t.getChildren()) {
+		for (Text child : children) {
 			try {
 				cur = merge(cur, child);
 			} catch (Exception e) {
@@ -1794,7 +1778,7 @@ public class TextUtils {
 						texts.add(cur);
 						// assume optional is present due to nature of children.
 						// exception throwing is important here anyways
-						cur = Utils.getLast(flatten(mergeChildrenIfPossible(child))).get();
+						cur = Utils.getLast(flatten(mergeChildrenIfPossible(child), false)).get();
 					}
 				}
 			}
@@ -1806,7 +1790,10 @@ public class TextUtils {
 				f = false;
 				continue;
 			}
-			out.concat(t2);
+			out = out.concat(t2);
+		}
+		if (!f) {
+			out = out.concat(cur);
 		}
 		return out;
 	}
@@ -1816,7 +1803,7 @@ public class TextUtils {
 	 */
 	public static Text condense(Text t) {
 		if (!hasContent(t)) {
-			return EMPTY();
+			return t;
 		}
 		if (t.getChildren().isEmpty()) {
 			return t;
@@ -1835,7 +1822,7 @@ public class TextUtils {
 					f = false;
 					continue;
 				}
-				child.concat(t2);
+				child = child.concat(t2);
 			}
 			return child;
 		} else {

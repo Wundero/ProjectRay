@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 script:
-- mvn clean verify -f /home/travis/build/Wundero/Ray/pom.xml
+- ./gradlew check
 deploy:
   provider: releases
   file: /home/travis/build/Wundero/Ray/target/Ray.jar

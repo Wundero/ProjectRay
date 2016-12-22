@@ -33,6 +33,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Toggle whether or not you are spying on messages.
@@ -49,7 +50,7 @@ public class SpyCommand implements CommandExecutor {
 		}
 		RayPlayer p = RayPlayer.get((Player) src);
 		p.setSpy(!p.spy());
-		src.sendMessage(Text.of("You are no" + (p.spy() ? "w" : " longer") + " spying on messages!"));
+		Utils.send(src, Text.of("You are no" + (p.spy() ? "w" : " longer") + " spying on messages!"));
 		return CommandResult.success();
 	}
 }
