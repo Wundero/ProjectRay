@@ -29,10 +29,6 @@ __View information about format contexts [[Here]](https://github.com/Wundero/Ray
 This plugin also has internal support for customizable ChatChannels, which are customizable and have an in-game builder.
 
 __View information about channels [[Here]](https://github.com/Wundero/Ray/wiki/Channels).__
-## Tags
-Tags are a generic "button" that can be used in chat to create dynamic effects. There are several types of tags included in the plugin.
-
-__View information about tags [[Here]](https://github.com/Wundero/Ray/wiki/Tags).__
 
 ### Extras
 Download: [__[Here]__](https://github.com/Wundero/Ray/releases)
