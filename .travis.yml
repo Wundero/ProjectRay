@@ -1,8 +1,10 @@
 language: java
 jdk:
 - oraclejdk8
+before_install:
+ - chmod +x gradlew
 script:
-- gradle check
+- ./gradlew check
 deploy:
   provider: releases
   file: /home/travis/build/Wundero/Ray/target/Ray.jar
