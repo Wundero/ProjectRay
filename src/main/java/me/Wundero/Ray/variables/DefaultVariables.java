@@ -40,7 +40,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.Ray.Ray;
-import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
@@ -147,16 +146,6 @@ public class DefaultVariables {
 				return Text.of();
 			}
 			return TextSerializers.FORMATTING_CODE.deserialize(opt.get());
-		});
-		v.registerVariable("quote", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
-				return Text.of();
-			}
-			Optional<String> quote = RayPlayer.get((Player) objects.get(Param.SENDER)).getQuote();
-			if (!quote.isPresent()) {
-				return Text.of();
-			}
-			return TextSerializers.FORMATTING_CODE.deserialize(quote.get());
 		});
 		v.registerVariable("freeram", () -> {
 			return Text.of(convertToMb(Runtime.getRuntime().freeMemory()) + " MB");
@@ -302,33 +291,6 @@ public class DefaultVariables {
 				}
 			}
 			sender.playSound(type, sender.getLocation().getPosition(), 1.0);
-		});
-		v.registerVariable("channel", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
-				return Text.of();
-			}
-			Player pl = (Player) objects.get(Param.SENDER);
-			RayPlayer p = RayPlayer.get(pl);
-			ChatChannel c = p.getActiveChannel();
-			if (c == null) {
-				return Text.of();
-			}
-			if (c.getTag() == null) {
-				return Text.of(c.getName());
-			}
-			return c.getTag();
-		});
-		v.registerVariable("channelname", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
-				return Text.of();
-			}
-			Player pl = (Player) objects.get(Param.SENDER);
-			RayPlayer p = RayPlayer.get(pl);
-			ChatChannel c = p.getActiveChannel();
-			if (c == null) {
-				return Text.of();
-			}
-			return Text.of(c.getName());
 		});
 		v.registerVariable("timestamp", () -> {
 			Date date = new Date();

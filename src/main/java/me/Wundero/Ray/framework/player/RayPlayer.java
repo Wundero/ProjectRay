@@ -47,10 +47,7 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.animation.Animation;
 import me.Wundero.Ray.animation.AnimationQueue;
 import me.Wundero.Ray.framework.Group;
-import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
-import me.Wundero.Ray.menu.ChatMenu;
-import me.Wundero.Ray.menu.Menu;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -141,15 +138,12 @@ public class RayPlayer {
 	private Optional<RayPlayer> lastMessaged = Optional.empty();
 	private List<UUID> ignore = Utils.sl();
 	private ConfigurationNode config;
-	private ChatChannel activeChannel = null;
 	private Runnable tabTask;
 	private boolean afk = false;
 	private Task tabHFTask = null;
 	private Deque<Text> headerQueue = Utils.sd(), footerQueue = Utils.sd();
-	private List<String> listenChannels = Utils.sl();
 	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
 	private boolean spy = false;
-	private Optional<String> quote = Optional.empty();
 	private List<ServerBossBar> bossbars = Utils.sl();
 
 	public boolean addBossbar(ServerBossBar bar) {
@@ -219,28 +213,6 @@ public class RayPlayer {
 	 */
 	public void setAFK(boolean a) {
 		this.afk = a;
-	}
-
-	/**
-	 * Set the player's quote
-	 */
-	public void setQuote(String quote) {
-		setQuote(Utils.wrap(quote, !quote.trim().isEmpty()));
-	}
-
-	/**
-	 * Set the player's quote
-	 */
-	public void setQuote(Optional<String> quote) {
-		// Empty string safeguard
-		setQuote(quote.orElse(null));
-	}
-
-	/**
-	 * Get the player's quote
-	 */
-	public Optional<String> getQuote() {
-		return quote;
 	}
 
 	/**
@@ -337,44 +309,6 @@ public class RayPlayer {
 	}
 
 	/**
-	 * Check to see if the player is reading messages from a channel
-	 */
-	public boolean listeningTo(ChatChannel c) {
-		return listeningTo(c.getName());
-	}
-
-	/**
-	 * Check to see if the player is reading messages from a channel
-	 */
-	public boolean listeningTo(String channel) {
-		return listenChannels.contains(channel);
-	}
-
-	/**
-	 * Stop reading messages from a channel
-	 */
-	public void removeListenChannel(ChatChannel c) {
-		removeListenChannel(c.getName());
-	}
-
-	/**
-	 * Stop reading messages from a channel
-	 */
-	public boolean removeListenChannel(String s) {
-		if (!listenChannels.contains(s)) {
-			return false;
-		}
-		return listenChannels.remove(s);
-	}
-
-	/**
-	 * Start reading messages from a channel
-	 */
-	public void addListenChannel(ChatChannel c) {
-		listenChannels.add(c.getName());
-	}
-
-	/**
 	 * @return whether the @param player is being ignored
 	 */
 	public boolean isIgnoring(RayPlayer player) {
@@ -410,69 +344,6 @@ public class RayPlayer {
 	}
 
 	/**
-	 * @return the channel this player speaks into
-	 */
-	public ChatChannel getActiveChannel() {
-		return activeChannel;
-	}
-
-	/**
-	 * Set the active chanel as the messagechannel of the player
-	 */
-	public void applyChannel() {
-		applyChannel(false);
-	}
-
-	private void applyChannel(boolean init) {
-		if (activeChannel != null) {
-			if (isOnline()) {
-				getPlayer().get().setMessageChannel(activeChannel);
-				if (Ray.get().isUseChatMenus()) {
-					try {
-						this.getActiveMenu().deactive();
-					} catch (Exception e) {
-					}
-					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
-					this.getActiveMenu().activate();
-					if (!init) {
-						this.getActiveMenu().send();
-					}
-				}
-			}
-		}
-	}
-
-	private ChatMenu activeMenu = null;
-
-	/**
-	 * Set the channel this user speaks into
-	 */
-	public void setActiveChannel(ChatChannel channel) {
-		setActiveChannel(channel, false);
-	}
-
-	private void setActiveChannel(ChatChannel channel, boolean init) {
-		if (channel == null) {
-			return;
-		}
-		activeChannel = channel;
-		if (isOnline()) {
-			getPlayer().get().setMessageChannel(activeChannel);
-			if (Ray.get().isUseChatMenus()) {
-				try {
-					this.getActiveMenu().deactive();
-					this.setActiveMenu(activeChannel.getMenus().get(this.uuid));
-					this.getActiveMenu().activate();
-					if (!init) {
-						this.getActiveMenu().send();
-					}
-				} catch (Exception e) {
-				}
-			}
-		}
-	}
-
-	/**
 	 * Load player data from file
 	 */
 	public void load() throws ObjectMappingException {
@@ -481,9 +352,7 @@ public class RayPlayer {
 		}
 		ConfigurationNode i = config.getNode("ignoring");
 		ignore = Utils.sl(i.getList(TypeToken.of(UUID.class)), true);
-		setActiveChannel(Ray.get().getChannels().getChannel(config.getNode("channel").getString()), true);
 		this.spy = config.getNode("spy").getBoolean(false);
-		this.quote = Utils.wrap(config.getNode("quote").getString());
 	}
 
 	/**
@@ -494,14 +363,11 @@ public class RayPlayer {
 			return;
 		}
 		config.getNode("ignoring").setValue(ignore);
-		config.getNode("channel")
-				.setValue(activeChannel == null ? config.getNode("channel").getString(null) : activeChannel.getName());
 		config.getNode("lastname").setValue(getUser().getName());
 		if (getDisplayName().isPresent()) {
 			config.getNode("displayname").setValue(TypeToken.of(Text.class), getDisplayName().get());
 		}
 		config.getNode("spy").setValue(spy);
-		quote.ifPresent(q -> config.getNode("quote").setValue(q));
 	}
 
 	/**
@@ -666,48 +532,6 @@ public class RayPlayer {
 	 */
 	public void setTabTask(Runnable tabTask) {
 		this.tabTask = tabTask;
-	}
-
-	/**
-	 * Get all channels this user receives messages from
-	 */
-	public List<String> getListenChannels() {
-		return listenChannels;
-	}
-
-	/**
-	 * Set all channels this user receives messages from
-	 */
-	public void setListenChannels(List<String> listenChannels) {
-		this.listenChannels = listenChannels;
-	}
-
-	public void open(Menu menu, int delay) {
-		if (menu instanceof ChatMenu) {
-			menu.send();
-		} else {
-			this.activeMenu.deactive();
-			menu.insertSource(true, activeMenu);
-			menu.send();
-			if (delay > 0) {
-				Task.builder().delayTicks(delay).execute(() -> this.activeMenu.send()).submit(Ray.get().getPlugin());
-			}
-		}
-	}
-
-	/**
-	 * @return the activeMenu
-	 */
-	public ChatMenu getActiveMenu() {
-		return activeMenu;
-	}
-
-	/**
-	 * @param activeMenu
-	 *            the activeMenu to set
-	 */
-	public void setActiveMenu(ChatMenu activeMenu) {
-		this.activeMenu = activeMenu;
 	}
 
 }

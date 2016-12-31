@@ -1,6 +1,5 @@
 package me.Wundero.Ray;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
@@ -20,12 +20,10 @@ import com.google.common.reflect.TypeToken;
 import me.Wundero.Ray.config.InternalClickAction;
 import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.framework.Groups;
-import me.Wundero.Ray.framework.channel.ChatChannels;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.listeners.AfkListener;
-import me.Wundero.Ray.pagination.RayPaginationService;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.UserCache;
 import me.Wundero.Ray.utils.Utils;
@@ -92,7 +90,7 @@ public class Ray {
 	}
 
 	// paginate texts. Use instead of sponges pagination service.
-	private RayPaginationService paginationService;
+	private PaginationService paginationService;
 
 	// instance of the plugin to give to things like tasks and sponge singleton
 	// calls
@@ -103,16 +101,12 @@ public class Ray {
 	private Groups groups;
 	// variable parser
 	private Variables vars;
-	// channels store
-	private ChatChannels channels;
 	// all configs created/loaded by the plugin through Utils are saved here.
 	private Map<ConfigurationLoader<CommentedConfigurationNode>, ConfigurationNode> toSave = Utils.sm();
 	// econ
 	private EconomyService econ;
 	// cache
 	private UserCache cache;
-
-	private boolean useChatMenus = false;
 
 	/**
 	 * Return the economy service, if available
@@ -144,24 +138,6 @@ public class Ray {
 		this.getGroups().terminate();
 		this.setGroups(null);
 		try {
-			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
-			if (!f.exists()) {
-				f.getParentFile().mkdirs();
-				f.createNewFile();
-			} else if (f.isDirectory()) {
-				f.delete();
-				f.createNewFile();
-			}
-			channels.load(Utils.load(f));
-		} catch (Exception e) {
-			Utils.printError(e);
-		}
-		if (channels.useChannels()) {
-			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
-		} else {
-			this.setUseChatMenus(false);
-		}
-		try {
 			this.setEcon(Sponge.getServiceManager().provide(EconomyService.class)
 					.orElseThrow(() -> new NullPointerException("Escape")));
 		} catch (Exception e) {
@@ -179,27 +155,8 @@ public class Ray {
 		this.setPlugin(plugin);
 		this.setConfig(plugin.getConfig());
 		this.setVariables(new Variables());
-		this.setChannels(new ChatChannels());
 		this.setCache(new UserCache());
-		this.setPaginationService(new RayPaginationService());
-		try {
-			File f = new File(plugin.getConfigDir().toFile(), "channels.conf");
-			if (!f.exists()) {
-				f.getParentFile().mkdirs();
-				f.createNewFile();
-			} else if (f.isDirectory()) {
-				f.delete();
-				f.createNewFile();
-			}
-			channels.load(Utils.load(f));
-		} catch (Exception e) {
-			Utils.printError(e);
-		}
-		if (channels.useChannels()) {
-			this.setUseChatMenus(config.getNode("channelmenus", "enabled").getBoolean(false));
-		} else {
-			this.setUseChatMenus(false);
-		}
+		this.setPaginationService(plugin.getGame().getServiceManager().provideUnchecked(PaginationService.class));
 		try {
 			this.setEcon(Sponge.getServiceManager().provide(EconomyService.class)
 					.orElseThrow(() -> new NullPointerException("Escape")));
@@ -235,10 +192,6 @@ public class Ray {
 			RayPlayer.saveAll();
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
-		}
-		try {
-			this.getChannels().save();
-		} catch (Exception e) {
 		}
 		for (ConfigurationLoader<?> loader : toSave.keySet()) {
 			try {
@@ -454,20 +407,6 @@ public class Ray {
 	}
 
 	/**
-	 * Get chat channels singleton
-	 */
-	public ChatChannels getChannels() {
-		return channels;
-	}
-
-	/**
-	 * Set chat channels singelton
-	 */
-	public void setChannels(ChatChannels channels) {
-		this.channels = channels;
-	}
-
-	/**
 	 * @return the cache
 	 */
 	public UserCache getCache() {
@@ -485,7 +424,7 @@ public class Ray {
 	/**
 	 * @return the paginationService
 	 */
-	public RayPaginationService getPaginationService() {
+	public PaginationService getPaginationService() {
 		return paginationService;
 	}
 
@@ -493,22 +432,8 @@ public class Ray {
 	 * @param paginationService
 	 *            the paginationService to set
 	 */
-	public void setPaginationService(RayPaginationService paginationService) {
+	public void setPaginationService(PaginationService paginationService) {
 		this.paginationService = paginationService;
 	}
 
-	/**
-	 * @return whether to use chat menus
-	 */
-	public boolean isUseChatMenus() {
-		return useChatMenus;
-	}
-
-	/**
-	 * @param useChatMenus
-	 *            set whether to use chat menus
-	 */
-	private void setUseChatMenus(boolean useChatMenus) {
-		this.useChatMenus = useChatMenus;
-	}
 }

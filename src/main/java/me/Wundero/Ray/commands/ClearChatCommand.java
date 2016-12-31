@@ -33,10 +33,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import me.Wundero.Ray.Ray;
-import me.Wundero.Ray.framework.channel.ChatChannel;
-import me.Wundero.Ray.framework.player.RayPlayer;
-import me.Wundero.Ray.menu.ChatMenu;
 import me.Wundero.Ray.utils.Utils;
 
 /**
@@ -51,21 +47,6 @@ public class ClearChatCommand implements CommandExecutor {
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (!src.hasPermission("ray.clearchat")) {
 			Utils.send(src, Text.of(TextColors.RED, "You are not allowed to do that!"));
-			return CommandResult.success();
-		}
-		if (Ray.get().isUseChatMenus() && src instanceof Player) {
-			String ch = args.getOne("channel").orElse(RayPlayer.get((Player) src).getActiveChannel().getName())
-					.toString();
-			ChatChannel chan = Ray.get().getChannels().getChannel(ch);
-			if (chan != null) {
-				for (ChatMenu m : chan.getMenus().values()) {
-					m.clear();
-				}
-			} else {
-				for (Player p : Sponge.getServer().getOnlinePlayers()) {
-					Utils.fill(Text.of(" "), (t, i) -> t, 100, true).forEach(m -> Utils.send(p, m));
-				}
-			}
 			return CommandResult.success();
 		}
 		for (Player p : Sponge.getServer().getOnlinePlayers()) {

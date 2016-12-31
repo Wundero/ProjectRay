@@ -46,8 +46,6 @@ public class Commands {
 				CommandSpec.builder().permission("ray.announcementbuilder")
 						.description(Text.of("Create a new announcement"))
 						.executor(new AnnouncementConversationCommand()).build());
-		children.put(Utils.al("channel"), CommandSpec.builder().permission("ray.channelbuilder")
-				.description(Text.of("Create a new channel")).executor(new ChannelConversationCommand()).build());
 	}
 
 	/**
