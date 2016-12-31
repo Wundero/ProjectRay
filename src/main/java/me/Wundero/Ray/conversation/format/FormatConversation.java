@@ -73,8 +73,8 @@ public class FormatConversation {
 			return;
 		}
 		final Translator t = new Translator(player);
-		player.sendMessage(
-				t.t("prefix.format").concat(TextUtils.SPACE()).concat(t.t("conversation.creation.exit.reminder", "format")));
+		player.sendMessage(t.t("prefix.format").concat(TextUtils.SPACE())
+				.concat(t.t("conversation.creation.exit.reminder", "format")));
 		Conversation convo = ConversationFactory.builder(Ray.get()).withSuppression(true).withEcho(true)
 				.withPrefix(t.t("prefix.format")).withCanceller(new ConversationCanceller() {
 
@@ -88,8 +88,8 @@ public class FormatConversation {
 						if (!context.hasData("wipable node")) {
 							return;
 						}
-						ConfigurationNode node = context.getData("wipable node");
-						boolean wipegroup = context.getData("wipegroup", false);
+						ConfigurationNode node = context.getData("wipable node", ConfigurationNode.class, null);
+						boolean wipegroup = context.getData("wipegroup", boolean.class, false);
 						if (node != null) {
 							if (wipegroup) {
 								node.getParent().setValue(null);
@@ -204,12 +204,10 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.al();
-			for (String g : Ray.get().getGroups().getGroups(context.getData("world").toString()).keySet()) {
-				options.add(new Option(g,
-						Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
-								.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!")))
-								.build(),
-						Ray.get().getGroups().getGroup(g, context.getData("world").toString())));
+			for (String g : Ray.get().getGroups().getGroups(context.getData("world", String.class, "")).keySet()) {
+				options.add(new Option(g, Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
+						.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!"))).build(),
+						Ray.get().getGroups().getGroup(g, context.getData("world", String.class, ""))));
 			}
 			return Optional.of(options);
 		}
@@ -221,7 +219,7 @@ public class FormatConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			context.putData("node", node.getNode(selected.isPresent() ? selected.get().getKey() : text, "formats"));
 			if (selected.isPresent()) {
 				context.putData("group", selected.get().getValue());
@@ -247,7 +245,7 @@ public class FormatConversation {
 
 		@Override
 		public boolean isInputValid(ConversationContext context, String input) {
-			Group group = context.getData("group");
+			Group group = context.getData("group", Group.class, null);
 			for (Format f : group.getAllFormats().get()) {
 				if (f.getName().equalsIgnoreCase(input.trim())) {
 					return false;
@@ -273,7 +271,7 @@ public class FormatConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			node = node.getNode(text.toLowerCase().trim());
 			context.putData("node", node);
 			context.putData("wipable node", node.getParent().getNode(node.getKey()));
@@ -349,9 +347,9 @@ public class FormatConversation {
 			if (parseInput(text)) {
 				return new TypePrompt();
 			} else {
-				context.putData("formattype", FormatContext.fromString(context.getData("name")));
-				ConfigurationNode node = context.getData("node");
-				String type = ((FormatContext) context.getData("formattype")).getName();
+				context.putData("formattype", FormatContext.fromString(context.getData("name", String.class, "")));
+				ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
+				String type = context.getData("formattype", FormatContext.class, null).getName();
 				node.getNode("context").setValue(type);
 				return Format.buildConversation(null, context, node);
 			}
@@ -403,8 +401,8 @@ public class FormatConversation {
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			context.putData("formattype", selected.get().getValue());
-			ConfigurationNode node = context.getData("node");
-			String type = ((FormatContext) context.getData("formattype")).getName();
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
+			String type = context.getData("formattype", FormatContext.class, null).getName();
 			node.getNode("context").setValue(type);
 			return Format.buildConversation(null, context, node);
 		}

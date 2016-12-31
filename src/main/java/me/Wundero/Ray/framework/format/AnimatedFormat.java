@@ -303,17 +303,17 @@ public class AnimatedFormat extends Format {
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			if (parseInput(text)) {
-				int framenumber = context.getData("framenumber");
-				ConfigurationNode frame = context.getData("frame" + framenumber);
+				int framenumber = context.getData("framenumber", int.class, 0);
+				ConfigurationNode frame = context.getData("frame" + framenumber, ConfigurationNode.class, null);
 				frame.getNode("number").setValue(framenumber);
 				context.putData("framenumber", framenumber + 1);
-				ConfigurationNode node = context.getData("node");
+				ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 				context.putData("frame" + (framenumber + 1), node.getNode("frames", "frame" + (framenumber + 1)));
 				return Format.buildConversation(new StayPrompt(p), context,
 						node.getNode("frames", "frame" + (framenumber + 1)));
 			} else {
-				int framenumber = context.getData("framenumber");
-				ConfigurationNode frame = context.getData("frame" + framenumber);
+				int framenumber = context.getData("framenumber", int.class, 0);
+				ConfigurationNode frame = context.getData("frame" + framenumber, ConfigurationNode.class, null);
 				frame.getNode("number").setValue(framenumber);
 				return p;
 			}
@@ -336,8 +336,8 @@ public class AnimatedFormat extends Format {
 
 		@Override
 		public Prompt onTypeInput(Integer object, String text, ConversationContext context) {
-			int num = context.getData("framenumber");
-			ConfigurationNode n = context.getData("frame" + num);
+			int num = context.getData("framenumber", int.class, 0);
+			ConfigurationNode n = context.getData("frame" + num, ConfigurationNode.class, null);
 			n.getNode("stay").setValue(text);
 			return new FramePrompt(p);
 		}
@@ -362,13 +362,14 @@ public class AnimatedFormat extends Format {
 	 */
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		ConfigurationNode node = context.getData("node");
+		ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 		int framenumber = 0;
 		context.putData("framenumber", framenumber);
 		context.putData("animated", true);
 		context.putData("frame0", node.getNode("frames", "frame0"));
 		context.sendMessage(Text.of("Creating first frame..."));
-		return Format.buildConversation(new StayPrompt(returnTo), context, context.getData("frame0"));
+		return Format.buildConversation(new StayPrompt(returnTo), context,
+				context.getData("frame0", ConfigurationNode.class, null));
 	}
 
 	@Override

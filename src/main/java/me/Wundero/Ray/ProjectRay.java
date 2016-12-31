@@ -106,7 +106,7 @@ public class ProjectRay {
 	@Inject
 	private Game game;
 	/**
-	 * THe path to the config. Held in it's own folder.
+	 * The path to the config. Held in it's own folder.
 	 */
 	@Inject
 	@ConfigDir(sharedRoot = false)

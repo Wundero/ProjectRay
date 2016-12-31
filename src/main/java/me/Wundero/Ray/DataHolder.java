@@ -1,6 +1,7 @@
 package me.Wundero.Ray;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import me.Wundero.Ray.utils.Utils;
@@ -62,20 +63,30 @@ public abstract class DataHolder {
 	/**
 	 * Get an object from a key.
 	 */
-	@SuppressWarnings("unchecked")
-	public synchronized <T> T getData(String key) {
-		return (T) data.get(key);
+	public synchronized <T> Optional<T> getData(String key, Class<T> clazz) {
+		if (!hasData(key)) {
+			return Optional.empty();
+		}
+		try {
+			Object o = data.get(key);
+			if (!clazz.isInstance(o)) {
+				return Optional.empty();
+			}
+			return Utils.wrap(clazz.cast(o));
+		} catch (Exception e) {
+			return Optional.empty();
+		}
 	}
 
 	/**
 	 * Get an object from a key. If the returning object is null or the map does
 	 * not contain the key, the default value is returned.
 	 */
-	public synchronized <T> T getData(String key, T def) {
+	public synchronized <T> T getData(String key, Class<T> clazz, T def) {
 		if (!hasData(key)) {
 			return def;
 		}
-		T out = getData(key);
+		T out = getData(key, clazz).orElse(def);
 		return out == null ? def : out;
 	}
 
@@ -89,17 +100,16 @@ public abstract class DataHolder {
 	/**
 	 * Delete the value stored by a key. Returns the value removed.
 	 */
-	@SuppressWarnings("unchecked")
-	public synchronized <T> T removeData(String key) {
-		return (T) data.remove(key);
+	public synchronized Optional<Object> removeData(String key) {
+		return Utils.wrap(data.remove(key));
 	}
 
 	/**
 	 * Push datum onto the set under a key.
 	 */
-	@SuppressWarnings("unchecked")
-	public synchronized <T> T putData(String key, T value) {
-		return (T) data.put(key, value);
+	public synchronized <T> Optional<Object> putData(String key, T value) {
+		Object o = data.put(key, value);
+		return Utils.wrap(o);
 	}
 
 	/**

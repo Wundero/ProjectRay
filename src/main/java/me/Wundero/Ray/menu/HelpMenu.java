@@ -24,38 +24,48 @@ package me.Wundero.Ray.menu;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
+
+import me.Wundero.Ray.utils.Utils;
 
 public class HelpMenu extends Menu {
 
-	public HelpMenu(Player player) {
+	private PaginationList list;
+
+	public HelpMenu(Player player, PaginationList list) {
 		super(player);
-		// TODO Auto-generated constructor stub
+		this.list = list;
+		list.getTitle().ifPresent(t -> this.setTitle(t));
 	}
 
-	public HelpMenu(Player player, Menu from) {
-		super(player, from);
-		// TODO Auto-generated constructor stub
+	@Override
+	public void send() {
+		this.getPlayer().ifPresent(list::sendTo);
 	}
 
 	@Override
 	public List<Text> renderBody() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Text> l = Utils.al();
+		for (Text t : list.getContents()) {
+			l.add(t);
+		}
+		return l;
 	}
 
 	@Override
 	public List<Text> renderHeader() {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Text> h = list.getHeader();
+		return h.isPresent() ? Utils.al(h.get()) : Utils.al();
 	}
 
 	@Override
 	public List<Text> renderFooter() {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Text> h = list.getFooter();
+		return h.isPresent() ? Utils.al(h.get()) : Utils.al();
 	}
 
 }

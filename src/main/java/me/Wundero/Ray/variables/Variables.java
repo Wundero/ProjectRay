@@ -236,6 +236,22 @@ public class Variables {
 	/**
 	 * Register a new variable wrapper
 	 */
+	public boolean registerWrapper(String key, Consumer<Text> c, int useless) {
+		return registerWrapper(key, (va, t) -> c.accept(t));
+	}
+
+	/**
+	 * Register a new variable wrapper
+	 */
+	public boolean registerWrapper(String key, Function<Text, Text> f, int useless) {
+		return registerWrapper(key, (va, t) -> {
+			return f.apply(t);
+		});
+	}
+
+	/**
+	 * Register a new variable wrapper
+	 */
 	public boolean registerWrapper(String key, BiConsumer<Variable, Text> c) {
 		return registerWrapper(key, (BiFunction<Variable, Text, Text>) (v, t) -> {
 			c.accept(v, t);

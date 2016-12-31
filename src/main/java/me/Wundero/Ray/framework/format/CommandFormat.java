@@ -153,13 +153,13 @@ public class CommandFormat extends Format {
 
 			@Override
 			public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-				ConfigurationNode node = context.getData("node");
+				ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 				node.getNode("command").setValue(text);
 				return new BooleanPrompt(TextTemplate.of("Would you like to cancel the command?")) {
 
 					@Override
 					public Prompt onBooleanInput(boolean value, String text, ConversationContext context) {
-						ConfigurationNode node = context.getData("node");
+						ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 						node.getNode("cancel").setValue(value);
 						return Format.buildConversation(returnTo, context, node);
 					}

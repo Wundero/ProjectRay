@@ -215,7 +215,7 @@ public class EventFormat extends Format {
 
 			@Override
 			public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-				ConfigurationNode node = context.getData("node");
+				ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 				node.getNode("event").setValue(text);
 				return Format.buildConversation(returnTo, context, node);
 			}

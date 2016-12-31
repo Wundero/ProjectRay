@@ -55,7 +55,7 @@ public class ConversationContext extends DataHolder {
 	 * Send a message (with prefix) to the holder
 	 */
 	public void sendMessage(Text message) {
-		Conversation convo = getData("conversation");
+		Conversation convo = getData("conversation", Conversation.class, null);
 		Text prefix = convo.getPrefix();
 		holder.sendMessage(prefix.concat(message));
 	}

@@ -41,6 +41,8 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.menu.HelpMenu;
 import me.Wundero.Ray.utils.Utils;
 
 /**
@@ -55,8 +57,8 @@ public class ChannelCommand implements CommandExecutor {
 			return CommandResult.builder().successCount(0).build();
 		}
 		Player sender = (Player) src;
-		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextStyles.RESET, TextColors.BLACK,
-				"]", " ", TextColors.GRAY, "Available channels:");
+		Text header = Text.of(TextColors.BLACK, "[", TextColors.AQUA, TextStyles.BOLD, "Channels", TextStyles.RESET,
+				TextColors.BLACK, "]", " ", TextColors.GRAY, "Available channels:");
 		List<Text> texts = Utils.al();
 		for (ChatChannel channel : Ray.get().getChannels().getJoinableChannels(sender, false)) {
 			texts.add(buildForChannel(channel, sender));
@@ -66,7 +68,11 @@ public class ChannelCommand implements CommandExecutor {
 		b.contents(texts);
 		b.title(Text.of(TextColors.AQUA, TextStyles.BOLD, "Channels", TextColors.GREEN));
 		b.header(header).padding(Text.of(TextColors.GREEN, "="));
-		b.sendTo(src);
+		if (Ray.get().isUseChatMenus()) {
+			RayPlayer.get(sender).open(new HelpMenu(sender, b.build()), 20 * 15);
+		} else {
+			b.sendTo(src);
+		}
 		return CommandResult.success();
 	}
 

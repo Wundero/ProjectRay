@@ -1042,6 +1042,20 @@ public class TextUtils {
 	}
 
 	/**
+	 * Change the content of the text.
+	 */
+	public static Text forEach(final Text t, final Function<String, String> replacer) {
+		String content = t.toPlainSingle();
+		String nc = replacer.apply(content);
+		List<Text> children = t.getChildren();
+		Text.Builder out = Text.builder(nc).format(t.getFormat());
+		TextUtils.apply(out, t.toBuilder());
+		List<Text> newchildren = children.stream().map(child -> forEach(child, replacer))
+				.collect(RayCollectors.rayList());
+		return out.append(newchildren).build();
+	}
+
+	/**
 	 * Split the text at all newline characters.
 	 */
 	public static List<Text> newlines(Text t) {
@@ -1177,8 +1191,19 @@ public class TextUtils {
 	/**
 	 * Compare the formats of two texts.
 	 */
-	public static boolean formatsEqual(Text one, Text two) {
-		return one.getFormat().equals(two.getFormat());
+	public static boolean formatsEqual(Text one, Text two, boolean strict) {
+		if (strict) {
+			return one.getFormat().equals(two.getFormat());
+		} else {
+			boolean c = one.getColor().equals(two.getColor()), s = one.getStyle().equals(two.getStyle());
+			if (one.getColor().equals(TextColors.NONE) || two.getColor().equals(TextColors.NONE)) {
+				c = true;
+			}
+			if (one.getStyle().equals(TextStyles.NONE) || two.getStyle().equals(TextStyles.NONE)) {
+				s = true;
+			}
+			return c && s;
+		}
 	}
 
 	/**
@@ -1367,7 +1392,7 @@ public class TextUtils {
 		if (clickHover && !extrasEqual(one, two)) {
 			return false;
 		}
-		if (formats && !formatsEqual(one, two)) {
+		if (formats && !formatsEqual(one, two, true)) {
 			return false;
 		}
 		return true;
@@ -1412,7 +1437,7 @@ public class TextUtils {
 		LiteralText t1 = (LiteralText) in;
 		LiteralText t2 = (LiteralText) val;
 		int c = t1.getContent().indexOf(t2.getContent(), offset);
-		return extrasEqual(t1, t2) && formatsEqual(t1, t2) ? c : -1;
+		return extrasEqual(t1, t2) && formatsEqual(t1, t2, false) ? c : -1;
 	}
 
 	/**
@@ -1744,14 +1769,14 @@ public class TextUtils {
 		if (one == null || two == null) {
 			throw new IllegalArgumentException("Texts cannot be null!");
 		}
-		if (!extrasEqual(one, two) || !formatsEqual(one, two)) {
+		if (!extrasEqual(one, two) || !formatsEqual(one, two, false)) {
 			throw new IllegalArgumentException("Both texts must have matching formats and extras!");
 		}
 		if (!one.getChildren().isEmpty() || !two.getChildren().isEmpty()) {
 			throw new IllegalArgumentException("Texts cannot have children!");
 		}
 		String val = one.toPlain() + two.toPlain();
-		return mergeOnto(one, Text.of(val));
+		return mergeOnto(one, Text.of(val).toBuilder().format(two.getFormat()).build());
 	}
 
 	/**

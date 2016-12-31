@@ -682,13 +682,16 @@ public class RayPlayer {
 		this.listenChannels = listenChannels;
 	}
 
-	public void open(Menu menu) {
+	public void open(Menu menu, int delay) {
 		if (menu instanceof ChatMenu) {
 			menu.send();
 		} else {
 			this.activeMenu.deactive();
 			menu.insertSource(true, activeMenu);
 			menu.send();
+			if (delay > 0) {
+				Task.builder().delayTicks(delay).execute(() -> this.activeMenu.send()).submit(Ray.get().getPlugin());
+			}
 		}
 	}
 

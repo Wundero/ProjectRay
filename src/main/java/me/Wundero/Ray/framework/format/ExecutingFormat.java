@@ -116,7 +116,7 @@ public class ExecutingFormat extends Format {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode supnode = context.getData("node");
+			ConfigurationNode supnode = context.getData("node", ConfigurationNode.class, null);
 			ConfigurationNode cmdnode = supnode.getNode("commands", text);
 			cmdnode.getNode("command").setValue(text);
 			context.putData("commandnode", cmdnode);
@@ -137,7 +137,7 @@ public class ExecutingFormat extends Format {
 
 		@Override
 		public Prompt onBooleanInput(boolean value, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("commandnode");
+			ConfigurationNode node = context.getData("commandnode", ConfigurationNode.class, null);
 			node.getNode("use-console").setValue(value);
 			return new AnotherCommandPrompt(r);
 		}

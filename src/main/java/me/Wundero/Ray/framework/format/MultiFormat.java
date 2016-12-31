@@ -146,7 +146,7 @@ public class MultiFormat extends Format {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			node = node.getNode("formats", text);
 			return Format.buildConversation(new AnotherFormatPrompt(r), context, node);
 		}
@@ -217,7 +217,7 @@ public class MultiFormat extends Format {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			node.getNode("mode").setValue(selected.get().getValue().toString());
 			return new NamePrompt(r);
 		}

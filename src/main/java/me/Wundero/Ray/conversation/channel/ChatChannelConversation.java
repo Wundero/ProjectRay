@@ -85,7 +85,7 @@ public class ChatChannelConversation {
 						if (!context.hasData("node")) {
 							return;
 						}
-						ConfigurationNode node = context.getData("node");
+						ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 						if (node != null) {
 							node.setValue(null);
 						}
@@ -98,7 +98,8 @@ public class ChatChannelConversation {
 					@Override
 					public void onFinish(Finish finish) {
 						try {
-							Ray.get().getChannels().addChannel((ConfigurationNode) finish.getContext().getData("node"));
+							Ray.get().getChannels()
+									.addChannel(finish.getContext().getData("node", ConfigurationNode.class, null));
 						} catch (ObjectMappingException e) {
 							Utils.printError(e);
 						}
@@ -189,35 +190,23 @@ public class ChatChannelConversation {
 							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select permission!")))
 							.build(),
 					"string"));
-			out.add(new Option("password",
-					Text.builder("password").onClick(TextActions.runCommand("password"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select password!")))
-							.build(),
+			out.add(new Option("password", Text.builder("password").onClick(TextActions.runCommand("password"))
+					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select password!"))).build(),
 					"string"));
-			out.add(new Option("tag",
-					Text.builder("tag").onClick(TextActions.runCommand("tag"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select tag!")))
-							.build(),
+			out.add(new Option("tag", Text.builder("tag").onClick(TextActions.runCommand("tag"))
+					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select tag!"))).build(),
 					"string"));
-			out.add(new Option("range",
-					Text.builder("range").onClick(TextActions.runCommand("range"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select range!")))
-							.build(),
+			out.add(new Option("range", Text.builder("range").onClick(TextActions.runCommand("range"))
+					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select range!"))).build(),
 					"double"));
-			out.add(new Option("hidden",
-					Text.builder("hidden").onClick(TextActions.runCommand("hidden"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select hidden!")))
-							.build(),
+			out.add(new Option("hidden", Text.builder("hidden").onClick(TextActions.runCommand("hidden"))
+					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select hidden!"))).build(),
 					"boolean"));
-			out.add(new Option("autojoin",
-					Text.builder("autojoin").onClick(TextActions.runCommand("autojoin"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select autojoin!")))
-							.build(),
+			out.add(new Option("autojoin", Text.builder("autojoin").onClick(TextActions.runCommand("autojoin"))
+					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select autojoin!"))).build(),
 					"boolean"));
-			out.add(new Option("obfuscate",
-					Text.builder("obfuscate").onClick(TextActions.runCommand("obfuscate"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select obfuscate!")))
-							.build(),
+			out.add(new Option("obfuscate", Text.builder("obfuscate").onClick(TextActions.runCommand("obfuscate"))
+					.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click here to select obfuscate!"))).build(),
 					"boolean"));
 			return Optional.of(out);
 		}
@@ -270,7 +259,7 @@ public class ChatChannelConversation {
 
 		@Override
 		public Prompt onTypeInput(Double object, String text, ConversationContext context) {
-			ConfigurationNode n = context.getData("node");
+			ConfigurationNode n = context.getData("node", ConfigurationNode.class, null);
 			n.getNode(node).setValue(object);
 			return new OptionPrompt();
 		}
@@ -340,7 +329,7 @@ public class ChatChannelConversation {
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
 			boolean b = parseInput(text);
-			ConfigurationNode n = context.getData("node");
+			ConfigurationNode n = context.getData("node", ConfigurationNode.class, null);
 			n.getNode(node).setValue(b);
 			return new OptionPrompt();
 		}
@@ -377,7 +366,7 @@ public class ChatChannelConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode n = context.getData("node");
+			ConfigurationNode n = context.getData("node", ConfigurationNode.class, null);
 			n.getNode(node).setValue(text);
 			return new OptionPrompt();
 		}

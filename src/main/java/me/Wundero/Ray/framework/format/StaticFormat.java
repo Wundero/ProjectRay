@@ -43,6 +43,7 @@ import me.Wundero.Ray.conversation.Conversation;
 import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
 import me.Wundero.Ray.utils.TextUtils;
@@ -136,7 +137,7 @@ public class StaticFormat extends Format {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> opts = Utils.al();
-			for(FormatLocation f : FormatLocations.values()) {
+			for (FormatLocation f : FormatLocations.values()) {
 				opts.add(Option.build(f.getName(), f.getName()));
 			}
 			return Optional.of(opts);
@@ -149,7 +150,7 @@ public class StaticFormat extends Format {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode n = context.getData("node");
+			ConfigurationNode n = context.getData("node", ConfigurationNode.class, null);
 			n.getNode("location").setValue(text);
 			return new TemplateBuilderTypePrompt(true, context, returnTo);
 		}
@@ -165,8 +166,9 @@ public class StaticFormat extends Format {
 			if (!constructNewBuilder) {
 				return;
 			}
-			FormatBuilder fb = new FormatBuilder(context.getData("node"), context.getData("name"));
-			fb.withType(context.getData("formattype"));
+			FormatBuilder fb = new FormatBuilder(context.getData("node", ConfigurationNode.class, null),
+					context.getData("name", String.class, ""));
+			fb.withType(context.getData("formattype", FormatContext.class, null));
 			context.putData("builder", fb);
 		}
 
@@ -216,7 +218,7 @@ public class StaticFormat extends Format {
 			if (text.equals("text")) {
 				return new TextTypePrompt(returnTo);
 			}
-			((FormatBuilder) context.getData("builder")).build();
+			context.getData("builder", FormatBuilder.class, null).build();
 			return returnTo;
 		}
 	}
@@ -254,13 +256,12 @@ public class StaticFormat extends Format {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.al();
-			options.add(
-					new Option("key",
-							Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
-									.onHover(TextActions.showText(Text
-											.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
-									.build(),
-							"key"));
+			options.add(new Option("key",
+					Text.builder("key").color(TextColors.GOLD).onClick(TextActions.runCommand("key"))
+							.onHover(TextActions.showText(
+									Text.of("Click this to select key (creates a new variable)!", TextColors.AQUA)))
+							.build(),
+					"key"));
 			Text t2 = Text.builder("click").color(TextColors.GOLD).onClick(TextActions.runCommand("click"))
 					.onHover(TextActions.showText(Text.of("Click this to select click!", TextColors.AQUA))).build();
 			Text t3 = Text.builder("hover").color(TextColors.GOLD).onClick(TextActions.runCommand("hover"))
@@ -288,8 +289,8 @@ public class StaticFormat extends Format {
 						+ " (put url:, run:, or suggest: in front of the click to change it's type (default is suggest))";
 			case "hover":
 				if (p == null) {
-					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
-							.concat(Text.of(TextColors.RED, "You must choose a key first!")));
+					context.getHolder().sendMessage(context.getData("conversation", Conversation.class, null)
+							.getPrefix().concat(Text.of(TextColors.RED, "You must choose a key first!")));
 					return this;
 				}
 				p.value = text.toLowerCase().trim();
@@ -343,7 +344,7 @@ public class StaticFormat extends Format {
 		}
 
 		public void apply(ConversationContext context) {
-			FormatBuilder builder = context.getData("builder");
+			FormatBuilder builder = context.getData("builder", FormatBuilder.class, null);
 			builder = builder.withArg(key, click, hover);
 			context.putData("builder", builder);
 		}
@@ -435,8 +436,8 @@ public class StaticFormat extends Format {
 						+ " (put url:, run:, or suggest: in front of the click to change it's type (default is suggest))";
 			case "hover":
 				if (p == null) {
-					context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
-							.concat(Text.of(TextColors.RED, "You must input some text first!")));
+					context.getHolder().sendMessage(context.getData("conversation", Conversation.class, null)
+							.getPrefix().concat(Text.of(TextColors.RED, "You must input some text first!")));
 					return this;
 				}
 				p.value = text.toLowerCase().trim();
@@ -490,7 +491,7 @@ public class StaticFormat extends Format {
 		}
 
 		public void apply(ConversationContext context) {
-			FormatBuilder builder = context.getData("builder");
+			FormatBuilder builder = context.getData("builder", FormatBuilder.class, null);
 			Text.Builder t = text.toBuilder();
 			if (click != null) {
 				click.applyTo(t);

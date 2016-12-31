@@ -32,6 +32,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -40,6 +41,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.menu.HelpMenu;
 import me.Wundero.Ray.utils.Utils;
 
 /**
@@ -60,7 +63,11 @@ public class RayCommand implements CommandExecutor {
 		b.contents(texts);
 		b.title(Text.of(TextColors.AQUA, TextStyles.BOLD, "Ray", TextColors.GREEN));
 		b.header(header).padding(Text.of(TextColors.GREEN, "="));
-		b.sendTo(src);
+		if (src instanceof Player && Ray.get().isUseChatMenus()) {
+			RayPlayer.get((Player) src).open(new HelpMenu((Player) src, b.build()), 20 * 15);
+		} else {
+			b.sendTo(src);
+		}
 		return CommandResult.success();
 	}
 

@@ -43,6 +43,7 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.channel.ChatChannel;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Class that loads default variables that come with the plugin into the store.
@@ -60,12 +61,13 @@ public class DefaultVariables {
 	 * Register all default vars and wrappers
 	 */
 	public static void register(Variables v) {
-		v.registerWrapper("stripped", (va, t) -> {
+		v.registerWrapper("latin", (t) -> {
+			return TextUtils.forEach(t, Utils::makeUnicode);
+		}, 0);
+		v.registerWrapper("stripped", t -> {
 			return TextUtils.strip(t);
-		});
-		v.registerWrapper("nourls", (va, t) -> {
-			return TextUtils.noUrls(t);
-		});
+		}, 0);
+		v.registerWrapper("nourls", TextUtils::noUrls, 0);
 		v.registerVariable("suffix", (objects) -> {
 			Param playerToUse = Param.SENDER;
 			Player player = null;

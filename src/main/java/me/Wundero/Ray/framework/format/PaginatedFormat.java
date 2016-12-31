@@ -89,7 +89,7 @@ public class PaginatedFormat extends Format {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			node = node.getNode("pages", text);
 			return Format.buildConversation(new AnotherFormatPrompt(r), context, node);
 		}
@@ -127,7 +127,7 @@ public class PaginatedFormat extends Format {
 
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		return Format.buildConversation(new AnotherFormatPrompt(returnTo), context, context.getData("node"));
+		return Format.buildConversation(new AnotherFormatPrompt(returnTo), context, context.getData("node", ConfigurationNode.class, null));
 	}
 
 	@SuppressWarnings("unchecked")

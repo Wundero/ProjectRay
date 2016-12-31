@@ -122,7 +122,7 @@ public abstract class Prompt {
 		if (isInputValid(context, input)) {
 			return onInput(getSelected(context, input), input, context);
 		} else {
-			context.getHolder().sendMessage(((Conversation) context.getData("conversation")).getPrefix()
+			context.getHolder().sendMessage((context.getData("conversation", Conversation.class, null)).getPrefix()
 					.concat(getFailedText(context, input).toBuilder().color(TextColors.RED).build()));
 			return this;
 		}

@@ -77,9 +77,9 @@ public abstract class Format {
 	 * a node to set the context node to.
 	 */
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode) {
-		ConfigurationNode oldNode = c.getData("node");
-		oldNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
-		newNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
+		ConfigurationNode oldNode = c.getData("node", ConfigurationNode.class, null);
+		oldNode.getNode("context").setValue(c.getData("formattype", FormatContext.class, null).getName());
+		newNode.getNode("context").setValue(c.getData("formattype", FormatContext.class, null).getName());
 		c.putData("node", newNode);
 		return new FormatPrompt(p == null ? null : new WrapperPrompt(p, oldNode, c));
 	}
@@ -90,9 +90,9 @@ public abstract class Format {
 	 */
 	public static Prompt buildConversation(Prompt p, final ConversationContext c, final ConfigurationNode newNode,
 			final Format chosen) {
-		ConfigurationNode oldNode = c.getData("node");
-		oldNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
-		newNode.getNode("context").setValue(((FormatContext) c.getData("formattype")).getName());
+		ConfigurationNode oldNode = c.getData("node", ConfigurationNode.class, null);
+		oldNode.getNode("context").setValue(c.getData("formattype", FormatContext.class, null).getName());
+		newNode.getNode("context").setValue(c.getData("formattype", FormatContext.class, null).getName());
 		c.putData("node", newNode);
 		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
 	}
@@ -209,14 +209,16 @@ public abstract class Format {
 	/**
 	 * Send a message to the location of this format, parsing for variables.
 	 */
-	public boolean send(MessageReceiver target, Map<String, Object> args, Object o, UUID uuid, boolean broadcast, boolean irrelevant) {
+	public boolean send(MessageReceiver target, Map<String, Object> args, Object o, UUID uuid, boolean broadcast,
+			boolean irrelevant) {
 		return send(target, args, Optional.ofNullable(o), Utils.wrap(uuid), broadcast);
 	}
 
 	/**
 	 * Send a message to the location of this format, parsing for variables.
 	 */
-	public boolean send(MessageReceiver target, ParsableData data, Object o, UUID uuid, boolean broadcast, boolean irrelevant) {
+	public boolean send(MessageReceiver target, ParsableData data, Object o, UUID uuid, boolean broadcast,
+			boolean irrelevant) {
 		return send(target, data, Optional.ofNullable(o), Utils.wrap(uuid), broadcast);
 	}
 

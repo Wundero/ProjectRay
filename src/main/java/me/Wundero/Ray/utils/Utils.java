@@ -187,7 +187,7 @@ public class Utils {
 	}
 
 	/**
-	 * Combine multiple lists into one. Boolean to filter unique items.
+	 * Combine multiple lists into one. Items must be present in all lists.
 	 */
 	@SafeVarargs
 	public static <T> List<T> intersect(List<T>... lists) {
@@ -214,7 +214,7 @@ public class Utils {
 	}
 
 	/**
-	 * Combine multiple arrays into one. Boolean to filter unique items.
+	 * Combine multiple arrays into one. Items must be present in all arrays.
 	 */
 	@SuppressWarnings("unchecked")
 	@SafeVarargs
@@ -896,18 +896,17 @@ public class Utils {
 			Utils.printError(e);
 		}
 	}
-
+	
 	/**
 	 * Check to see if the config value contains subsections specified in the
 	 * varargs parameter.
 	 */
 	public static boolean hasSections(ConfigurationNode config, String... toValidate) {
+		boolean b = true;
 		for (String s : toValidate) {
-			if (!config.getChildrenMap().containsKey(s)) {
-				return false;
-			}
+			b &= !config.getNode(s).isVirtual();
 		}
-		return true;
+		return b;
 	}
 
 	/**
@@ -1300,7 +1299,7 @@ public class Utils {
 		if (list == null || list.isEmpty()) {
 			return Optional.empty();
 		}
-		return Optional.ofNullable(list.get(0));
+		return wrap(list.get(0));
 	}
 
 	/**
@@ -1310,7 +1309,7 @@ public class Utils {
 		if (list == null || list.isEmpty()) {
 			return Optional.empty();
 		}
-		return Optional.ofNullable(list.get(list.size() - 1));
+		return wrap(list.get(list.size() - 1));
 	}
 
 	/**
@@ -1333,7 +1332,7 @@ public class Utils {
 		for (Character c : n.toCharArray()) {
 			if (skipNext) {
 				s += c;
-				skipNext = true;
+				skipNext = false;
 				continue;
 			}
 			s += makeUnicode(c);
@@ -1490,7 +1489,7 @@ public class Utils {
 				continue;
 			}
 			if (i == 0) {
-				out.add(map.get(i));
+				out.add(0, map.get(i));
 				continue;
 			}
 			int dif = i - last;
@@ -1510,9 +1509,7 @@ public class Utils {
 	public static <T> List<T> flatten(List<List<T>> list) {
 		List<T> out = al();
 		for (List<T> l : list) {
-			for (T t : l) {
-				out.add(t);
-			}
+			out.addAll(l);
 		}
 		return out;
 	}

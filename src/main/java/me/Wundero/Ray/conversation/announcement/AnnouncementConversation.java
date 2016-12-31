@@ -86,7 +86,8 @@ public class AnnouncementConversation {
 					public void onCancel(Cancel cancel) {
 						cancel.getContext().sendMessage(Text.of(TextColors.RED, "Announcement creation cancelled!"));
 						if (cancel.getContext().hasData("wipable node")) {
-							ConfigurationNode wn = cancel.getContext().getData("wipable node");
+							ConfigurationNode wn = cancel.getContext().getData("wipable node", ConfigurationNode.class,
+									null);
 							wn.setValue(null);
 						}
 					}
@@ -134,7 +135,7 @@ public class AnnouncementConversation {
 
 		@Override
 		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			context.putData("node", node.getNode(text, "frames", text));
 			context.putData("wipable node", node.getNode(text));
 			return new DelayPrompt();
@@ -189,7 +190,7 @@ public class AnnouncementConversation {
 				context.sendMessage(getFailedText(context, text));
 				return this;
 			}
-			ConfigurationNode node = context.getData("node");
+			ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 			node.getNode("stay").setValue(object);
 			String k = node.getKey().toString();
 			return Format.buildConversation(null, context, node.getNode("frames", k), Format.valueOf("multi"));

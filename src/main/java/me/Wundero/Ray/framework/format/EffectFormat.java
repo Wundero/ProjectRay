@@ -100,7 +100,7 @@ public class EffectFormat extends Format {
 
 			@Override
 			public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-				ConfigurationNode node = context.getData("node");
+				ConfigurationNode node = context.getData("node", ConfigurationNode.class, null);
 				node.getNode("type").setValue(text);
 				return new BooleanPrompt(TextTemplate.of(TextColors.AQUA,
 						"Would you like to include optional settings? ", TextTemplate.arg("options")), true) {
