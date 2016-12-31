@@ -24,7 +24,6 @@ dependencies {
     compile 'org.spongepowered:spongeapi:5.0.0'
 }
 
-
 processResources {
     from('src/main/resources') {
         include 'mcmod.info'

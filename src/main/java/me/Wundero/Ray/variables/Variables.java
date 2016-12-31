@@ -223,7 +223,7 @@ public class Variables {
 	public boolean registerWrapper(String key, Runnable r) {
 		return registerWrapper(key, (BiConsumer<Variable, Text>) (v, t) -> {
 			r.run();
-		});
+		}, 0);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class Variables {
 	 * Register a new variable wrapper
 	 */
 	public boolean registerWrapper(String key, Consumer<Text> c, int useless) {
-		return registerWrapper(key, (va, t) -> c.accept(t));
+		return registerWrapper(key, (va, t) -> c.accept(t), useless);
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class Variables {
 	/**
 	 * Register a new variable wrapper
 	 */
-	public boolean registerWrapper(String key, BiConsumer<Variable, Text> c) {
+	public boolean registerWrapper(String key, BiConsumer<Variable, Text> c, int useless) {
 		return registerWrapper(key, (BiFunction<Variable, Text, Text>) (v, t) -> {
 			c.accept(v, t);
 			return t;
