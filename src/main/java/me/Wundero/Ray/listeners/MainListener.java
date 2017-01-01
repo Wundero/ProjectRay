@@ -53,7 +53,6 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import me.Wundero.Ray.Ray;
@@ -66,6 +65,7 @@ import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
 import me.Wundero.Ray.framework.player.RayPlayer;
+import me.Wundero.Ray.utils.RayCollectors;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -215,38 +215,10 @@ public class MainListener {
 	}
 
 	/**
-	 * Fires AFK context.
-	 */
-	@Listener(order = Order.POST)
-	public void onAFK(AfkEvent event) {
-		Group g = RayPlayer.get(event.getAfkPlayer()).getActiveGroup();
-		if (g != null) {
-			FormatCollection f = g.getFormats(FormatContexts.AFK);
-			if (f != null && !f.isEmpty()) {
-				event.setMessageCancelled(true);
-				String s = event.isAFK() ? "w" : " longer";
-				Map<String, Object> v = Utils.hm();
-				v.put("afk", event.isAFK() ? Text.of(TextColors.GRAY, "[AFK]") : Text.EMPTY);
-				v.put("afkmessage", "no" + s);
-				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.AFK)
-								.named("broadcast", Boolean.TRUE).named("vars", v).build(),
-						MessageChannel.TO_ALL, Utils.wrap(MessageChannel.TO_ALL), event.getFormatter(),
-						event.getMessage(), false);
-				Sponge.getEventManager().post(ev2);
-				if (!ev2.isCancelled()) {
-					ev2.getChannel().get().send(event.getAfkPlayer(), ev2.getMessage(), ChatTypes.CHAT);
-				}
-			}
-		}
-	}
-
-	/**
 	 * Fires join, motd, welcome and tab based contexts.
 	 */
 	@Listener(order = Order.LATE)
 	public void onJoin(final ClientConnectionEvent.Join event) {
-		boolean welcome = !event.getTargetEntity().hasPlayedBefore();
 		final RayPlayer p = RayPlayer.get(event.getTargetEntity());
 		MessageChannel original = event.getChannel().orElse(event.getOriginalChannel());
 		p.setTabTask(() -> {
@@ -265,7 +237,7 @@ public class MainListener {
 				if (g == null) {
 					continue;
 				}
-				FormatCollection f = g.getFormats(FormatContexts.TABLIST_ENTRY);
+				FormatCollection f = g.getFormats(FormatContexts.JOIN);
 				if (f == null || f.isEmpty()) {
 					continue;
 				}
@@ -285,8 +257,12 @@ public class MainListener {
 		final Group g = p.getActiveGroup();
 		if (g != null) {
 			Task.builder().delayTicks(20).execute(() -> {
-				FormatCollection h = g.getFormats(FormatContexts.TABLIST_HEADER);
-				FormatCollection f = g.getFormats(FormatContexts.TABLIST_FOOTER);
+				FormatCollection hf = g.getFormats(FormatContexts.JOIN);
+				List<Format> total = hf.get();
+				FormatCollection h = new FormatCollection(total.stream()
+						.filter(f2 -> f2.getLocation() == FormatLocations.TAB_HEADER).collect(RayCollectors.rayList()));
+				FormatCollection f = new FormatCollection(total.stream()
+						.filter(f2 -> f2.getLocation() == FormatLocations.TAB_FOOTER).collect(RayCollectors.rayList()));
 				if (h != null && !h.isEmpty()) {
 					h.sendAll(event.getTargetEntity(),
 							new ParsableData().setClickHover(false).setSender(event.getTargetEntity())
@@ -324,33 +300,6 @@ public class MainListener {
 				}
 			}).submit(Ray.get().getPlugin());
 		}
-		if (welcome) {
-			Task.builder().delayTicks(15).execute(() -> {
-				MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-						Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.WELCOME)
-								.named("broadcast", Boolean.TRUE).build(),
-						original, Optional.of(original),
-						new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE,
-								"Welcome " + event.getTargetEntity().getName() + " to the server!")),
-						event.getMessage(), false);
-				Sponge.getEventManager().post(ev2);
-				if (!ev2.isCancelled()) {
-					ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
-				}
-			}).submit(Ray.get().getPlugin());
-		}
-		Task.builder().delayTicks(15).execute(() -> {
-			MessageChannelEvent.Chat ev2 = SpongeEventFactory.createMessageChannelEventChat(
-					Cause.builder().from(event.getCause()).named("formatcontext", FormatContexts.MOTD).build(),
-					MessageChannel.fixed(event.getTargetEntity()),
-					Optional.of(MessageChannel.fixed(event.getTargetEntity())),
-					new MessageEvent.MessageFormatter(Text.of(TextColors.LIGHT_PURPLE, "Welcome to the server!")),
-					event.getMessage(), false);
-			Sponge.getEventManager().post(ev2);
-			if (!ev2.isCancelled()) {
-				ev2.getChannel().get().send(event.getTargetEntity(), ev2.getMessage(), ChatTypes.CHAT);
-			}
-		}).submit(Ray.get().getPlugin());
 		Task.builder().delayTicks(30).execute(() -> {
 			RayPlayer.updateTabs();
 			p.updateTab();

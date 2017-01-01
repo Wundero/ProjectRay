@@ -45,7 +45,6 @@ import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
-import me.Wundero.Ray.listeners.AfkEvent;
 import me.Wundero.Ray.utils.EventUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
@@ -67,7 +66,6 @@ public class EventFormat extends Format {
 		spongeEvents.put("disconnect", ClientConnectionEvent.Disconnect.class);
 		spongeEvents.put("quit", ClientConnectionEvent.Disconnect.class);
 		spongeEvents.put("chat", MessageChannelEvent.Chat.class);
-		spongeEvents.put("afk", AfkEvent.class);
 	}
 
 	private Optional<String> eventClass = Optional.empty();

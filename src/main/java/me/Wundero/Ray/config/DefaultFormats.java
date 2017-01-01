@@ -37,8 +37,8 @@ public class DefaultFormats {
 
 	public static final DefaultFormat BASIC_CHAT = new DefaultFormat("chat", FormatContexts.CHAT)
 			.with(TextTemplate.arg("player")).with(" ").with(TextTemplate.arg("message"));
-	public static final DefaultFormat CHAT = new DefaultFormat("chat", FormatContexts.CHAT).with(DefaultArgs.CHANNEL)
-			.with(" ").with(DefaultArgs.DISPLAYNAME).with(" ").with(TextTemplate.arg("message").color(TextColors.GRAY));
+	public static final DefaultFormat CHAT = new DefaultFormat("chat", FormatContexts.CHAT)
+			.with(DefaultArgs.DISPLAYNAME).with(" ").with(TextTemplate.arg("message").color(TextColors.GRAY));
 	public static final DefaultFormat JOIN = new DefaultFormat("join", FormatContexts.JOIN)
 			.with(DefaultArgs.DISPLAYNAME).with(" ").with(Text.of(TextColors.AQUA, "has joined!"));
 	public static final DefaultFormat LEAVE = new DefaultFormat("leave", FormatContexts.LEAVE)
@@ -54,23 +54,16 @@ public class DefaultFormats {
 			.with(DefaultArgs.DISPLAYNAME).with(Text.of(TextColors.AQUA, " to ")).with(DefaultArgs.RECIP_DISPLAYNAME)
 			.with(Text.of(TextColors.GRAY, ": ")).with(TextTemplate.arg("message").color(TextColors.GRAY))
 			.withLoc(FormatLocations.ACTIONBAR);
-	public static final DefaultFormat WELCOME = new DefaultFormat("welcome", FormatContexts.WELCOME)
-			.with(Text.of(TextColors.LIGHT_PURPLE, "Welcome ")).with(DefaultArgs.DISPLAYNAME)
-			.with(Text.of(TextColors.LIGHT_PURPLE, " to the server!")).withLoc(FormatLocations.BOSSBAR);
-	public static final DefaultFormat MOTD = new DefaultFormat("motd", FormatContexts.MOTD)
-			.with("Welcome to the server!").withLoc(FormatLocations.BOSSBAR);
-	public static final DefaultFormat TABLIST_ENTRY = new DefaultFormat("tablist", FormatContexts.TABLIST_ENTRY)
+	public static final DefaultFormat TABLIST_ENTRY = new DefaultFormat("tablist", FormatContexts.JOIN)
 			.withLoc(FormatLocations.TAB_ENTRY).with(DefaultArgs.DISPLAYNAME, " ", Text.of(TextColors.AQUA, "Hi"));
-	public static final DefaultFormat TABLIST_HEADER = new DefaultFormat("header", FormatContexts.TABLIST_HEADER)
+	public static final DefaultFormat TABLIST_HEADER = new DefaultFormat("header", FormatContexts.JOIN)
 			.withLoc(FormatLocations.TAB_HEADER).with("Hi");
-	public static final DefaultFormat TABLIST_FOOTER = new DefaultFormat("footer", FormatContexts.TABLIST_FOOTER)
+	public static final DefaultFormat TABLIST_FOOTER = new DefaultFormat("footer", FormatContexts.JOIN)
 			.withLoc(FormatLocations.TAB_FOOTER).with("Hello");
 	public static final DefaultFormat ACHIEVEMENT = new DefaultFormat("achievement", FormatContexts.ACHIEVEMENT).with(
 			DefaultArgs.DISPLAYNAME, Text.of(TextColors.AQUA, " has earned "), Text.of(TextColors.GREEN, "["),
 			TextTemplate.arg("achievement").color(TextColors.GREEN), Text.of(TextColors.GREEN, "]"));
 	public static final DefaultFormat KICK = new DefaultFormat("kick", FormatContexts.KICK)
 			.with(DefaultArgs.DISPLAYNAME, Text.of(TextColors.RED, " was kicked!"));
-	public static final DefaultFormat ANNOUNCEMENT = new DefaultFormat("announcement", FormatContexts.ANNOUNCEMENT)
-			.with(Text.of("Announcement 1."));
 
 }

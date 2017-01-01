@@ -23,7 +23,6 @@ import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.framework.player.RayPlayer;
-import me.Wundero.Ray.listeners.AfkListener;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.UserCache;
 import me.Wundero.Ray.utils.Utils;
@@ -143,8 +142,6 @@ public class Ray {
 		} catch (Exception e) {
 			this.setEcon(null);
 		}
-		new AfkListener(config.getNode("afk", "timer").getInt(-1), config.getNode("afk", "kick").getInt(-1),
-				config.getNode("afk", "cancel-movement").getBoolean(false));
 	}
 
 	/**
@@ -163,8 +160,6 @@ public class Ray {
 		} catch (Exception e) {
 			this.setEcon(null);
 		}
-		new AfkListener(config.getNode("afk", "timer").getInt(-1), config.getNode("afk", "kick").getInt(-1),
-				config.getNode("afk", "cancel-movement").getBoolean(false));
 	}
 
 	/**

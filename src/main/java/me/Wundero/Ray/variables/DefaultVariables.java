@@ -25,6 +25,7 @@ package me.Wundero.Ray.variables;
 
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
@@ -53,8 +54,41 @@ public class DefaultVariables {
 		return input / 1048576;
 	}
 
-	// TODO separate vars into classes
 	// TODO add click/hover onto vars
+
+	private static Player getFor(Map<Param, Object> objects) {
+		Param playerToUse = Param.SENDER;
+		Player player = null;
+		if (objects.containsKey(Param.DATA)) {
+			String data = (String) objects.get(Param.DATA);
+			switch (data) {
+			case "sender":
+				break;
+			case "recipient":
+			case "recip":
+				playerToUse = Param.RECIPIENT;
+				break;
+			case "observer":
+			case "killer":
+				playerToUse = Param.OBSERVER;
+				break;
+			default:
+				playerToUse = Param.DATA;
+				Optional<Player> po = Sponge.getServer().getPlayer(data);
+				if (!po.isPresent()) {
+					return null;
+				}
+				player = po.get();
+			}
+		}
+		if (!objects.containsKey(playerToUse)) {
+			return null;
+		}
+		if (player == null) {
+			player = (Player) objects.get(playerToUse);
+		}
+		return null;
+	}
 
 	/**
 	 * Register all default vars and wrappers
@@ -68,36 +102,7 @@ public class DefaultVariables {
 		}, 0);
 		v.registerWrapper("nourls", TextUtils::noUrls, 0);
 		v.registerVariable("suffix", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
+			Player player = getFor(objects);
 			if (player == null) {
 				return Text.of();
 			}
@@ -108,36 +113,7 @@ public class DefaultVariables {
 			return TextSerializers.FORMATTING_CODE.deserialize(opt.get());
 		});
 		v.registerVariable("prefix", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
+			Player player = getFor(objects);
 			if (player == null) {
 				return Text.of();
 			}
@@ -160,36 +136,7 @@ public class DefaultVariables {
 			return Text.of(Runtime.getRuntime().availableProcessors());
 		});
 		v.registerVariable("afk", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
+			Player player = getFor(objects);
 			if (player == null) {
 				return Text.of();
 			}
@@ -197,72 +144,14 @@ public class DefaultVariables {
 		});
 		v.registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		v.registerVariable("player", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
+			Player player = getFor(objects);
 			if (player == null) {
 				return Text.of();
 			}
 			return Text.of(player.getName());
 		});
 		v.registerVariable("displayname", (objects) -> {
-			Param playerToUse = Param.SENDER;
-			Player player = null;
-			if (objects.containsKey(Param.DATA)) {
-				String data = (String) objects.get(Param.DATA);
-				switch (data) {
-				case "sender":
-					break;
-				case "recipient":
-				case "recip":
-					playerToUse = Param.RECIPIENT;
-					break;
-				case "observer":
-				case "killer":
-					playerToUse = Param.OBSERVER;
-					break;
-				default:
-					playerToUse = Param.DATA;
-					Optional<Player> po = Sponge.getServer().getPlayer(data);
-					if (!po.isPresent()) {
-						return Text.of();
-					}
-					player = po.get();
-				}
-			}
-			if (!objects.containsKey(playerToUse)) {
-				return Text.of();
-			}
-			if (player == null) {
-				player = (Player) objects.get(playerToUse);
-			}
+			Player player = getFor(objects);
 			if (player == null) {
 				return Text.of();
 			}
@@ -304,7 +193,8 @@ public class DefaultVariables {
 			return Text.of(p.getWorld().getName());
 		});
 		v.registerVariable("balance", (objects) -> {
-			if (!objects.containsKey(Param.SENDER)) {
+			Player player = getFor(objects);
+			if (player == null) {
 				return Text.EMPTY;
 			}
 			if (!Ray.get().getEcon().isPresent()) {
@@ -323,7 +213,7 @@ public class DefaultVariables {
 					}
 				}
 			}
-			UniqueAccount acc = e.getOrCreateAccount(((Player) objects.get(Param.SENDER)).getUniqueId())
+			UniqueAccount acc = e.getOrCreateAccount((player).getUniqueId())
 					.orElseThrow(() -> new NullPointerException("Could not get account"));
 			return Text.of(acc.getBalance(c).toPlainString());
 		});

@@ -6,7 +6,6 @@ import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
@@ -22,12 +21,8 @@ import org.spongepowered.api.text.Text;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
-import me.Wundero.Ray.commands.ActionCommand;
-import me.Wundero.Ray.commands.AfkCommand;
-import me.Wundero.Ray.commands.BroadcastCommand;
 import me.Wundero.Ray.commands.ClearChatCommand;
 import me.Wundero.Ray.commands.Commands;
-import me.Wundero.Ray.commands.HelpOpCommand;
 import me.Wundero.Ray.commands.IgnoreCommand;
 import me.Wundero.Ray.commands.MessageCommand;
 import me.Wundero.Ray.commands.MuteCommand;
@@ -233,9 +228,9 @@ public class ProjectRay {
 	 */
 	@Listener
 	public void onReload(GameReloadEvent event) {
-		Sponge.getEventManager().unregisterPluginListeners(this);
+		game.getEventManager().unregisterPluginListeners(this);
 		loadConfig();
-		Sponge.getEventManager().registerListeners(this, new MainListener());
+		game.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().reload(this);
 		Ray.get().setGroups(new Groups(config.getNode("worlds")));
 	}
@@ -255,56 +250,39 @@ public class ProjectRay {
 	 */
 	@Listener
 	public void registerEvent(GameInitializationEvent event) {
-		Sponge.getEventManager().registerListeners(this, new MainListener());
+		game.getEventManager().registerListeners(this, new MainListener());
 		// register all commands. Might make this neater in the future.
 		CommandSpec myCommandSpec = CommandSpec.builder().description(Text.of("Base command for Ray."))
 				.children(Commands.getChildren()).executor(Commands.getExecutor()).permission("ray.use").build();
-		Sponge.getCommandManager().register(this, myCommandSpec, "ray", "projectray");
-		Sponge.getCommandManager().register(this,
+		game.getCommandManager().register(this, myCommandSpec, "ray", "projectray");
+		game.getCommandManager().register(this,
 				CommandSpec.builder().permission("ray.message").description(Text.of("Message a player."))
 						.arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of("player"))),
 								GenericArguments.remainingJoinedStrings(Text.of("message")))
 						.executor(new MessageCommand()).build(),
 				"m", "msg", "message", "w", "whisper", "t", "tell");
-		Sponge.getCommandManager().register(this,
+		game.getCommandManager().register(this,
 				CommandSpec.builder().permission("ray.message").description(Text.of("Reply to a player."))
 						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
 						.executor(new ReplyCommand()).build(),
 				"r", "reply");
-		Sponge.getCommandManager().register(this,
+		game.getCommandManager().register(this,
 				CommandSpec.builder().executor(new IgnoreCommand())
 						.arguments(GenericArguments.player(Text.of("player"))).description(Text.of("Ignore a player."))
 						.permission("ray.ignore").build(),
 				"ignore");
-		Sponge.getCommandManager().register(this,
+		game.getCommandManager().register(this,
 				CommandSpec.builder().executor(new ClearChatCommand()).description(Text.of("Clear the chat."))
 						.permission("ray.clearchat")
 						.arguments(
 								GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("channel"))))
 						.build(),
 				"clearchat", "chatclear", "cc");
-		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new AfkCommand())
-				.description(Text.of("Toggle being AFK.")).permission("ray.afk").build(), "afk");
-		Sponge.getCommandManager().register(this,
+		game.getCommandManager().register(this,
 				CommandSpec.builder().executor(new MuteCommand()).arguments(GenericArguments.player(Text.of("target")))
 						.permission("ray.mute").description(Text.of("Mute a player")).build(),
 				"mute");
-		Sponge.getCommandManager().register(this,
-				CommandSpec.builder().executor(new ActionCommand()).permission("ray.action")
-						.description(Text.of("Describe yourself doing something."))
-						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message"))).build(),
-				"action", "me");
-		Sponge.getCommandManager().register(this,
-				CommandSpec.builder().executor(new BroadcastCommand()).permission("ray.broadcast")
-						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
-						.description(Text.of("Send a message to everyone on the server.")).build(),
-				"broadcast", "bc");
-		Sponge.getCommandManager().register(this,
-				CommandSpec.builder().executor(new HelpOpCommand()).permission("ray.helpop")
-						.description(Text.of("Ask for help from staff members on the server."))
-						.arguments(GenericArguments.remainingJoinedStrings(Text.of("message"))).build(),
-				"helpop");
-		Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new SpyCommand()).permission("ray.spy")
+		game.getCommandManager().register(this, CommandSpec.builder().executor(new SpyCommand()).permission("ray.spy")
 				.description(Text.of("Toggle whether you can see private messages between other players.")).build(),
 				"spy", "socialspy");
 	}

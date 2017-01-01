@@ -44,20 +44,9 @@ public class FormatContexts {
 	public static FormatContext MESSAGE_SPY = new FormatContext("spy", new String[] { "message spy" });
 	public static FormatContext JOIN = new FormatContext("join", new String[] { "j" });
 	public static FormatContext LEAVE = new FormatContext("leave", new String[] { "l" });
-	public static FormatContext CUSTOM = new FormatContext("custom");
-	public static FormatContext WELCOME = new FormatContext("welcome", new String[] { "w" });
-	public static FormatContext MOTD = new FormatContext("motd");
-	public static FormatContext TABLIST_ENTRY = new FormatContext("tablist", new String[] { "list", "t", "tab" });
 	public static FormatContext DEFAULT = new FormatContext("default");
 	public static FormatContext ACHIEVEMENT = new FormatContext("achievement", new String[] { "ach" });
 	public static FormatContext KICK = new FormatContext("kick", new String[] { "k" });
-	public static FormatContext TABLIST_HEADER = new FormatContext("header", new String[] { "h" });
-	public static FormatContext TABLIST_FOOTER = new FormatContext("footer", new String[] { "f" });
-	public static FormatContext ANNOUNCEMENT = new FormatContext("announcement", new String[] { "a" });
-	public static FormatContext AFK = new FormatContext("afk");
-	public static FormatContext BROADCAST = new FormatContext("broadcast");
-	public static FormatContext ACTION = new FormatContext("action", new String[] { "me" });
-	public static FormatContext HELPOP = new FormatContext("helpop", new String[] { "help-op", "help op" });
 
 	private static Map<String, FormatContext> lookup = Utils.sm();
 

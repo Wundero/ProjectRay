@@ -61,10 +61,9 @@ public class Templates {
 		return t.withGroup("default").withPriority(0).withFormat(DefaultFormats.CHAT).withFormat(DefaultFormats.JOIN)
 				.withFormat(DefaultFormats.LEAVE).withFormat(DefaultFormats.MSG_RECEIVE)
 				.withFormat(DefaultFormats.MSG_SEND).withFormat(DefaultFormats.ACHIEVEMENT)
-				.withFormat(DefaultFormats.ANNOUNCEMENT).withFormat(DefaultFormats.KICK).withFormat(DefaultFormats.MOTD)
-				.withFormat(DefaultFormats.MSG_SPY).withFormat(DefaultFormats.TABLIST_ENTRY)
-				.withFormat(DefaultFormats.TABLIST_FOOTER).withFormat(DefaultFormats.TABLIST_HEADER)
-				.withFormat(DefaultFormats.WELCOME).build().build();
+				.withFormat(DefaultFormats.KICK).withFormat(DefaultFormats.MSG_SPY)
+				.withFormat(DefaultFormats.TABLIST_ENTRY).withFormat(DefaultFormats.TABLIST_FOOTER)
+				.withFormat(DefaultFormats.TABLIST_HEADER).build().build();
 	}
 
 	/**

@@ -51,10 +51,4 @@ public class DefaultArgs {
 			TextUtils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
 					TextTemplate.arg("recip_displayname").color(TextColors.AQUA).build(), "\n", Text
 							.builder("Say hello!").color(TextColors.GOLD).build())));
-	/**
-	 * Channel tag
-	 */
-	public static final DefaultArg CHANNEL = new DefaultArg("channel",
-			TextUtils.suggestTemplate(TextUtils.parse("/ch join {channelname}", false)),
-			TextUtils.showTemplate(TextUtils.parse("&7Channel: {channelname}\n&bClick to join!", true)));
 }
