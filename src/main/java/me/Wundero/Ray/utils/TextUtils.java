@@ -1044,15 +1044,26 @@ public class TextUtils {
 	/**
 	 * Change the content of the text.
 	 */
-	public static Text forEach(final Text t, final Function<String, String> replacer) {
+	public static Text forEachString(final Text t, final Function<String, String> replacer) {
 		String content = t.toPlainSingle();
 		String nc = replacer.apply(content);
 		List<Text> children = t.getChildren();
 		Text.Builder out = Text.builder(nc).format(t.getFormat());
 		TextUtils.apply(out, t.toBuilder());
-		List<Text> newchildren = children.stream().map(child -> forEach(child, replacer))
+		List<Text> newchildren = children.stream().map(child -> forEachString(child, replacer))
 				.collect(RayCollectors.rayList());
 		return out.append(newchildren).build();
+	}
+
+	/**
+	 * Change each part of the text.
+	 */
+	public static Text forEachText(final Text t, final Function<Text, Text> replacer) {
+		Text t2 = t.toBuilder().removeAll().build();
+		t2 = replacer.apply(t2);
+		return t2.toBuilder()
+				.append(t.getChildren().stream().map(c -> forEachText(c, replacer)).collect(RayCollectors.rayList()))
+				.build();
 	}
 
 	/**

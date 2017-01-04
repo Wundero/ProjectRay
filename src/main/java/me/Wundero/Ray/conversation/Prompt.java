@@ -33,6 +33,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.utils.Utils;
+import me.Wundero.Ray.variables.ParsableData;
 
 /**
  * The class that represents a question or statement sent to the player in any
@@ -156,8 +157,9 @@ public abstract class Prompt {
 	public Text formatTemplate(ConversationContext context) {
 		Map<String, Object> args = Utils.hm();
 		args.put("options", buildList(options(context)));
-		args = Ray.get().setVars(args, template, Optional.of(context.getHolder()), Optional.empty(), Optional.empty(),
-				Optional.empty(), false);
+		args = Ray.get().setVars(
+				new ParsableData().withSender(context.getHolder()).withKnown(args).withClickHover(false), template,
+				Optional.empty());
 		return template.apply(args).build();
 	}
 }

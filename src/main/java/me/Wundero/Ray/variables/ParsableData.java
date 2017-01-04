@@ -40,7 +40,7 @@ public class ParsableData {
 	private Optional<Player> recipient = Optional.empty();
 	private Optional<Player> observer = Optional.empty();
 	private Optional<Integer> page = Optional.empty();
-	private boolean clickHover = false;
+	private boolean clickHover = true;
 
 	public ParsableData() {
 	}
@@ -230,6 +230,23 @@ public class ParsableData {
 	 */
 	public Optional<Integer> getPage() {
 		return page;
+	}
+
+	/**
+	 * Set the page to use
+	 */
+	public ParsableData setPage(Optional<Integer> i) {
+		return withPage(i);
+	}
+
+	/**
+	 * Set the page to use
+	 */
+	public ParsableData withPage(Optional<Integer> i) {
+		if (!i.isPresent()) {
+			return this;
+		}
+		return withPage(i.get());
 	}
 
 	/**

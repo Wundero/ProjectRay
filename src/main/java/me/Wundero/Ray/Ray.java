@@ -8,17 +8,12 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 
-import com.google.common.reflect.TypeToken;
-
-import me.Wundero.Ray.config.InternalClickAction;
-import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.StaticFormat;
@@ -242,15 +237,15 @@ public class Ray {
 	 * vars
 	 */
 	public Text applyVars(TextTemplate t, ParsableData data) {
-		return applyVars(t, data, Optional.empty(), true);
+		return applyVars(t, data, Optional.empty());
 	}
 
 	/**
 	 * Parse a template for variables and return the template's applied text
 	 * vars
 	 */
-	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format, boolean clickhover) {
-		Map<String, Object> v = setVars(data, t, format, clickhover);
+	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format) {
+		Map<String, Object> v = setVars(data, t, format);
 		for (String a : t.getArguments().keySet()) {
 			if (!v.containsKey(a)) {
 				v.put(a, "");
@@ -265,28 +260,15 @@ public class Ray {
 	 * template
 	 */
 	public Map<String, Object> setVars(ParsableData data, TextTemplate template) {
-		return setVars(data, template, Optional.empty(), true);
+		return setVars(data, template, Optional.empty());
 	}
 
 	/**
 	 * Return a map with the String-Object map that can be applied to the given
 	 * template
 	 */
-	public Map<String, Object> setVars(ParsableData data, TextTemplate template, Optional<Format> formatUsed,
-			boolean ch) {
-		return setVars(data.getKnown().orElse(Utils.hm()), template, data.getSender(), data.getRecipient(),
-				data.getObserver(), formatUsed, ch);
-	}
-
-	/**
-	 * Return a map with the String-Object map that can be applied to the given
-	 * template
-	 */
-	public Map<String, Object> setVars(Map<String, Object> known, TextTemplate template, Optional<Player> sender,
-			Optional<Player> recip, Optional<Player> observer, Optional<Format> formatUsed, boolean useClickHover) {
-		if (known == null) {
-			known = Utils.hm();
-		}
+	public Map<String, Object> setVars(ParsableData data, TextTemplate template, Optional<Format> formatUsed) {
+		Map<String, Object> known = data.getKnown().orElse(Utils.hm());
 		// template is required to get the args to fill
 		if (template == null) {
 			if (formatUsed.isPresent() && formatUsed.get() instanceof StaticFormat) {
@@ -309,78 +291,13 @@ public class Ray {
 				out.put(key, known.get(key));
 			}
 		}
-		// if this is not null, click and hover will be applied to args.
-		ConfigurationNode args = null;
-		if (formatUsed.isPresent() && formatUsed.get().getNode().isPresent()
-				&& formatUsed.get() instanceof StaticFormat) {
-			args = formatUsed.get().getNode().get().getNode("format_args", "arguments");
-		}
 		// for the unfilled args
 		if (template != null && template.getArguments() != null) {
 			for (String key : template.getArguments().keySet()) {
-				String k = key;
-				// killer replaced with displayname killer for var parsing
-				// purposes; not replaced in template
-				if (k.equalsIgnoreCase("killer") && !out.containsKey(key)) {
-					k = "displayname:killer";
-				}
-				boolean irecip = false;
-				if (k.toLowerCase().startsWith("recip_")) {
-					k = k.substring("recip_".length());
-					irecip = true;
-				}
 				if (!out.containsKey(key)) {
-					Optional<Player> s1;
-					Optional<Player> r1;
-					if (irecip) {// who is parsed as sender depends on recip tag
-						s1 = recip;
-						r1 = sender;
-					} else {
-						s1 = sender;
-						r1 = recip;
-					}
-					// parse var into object
-					Object var = getVariables().get(k,
-							new ParsableData().withSender(s1).withRecipient(r1).withObserver(observer), formatUsed,
-							Optional.of(template));// probably could replace
-													// this with just Text but
-													// meh
-					Object var2 = var;
-					if (args != null) {
-						// apply var parsing to args
-						Text t = var instanceof Text ? (Text) var : Text.of(var.toString());
-						Text.Builder newVar = t.toBuilder();
-						if (useClickHover) { // recursive/unsafe format failsafe
-							try {
-								InternalClickAction<?> click = args.getNode(key, "click")
-										.getValue(TypeToken.of(InternalClickAction.class));
-								InternalHoverAction<?> hover = args.getNode(key, "hover")
-										.getValue(TypeToken.of(InternalHoverAction.class));
-								// get values for args and apply if they are
-								// there
-								if (click != null) {
-									if (click instanceof InternalClickAction.ATemplate) {
-										((InternalClickAction.ATemplate) click)
-												.apply(setVars(known, (TextTemplate) click.getResult(), sender, recip,
-														observer, formatUsed, false));
-									}
-									click.applyTo(newVar);
-								}
-								if (hover != null) {
-									if (hover instanceof InternalHoverAction.ShowTemplate) {
-										((InternalHoverAction.ShowTemplate) hover)
-												.apply(setVars(known, (TextTemplate) hover.getResult(), sender, recip,
-														observer, formatUsed, false));
-									}
-									hover.applyTo(newVar);
-								}
-							} catch (Exception e) {
-								Utils.printError(e);
-							}
-						}
-						var2 = newVar.build();
-					}
-					out.put(key, var2);
+					// parse
+					Text var = getVariables().get(key, data, formatUsed, Optional.of(template));
+					out.put(key, var);
 				}
 			}
 		}

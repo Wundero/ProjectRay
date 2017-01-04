@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
@@ -308,13 +309,12 @@ public class StaticFormat extends Format {
 	private static class ArgBuilderPrompt extends Prompt {
 
 		private String key;
-		private InternalClickAction<?> click;
-		private InternalHoverAction<?> hover;
+		private String click;
+		private String hover;
 		private String value;
 		private Prompt r;
 
-		public ArgBuilderPrompt(Prompt r, String key, InternalClickAction<?> click, InternalHoverAction<?> hover,
-				String value) {
+		public ArgBuilderPrompt(Prompt r, String key, String click, String hover, String value) {
 			this(null);
 			this.r = r;
 			this.key = key;
@@ -359,11 +359,10 @@ public class StaticFormat extends Format {
 				key = text;
 				return new ArgTypePrompt(this, r);
 			case "click":
-				click = findClick(text);
+				click = text;
 				return new ArgTypePrompt(this, r);
 			case "hover":
-				hover = InternalHoverAction.builder().withResult(TextUtils.parse(text, true))
-						.build(InternalHoverAction.ShowTemplate.class);
+				hover = text;
 				return new ArgTypePrompt(this, r);
 			}
 			return this;
@@ -537,6 +536,56 @@ public class StaticFormat extends Format {
 			text = text.substring(4);
 		}
 		return InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
+	}
+
+	public Text formatVariable(String key, Text var) {
+		if (!this.getNode().isPresent()) {
+			return var;
+		}
+		ConfigurationNode n = this.getNode().get();
+		if (n.getNode("args").isVirtual()) {
+			return var;
+		}
+		n = n.getNode("args").getNode(key);
+		if (!n.getNode("click").isVirtual()) {
+			String c = n.getNode("click").getString();
+			if (c != null) {
+				InternalClickAction<?> act = findClick(c);
+				var = TextUtils.forEachText(var, t -> {
+					Text.Builder b = t.toBuilder();
+					act.applyTo(b);
+					return b.build();
+				});
+			}
+		}
+		if (!n.getNode("hover").isVirtual()) {
+			Text t = null;
+			try {
+				t = n.getNode("hover").getValue(TypeToken.of(Text.class));
+				if (t == null) {
+					throw new NullPointerException();
+				}
+			} catch (Exception e) {
+				String s = null;
+				try {
+					List<String> l = n.getNode("hover").getList(TypeToken.of(String.class));
+					if (l == null || l.isEmpty()) {
+						throw new NullPointerException();
+					}
+					s = Utils.join("\n", l);
+				} catch (Exception e2) {
+					s = n.getNode("hover").getString();
+				}
+				if (s != null) {
+					t = TextSerializers.FORMATTING_CODE.deserialize(s);
+				}
+			}
+			if (t != null) {
+				HoverAction<Text> h = TextActions.showText(t);
+				var = TextUtils.forEachText(var, tx -> tx.toBuilder().onHover(h).build());
+			}
+		}
+		return var;
 	}
 
 	@Override

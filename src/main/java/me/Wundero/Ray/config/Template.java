@@ -167,8 +167,8 @@ public class Template {
 				private Optional<Consumer<ConfigurationNode>> locdataset = Optional.empty();
 				private GroupBuilder parent;
 				private TextTemplate template;
-				private Map<Arg, InternalClickAction<?>> clicks = Utils.hm();
-				private Map<Arg, InternalHoverAction<?>> hovers = Utils.hm();
+				private Map<Arg, String> clicks = Utils.hm();
+				private Map<Arg, String> hovers = Utils.hm();
 
 				FormatBuilder(ConfigurationNode node, String name, GroupBuilder parent) {
 					this.node = node;
@@ -183,14 +183,12 @@ public class Template {
 				public GroupBuilder build() {
 					try {
 						node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
-						ConfigurationNode args = node.getNode("format_args", "arguments");
+						ConfigurationNode args = node.getNode("args");
 						for (Arg a : clicks.keySet()) {
-							args.getNode(a.getName(), "click").setValue(TypeToken.of(InternalClickAction.class),
-									clicks.get(a));
+							args.getNode(a.getName(), "click").setValue(clicks.get(a));
 						}
 						for (Arg a : hovers.keySet()) {
-							args.getNode(a.getName(), "hover").setValue(TypeToken.of(InternalHoverAction.class),
-									hovers.get(a));
+							args.getNode(a.getName(), "hover").setValue(hovers.get(a));
 						}
 						if (type.isPresent()) {
 							node.getNode("context").setValue(type.get().getName());
@@ -226,20 +224,6 @@ public class Template {
 				/**
 				 * Add an argument
 				 */
-				public FormatBuilder withArg(String key, InternalHoverAction<?> hover) {
-					return withArg(key, null, hover);
-				}
-
-				/**
-				 * Add an argument
-				 */
-				public FormatBuilder withArg(String key, InternalClickAction<?> click) {
-					return withArg(key, click, null);
-				}
-
-				/**
-				 * Add an argument
-				 */
 				public FormatBuilder withArg(String key, boolean optional) {
 					return withArg(key, null, null);
 				}
@@ -247,31 +231,15 @@ public class Template {
 				/**
 				 * Add an argument
 				 */
-				public FormatBuilder withArg(String key, InternalHoverAction<?> hover, boolean optional) {
-					return withArg(key, null, hover);
-				}
 
-				/**
-				 * Add an argument
-				 */
-
-				public FormatBuilder withArg(String key, InternalClickAction<?> click, boolean optional) {
-					return withArg(key, click, null);
-				}
-
-				/**
-				 * Add an argument
-				 */
-
-				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover) {
+				public FormatBuilder withArg(String key, String click, String hover) {
 					return withArg(key, click, hover, false);
 				}
 
 				/**
 				 * Add an argument
 				 */
-				public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover,
-						boolean optional) {
+				public FormatBuilder withArg(String key, String click, String hover, boolean optional) {
 					return withArg(TextTemplate.arg(key), click, hover, optional);
 				}
 
@@ -285,36 +253,8 @@ public class Template {
 				/**
 				 * Add an argument
 				 */
-				public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover) {
-					return withArg(builder, null, hover);
-				}
-
-				/**
-				 * Add an argument
-				 */
-				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click) {
-					return withArg(builder, click, null);
-				}
-
-				/**
-				 * Add an argument
-				 */
 				public FormatBuilder withArg(Arg.Builder builder) {
 					return withArg(builder, null, null);
-				}
-
-				/**
-				 * Add an argument
-				 */
-				public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover, boolean optional) {
-					return withArg(builder, null, hover, optional);
-				}
-
-				/**
-				 * Add an argument
-				 */
-				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click, boolean optional) {
-					return withArg(builder, click, null, optional);
 				}
 
 				/**
@@ -327,16 +267,14 @@ public class Template {
 				/**
 				 * Add an argument
 				 */
-				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
-						InternalHoverAction<?> hover) {
+				public FormatBuilder withArg(Arg.Builder builder, String click, String hover) {
 					return withArg(builder, click, hover, false);
 				}
 
 				/**
 				 * Add an argument
 				 */
-				public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click,
-						InternalHoverAction<?> hover, boolean optional) {
+				public FormatBuilder withArg(Arg.Builder builder, String click, String hover, boolean optional) {
 					builder.optional(optional);
 					Arg built = builder.build();
 					if (click != null) {

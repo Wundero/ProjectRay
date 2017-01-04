@@ -35,11 +35,11 @@ import org.apache.commons.lang3.Validate;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.format.TextColors;
 
 import com.google.inject.Singleton;
 
 import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
@@ -48,16 +48,26 @@ import me.Wundero.Ray.utils.Utils;
  */
 @Singleton
 public class Variables {
-	// parse for provided data
+
 	/**
 	 * Parse a string as a key for a variable.
 	 */
 	public Text get(String key, ParsableData parsedat, Optional<Format> format, Optional<TextTemplate> template) {
 		Validate.notNull(parsedat);
 		Validate.notEmpty(key);
+		final String k2 = key;
 		Optional<Player> sender = parsedat.getSender();
 		Optional<Player> recipient = parsedat.getRecipient();
 		Optional<Player> observer = parsedat.getObserver();
+		boolean ch = parsedat.isClickHover();
+		Function<Text, Text> formatVar = t -> t;
+		if (format.isPresent()) {
+			Optional<StaticFormat> intern = format.get().getInternal(StaticFormat.class, parsedat.getPage());
+			if (intern.isPresent()) {
+				final StaticFormat in = intern.get();
+				formatVar = t -> in.formatVariable(k2, t);
+			}
+		}
 		String data = null;
 		String[] decdata = null;
 		if (key.contains(":")) {
@@ -126,9 +136,9 @@ public class Variables {
 				}
 			}
 			try {
-				return TextUtils.urls(v.parse(map));
+				return filterCH(TextUtils.urls(v.parse(map)), ch, formatVar);
 			} catch (Exception e) {
-				return Text.of(TextColors.RED, "ERROR: " + e.getMessage());
+				return Text.of();
 			}
 		} else if (store.getWrapper(key).isPresent() && data != null) {
 			VariableWrapper v = store.getWrapper(key).get();
@@ -181,13 +191,22 @@ public class Variables {
 					}
 				}
 				try {
-					return TextUtils.urls(v.parse(vx.get(), vx.get().parse(map)));
+					return filterCH(TextUtils.urls(v.parse(vx.get(), vx.get().parse(map))), ch, formatVar);
 				} catch (Exception e) {
 					return Text.of();
 				}
 			}
 		}
 		return Text.of();
+	}
+
+	private static Text filterCH(Text t, boolean ch, Function<Text, Text> fv) {
+		t = fv.apply(t);
+		if (ch) {
+			return t;
+		} else {
+			return t.toBuilder().onClick(null).onHover(null).onShiftClick(null).build();
+		}
 	}
 
 	/**

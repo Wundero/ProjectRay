@@ -37,11 +37,9 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import me.Wundero.Ray.Ray;
-import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
@@ -53,8 +51,6 @@ public class DefaultVariables {
 	private static long convertToMb(long input) {
 		return input / 1048576;
 	}
-
-	// TODO add click/hover onto vars
 
 	private static Player getFor(Map<Param, Object> objects) {
 		Param playerToUse = Param.SENDER;
@@ -95,7 +91,7 @@ public class DefaultVariables {
 	 */
 	public static void register(Variables v) {
 		v.registerWrapper("latin", (t) -> {
-			return TextUtils.forEach(t, Utils::makeUnicode);
+			return TextUtils.forEachString(t, Utils::makeUnicode);
 		}, 0);
 		v.registerWrapper("stripped", t -> {
 			return TextUtils.strip(t);
@@ -134,13 +130,6 @@ public class DefaultVariables {
 		});
 		v.registerVariable("processors", () -> {
 			return Text.of(Runtime.getRuntime().availableProcessors());
-		});
-		v.registerVariable("afk", (objects) -> {
-			Player player = getFor(objects);
-			if (player == null) {
-				return Text.of();
-			}
-			return RayPlayer.get(player).AFK() ? Text.of(TextColors.GRAY, "[AFK] ") : Text.of();
 		});
 		v.registerVariable("online", () -> Text.of(Sponge.getServer().getOnlinePlayers().size() + ""));
 		v.registerVariable("player", (objects) -> {

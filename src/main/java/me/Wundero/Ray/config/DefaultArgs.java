@@ -23,32 +23,22 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
-
-import me.Wundero.Ray.utils.TextUtils;
 
 /**
  * Arguments made to be swiftly used when loading templates into the config.
  */
 public class DefaultArgs {
-	// random default args
 	/**
 	 * Player displayname
 	 */
 	public static final DefaultArg DISPLAYNAME = new DefaultArg(TextTemplate.arg("displayname").color(TextColors.AQUA),
-			TextUtils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("displayname").build(), " ")),
-			TextUtils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
-					TextTemplate.arg("displayname").color(TextColors.AQUA).build(), "\n",
-					Text.builder("Say hello!").color(TextColors.GOLD).build())));
+			"/msg {displayname} ", "&7Name: &3{displayname}\n&6Say hello!");
 	/**
 	 * Recipient displayname
 	 */
 	public static final DefaultArg RECIP_DISPLAYNAME = new DefaultArg(
-			TextTemplate.arg("recip_displayname").color(TextColors.AQUA),
-			TextUtils.suggestTemplate(TextTemplate.of("/msg ", TextTemplate.arg("recip_displayname").build(), " ")),
-			TextUtils.showTemplate(TextTemplate.of(Text.builder("Name: ").color(TextColors.GRAY).build(),
-					TextTemplate.arg("recip_displayname").color(TextColors.AQUA).build(), "\n", Text
-							.builder("Say hello!").color(TextColors.GOLD).build())));
+			TextTemplate.arg("displayname:recip").color(TextColors.AQUA), "/msg {displayname:recip} ",
+			"&7Name: &3{displayname:recip}\n&6Say hello!");
 }

@@ -139,7 +139,6 @@ public class RayPlayer {
 	private List<UUID> ignore = Utils.sl();
 	private ConfigurationNode config;
 	private Runnable tabTask;
-	private boolean afk = false;
 	private Task tabHFTask = null;
 	private Deque<Text> headerQueue = Utils.sd(), footerQueue = Utils.sd();
 	private Map<FormatLocation, AnimationQueue> animations = Utils.sm();
@@ -192,27 +191,6 @@ public class RayPlayer {
 	 */
 	public boolean hasPermission(String s) {
 		return getUser().hasPermission(s);
-	}
-
-	/**
-	 * @return whether the player is AFK.
-	 */
-	public boolean AFK() {
-		return afk;
-	}
-
-	/**
-	 * Toggle whether the player is AFK.
-	 */
-	public void toggleAFK() {
-		this.afk = !afk;
-	}
-
-	/**
-	 * Set whether the player is AFK.
-	 */
-	public void setAFK(boolean a) {
-		this.afk = a;
 	}
 
 	/**

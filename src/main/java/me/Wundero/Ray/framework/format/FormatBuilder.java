@@ -33,8 +33,6 @@ import org.spongepowered.api.text.TextTemplate.Arg;
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.Ray.config.DefaultArg;
-import me.Wundero.Ray.config.InternalClickAction;
-import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
@@ -51,8 +49,8 @@ public class FormatBuilder {
 	@SuppressWarnings("unused")
 	private String name;
 	private TextTemplate template;
-	private Map<Arg, InternalClickAction<?>> clicks = Utils.hm();
-	private Map<Arg, InternalHoverAction<?>> hovers = Utils.hm();
+	private Map<Arg, String> clicks = Utils.hm();
+	private Map<Arg, String> hovers = Utils.hm();
 	private Optional<FormatContext> type;
 
 	/**
@@ -70,12 +68,12 @@ public class FormatBuilder {
 	public Format build() {
 		try {
 			node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
-			ConfigurationNode args = node.getNode("format_args", "arguments");
+			ConfigurationNode args = node.getNode("args");
 			for (Arg a : clicks.keySet()) {
-				args.getNode(a.getName(), "click").setValue(TypeToken.of(InternalClickAction.class), clicks.get(a));
+				args.getNode(a.getName(), "click").setValue(clicks.get(a));
 			}
 			for (Arg a : hovers.keySet()) {
-				args.getNode(a.getName(), "hover").setValue(TypeToken.of(InternalHoverAction.class), hovers.get(a));
+				args.getNode(a.getName(), "hover").setValue(hovers.get(a));
 			}
 			type.ifPresent(type -> node.getNode("context").setValue(type.getName()));
 		} catch (ObjectMappingException e) {
@@ -112,21 +110,7 @@ public class FormatBuilder {
 	/**
 	 * Add an arg
 	 */
-	public FormatBuilder withArg(String key, InternalHoverAction<?> hover) {
-		return withArg(key, null, hover);
-	}
-
-	/**
-	 * Add an arg
-	 */
-	public FormatBuilder withArg(String key, InternalClickAction<?> click) {
-		return withArg(key, click, null);
-	}
-
-	/**
-	 * Add an arg
-	 */
-	public FormatBuilder withArg(String key, InternalClickAction<?> click, InternalHoverAction<?> hover) {
+	public FormatBuilder withArg(String key, String click, String hover) {
 		return withArg(TextTemplate.arg(key), click, hover);
 	}
 
@@ -140,20 +124,6 @@ public class FormatBuilder {
 	/**
 	 * Add an arg
 	 */
-	public FormatBuilder withArg(Arg.Builder builder, InternalHoverAction<?> hover) {
-		return withArg(builder, null, hover);
-	}
-
-	/**
-	 * Add an arg
-	 */
-	public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click) {
-		return withArg(builder, click, null);
-	}
-
-	/**
-	 * Add an arg
-	 */
 	public FormatBuilder withArg(Arg.Builder builder) {
 		return withArg(builder, null, null);
 	}
@@ -161,7 +131,7 @@ public class FormatBuilder {
 	/**
 	 * Add an arg
 	 */
-	public FormatBuilder withArg(Arg.Builder builder, InternalClickAction<?> click, InternalHoverAction<?> hover) {
+	public FormatBuilder withArg(Arg.Builder builder, String click, String hover) {
 		Arg built = builder.build();
 		if (click != null) {
 			clicks.put(built, click);

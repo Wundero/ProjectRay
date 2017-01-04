@@ -343,8 +343,7 @@ public abstract class Format {
 		if (data == null) {
 			return Utils.hm();
 		}
-		return Ray.get().setVars(data.getKnown().orElse(Utils.hm()), t, data.getSender(), data.getRecipient(),
-				data.getObserver(), Optional.of(this), data.isClickHover());
+		return Ray.get().setVars(data, t, Optional.of(this));
 	}
 
 	/**
@@ -361,7 +360,6 @@ public abstract class Format {
 		this.name = name;
 		return this;
 	}
-
 	/**
 	 * Create a new format from a configuration node.
 	 */

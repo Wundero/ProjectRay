@@ -33,14 +33,14 @@ import org.spongepowered.api.text.TextTemplate.Arg;
  */
 public class DefaultArg {
 	private Arg.Builder builder;
-	private InternalClickAction<?> click;
-	private InternalHoverAction<?> hover;
+	private String click;
+	private String hover;
 	private boolean optional = false;
 
 	/**
 	 * Create a new Default Arg
 	 */
-	public DefaultArg(Arg.Builder b, InternalClickAction<?> c, InternalHoverAction<?> h) {
+	public DefaultArg(Arg.Builder b, String c, String h) {
 		this.setBuilder(b);
 		this.setClick(c);
 		this.setHover(h);
@@ -49,7 +49,7 @@ public class DefaultArg {
 	/**
 	 * Create a new DefaultArg
 	 */
-	public DefaultArg(String s, InternalClickAction<?> c, InternalHoverAction<?> h) {
+	public DefaultArg(String s, String c, String h) {
 		this(TextTemplate.arg(s), c, h);
 	}
 
@@ -71,14 +71,14 @@ public class DefaultArg {
 	/**
 	 * Get the click action associated with this arg
 	 */
-	public InternalClickAction<?> getClick() {
+	public String getClick() {
 		return click;
 	}
 
 	/**
 	 * Set the click action associated with this arg.
 	 */
-	public DefaultArg setClick(InternalClickAction<?> click) {
+	public DefaultArg setClick(String click) {
 		this.click = click;
 		return this;
 	}
@@ -86,14 +86,14 @@ public class DefaultArg {
 	/**
 	 * Get the hover action associated with this arg.
 	 */
-	public InternalHoverAction<?> getHover() {
+	public String getHover() {
 		return hover;
 	}
 
 	/**
 	 * Set the hover action associated with this arg.
 	 */
-	public DefaultArg setHover(InternalHoverAction<?> hover) {
+	public DefaultArg setHover(String hover) {
 		this.hover = hover;
 		return this;
 	}
