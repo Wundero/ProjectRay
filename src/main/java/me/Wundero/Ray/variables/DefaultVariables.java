@@ -83,7 +83,7 @@ public class DefaultVariables {
 		if (player == null) {
 			player = (Player) objects.get(playerToUse);
 		}
-		return null;
+		return player;
 	}
 
 	/**
@@ -144,8 +144,7 @@ public class DefaultVariables {
 			if (player == null) {
 				return Text.of();
 			}
-			return player.get(Keys.DISPLAY_NAME).isPresent() ? player.get(Keys.DISPLAY_NAME).get()
-					: Text.of(player.getName());
+			return player.get(Keys.DISPLAY_NAME).orElse(Text.of(player.getName()));
 		});
 		v.registerVariable("sound", (objects) -> {
 			if (!objects.containsKey(Param.RECIPIENT) || !objects.containsKey(Param.DATA)) {
