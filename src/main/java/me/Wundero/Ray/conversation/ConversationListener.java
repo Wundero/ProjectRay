@@ -24,6 +24,8 @@ package me.Wundero.Ray.conversation;
  */
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,6 +40,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MutableMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
+
+import me.Wundero.Ray.utils.Utils;
 
 /**
  * Listener built around conversations - handles events
@@ -146,6 +150,7 @@ public abstract class ConversationListener {
 			event.setCancelled(true);
 			ConversationContext context = conversation.getContext();
 			String input = event.getRawMessage().toPlain();
+			input = sanitize(input);
 			ConversationEvent.Chat event1 = new ConversationEvent.Chat(
 					Cause.source(context.getPlugin()).named(NamedCause.of("conversation", this)).build(), context,
 					input);
@@ -173,6 +178,21 @@ public abstract class ConversationListener {
 			});
 			return;
 		}
+	}
+
+	private static final String sanitize(String input) {
+		Pattern p = Utils.compile("[\"][^\"]*[\"]", Pattern.CASE_INSENSITIVE);
+		String out = "";
+		Matcher m = p.matcher(input);
+		if (!m.find()) {
+			return input;
+		}
+		while ((m = m.reset(input)).find()) {
+			String s = m.group();
+			out += s.substring(1, s.length() - 1);
+			input = input.replace(s, "");
+		}
+		return out;
 	}
 
 	/**

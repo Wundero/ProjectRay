@@ -1049,7 +1049,7 @@ public class TextUtils {
 		String nc = replacer.apply(content);
 		List<Text> children = t.getChildren();
 		Text.Builder out = Text.builder(nc).format(t.getFormat());
-		TextUtils.apply(out, t.toBuilder());
+		out = TextUtils.apply(out, t.toBuilder());
 		List<Text> newchildren = children.stream().map(child -> forEachString(child, replacer))
 				.collect(RayCollectors.rayList());
 		return out.append(newchildren).build();

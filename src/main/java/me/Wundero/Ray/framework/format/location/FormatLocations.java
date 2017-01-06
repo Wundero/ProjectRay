@@ -104,6 +104,10 @@ public class FormatLocations {
 		}
 	}
 
+	private static Text fix(Text t) {
+		return TextUtils.forEachString(t, s -> s.replace("\\n", "\n"));
+	}
+
 	public static List<FormatLocation> values() {
 		return Utils.al(TITLE, SUBTITLE, ACTIONBAR, BOSSBAR, TITLE_SUBTITLE, TAB_ENTRY, TAB_FOOTER, TAB_HEADER, CHAT);
 	}
@@ -122,7 +126,7 @@ public class FormatLocations {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {
-			target.sendMessage(text);
+			target.sendMessage(fix(text));
 			return true;
 		}
 	};
@@ -140,6 +144,7 @@ public class FormatLocations {
 		@Override
 		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> o, Optional<UUID> u,
 				boolean broadcast) {
+			text = fix(text);
 			// TODO this
 			return false;
 		}
@@ -163,6 +168,7 @@ public class FormatLocations {
 			if (!(target instanceof Player)) {
 				return false;
 			}
+			text = fix(text);
 			List<Text> tx = TextUtils.newlines(text);
 			if (tx.size() < 2) {
 				return false;
@@ -197,6 +203,7 @@ public class FormatLocations {
 			if (!(target instanceof Player)) {
 				return false;
 			}
+			text = fix(text);
 			if (f == null || !f.getNode().isPresent()) {
 				Player p = (Player) target;
 				p.sendTitle(Title.builder().subtitle(text).fadeIn(0).stay(10).fadeOut(0).build());
@@ -227,6 +234,7 @@ public class FormatLocations {
 			if (!(target instanceof Player)) {
 				return false;
 			}
+			text = fix(text);
 			if (f == null || !f.getNode().isPresent()) {
 				Player p = (Player) target;
 				p.sendTitle(Title.builder().title(text).fadeIn(0).stay(10).fadeOut(0).build());
@@ -257,6 +265,7 @@ public class FormatLocations {
 			if (!(target instanceof Player)) {
 				return false;
 			}
+			text = fix(text);
 			if (f == null || !f.getNode().isPresent()) {
 				return false;
 			}
@@ -333,6 +342,7 @@ public class FormatLocations {
 			if (!(target instanceof ChatTypeMessageReceiver)) {
 				return false;
 			}
+			text = fix(text);
 			ChatTypeMessageReceiver r = (ChatTypeMessageReceiver) target;
 			r.sendMessage(ChatTypes.ACTION_BAR, text);
 			return true;
@@ -349,11 +359,12 @@ public class FormatLocations {
 		}
 
 		@Override
-		public boolean send(Text text, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u,
+		public boolean send(Text t, MessageReceiver target, Format f, Optional<Object> p, Optional<UUID> u,
 				boolean broadcast) {
 			if (p == null || !p.isPresent() || !(target instanceof Player)) {
 				return false;
 			}
+			final Text text = fix(t);
 			Object operatable = p.get();
 			UUID uuid;
 			if (operatable instanceof UUID) {
@@ -384,6 +395,7 @@ public class FormatLocations {
 			if (!(target instanceof Player)) {
 				return false;
 			}
+			text = fix(text);
 			Player p = (Player) target;
 			RayPlayer.get(p.getUniqueId()).queueFooter(text);
 			return true;
@@ -405,6 +417,7 @@ public class FormatLocations {
 			if (!(target instanceof Player)) {
 				return false;
 			}
+			text = fix(text);
 			Player p = (Player) target;
 			RayPlayer.get(p.getUniqueId()).queueHeader(text);
 			return true;
