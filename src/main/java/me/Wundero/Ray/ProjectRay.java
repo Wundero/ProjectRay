@@ -92,6 +92,13 @@ public class ProjectRay {
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	private Path configDir;
+	
+	/**
+	 * The Config loader
+	 */
+	@Inject
+	@ConfigDir(sharedRoot = false)
+	private ConfigurationLoader<CommentedConfigurationNode> loader;
 
 	/**
 	 * The configuration itself, as loaded into memory.
