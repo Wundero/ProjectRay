@@ -27,43 +27,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.world.World;
 
-import me.Wundero.Ray.Ray;
+import com.google.common.reflect.TypeToken;
+
+import me.Wundero.Ray.config.Rootable;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 /**
  * Singleton instance containing all groups in memory.
  */
-public class Groups {
-	private Map<String, Map<String, Group>> groups = Utils.sm();
+@ConfigSerializable
+public class Groups implements Rootable {
 
-	/**
-	 * Loads groups into memory from file.
-	 */
-	public Groups(ConfigurationNode node) {
-		for (ConfigurationNode child : node.getChildrenMap().values()) {
-			boolean global = false;
-			String world = child.getKey().toString();
-			if (world.equalsIgnoreCase("all")) {
-				global = true;
-			}
-			ConfigurationNode groups = child.getNode("groups");
-			for (ConfigurationNode group : groups.getChildrenMap().values()) {
-				String name = group.getKey().toString();
-				if (!this.groups.containsKey(world)) {
-					Map<String, Group> map = Utils.sm();
-					map.put(name, new Group(world, group, global));
-					this.groups.put(world, map);
-				} else {
-					Map<String, Group> map = this.groups.get(world);
-					map.put(name, new Group(world, group, global));
-					this.groups.put(world, map);
-				}
-			}
-		}
-	}
+	public static TypeToken<Groups> type = TypeToken.of(Groups.class);
+
+	@Setting
+	private Map<String, Group> groups = Utils.sm();
 
 	/**
 	 * Clear all group references.
@@ -73,50 +55,21 @@ public class Groups {
 	}
 
 	/**
-	 * Loads groups into memory from file.
-	 */
-	public Group load(ConfigurationNode groupNode) {
-		String worldname = groupNode.getParent().getParent().getKey().toString();
-		Group group = new Group(worldname, groupNode, worldname.equalsIgnoreCase("all"));
-		Map<String, Group> map = groups.getOrDefault(worldname, Utils.hm());
-		map.put(group.getName(), group);
-		groups.put(worldname, map);
-		return group;
-	}
-
-	/**
 	 * Return all groups from all worlds.
 	 */
-	public List<Group> getAllGroups() {
-		List<Group> groups = Utils.al();
-		for (Map<String, Group> g1 : this.groups.values()) {
-			for (Group g : g1.values()) {
-				groups.add(g);
-			}
-		}
-		return groups;
-	}
-
-	/**
-	 * Get the primary group for a player.
-	 */
-	public Group getMainGroup(User p) {
-		if (!p.isOnline()) {
-			return getMainGroup(p, "all");
-		} else {
-			World w = p.getPlayer().get().getWorld();
-			String wname = w.getName().toLowerCase();
-			return getMainGroup(p, wname);
-		}
+	public List<Group> getGroups() {
+		return Utils.al(groups.values(), true);
 	}
 
 	/**
 	 * Get the primary group for a player on a world.
 	 */
-	public Group getMainGroup(User p, String world) {
+	public Group getMainGroup(User p) {
 		Group cg = null;
-		for (Group g : getGroups(world).values()) {
-			// TODO ensure non null group returns for first server join
+		for (Group g : getGroups()) {
+			if (g == null) {
+				continue;
+			}
 			if (!g.getPermission().isPresent() || p.hasPermission(g.getPermission().get())) {
 				if (cg == null) {
 					cg = g;
@@ -128,38 +81,18 @@ public class Groups {
 		return cg;
 	}
 
-	/**
-	 * Get a group from a name and a world.
-	 */
-	public Group getGroup(String name, String world) {
-		return getGroups(world).get(name);
+	public Map<String, Group> getGroupsMap() {
+		return Utils.hm(groups);
 	}
 
-	/**
-	 * Get the groups a player can use.
-	 */
-	public Map<String, Group> getGroups(User user) {
-		Map<String, Group> out = Utils.hm();
-		for (String world : groups.keySet()) {
-			if (getMainGroup(user, world) == null) {
-				continue;
-			}
-			out.put(world, getMainGroup(user, world));
-		}
-		if (out.isEmpty()) {
-			Ray.get().getLogger().warn("No groups loaded for player: " + user.getName());
-		}
-		return out;
+	public Group getGroup(String name) {
+		return groups.get(name);
 	}
 
-	/**
-	 * Get the groups on a world; as well as all global groups.
-	 */
-	public Map<String, Group> getGroups(String world) {
-		Map<String, Group> out = groups.get(world) == null ? Utils.hm() : groups.get(world);
-		if (!world.equalsIgnoreCase("all")) {
-			out.putAll(getGroups("all"));
+	@Override
+	public void applyRoot(String name, ConfigurationNode root) {
+		for(Map.Entry<String, Group> e : groups.entrySet()) {
+			e.getValue().applyRoot(e.getKey(), root.getNode("groups", e.getKey()));
 		}
-		return out;
 	}
 }

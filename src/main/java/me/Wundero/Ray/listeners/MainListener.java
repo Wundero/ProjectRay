@@ -91,7 +91,7 @@ public class MainListener {
 			return Tristate.UNDEFINED;
 		}
 		RayPlayer r = RayPlayer.getRay(p);
-		Group g = r.getActiveGroup();
+		Group g = r.getGroup();
 		if (g == null) {
 			return Tristate.UNDEFINED;
 		}
@@ -233,7 +233,7 @@ public class MainListener {
 				}
 				Player pla = h.get();
 				RayPlayer plx = RayPlayer.get(pla);
-				Group g = plx.getActiveGroup();
+				Group g = plx.getGroup();
 				if (g == null) {
 					continue;
 				}
@@ -254,7 +254,7 @@ public class MainListener {
 		});
 		Task.builder().delayTicks(20).execute(() -> RayPlayer.updateTabs()).submit(Ray.get().getPlugin());
 		p.startTabHFTask();
-		final Group g = p.getActiveGroup();
+		final Group g = p.getGroup();
 		if (g != null) {
 			Task.builder().delayTicks(20).execute(() -> {
 				FormatCollection hf = g.getFormats(FormatContexts.JOIN);

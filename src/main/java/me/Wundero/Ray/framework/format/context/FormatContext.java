@@ -2,6 +2,11 @@ package me.Wundero.Ray.framework.format.context;
 
 import java.util.regex.Pattern;
 
+import com.google.common.reflect.TypeToken;
+
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
 /*
  The MIT License (MIT)
 
@@ -29,12 +34,16 @@ import java.util.regex.Pattern;
  * Represents a context for a format. A context is how the plugin decides when
  * to send a format.
  */
+@ConfigSerializable
 public class FormatContext {
+
+	public static TypeToken<FormatContext> type = TypeToken.of(FormatContext.class);
 
 	private static Pattern namepat = Pattern.compile("[a-zA-Z]+[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 	private static Pattern altpat = Pattern.compile("[_\\-\\. ]*[0-9]+", Pattern.CASE_INSENSITIVE);
 
 	private String[] aliases;
+	@Setting
 	private String name;
 
 	/**

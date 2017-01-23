@@ -134,7 +134,7 @@ public class RayPlayer {
 	}
 
 	private UUID uuid;
-	private Map<String, Group> groups;
+	private Group group;
 	private Optional<RayPlayer> lastMessaged = Optional.empty();
 	private List<UUID> ignore = Utils.sl();
 	private ConfigurationNode config;
@@ -375,7 +375,7 @@ public class RayPlayer {
 	public RayPlayer(User u) {
 		this.setUser(u);
 		this.uuid = u.getUniqueId();
-		this.setGroups(Ray.get().getGroups().getGroups(u));
+		this.setGroup(Ray.get().getGroups().getMainGroup(u));
 		this.checkDisplayname();
 		File p = new File(Ray.get().getPlugin().getConfigDir().toFile(), "players");
 		File f = new File(p, u.getUniqueId() + ".conf");
@@ -431,37 +431,23 @@ public class RayPlayer {
 	/**
 	 * @return the groups this user is in
 	 */
-	public Map<String, Group> getGroups() {
-		return groups;
+	public Group getGroup() {
+		return group;
 	}
 
-	/**
-	 * Return the group applied for the user's current world
-	 */
-	public Group getActiveGroup() {
-		if (!getUser().isOnline()) {
-			return gg("all");
-		}
-		return gg((getPlayer().get()).getWorld().getName()) == null ? gg("all")
-				: gg((getPlayer().get()).getWorld().getName());
-	}
-
-	private Group gg(String world) {
-		return getGroups().get(world);
-	}
 
 	/**
 	 * Set the user's groups
 	 */
-	public void setGroups(Map<String, Group> groups) {
-		this.groups = groups;
+	public void setGroup(Group group) {
+		this.group = group;
 	}
 
 	/**
 	 * Reload the player's active groups
 	 */
 	public void reloadGroups() {
-		this.setGroups(Ray.get().getGroups().getGroups(this.getUser()));
+		this.setGroup(Ray.get().getGroups().getMainGroup(this.getUser()));
 	}
 
 	/**

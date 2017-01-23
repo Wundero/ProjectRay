@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import com.google.common.reflect.TypeToken;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.config.Rootable;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.FormatCollection;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 /*
  The MIT License (MIT)
@@ -46,76 +50,45 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  * means it is chosen over other groups), a permission, and additional info that
  * determines internal functionality.
  */
-public class Group {
-	private Map<FormatContext, FormatCollection> formats = Utils.sm();
-	private List<String> parents = Utils.sl();
-	private String world;
-	private int priority;
-	private Optional<String> permission;
-	private ConfigurationNode config;
-	private String name;
-	private boolean global = false;
+@ConfigSerializable
+public class Group implements Rootable {
 
-	/**
-	 * Create a new group.
-	 */
-	public Group(String world, ConfigurationNode config, boolean global) {
-		this.setGlobal(global);
-		this.setWorld(world);
-		this.setConfig(config);
-		load();
-	}
+	public static TypeToken<Group> type = TypeToken.of(Group.class);
+
+	@Setting("formats")
+	private Map<String, Format> all = Utils.sm();
+	private Map<FormatContext, FormatCollection> formats = Utils.sm();
+	@Setting
+	private List<String> parents = Utils.sl();
+	@Setting
+	private int priority = 0;
+	@Setting
+	private String permission;
+	private String name;
+	@Nullable
+	private ConfigurationNode config;
 
 	/**
 	 * Add a format to the group.
 	 */
 	public void addFormat(Format format) {
-		FormatContext type = format.getContext();
-		FormatCollection f = formats.get(type);
-		if (f == null) {
-			f = new FormatCollection();
-		}
-		f.add(format);
-		formats.put(type, f);
+		all.put(format.getName(), format);
+		applyAll();
 	}
 
-	/**
-	 * Load the group from the config node.
-	 */
-	public synchronized void load() {
-		this.setName(config.getKey().toString());
-		this.setPermission(config.getNode("permission").getString());
-		this.setPriority(config.getNode("priority").getInt(0));
-		try {
-			this.setParents(config.getNode("parents").getList(TypeToken.of(String.class)));
-		} catch (ObjectMappingException e) {
-			Utils.printError(e);
-		}
-		loadFormats();
-	}
-
-	private synchronized void lf(ConfigurationNode nod) {
-		ConfigurationNode nod2;
-		if (nod.getNode("formats").isVirtual()) {
-			nod2 = nod;
-		} else {
-			nod2 = nod.getNode("formats");
-		}
-		for (ConfigurationNode node : nod2.getChildrenMap().values()) {
-			Format f = Format.create(node);
+	private void applyAll() {
+		all.values().forEach(f -> {
 			FormatContext type = f.getContext();
-			if (!formats.containsKey(type)) {
-				formats.put(type, new FormatCollection(Utils.sl(f)));
-			} else {
-				FormatCollection list = formats.get(type);
-				list.add(f);
-				formats.put(type, list);
+			FormatCollection fc = formats.get(type);
+			if (fc == null) {
+				fc = new FormatCollection();
 			}
-		}
-	}
-
-	private synchronized void loadFormats() {
-		lf(config);
+			if (fc.contains(f)) {
+				return;
+			}
+			fc.add(f);
+			formats.put(type, fc);
+		});
 	}
 
 	/**
@@ -123,22 +96,23 @@ public class Group {
 	 */
 	public FormatCollection getAllFormats() {
 		List<Format> out = Utils.al();
-		for (FormatCollection f : formats.values()) {
-			out.addAll(f.get());
+		for (Format f : all.values()) {
+			out.add(f);
 		}
 		return new FormatCollection(out);
 	}
 
 	/**
-	 * @return all formats on all worlds, for this and parents. RecurseTimes is
-	 *         a safeguard against stack overflow.
+	 * @param recurseTimes number of times to recurse.
+	 * 
+	 * @return all formats on all worlds, for this and parents.
 	 */
-	public FormatCollection getAllFormats(boolean inherits, int recurseTimes) {
+	public FormatCollection getAllFormats(int recurseTimes) {
 		List<Format> out2 = Utils.al();
 		out2.addAll(getAllFormats().get());
 		List<Group> groups = getParentsGroups();
 		for (Group g : groups) {
-			out2.addAll(recurseTimes > 0 ? g.getAllFormats(inherits, recurseTimes - 1).get() : g.getAllFormats().get());
+			out2.addAll(recurseTimes > 0 || recurseTimes < 16 ? g.getAllFormats(recurseTimes - 1).get() : g.getAllFormats().get());
 		}
 		return new FormatCollection(out2);
 	}
@@ -148,7 +122,7 @@ public class Group {
 	 * against infinite parent loops are in place.
 	 */
 	public List<Group> getParentsGroups() {
-		List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(world).values(), true);
+		List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(), true);
 		List<Group> torem = Utils.al();
 		for (Group g : groups) {
 			if (!parents.contains(g.name)) {
@@ -189,7 +163,7 @@ public class Group {
 	 */
 	public FormatCollection getFormats(FormatContext type) {
 		if (formats.get(type) == null || formats.get(type).isEmpty()) {
-			List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(world).values(), true);
+			List<Group> groups = Utils.al(Ray.get().getGroups().getGroups(), true);
 			List<Group> torem = Utils.al();
 			for (Group g : groups) {
 				if (!parents.contains(g.name)) {
@@ -218,20 +192,6 @@ public class Group {
 	}
 
 	/**
-	 * Return the node for this group.
-	 */
-	public ConfigurationNode getConfig() {
-		return config;
-	}
-
-	/**
-	 * Set the node for this group.
-	 */
-	public void setConfig(ConfigurationNode config) {
-		this.config = config;
-	}
-
-	/**
 	 * Get the names of all parent groups.
 	 */
 	public List<String> getParents() {
@@ -243,20 +203,6 @@ public class Group {
 	 */
 	public void setParents(List<String> parents) {
 		this.parents = parents;
-	}
-
-	/**
-	 * Get the world.
-	 */
-	public String getWorld() {
-		return world;
-	}
-
-	/**
-	 * Set the world.
-	 */
-	public void setWorld(String world) {
-		this.world = world;
 	}
 
 	/**
@@ -277,14 +223,14 @@ public class Group {
 	 * Get the permission, if it exists, for this group.
 	 */
 	public Optional<String> getPermission() {
-		return permission;
+		return Utils.wrap2(permission, perm -> perm.isPresent() && !perm.get().isEmpty());
 	}
 
 	/**
 	 * Set the permission for this group.
 	 */
 	public void setPermission(String permission) {
-		this.permission = Utils.wrap2(permission, perm -> perm.isPresent() && !perm.get().isEmpty());
+		this.permission = permission;
 	}
 
 	/**
@@ -301,17 +247,28 @@ public class Group {
 		this.name = name;
 	}
 
-	/**
-	 * @return whether the group is on all worlds.
-	 */
-	public boolean isGlobal() {
-		return global;
+	@Override
+	public void applyRoot(String name, ConfigurationNode root) {
+		setName(name);
+		setConfig(root);
+		for (Map.Entry<String, Format> e : all.entrySet()) {
+			e.getValue().applyRoot(name, root.getNode("formats").getNode(e.getKey()));
+		}
+		applyAll();
 	}
 
 	/**
-	 * set whether the group is on all worlds.
+	 * @return the config
 	 */
-	public void setGlobal(boolean global) {
-		this.global = global;
+	public ConfigurationNode getConfig() {
+		return config;
+	}
+
+	/**
+	 * @param config
+	 *            the config to set
+	 */
+	public void setConfig(ConfigurationNode config) {
+		this.config = config;
 	}
 }

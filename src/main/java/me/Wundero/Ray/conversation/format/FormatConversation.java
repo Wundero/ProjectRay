@@ -125,58 +125,8 @@ public class FormatConversation {
 					@Override
 					public void onStart(Start start) {
 					}
-				}).withFirstPrompt(new WorldPrompt()).build(player);
+				}).withFirstPrompt(new GroupPrompt()).build(player);
 		convo.start();
-	}
-
-	private static class WorldPrompt extends Prompt {
-
-		public WorldPrompt() {
-			this(TextTemplate.of(Text.of(TextColors.GRAY, "Choose a world: "),
-					TextTemplate.arg("options").color(TextColors.GOLD).build()));
-		}
-
-		public WorldPrompt(TextTemplate template) {
-			super(template);
-		}
-
-		@Override
-		public Text getQuestion(ConversationContext context) {
-			return this.formatTemplate(context);
-		}
-
-		@Override
-		public Optional<List<Option>> options(ConversationContext context) {
-			List<Option> options = Utils.al();
-			options.add(new Option("all",
-					Text.builder("all").color(TextColors.GOLD).onClick(TextActions.runCommand("all"))
-							.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to choose all!"))).build(),
-					"all"));
-			for (World world : Sponge.getServer().getWorlds()) {
-				options.add(new Option(world.getName(),
-						Text.builder(world.getName()).color(TextColors.GOLD)
-								.onClick(TextActions.runCommand(world.getName()))
-								.onHover(TextActions
-										.showText(Text.of(TextColors.AQUA, "Click to choose " + world.getName() + "!")))
-								.build(),
-						world.getName()));
-			}
-			return Optional.of(options);
-		}
-
-		@Override
-		public Text getFailedText(ConversationContext context, String failedInput) {
-			return Text.of(TextColors.RED, failedInput + " is not a valid world!");
-		}
-
-		@Override
-		public Prompt onInput(Optional<Option> selected, String text, ConversationContext context) {
-			ConfigurationNode node = Ray.get().getConfig().getNode("worlds", selected.get().getValue(), "groups");
-			context.putData("node", node);
-			context.putData("world", selected.get().getValue());
-			return new GroupPrompt();
-		}
-
 	}
 
 	private static class GroupPrompt extends Prompt {

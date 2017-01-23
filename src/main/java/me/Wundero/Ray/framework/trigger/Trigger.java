@@ -1,14 +1,9 @@
-package me.Wundero.Ray.framework.format.location;
+package me.Wundero.Ray.framework.trigger;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
+import java.util.Map;
 
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
-
-import com.google.common.reflect.TypeToken;
-
-import me.Wundero.Ray.framework.format.Format;
+import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -36,44 +31,14 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
  SOFTWARE.
  */
 
-/**
- * Represents a place to which a message can be sent.
- */
 @ConfigSerializable
-public abstract class FormatLocation {
+public abstract class Trigger {
 	
-	public static TypeToken<FormatLocation> type = TypeToken.of(FormatLocation.class);
-
 	@Setting
-	private final String name;
+	protected List<String> formats;
 
-	public FormatLocation(String name) {
-		this.name = name;
-	}
+	public abstract boolean trigger(ParsableData data);
 
-	/**
-	 * @return the location's name.
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @return whether the location can have multiple formats at one time
-	 */
-	public abstract boolean isMulti();
-	
-	/**
-	 * Send a message to the location.
-	 */
-	public abstract boolean send(Text text, MessageReceiver target, Format f, Optional<Object> sender,
-			Optional<UUID> textId, boolean broadcast);
-
-	/**
-	 * Send a message to the location.
-	 */
-	public boolean send(Text text, MessageReceiver target, Format format, Optional<Object> sender) {
-		return send(text, target, format, sender, Optional.empty(), false);
-	}
+	public abstract boolean trigger(Map<String, Object> data);
 
 }

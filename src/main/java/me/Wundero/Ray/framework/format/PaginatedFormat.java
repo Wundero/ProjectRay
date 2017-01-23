@@ -40,24 +40,15 @@ import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.Setting;
 
 /**
  * Format type that splits formats into pages [each format is a page].
  */
 public class PaginatedFormat extends Format {
 
+	@Setting
 	private List<Format> pages = Utils.sl();
-
-	public PaginatedFormat(ConfigurationNode node) {
-		super(node);
-		if (node == null || node.isVirtual()) {
-			return;
-		}
-		ConfigurationNode subs = node.getNode("pages");
-		for (ConfigurationNode f : subs.getChildrenMap().values()) {
-			pages.add(Format.create(f));
-		}
-	}
 
 	private static class NamePrompt extends Prompt {
 

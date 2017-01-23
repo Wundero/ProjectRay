@@ -23,25 +23,10 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import com.google.common.reflect.TypeToken;
-
-import me.Wundero.Ray.framework.Groups;
 import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-@ConfigSerializable
-public class Config implements Rootable {
-	public static final TypeToken<Config> type = TypeToken.of(Config.class);
+public interface Rootable {
 
-	@Setting(value="base")
-	public Groups groups;
-
-	@Override
-	public void applyRoot(String name, ConfigurationNode root) {
-		if (groups != null) {
-			groups.applyRoot("groups", root.getNode("base"));
-		}
-	}
+	public void applyRoot(String name, ConfigurationNode root);
 
 }

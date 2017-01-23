@@ -51,57 +51,21 @@ import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.Setting;
 
 /**
  * Standard format type that simply sends a text to the location.
  */
 public class StaticFormat extends Format {
+
+	@Setting
 	private TextTemplate template;
-
-	public StaticFormat(ConfigurationNode node) {
-		super(node);
-		if (node == null || node.isVirtual()) {
-			return;
-		}
-		if (node.getNode("simple").isVirtual()) {
-			TextTemplate.of("").apply();// instantiates type token if not
-										// present
-			try {
-				setTemplate(node.getNode("format").getValue(TypeToken.of(TextTemplate.class)));
-				usable = true;
-			} catch (ObjectMappingException e) {
-				usable = false;
-			}
-		} else {
-			String simple = node.getNode("simple").getString();
-			node.getNode("simple").setValue(null);
-			setTemplate(TextUtils.parse(simple, true));
-			usable = template != null;
-			if (usable) {
-				try {
-					node.getNode("format").setValue(TypeToken.of(TextTemplate.class), template);
-				} catch (ObjectMappingException e) {
-					Utils.printError(e);
-				}
-			} else {
-				Utils.printError(new Exception("You must set a format!"));
-			}
-		}
-	}
-
-	private void setTemplate(TextTemplate template) {
-		this.template = template;
-	}
 
 	/**
 	 * @return the template this parses, if it exists.
 	 */
 	public Optional<TextTemplate> getTemplate() {
-		if (usable) {
-			return Optional.ofNullable(template);
-		}
-		return Optional.empty();
+		return Utils.wrap(template);
 	}
 
 	@Override
