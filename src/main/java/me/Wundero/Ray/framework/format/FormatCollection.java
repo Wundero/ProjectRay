@@ -54,7 +54,7 @@ public class FormatCollection {
 	 * Set the internal list.
 	 */
 	public void set(List<Format> formats) {
-		this.formats = formats;
+		this.formats = Utils.sl(formats, true);
 	}
 
 	/**
@@ -67,14 +67,14 @@ public class FormatCollection {
 	 * Create a format collection with the specified formats.
 	 */
 	public FormatCollection(Format... formats) {
-		this.formats = Utils.sl(formats);
+		set(Utils.al(formats));
 	}
 
 	/**
 	 * Create a format collection with the specified formats.
 	 */
 	public FormatCollection(Collection<Format> formats) {
-		this.formats = Utils.sl(formats, true);
+		set(Utils.al(formats, true));
 	}
 
 	/**
@@ -88,14 +88,7 @@ public class FormatCollection {
 	 * Remove a format.
 	 */
 	public boolean remove(Format f) {
-		return formats.remove(f);
-	}
-
-	/**
-	 * Remove a format.
-	 */
-	public Format remove(int index) {
-		return formats.remove(index);
+		return formats.remove(f.getName());
 	}
 
 	/**
@@ -103,20 +96,6 @@ public class FormatCollection {
 	 */
 	public boolean add(Format f) {
 		return formats.add(f);
-	}
-
-	/**
-	 * Add a format at the index.
-	 */
-	public void add(Format f, int i) {
-		formats.add(i, f);
-	}
-
-	/**
-	 * Add formats.
-	 */
-	public void addAll(Collection<? extends Format> formats) {
-		this.formats.addAll(formats);
 	}
 
 	/**
@@ -138,23 +117,26 @@ public class FormatCollection {
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, UUID u, boolean broadcast, boolean irrelevant) {
+	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, UUID u, boolean broadcast,
+			boolean irrelevant) {
 		return sendAll(target, args, Utils.wrap(o), Utils.wrap(u), broadcast);
 	}
 
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, ParsableData data, Object o, UUID u, boolean broadcast, boolean irrelevant) {
+	public int sendAll(MessageReceiver target, ParsableData data, Object o, UUID u, boolean broadcast,
+			boolean irrelevant) {
 		return sendAll(target, data, Utils.wrap(o), Utils.wrap(u), broadcast);
 	}
 
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
+	public int sendAll(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u,
+			boolean broadcast) {
 		int count = 0;
-		for (Format f : this.formats) {
+		for (Format f : formats) {
 			if (f.send(target, args, sender, u, broadcast)) {
 				count++;
 			}
@@ -165,9 +147,10 @@ public class FormatCollection {
 	/**
 	 * Send to all formats.
 	 */
-	public int sendAll(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
+	public int sendAll(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u,
+			boolean broadcast) {
 		int count = 0;
-		for (Format f : this.formats) {
+		for (Format f : formats) {
 			if (f.send(target, data, sender, u, broadcast)) {
 				count++;
 			}
@@ -218,66 +201,10 @@ public class FormatCollection {
 	}
 
 	/**
-	 * Add all formats to an index.
-	 */
-	public boolean addAll(int index, Collection<? extends Format> c) {
-		return formats.addAll(index, c);
-	}
-
-	/**
-	 * Remove all specified formats.
-	 */
-	public boolean removeAll(Collection<?> c) {
-		return formats.removeAll(c);
-	}
-
-	/**
-	 * Retain all specified formats.
-	 */
-	public boolean retainAll(Collection<?> c) {
-		return formats.retainAll(c);
-	}
-
-	/**
 	 * Clear the collection.
 	 */
 	public void clear() {
 		formats.clear();
-	}
-
-	/**
-	 * Get a format.
-	 */
-	public Format get(int index) {
-		return formats.get(index);
-	}
-
-	/**
-	 * Set a format.
-	 */
-	public Format set(int index, Format element) {
-		return formats.set(index, element);
-	}
-
-	/**
-	 * Add a format.
-	 */
-	public void add(int index, Format element) {
-		formats.add(index, element);
-	}
-
-	/**
-	 * Find the index of a format.
-	 */
-	public int indexOf(Object o) {
-		return formats.indexOf(o);
-	}
-
-	/**
-	 * Find the last index of a format.
-	 */
-	public int lastIndexOf(Object o) {
-		return formats.lastIndexOf(o);
 	}
 
 	/**

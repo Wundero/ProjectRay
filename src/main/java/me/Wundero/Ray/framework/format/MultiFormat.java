@@ -24,6 +24,7 @@ package me.Wundero.Ray.framework.format;
  */
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,6 +44,7 @@ import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.Setting;
 
 /**
  * Format type that holds multiple subformats, and selects based on a selection
@@ -50,10 +52,12 @@ import ninja.leaping.configurate.ConfigurationNode;
  */
 public class MultiFormat extends Format {
 
+	@Setting
 	private List<Format> formats = Utils.sl();
+	@Setting
 	private Mode mode = Mode.SHUFFLE;
 	private Random r = new Random();
-	private ArrayDeque<Format> unused;
+	private Deque<Format> unused = Utils.ad();
 
 	private synchronized Format getNext(boolean pop) {
 		switch (mode) {
@@ -77,33 +81,6 @@ public class MultiFormat extends Format {
 
 	private enum Mode {
 		SEQUENCE, RANDOM, SHUFFLE;
-
-		public static Mode getMode(String m) {
-			if (m == null) {
-				return SHUFFLE;
-			}
-			m = m.toLowerCase().trim();
-			if ("random".startsWith(m)) {
-				return RANDOM;
-			}
-			if ("sequence".startsWith(m)) {
-				return SEQUENCE;
-			}
-			return SHUFFLE;
-		}
-	}
-
-	public MultiFormat(ConfigurationNode node) {
-		super(node);
-		if (node == null || node.isVirtual()) {
-			return;
-		}
-		mode = Mode.getMode(node.getNode("mode").getString("shuffle"));
-		ConfigurationNode subs = node.getNode("formats");
-		for (ConfigurationNode f : subs.getChildrenMap().values()) {
-			formats.add(Format.create(f));
-		}
-		populateDeque();
 	}
 
 	@Override

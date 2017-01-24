@@ -35,7 +35,10 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
+import com.google.common.reflect.TypeToken;
+
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.config.Rootable;
 import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
@@ -47,15 +50,21 @@ import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 /**
  * Represents a sendable object. Generic class that allows players to create
  * dynamic formats depending on need.
  */
-public abstract class Format {
+@ConfigSerializable
+public abstract class Format implements Rootable {
+	public static TypeToken<Format> type = TypeToken.of(Format.class);
+	@Setting
 	private FormatContext context;
 	private String name;
 	protected boolean usable = false;
+	@Setting
 	protected FormatLocation loc = FormatLocations.CHAT;
 	private Optional<ConfigurationNode> node;
 
@@ -360,6 +369,7 @@ public abstract class Format {
 		this.name = name;
 		return this;
 	}
+
 	/**
 	 * Create a new format from a configuration node.
 	 */
@@ -395,26 +405,6 @@ public abstract class Format {
 			return buildFormat(node, new ExecutingFormat(node, towrap), event, command, false);
 		}
 		return out;
-	}
-
-	/**
-	 * Create a new format.
-	 * 
-	 * NOTE: All extending classes should handle null nodes, for the
-	 * conversation builder.
-	 */
-	public Format(final ConfigurationNode node) {
-		this.setNode(Optional.ofNullable(node));
-		if (node == null || node.isVirtual()) {
-			return;
-		}
-		name = node.getKey().toString();
-		setContext(node.getNode("context").isVirtual() ? FormatContext.fromString(name)
-				: FormatContext.fromString(node.getNode("context").getString()));
-		node.getNode("context").setValue(context.getName());
-		setLocation(node.getNode("location").getString("chat"));
-		node.getNode("location").setValue(getLocation().getName());
-		// forces type to be present
 	}
 
 	/**
@@ -517,4 +507,10 @@ public abstract class Format {
 	private static EventFormat ef = new EventFormat(null, null);
 	private static MultiFormat mf = new MultiFormat(null);
 	private static CommandFormat cf = new CommandFormat(null, null);
+
+	@Override
+	public void applyRoot(String name, ConfigurationNode root) {
+		setName(name);
+		this.setNode(Utils.wrap(root));
+	}
 }
