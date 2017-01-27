@@ -46,7 +46,8 @@ public class CommandExecutable implements Executable {
 		private boolean isConsole = false;
 		@Setting
 		private String command;
-		// TODO more
+		@Setting(value = "permission", comment = "Irrelevant if use-console is enabled.")
+		private String permission;
 	}
 
 	@Override
@@ -58,6 +59,9 @@ public class CommandExecutable implements Executable {
 		boolean ic = Sponge.getServer().getConsole().equals(src);
 		for (Cmd c : commands) {
 			if (c.isConsole && ic || !c.isConsole && !ic) {
+				if (!src.hasPermission(c.permission)) {
+					continue;
+				}
 				Sponge.getCommandManager().process(src, c.command);
 			}
 		}

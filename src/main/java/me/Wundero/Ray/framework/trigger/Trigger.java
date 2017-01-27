@@ -1,7 +1,8 @@
 package me.Wundero.Ray.framework.trigger;
 
 import java.util.List;
-import java.util.Map;
+
+import org.spongepowered.api.entity.living.player.Player;
 
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.objectmapping.Setting;
@@ -33,12 +34,13 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 @ConfigSerializable
 public abstract class Trigger {
-	
+
 	@Setting
 	protected List<String> formats;
 
-	public abstract boolean trigger(ParsableData data);
+	public boolean trigger(ParsableData data, List<Player> targets) {
 
-	public abstract boolean trigger(Map<String, Object> data);
+		return false;
+	}
 
 }

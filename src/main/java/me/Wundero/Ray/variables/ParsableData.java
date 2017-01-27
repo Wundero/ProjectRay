@@ -42,6 +42,11 @@ public class ParsableData {
 	private Optional<Integer> page = Optional.empty();
 	private boolean clickHover = true;
 
+	public ParsableData copy() {
+		return new ParsableData().withKnown(known).withClickHover(clickHover).withSender(sender)
+				.withRecipient(recipient).withObserver(observer).withPage(page);
+	}
+
 	public ParsableData() {
 	}
 

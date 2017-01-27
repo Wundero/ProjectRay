@@ -58,8 +58,7 @@ import ninja.leaping.configurate.objectmapping.Setting;
  */
 public class StaticFormat extends Format {
 
-	// TODO name
-	@Setting("TODO name me")
+	@Setting("executables")
 	private Map<String, Executable> sendables;
 
 	@Override
