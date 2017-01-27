@@ -57,7 +57,6 @@ import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
 
-import me.Wundero.Ray.ProjectRay;
 import me.Wundero.Ray.Ray;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -868,7 +867,7 @@ public class Utils {
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setPath(config)
 				.build();
 		try {
-			ConfigurationNode node = loader.load(ProjectRay.updateSerializers(loader.getDefaultOptions()));
+			ConfigurationNode node = loader.load();
 			Ray.get().registerLoader(loader, node);
 			return node;
 		} catch (Exception e) {
@@ -896,7 +895,7 @@ public class Utils {
 			Utils.printError(e);
 		}
 	}
-	
+
 	/**
 	 * Check to see if the config value contains subsections specified in the
 	 * varargs parameter.

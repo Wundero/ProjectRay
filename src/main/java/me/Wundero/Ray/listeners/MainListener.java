@@ -58,7 +58,6 @@ import org.spongepowered.api.util.Tristate;
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.RayCombinedMessageChannel;
-import me.Wundero.Ray.framework.format.ExecutingFormat;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.FormatCollection;
 import me.Wundero.Ray.framework.format.context.FormatContext;
@@ -105,9 +104,7 @@ public class MainListener {
 			return Tristate.UNDEFINED;
 		}
 		final FormatCollection f = fx;
-		final UUID exf = UUID.randomUUID();
 		final UUID locid = UUID.randomUUID();
-		final List<ExecutingFormat> ef = f.getInternals(ExecutingFormat.class, Optional.empty());
 		final Map<String, Object> args = Utils.hm(v);
 		// note that MessageChannel channel is inconsistent and can be many
 		// things. Do not infer types with it.
@@ -125,9 +122,6 @@ public class MainListener {
 					if (RayPlayer.getRay(r).isIgnoring(RayPlayer.getRay(s))) {
 						return Optional.empty();
 					}
-				}
-				for (ExecutingFormat ftx : ef) {
-					ftx.execConsoles(exf, 1000);
 				}
 				if (f.sendAll(recipient, new ParsableData().setKnown(mc).setSender(msgsender.orElse(p))
 						.setRecipient(msgrecip.orElse(recipient instanceof Player ? (Player) recipient : null))

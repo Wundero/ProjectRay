@@ -1,4 +1,12 @@
-package me.Wundero.Ray.config;
+package me.Wundero.Ray.framework.execute;
+
+import java.util.Optional;
+
+import org.spongepowered.api.text.TextRepresentable;
+import org.spongepowered.api.text.channel.MessageReceiver;
+
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
 /*
  The MIT License (MIT)
 
@@ -23,21 +31,9 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import com.google.common.reflect.TypeToken;
-
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
 @ConfigSerializable
-public class Config implements Rootable {
-	public static final TypeToken<Config> type = TypeToken.of(Config.class);
+public interface Executable {
 
-	@Override
-	public void applyRoot(String name, ConfigurationNode root) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	//TODO stuff
+	public Optional<? extends TextRepresentable> send(MessageReceiver receiver);
 
 }

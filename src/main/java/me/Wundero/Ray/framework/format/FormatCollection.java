@@ -99,22 +99,6 @@ public class FormatCollection {
 	}
 
 	/**
-	 * Get internal formats for the class.
-	 */
-	public <T extends Format> List<T> getInternals(Class<T> clazz, Optional<Integer> page) {
-		List<T> out = Utils.al();
-		for (Format f : formats) {
-			if (clazz.isInstance(f)) {
-				out.add(clazz.cast(f));
-			}
-			if (f.hasInternal(clazz, page)) {
-				f.getInternal(clazz, page).ifPresent(fm -> out.add(fm));
-			}
-		}
-		return out;
-	}
-
-	/**
 	 * Send to all formats.
 	 */
 	public int sendAll(MessageReceiver target, Map<String, Object> args, Object o, UUID u, boolean broadcast,

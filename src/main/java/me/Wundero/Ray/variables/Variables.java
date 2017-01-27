@@ -39,7 +39,6 @@ import org.spongepowered.api.text.TextTemplate;
 import com.google.inject.Singleton;
 
 import me.Wundero.Ray.framework.format.Format;
-import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 
@@ -62,11 +61,8 @@ public class Variables {
 		boolean ch = parsedat.isClickHover();
 		Function<Text, Text> formatVar = t -> t;
 		if (format.isPresent()) {
-			Optional<StaticFormat> intern = format.get().getInternal(StaticFormat.class, parsedat.getPage());
-			if (intern.isPresent()) {
-				final StaticFormat in = intern.get();
-				formatVar = t -> in.formatVariable(k2, t);
-			}
+			final Format f = format.get().getTopOwner();
+			formatVar = t -> f.formatVariable(k2, parsedat, t);
 		}
 		String data = null;
 		String[] decdata = null;

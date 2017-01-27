@@ -9,6 +9,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -18,7 +19,6 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
 import me.Wundero.Ray.commands.ClearChatCommand;
@@ -28,19 +28,13 @@ import me.Wundero.Ray.commands.MessageCommand;
 import me.Wundero.Ray.commands.MuteCommand;
 import me.Wundero.Ray.commands.ReplyCommand;
 import me.Wundero.Ray.commands.SpyCommand;
-import me.Wundero.Ray.config.InternalClickAction;
-import me.Wundero.Ray.config.InternalHoverAction;
-import me.Wundero.Ray.config.Template;
-import me.Wundero.Ray.config.Templates;
 import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.listeners.MainListener;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /*
  The MIT License (MIT)
@@ -92,12 +86,12 @@ public class ProjectRay {
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	private Path configDir;
-	
+
 	/**
 	 * The Config loader
 	 */
 	@Inject
-	@ConfigDir(sharedRoot = false)
+	@DefaultConfig(sharedRoot = false)
 	private ConfigurationLoader<CommentedConfigurationNode> loader;
 
 	/**
@@ -159,37 +153,11 @@ public class ProjectRay {
 		return f.toPath();
 	}
 
-	/**
-	 * Register some of my serializers. I could have done this differently with
-	 * a static method, but this allows me to apply the serializers to specific
-	 * configuration loaders.
-	 */
-	public static ConfigurationOptions updateSerializers(ConfigurationOptions opts) {
-		// adding custom serializers - makes config read/write easier
-		TypeSerializerCollection t = opts.getSerializers();
-		t.registerType(TypeToken.of(InternalClickAction.class), InternalClickAction.serializer());
-		t.registerType(TypeToken.of(InternalHoverAction.class), InternalHoverAction.serializer());
-		return opts.setSerializers(t);
-	}
-
 	private void loadConfig() {
-		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
-				.setPath(getConfigPath()).build();
 		try {
-			setConfig(loader.load(updateSerializers(loader.getDefaultOptions())));
+			setConfig(loader.load());
 		} catch (Exception e) {
 			Utils.printError(e);
-		}
-		tryLoadDefaults();
-	}
-
-	private void tryLoadDefaults() {
-		// if main info is missing, load a default template. Using advanced
-		// template here, but in the future I will add more templates, and allow
-		// for users to specify which to load either via cmd or config params
-		if (config.getNode("worlds").isVirtual()) {
-			Templates.TESTING(Template.builder(config));
-			saveConfig();
 		}
 	}
 
@@ -197,8 +165,6 @@ public class ProjectRay {
 		if (config == null) {
 			return;
 		}
-		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
-				.setPath(getConfigPath()).build();
 		try {
 			// This will allow safe editing out of game while still saving in
 			// game changes (in game has priority) (theoretically) - not sure if
@@ -221,25 +187,29 @@ public class ProjectRay {
 	/**
 	 * Fired when the game is initialized. Loads singleton values and registers
 	 * important listeners.
+	 * 
+	 * @throws ObjectMappingException
 	 */
 	@Listener
-	public void onStart(GameInitializationEvent event) {
+	public void onStart(GameInitializationEvent event) throws ObjectMappingException {
 		// registering listeners and loading singleton classes (safely-ish)
 		loadConfig();
 		Ray.get().load(this);
-		Ray.get().setGroups(new Groups(config.getNode("worlds")));
+		Ray.get().setGroups(config.getValue(Groups.type));
 	}
 
 	/**
 	 * Fired when the command /reload is fired.
+	 * 
+	 * @throws ObjectMappingException
 	 */
 	@Listener
-	public void onReload(GameReloadEvent event) {
+	public void onReload(GameReloadEvent event) throws ObjectMappingException {
 		game.getEventManager().unregisterPluginListeners(this);
 		loadConfig();
 		game.getEventManager().registerListeners(this, new MainListener());
 		Ray.get().reload(this);
-		Ray.get().setGroups(new Groups(config.getNode("worlds")));
+		Ray.get().setGroups(config.getValue(Groups.type));
 	}
 
 	/**

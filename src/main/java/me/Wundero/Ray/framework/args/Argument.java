@@ -1,4 +1,4 @@
-package me.Wundero.Ray.config;
+package me.Wundero.Ray.framework.args;
 /*
  The MIT License (MIT)
 
@@ -23,21 +23,54 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.text.Text;
 
+import me.Wundero.Ray.config.Rootable;
+import me.Wundero.Ray.utils.TextUtils;
+import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 @ConfigSerializable
-public class Config implements Rootable {
-	public static final TypeToken<Config> type = TypeToken.of(Config.class);
+public class Argument implements Rootable {
+
+	private String key;
+	@Setting
+	private Text value;
+	@Setting
+	private boolean override = false;
+	
+	/**
+	 * @return whether to override the string in the text.
+	 */
+	public boolean override() {
+		return override;
+	}
+
+	/**
+	 * @return the key
+	 */
+	public String getKey() {
+		return key;
+	}
+
+	/**
+	 * @return the value but with variables parsed
+	 */
+	public Text getValue(ParsableData data) {
+		return TextUtils.vars(value, data, true);
+	}
+
+	/**
+	 * @return the value
+	 */
+	public Text getValue() {
+		return value;
+	}
 
 	@Override
 	public void applyRoot(String name, ConfigurationNode root) {
-		// TODO Auto-generated method stub
-		
+		this.key = name;
 	}
-
-	//TODO stuff
-
 }

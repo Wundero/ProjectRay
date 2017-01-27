@@ -1,4 +1,4 @@
-package me.Wundero.Ray.config;
+package me.Wundero.Ray.framework.execute;
 /*
  The MIT License (MIT)
 
@@ -23,21 +23,45 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
-import com.google.common.reflect.TypeToken;
+import java.util.List;
+import java.util.Optional;
 
-import ninja.leaping.configurate.ConfigurationNode;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
+
+import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 @ConfigSerializable
-public class Config implements Rootable {
-	public static final TypeToken<Config> type = TypeToken.of(Config.class);
+public class CommandExecutable implements Executable {
 
-	@Override
-	public void applyRoot(String name, ConfigurationNode root) {
-		// TODO Auto-generated method stub
-		
+	@Setting
+	private List<Cmd> commands;
+
+	@ConfigSerializable
+	public static class Cmd {
+		@Setting("use-console")
+		private boolean isConsole = false;
+		@Setting
+		private String command;
+		// TODO more
 	}
 
-	//TODO stuff
+	@Override
+	public Optional<Text> send(MessageReceiver r) {
+		if (!(r instanceof CommandSource)) {
+			return Optional.empty();
+		}
+		CommandSource src = (CommandSource) r;
+		boolean ic = Sponge.getServer().getConsole().equals(src);
+		for (Cmd c : commands) {
+			if (c.isConsole && ic || !c.isConsole && !ic) {
+				Sponge.getCommandManager().process(src, c.command);
+			}
+		}
+		return Optional.empty();
+	}
 
 }

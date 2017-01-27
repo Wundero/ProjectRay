@@ -16,7 +16,6 @@ import org.spongepowered.api.text.TextTemplate;
 
 import me.Wundero.Ray.framework.Groups;
 import me.Wundero.Ray.framework.format.Format;
-import me.Wundero.Ray.framework.format.StaticFormat;
 import me.Wundero.Ray.framework.player.RayPlayer;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.UserCache;
@@ -237,14 +236,14 @@ public class Ray {
 	 * vars
 	 */
 	public Text applyVars(TextTemplate t, ParsableData data) {
-		return applyVars(t, data, Optional.empty());
+		return applyVars(t, data, Optional.empty(), false);
 	}
 
 	/**
 	 * Parse a template for variables and return the template's applied text
 	 * vars
 	 */
-	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format) {
+	public Text applyVars(TextTemplate t, ParsableData data, Optional<Format> format, boolean perms) {
 		Map<String, Object> v = setVars(data, t, format);
 		for (String a : t.getArguments().keySet()) {
 			if (!v.containsKey(a)) {
@@ -252,7 +251,7 @@ public class Ray {
 			}
 		}
 		Text tx = t.apply(v).build();
-		return TextUtils.vars(tx, data);
+		return TextUtils.vars(tx, data, perms);
 	}
 
 	/**
@@ -271,16 +270,7 @@ public class Ray {
 		Map<String, Object> known = data.getKnown().orElse(Utils.hm());
 		// template is required to get the args to fill
 		if (template == null) {
-			if (formatUsed.isPresent() && formatUsed.get() instanceof StaticFormat) {
-				TextTemplate t2 = ((StaticFormat) formatUsed.get()).getTemplate().orElse(null);
-				if (t2 != null) {
-					template = t2;
-				} else {
-					return known;
-				}
-			} else {
-				return known;
-			}
+			return known;
 		}
 
 		// for every key that is known that exists in the template, add it to

@@ -43,6 +43,7 @@ import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
 import me.Wundero.Ray.conversation.TypePrompt;
+import me.Wundero.Ray.framework.args.Argument;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
@@ -50,6 +51,7 @@ import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -63,10 +65,13 @@ public abstract class Format implements Rootable {
 	@Setting
 	private FormatContext context;
 	private String name;
+	private Format owner;
 	protected boolean usable = false;
-	@Setting
+	@Setting("location")
 	protected FormatLocation loc = FormatLocations.CHAT;
 	private Optional<ConfigurationNode> node;
+	@Setting
+	private Map<String, Argument> args = Utils.hm();
 
 	/**
 	 * Compare formats.
@@ -105,22 +110,6 @@ public abstract class Format implements Rootable {
 		c.putData("node", newNode);
 		return chosen.getConversationBuilder(p == null ? null : new WrapperPrompt(p, oldNode, c), c);
 	}
-
-	/**
-	 * A method to get an internal format. Used only to execute console commands
-	 * from the Executing format type.
-	 * 
-	 * @return the internal format matching the class, if it exists.
-	 */
-	public abstract <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index);
-
-	/**
-	 * A method to check if an internal format exists. Used only to execute
-	 * console commands from the Executing format type.
-	 * 
-	 * @return whether the internal format matching the class exists.
-	 */
-	public abstract boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index);
 
 	private static class WrapperPrompt extends Prompt {
 
@@ -377,34 +366,11 @@ public abstract class Format implements Rootable {
 		if (node == null || node.isVirtual()) {
 			return null;
 		}
-		boolean event = !node.getNode("event").isVirtual();
-		boolean cmd = !node.getNode("command").isVirtual();
-		boolean ex = !node.getNode("commands").isVirtual();
-		if (!node.getNode("frames").isVirtual()) {
-			return buildFormat(node, new AnimatedFormat(node), event, cmd, ex);
+		try {
+			return node.getValue(type);
+		} catch (ObjectMappingException e) {
+			return null;
 		}
-		if (!node.getNode("formats").isVirtual()) {
-			return buildFormat(node, new MultiFormat(node), event, cmd, ex);
-		}
-		return buildFormat(node, new StaticFormat(node), event, cmd, ex);
-	}
-
-	/**
-	 * Note: recursive
-	 */
-	private static Format buildFormat(ConfigurationNode node, Format towrap, boolean event, boolean command,
-			boolean ex) {
-		Format out = towrap;
-		if (event) {
-			return buildFormat(node, new EventFormat(node, towrap), false, command, ex);
-		}
-		if (command) {
-			return buildFormat(node, new CommandFormat(node, towrap), event, false, ex);
-		}
-		if (ex) {
-			return buildFormat(node, new ExecutingFormat(node, towrap), event, command, false);
-		}
-		return out;
 	}
 
 	/**
@@ -474,43 +440,74 @@ public abstract class Format implements Rootable {
 		case "animate":
 		case "a":
 			return af;
-		case "event":
-		case "e":
-			return ef;
-		case "effect":
-		case "animated effect":
-		case "animatedeffect":
-		case "animated-effect":
-		case "eff":
-			return aef;
-		case "executing":
-		case "exec":
-		case "execute":
-		case "x":
-			return xf;
 		case "multi":
 		case "many":
 		case "m":
 			return mf;
-		case "command":
-		case "cmd":
-		case "c":
-			return cf;
+		case "page":
+		case "pages":
+		case "paginated":
+		case "p":
+			return pf;
 		}
 		return sf;
 	}
 
-	private static ExecutingFormat xf = new ExecutingFormat(null, null);
-	private static AnimatedFormat af = new AnimatedFormat(null);
-	private static EffectFormat aef = new EffectFormat(null);
-	private static StaticFormat sf = new StaticFormat(null);
-	private static EventFormat ef = new EventFormat(null, null);
-	private static MultiFormat mf = new MultiFormat(null);
-	private static CommandFormat cf = new CommandFormat(null, null);
+	private static AnimatedFormat af = new AnimatedFormat();
+	private static StaticFormat sf = new StaticFormat();
+	private static MultiFormat mf = new MultiFormat();
+	private static PaginatedFormat pf = new PaginatedFormat();
 
 	@Override
 	public void applyRoot(String name, ConfigurationNode root) {
 		setName(name);
 		this.setNode(Utils.wrap(root));
+		ConfigurationNode r = root.getNode("args");
+		for (Map.Entry<String, Argument> e : args.entrySet()) {
+			e.getValue().applyRoot(e.getKey(), r.getNode(e.getKey()));
+		}
+		applyRootInt(name, root);
+	}
+
+	public abstract void applyRootInt(String name, ConfigurationNode root);
+
+	public Format getTopOwner() {
+		Format cur = this;
+		while (cur.getOwner().isPresent()) {
+			cur = cur.getOwner().get();
+		}
+		return cur;
+	}
+
+	public Text formatVariable(String key, ParsableData data, Text var) {
+		if (args == null || args.isEmpty()) {
+			return var;
+		}
+		Argument a = args.get(key);
+		if (a == null) {
+			return var;
+		}
+		Text v2 = a.getValue(data);
+		if (a.override()) {
+			return v2;
+		} else {
+			return TextUtils.mergeOnto(v2, var);
+		}
+	}
+
+	/**
+	 * @return the owner
+	 */
+	public Optional<Format> getOwner() {
+		return Utils.wrap(owner);
+	}
+
+	/**
+	 * @param owner
+	 *            the owner to set
+	 */
+	public void setOwner(Format owner) {
+		this.owner = owner;
+		this.loc = owner.loc;
 	}
 }

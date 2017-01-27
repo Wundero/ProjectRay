@@ -118,31 +118,13 @@ public class PaginatedFormat extends Format {
 
 	@Override
 	public Prompt getConversationBuilder(Prompt returnTo, ConversationContext context) {
-		return Format.buildConversation(new AnotherFormatPrompt(returnTo), context, context.getData("node", ConfigurationNode.class, null));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
-		int i = index.orElse(0);
-		if (i < 0 || i >= pages.size()) {
-			return Optional.empty();
-		}
-		Format f = pages.get(i);
-		if (f.getClass().equals(clazz)) {
-			return (Optional<T>) Utils.wrap(f);
-		} else {
-			return f.getInternal(clazz, index);
-		}
+		return Format.buildConversation(new AnotherFormatPrompt(returnTo), context,
+				context.getData("node", ConfigurationNode.class, null));
 	}
 
 	@Override
-	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
-		return getInternal(clazz, index).isPresent();
-	}
-
-	@Override
-	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
+	public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender, Optional<UUID> u,
+			boolean broadcast) {
 		int i = (Integer) Utils.wrap(args.get("page")).orElse(0);
 		if (i < 0 || i >= pages.size()) {
 			return false;
@@ -151,12 +133,20 @@ public class PaginatedFormat extends Format {
 	}
 
 	@Override
-	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u, boolean broadcast) {
+	public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender, Optional<UUID> u,
+			boolean broadcast) {
 		int i = data.getPage().orElse(0);
 		if (i < 0 || i >= pages.size()) {
 			return false;
 		}
 		return pages.get(i).send(target, data, sender, u, broadcast);
+	}
+
+	@Override
+	public void applyRootInt(String name, ConfigurationNode root) {
+		for(Format f : this.pages) {
+			f.setOwner(this);
+		}
 	}
 
 }

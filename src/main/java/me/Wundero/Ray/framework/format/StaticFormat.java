@@ -23,27 +23,27 @@ package me.Wundero.Ray.framework.format;
  SOFTWARE.
  */
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import com.google.common.reflect.TypeToken;
-
-import me.Wundero.Ray.config.InternalClickAction;
-import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.conversation.Conversation;
 import me.Wundero.Ray.conversation.ConversationContext;
 import me.Wundero.Ray.conversation.Option;
 import me.Wundero.Ray.conversation.Prompt;
+import me.Wundero.Ray.framework.execute.Executable;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.location.FormatLocation;
 import me.Wundero.Ray.framework.format.location.FormatLocations;
@@ -58,31 +58,51 @@ import ninja.leaping.configurate.objectmapping.Setting;
  */
 public class StaticFormat extends Format {
 
-	@Setting
-	private TextTemplate template;
-
-	/**
-	 * @return the template this parses, if it exists.
-	 */
-	public Optional<TextTemplate> getTemplate() {
-		return Utils.wrap(template);
-	}
+	// TODO name
+	@Setting("TODO name me")
+	private Map<String, Executable> sendables;
 
 	@Override
 	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u,
 			boolean broadcast) {
-		if (!getTemplate().isPresent()) {
+		if (sendables == null || sendables.isEmpty()) {
 			return false;
 		}
-		return this.s(f, args, getTemplate().get(), o, u, broadcast);
+		boolean b = false;
+		for (Executable e : sendables.values()) {
+			Optional<? extends TextRepresentable> o2 = e.send(f);
+			if (!o2.isPresent()) {
+				continue;
+			}
+			TextRepresentable t = o2.get();
+			if (t instanceof TextTemplate) {
+				this.s(f, args, (TextTemplate) t, o, u, broadcast);
+			} else {
+				this.s(f, args, t.toText(), o, u, broadcast);
+			}
+		}
+		return b;
 	}
 
 	@Override
 	public boolean send(MessageReceiver f, ParsableData data, Optional<Object> o, Optional<UUID> u, boolean broadcast) {
-		if (!getTemplate().isPresent()) {
+		if (sendables == null || sendables.isEmpty()) {
 			return false;
 		}
-		return this.s(f, data, getTemplate().get(), o, u, broadcast);
+		boolean b = false;
+		for (Executable e : sendables.values()) {
+			Optional<? extends TextRepresentable> o2 = e.send(f);
+			if (!o2.isPresent()) {
+				continue;
+			}
+			TextRepresentable t = o2.get();
+			if (t instanceof TextTemplate) {
+				this.s(f, data, (TextTemplate) t, o, u, broadcast);
+			} else {
+				this.s(f, data, t.toText(), o, u, broadcast);
+			}
+		}
+		return b;
 	}
 
 	private static class LocationPrompt extends Prompt {
@@ -418,13 +438,12 @@ public class StaticFormat extends Format {
 	private static class TextBuilderPrompt extends Prompt {
 
 		private Text text;
-		private InternalClickAction<?> click;
-		private InternalHoverAction<?> hover;
+		private ClickAction<?> click;
+		private HoverAction<?> hover;
 		private String value;
 		private Prompt r;
 
-		public TextBuilderPrompt(Prompt r, Text text, InternalClickAction<?> click, InternalHoverAction<?> hover,
-				String value) {
+		public TextBuilderPrompt(Prompt r, Text text, ClickAction<?> click, HoverAction<?> hover, String value) {
 			this(TextTemplate.of(Text.of(TextColors.GRAY, "Please input a " + value + ":")));
 			this.text = text;
 			this.hover = hover;
@@ -476,8 +495,7 @@ public class StaticFormat extends Format {
 				click = findClick(text);
 				return new TextTypePrompt(this, r);
 			case "hover":
-				hover = InternalHoverAction.builder().withResult(TextUtils.parse(text, true))
-						.build(InternalHoverAction.ShowTemplate.class);
+				hover = TextActions.showText(TextUtils.convertToText(TextUtils.parse(text, true)));
 				return new TextTypePrompt(this, r);
 			}
 			return this;
@@ -485,71 +503,24 @@ public class StaticFormat extends Format {
 
 	}
 
-	private static InternalClickAction<?> findClick(String t) {
+	private static ClickAction<?> findClick(String t) {
 		String text = t.toLowerCase();
-		Class<?> clickType = InternalClickAction.SuggestTemplate.class;
 		if (text.toLowerCase().startsWith("run:")) {
-			clickType = InternalClickAction.RunTemplate.class;
 			text = text.substring(4);
+			return TextActions.runCommand(text);
+		}
+		if (text.toLowerCase().startsWith("url:")) {
+			text = text.substring(4);
+			Optional<URL> u = Utils.toUrlSafe(text);
+			if (!u.isPresent()) {
+				return TextActions.suggestCommand("ERROR");
+			}
+			return TextActions.openUrl(u.get());
 		}
 		if (text.toLowerCase().startsWith("suggest:")) {
 			text = text.substring(8);
 		}
-		if (text.toLowerCase().startsWith("url:")) {
-			clickType = InternalClickAction.UrlTemplate.class;
-			text = text.substring(4);
-		}
-		return InternalClickAction.builder().withResult(TextUtils.parse(text, true)).build(clickType);
-	}
-
-	public Text formatVariable(String key, Text var) {
-		if (!this.getNode().isPresent()) {
-			return var;
-		}
-		ConfigurationNode n = this.getNode().get();
-		if (n.getNode("args").isVirtual()) {
-			return var;
-		}
-		n = n.getNode("args").getNode(key);
-		if (!n.getNode("click").isVirtual()) {
-			String c = n.getNode("click").getString();
-			if (c != null) {
-				InternalClickAction<?> act = findClick(c);
-				var = TextUtils.forEachText(var, t -> {
-					Text.Builder b = t.toBuilder();
-					act.applyTo(b);
-					return b.build();
-				});
-			}
-		}
-		if (!n.getNode("hover").isVirtual()) {
-			Text t = null;
-			try {
-				t = n.getNode("hover").getValue(TypeToken.of(Text.class));
-				if (t == null) {
-					throw new NullPointerException();
-				}
-			} catch (Exception e) {
-				String s = null;
-				try {
-					List<String> l = n.getNode("hover").getList(TypeToken.of(String.class));
-					if (l == null || l.isEmpty()) {
-						throw new NullPointerException();
-					}
-					s = Utils.join("\n", l);
-				} catch (Exception e2) {
-					s = n.getNode("hover").getString();
-				}
-				if (s != null) {
-					t = TextSerializers.FORMATTING_CODE.deserialize(s);
-				}
-			}
-			if (t != null) {
-				HoverAction<Text> h = TextActions.showText(t);
-				var = TextUtils.forEachText(var, tx -> tx.toBuilder().onHover(h).build());
-			}
-		}
-		return var;
+		return TextActions.suggestCommand(text);
 	}
 
 	@Override
@@ -558,13 +529,8 @@ public class StaticFormat extends Format {
 	}
 
 	@Override
-	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
-		return false;
-	}
+	public void applyRootInt(String name, ConfigurationNode root) {
 
-	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
-		return Optional.empty();
 	}
 
 }

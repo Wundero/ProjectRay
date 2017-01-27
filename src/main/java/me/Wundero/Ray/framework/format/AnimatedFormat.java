@@ -45,12 +45,17 @@ import me.Wundero.Ray.utils.RayCollectors;
 import me.Wundero.Ray.utils.Utils;
 import me.Wundero.Ray.variables.ParsableData;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 /**
  * Represents an animated format. This type stores numerous formats, each with
  * delays.
  */
+@ConfigSerializable
 public class AnimatedFormat extends Format {
+	@Setting("frames")
+	private Map<String, Format> frameLoadable = Utils.hm();
 	private Map<Format, Integer> frameWithDelay = Utils.sm();
 	private List<Format> inOrder = Utils.sl();
 	private Optional<Integer> initialDelay = Optional.empty();
@@ -79,37 +84,24 @@ public class AnimatedFormat extends Format {
 		public void setO(int o) {
 			this.o = o;
 		}
-
 	}
 
-	/**
-	 * Create a new animated format.
-	 */
-	public AnimatedFormat(ConfigurationNode node) {
-		super(node);
-		if (node == null || node.isVirtual()) {
-			return;
-		}
-		ConfigurationNode frames = node.getNode("frames");
-		this.initialDelay = Utils.wrap(node.getNode("initial-delay").getInt());
+	@Override
+	public void applyRootInt(String n, ConfigurationNode r) {
+		this.initialDelay = Utils.wrap(r.getNode("initial-delay").getInt());
 		Map<Format, Integer> t = Utils.hm();
+		ConfigurationNode rr = r.getNode("frames");
 		List<Frame> framez = Utils.al();
-		for (ConfigurationNode frame : frames.getChildrenMap().values()) {
-			Format f = null;
-			try {
-				f = Format.create(frame);
-				if (f == null) {
-					continue;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				continue;
-			}
-			int n = frame.getNode("number").getInt(-1);
-			int d = frame.getNode("stay").getInt(10);
+		for (Map.Entry<String, Format> e : frameLoadable.entrySet()) {
+			Format f = e.getValue();
+			f.setOwner(this);
+			ConfigurationNode rrr = rr.getNode(e.getKey());
+			f.applyRoot(e.getKey(), rrr);
+			int n2 = rrr.getNode("number").getInt(-1);
+			int d = rrr.getNode("stay").getInt(10);
 			if (f != null) {
 				t.put(f, d);
-				framez.add(new Frame(f, n));
+				framez.add(new Frame(f, n2));
 			}
 		}
 		framez.sort((frame1, frame2) -> {
@@ -117,7 +109,7 @@ public class AnimatedFormat extends Format {
 		});
 		inOrder = framez.stream().map(frame -> frame.getV()).collect(RayCollectors.syncList());
 		initialDelay.ifPresent((delay) -> {
-			Format f = new Format(null) {
+			Format f = new Format() {
 
 				@Override
 				public boolean equals(Object o) {
@@ -130,16 +122,6 @@ public class AnimatedFormat extends Format {
 				}
 
 				@Override
-				public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
-					return Optional.empty();
-				}
-
-				@Override
-				public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
-					return false;
-				}
-
-				@Override
 				public boolean send(MessageReceiver target, Map<String, Object> args, Optional<Object> sender,
 						Optional<UUID> u, boolean b) {
 					return true;
@@ -149,6 +131,10 @@ public class AnimatedFormat extends Format {
 				public boolean send(MessageReceiver target, ParsableData data, Optional<Object> sender,
 						Optional<UUID> u, boolean b) {
 					return true;
+				}
+
+				@Override
+				public void applyRootInt(String name, ConfigurationNode root) {
 				}
 			};
 			inOrder.add(0, f);
@@ -173,13 +159,6 @@ public class AnimatedFormat extends Format {
 			}
 			if (!template.send(p, args, opt, u, b)) {
 				return -1;
-			} else {
-				if (template instanceof ExecutingFormat
-						|| template.hasInternal(ExecutingFormat.class, Optional.empty())) {
-					Format ft = template instanceof ExecutingFormat ? template
-							: template.getInternal(ExecutingFormat.class, Optional.empty()).get();
-					((ExecutingFormat) ft).execConsoles(uuid, Math.min(1000, frameWithDelay.get(template) - 1));
-				}
 			}
 			return frameWithDelay.get(template);
 		}, (template) -> {
@@ -210,13 +189,6 @@ public class AnimatedFormat extends Format {
 			}
 			if (!template.send(p, data, opt, u, b)) {
 				return -1;
-			} else {
-				if (template instanceof ExecutingFormat
-						|| template.hasInternal(ExecutingFormat.class, Optional.empty())) {
-					Format ft = template instanceof ExecutingFormat ? template
-							: template.getInternal(ExecutingFormat.class, Optional.empty()).get();
-					((ExecutingFormat) ft).execConsoles(uuid, Math.min(1000, frameWithDelay.get(template) - 1));
-				}
 			}
 			return frameWithDelay.get(template);
 		}, (template) -> {
@@ -355,8 +327,6 @@ public class AnimatedFormat extends Format {
 
 	}
 
-	private static UUID uuid = UUID.randomUUID();
-
 	/**
 	 * Creation prompt.
 	 */
@@ -372,25 +342,4 @@ public class AnimatedFormat extends Format {
 				context.getData("frame0", ConfigurationNode.class, null));
 	}
 
-	@Override
-	public boolean hasInternal(Class<? extends Format> clazz, Optional<Integer> index) {
-		return getInternal(clazz, index).isPresent();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Format> Optional<T> getInternal(Class<T> clazz, Optional<Integer> index) {
-		if (index.isPresent() && index.get() >= 0 && index.get() < inOrder.size()) {
-			Format f = this.inOrder.get(index.get());
-			if (!f.getClass().equals(clazz)) {
-				if (!f.getInternal(clazz, index).isPresent()) {
-					return Optional.empty();
-				} else {
-					return f.getInternal(clazz, index);
-				}
-			}
-			return (Optional<T>) Utils.wrap(f);
-		}
-		return Optional.empty();
-	}
-};
+}

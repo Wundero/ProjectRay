@@ -26,13 +26,11 @@ package me.Wundero.Ray.conversation.format;
 import java.util.List;
 import java.util.Optional;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.World;
 
 import me.Wundero.Ray.Ray;
 import me.Wundero.Ray.conversation.Conversation;
@@ -56,6 +54,7 @@ import me.Wundero.Ray.translation.Translator;
 import me.Wundero.Ray.utils.TextUtils;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /**
  * A class that creates a format from a conversation. This method is far better
@@ -154,10 +153,11 @@ public class FormatConversation {
 		@Override
 		public Optional<List<Option>> options(ConversationContext context) {
 			List<Option> options = Utils.al();
-			for (String g : Ray.get().getGroups().getGroups(context.getData("world", String.class, "")).keySet()) {
+			for (Group g2 : Ray.get().getGroups().getGroups()) {
+				String g = g2.getName();
 				options.add(new Option(g, Text.builder(g).color(TextColors.GOLD).onClick(TextActions.runCommand(g))
 						.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to select " + g + "!"))).build(),
-						Ray.get().getGroups().getGroup(g, context.getData("world", String.class, ""))));
+						g2));
 			}
 			return Optional.of(options);
 		}
@@ -174,7 +174,13 @@ public class FormatConversation {
 			if (selected.isPresent()) {
 				context.putData("group", selected.get().getValue());
 			} else {
-				Group g = Ray.get().getGroups().load(node.getNode(text));
+				Group g;
+				try {
+					g = node.getNode(text).getValue(Group.type);
+				} catch (ObjectMappingException e) {
+					context.sendMessage(Text.of(TextColors.RED, "Failed to create group!"));
+					return null;
+				}
 				context.putData("group", g);
 				context.putData("wipegroup", true);
 			}

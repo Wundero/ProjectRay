@@ -26,31 +26,22 @@ package me.Wundero.Ray.utils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.Validate;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.scoreboard.Score;
-import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextTemplate;
@@ -73,8 +64,6 @@ import org.spongepowered.api.text.translation.locale.Locales;
 import com.flowpowered.math.GenericMath;
 
 import me.Wundero.Ray.Ray;
-import me.Wundero.Ray.config.InternalClickAction;
-import me.Wundero.Ray.config.InternalHoverAction;
 import me.Wundero.Ray.variables.ParsableData;
 
 /**
@@ -595,118 +584,6 @@ public class TextUtils {
 			x++;
 		}
 		return out;
-	}
-
-	/**
-	 * Create an internalclickaction with a url template.
-	 */
-	public static InternalClickAction<?> urlTemplate(TextTemplate t) {
-		return new InternalClickAction.UrlTemplate(t);
-	}
-
-	/**
-	 * Create an internalclickaction with a suggest template.
-	 */
-	public static InternalClickAction<?> suggestTemplate(TextTemplate t) {
-		return new InternalClickAction.SuggestTemplate(t);
-	}
-
-	/**
-	 * Create an internalclickaction with a run template.
-	 */
-	public static InternalClickAction<?> runTemplate(TextTemplate t) {
-		return new InternalClickAction.RunTemplate(t);
-	}
-
-	/**
-	 * Create an internalclickaction with a callback.
-	 */
-	public static InternalClickAction<?> executeCallback(Consumer<CommandSource> c) {
-		return new InternalClickAction.ExecuteCallback(c);
-	}
-
-	/**
-	 * Create an internalclickaction with a page change.
-	 */
-	public static InternalClickAction<?> changePage(int i) {
-		return new InternalClickAction.ChangePage(i);
-	}
-
-	/**
-	 * Create an internalclickaction with a url.
-	 */
-	public static InternalClickAction<?> openUrl(URL u) {
-		return new InternalClickAction.OpenUrl(u);
-	}
-
-	/**
-	 * Create an internalclickaction with a suggest command.
-	 */
-	public static InternalClickAction<?> suggestCommand(String s) {
-		return new InternalClickAction.SuggestCommand(s);
-	}
-
-	/**
-	 * Create an internalclickaction with a run command.
-	 */
-	public static InternalClickAction<?> runCommand(String s) {
-		return new InternalClickAction.RunCommand(s);
-	}
-
-	/**
-	 * Create an internalhoveraction with an entity
-	 */
-	public static InternalHoverAction.ShowEntity showEntity(InternalHoverAction.ShowEntity.Ref entity) {
-		return new InternalHoverAction.ShowEntity(entity);
-	}
-
-	/**
-	 * Create an internalhoveraction with an entity
-	 */
-	public static InternalHoverAction.ShowEntity showEntity(UUID uuid, String name, @Nullable EntityType type) {
-		return showEntity(new InternalHoverAction.ShowEntity.Ref(uuid, name, type));
-	}
-
-	/**
-	 * Create an internalhoveraction with an entity
-	 */
-	public static InternalHoverAction.ShowEntity showEntity(UUID uuid, String name) {
-		return showEntity(new InternalHoverAction.ShowEntity.Ref(uuid, name));
-	}
-
-	/**
-	 * Create an internalhoveraction with an entity
-	 */
-	public static InternalHoverAction.ShowEntity showEntity(Entity entity, String name) {
-		return showEntity(new InternalHoverAction.ShowEntity.Ref(entity, name));
-	}
-
-	/**
-	 * Create an internalhoveraction with an item
-	 */
-	public static InternalHoverAction<?> showItem(ItemStackSnapshot i) {
-		return new InternalHoverAction.ShowItem(i);
-	}
-
-	/**
-	 * Create an internalhoveraction with an achievement
-	 */
-	public static InternalHoverAction<?> showAchievement(Achievement a) {
-		return new InternalHoverAction.ShowAchievement(a);
-	}
-
-	/**
-	 * Create an internalhoveraction with a text.
-	 */
-	public static InternalHoverAction<?> showText(Text t) {
-		return new InternalHoverAction.ShowText(t);
-	}
-
-	/**
-	 * Create an internalhoveraction with a template.
-	 */
-	public static InternalHoverAction<?> showTemplate(TextTemplate t) {
-		return new InternalHoverAction.ShowTemplate(t);
 	}
 
 	/**
@@ -1554,13 +1431,14 @@ public class TextUtils {
 	/**
 	 * Parse a text for variables, and replace them.
 	 */
-	public static Text vars(Text t, ParsableData data) {
+	public static Text vars(Text t, ParsableData data, boolean... perms) {
 		if (!(t instanceof LiteralText)) {
 			return t;
 		}
+		boolean chp = perms.length > 0 && perms[0];
 		if (data.getSender().isPresent()) {
 			Player s = data.getSender().get();
-			if (!s.hasPermission("ray.vars")) {
+			if (!s.hasPermission("ray.vars") || chp) {
 				return t;
 			}
 		}

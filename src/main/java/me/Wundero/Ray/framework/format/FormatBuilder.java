@@ -32,7 +32,6 @@ import org.spongepowered.api.text.TextTemplate.Arg;
 
 import com.google.common.reflect.TypeToken;
 
-import me.Wundero.Ray.config.DefaultArg;
 import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.framework.format.context.FormatContext;
 import me.Wundero.Ray.framework.format.context.FormatContexts;
@@ -79,7 +78,11 @@ public class FormatBuilder {
 		} catch (ObjectMappingException e) {
 			Utils.printError(e);
 		}
-		return new StaticFormat(node);
+		try {
+			return node.getValue(Format.type);
+		} catch (ObjectMappingException e) {
+			return null;
+		}
 	}
 
 	/**
@@ -112,13 +115,6 @@ public class FormatBuilder {
 	 */
 	public FormatBuilder withArg(String key, String click, String hover) {
 		return withArg(TextTemplate.arg(key), click, hover);
-	}
-
-	/**
-	 * Add an arg
-	 */
-	public FormatBuilder withArg(DefaultArg arg) {
-		return withArg(arg.getBuilder(), arg.getClick(), arg.getHover());
 	}
 
 	/**
