@@ -12,6 +12,7 @@ import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import me.Wundero.Ray.Ray;
+import me.Wundero.Ray.framework.Group;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.objectmapping.Setting;
 
@@ -43,19 +44,14 @@ public class EventTrigger extends Trigger {
 
 	@Setting
 	private String event;
-	//TODO event filters + more data
-	//TODO choose targets - sender, event target, event targets, all?
-	//TODO mod event opts - cancel, cancelmsg, changecmd, etc.
+	// TODO event filters + more data
+	// TODO choose targets - sender, event target, event targets, all?
+	// TODO mod event opts - cancel, cancelmsg, changecmd, etc.
 	/*
-	 * Example triggers:
-	 * player block break/place/change [break is ex]
-	 *  - event: blockbreak
-	 *  - fitler for certain broken blocks
-	 *  - vars contains broken block
-	 *  - cancel event opt
-	 *  - cancel msg opt
-	 * player join
-	 *  - filter first join for welcome
+	 * Example triggers: player block break/place/change [break is ex] - event:
+	 * blockbreak - fitler for certain broken blocks - vars contains broken
+	 * block - cancel event opt - cancel msg opt player join - filter first join
+	 * for welcome
 	 */
 
 	private static Map<String, Class<? extends Event>> presetClasses = Utils.sm();
@@ -69,7 +65,9 @@ public class EventTrigger extends Trigger {
 		presetClasses.put("kick", KickPlayerEvent.class);
 	}
 
-	public EventTrigger() {
+	@Override
+	public void setGroup(Group g) {
+		super.setGroup(g);
 		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
 	}
 
@@ -82,7 +80,9 @@ public class EventTrigger extends Trigger {
 					return;
 				}
 			} else {
-				return;
+				if (!c.getSimpleName().equalsIgnoreCase(event)) {
+					return;
+				}
 			}
 		}
 		// TODO event loading

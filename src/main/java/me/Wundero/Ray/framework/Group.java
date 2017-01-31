@@ -14,6 +14,7 @@ import me.Wundero.Ray.config.Rootable;
 import me.Wundero.Ray.framework.format.Format;
 import me.Wundero.Ray.framework.format.FormatCollection;
 import me.Wundero.Ray.framework.format.context.FormatContext;
+import me.Wundero.Ray.framework.trigger.Trigger;
 import me.Wundero.Ray.utils.Utils;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.Setting;
@@ -64,6 +65,8 @@ public class Group implements Rootable {
 	private int priority = 0;
 	@Setting
 	private String permission;
+	@Setting
+	private Map<String, Trigger> triggers = Utils.sm();
 	private String name;
 	@Nullable
 	private ConfigurationNode config;
@@ -77,7 +80,7 @@ public class Group implements Rootable {
 	}
 
 	private void applyAll() {
-		all.values().forEach(f -> {
+		all.forEach((s, f) -> {
 			FormatContext type = f.getContext();
 			FormatCollection fc = formats.get(type);
 			if (fc == null) {
@@ -96,14 +99,13 @@ public class Group implements Rootable {
 	 */
 	public FormatCollection getAllFormats() {
 		List<Format> out = Utils.al();
-		for (Format f : all.values()) {
-			out.add(f);
-		}
+		all.forEach((s, f) -> out.add(f));
 		return new FormatCollection(out);
 	}
 
 	/**
-	 * @param recurseTimes number of times to recurse.
+	 * @param recurseTimes
+	 *            number of times to recurse.
 	 * 
 	 * @return all formats on all worlds, for this and parents.
 	 */
@@ -112,7 +114,8 @@ public class Group implements Rootable {
 		out2.addAll(getAllFormats().get());
 		List<Group> groups = getParentsGroups();
 		for (Group g : groups) {
-			out2.addAll(recurseTimes > 0 || recurseTimes < 16 ? g.getAllFormats(recurseTimes - 1).get() : g.getAllFormats().get());
+			out2.addAll(recurseTimes > 0 || recurseTimes < 16 ? g.getAllFormats(recurseTimes - 1).get()
+					: g.getAllFormats().get());
 		}
 		return new FormatCollection(out2);
 	}
@@ -255,6 +258,7 @@ public class Group implements Rootable {
 			e.getValue().applyRoot(name, root.getNode("formats").getNode(e.getKey()));
 		}
 		applyAll();
+		this.triggers.forEach((s, t) -> t.setGroup(this));
 	}
 
 	/**

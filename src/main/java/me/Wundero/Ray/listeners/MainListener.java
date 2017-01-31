@@ -74,13 +74,13 @@ import me.Wundero.Ray.variables.ParsableData;
  */
 public class MainListener {
 
-	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
+	private static Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel, boolean broadcast) {
 		return handle(t, e, v, p, channel, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
 				broadcast);
 	}
 
-	private Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
+	private static Tristate handle(FormatContext t, MessageChannelEvent e, Map<String, Object> v, final Player p,
 			MessageChannel channel, Optional<Player> msgsender, Optional<Player> msgrecip, Optional<String> formatName,
 			Optional<Player> observer, boolean broadcast) {
 		if (e == null) {

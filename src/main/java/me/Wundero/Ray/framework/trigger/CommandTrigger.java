@@ -44,15 +44,15 @@ public class CommandTrigger extends Trigger {
 
 	/*
 	 * TODO more opts
-	 * cancel - cancel cmd
-	 * filter cmds for args/names
-	 * aliases
+	 * filter cmds for args/names/aliases
 	 * more stuff
 	 * target choosing - sender, cmd targets, cmd target[x], all?
 	 */
-	
+
 	@Setting
 	private String command;
+	@Setting
+	private boolean cancel = false;
 
 	public CommandTrigger() {
 		Sponge.getEventManager().registerListeners(Ray.get().getPlugin(), this);
@@ -64,16 +64,19 @@ public class CommandTrigger extends Trigger {
 		vars.put("command", event.getCommand());
 		vars.put("args", event.getArguments());
 		vars.put("full command", "/" + event.getCommand() + event.getArguments());
-		CommandSource src = event.getCause().first(CommandSource.class).orElse(Sponge.getServer().getConsole());
-		if (!(src instanceof Player)) {
-			return;
-		}
-		Player p = (Player) src;
-		List<Player> targets = parseForPlayer(event.getArguments());
 		ParsableData d = new ParsableData();
-		d.withSender(p);
+		CommandSource src = event.getCause().first(CommandSource.class).orElse(Sponge.getServer().getConsole());
+		if (src instanceof Player) {
+			Player p = (Player) src;
+			d.withSender(p);
+		}
+		List<Player> targets = parseForPlayer(event.getArguments());
 		d.withKnown(vars);
-		trigger(d, targets);
+		if (trigger(d, targets) > 0) {
+			if (cancel) {
+				event.setCancelled(true);
+			}
+		}
 	}
 
 	private static List<Player> parseForPlayer(String args) {

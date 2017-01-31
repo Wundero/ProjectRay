@@ -64,7 +64,7 @@ public class RayCommand implements CommandExecutor {
 		return CommandResult.success();
 	}
 
-	private Text buildTextForCmd(CommandSource src, CommandCallable cmd, List<String> aliases) {
+	private static Text buildTextForCmd(CommandSource src, CommandCallable cmd, List<String> aliases) {
 		Text out = Text.builder("/ray " + aliases.get(0) + " ").color(TextColors.DARK_GREEN)
 				.onClick(TextActions.suggestCommand("/ray " + aliases.get(0)))
 				.onHover(TextActions.showText(Text.of(TextColors.AQUA, "Click to use the command!"))).build();

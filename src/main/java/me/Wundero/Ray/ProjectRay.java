@@ -66,9 +66,13 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  * This class is the main instance of the plugin, which stores much of Sponge's
  * plugin requisite information.
  */
-@Plugin(id = "ray", name = "Ray", version = "0.1.0", description = "A comprehensive and inclusive chat plugin.", authors = {
+@Plugin(id = ProjectRay.ID, name = ProjectRay.NAME, version = ProjectRay.VERSION, description = "A comprehensive and inclusive chat plugin.", authors = {
 		"Wundero" })
 public class ProjectRay {
+
+	public static final String NAME = "Ray";
+	public static final String ID = "ray";
+	public static final String VERSION = "1.0.0";
 
 	/**
 	 * The logger used by the plugin.
@@ -118,13 +122,6 @@ public class ProjectRay {
 	 */
 	public Game getGame() {
 		return game;
-	}
-
-	/**
-	 * Get the version of the plugin.
-	 */
-	public String getVersion() {
-		return "1.0.0";
 	}
 
 	/**

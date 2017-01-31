@@ -254,7 +254,7 @@ public class RayPlayer {
 		tabHFTask.cancel();
 	}
 
-	private synchronized Text pop(Deque<Text> from, Text def) {
+	private synchronized static Text pop(Deque<Text> from, Text def) {
 		return Utils.pop(from, def);
 	}
 
