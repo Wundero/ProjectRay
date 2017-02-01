@@ -23,9 +23,21 @@ package me.Wundero.Ray.config;
  SOFTWARE.
  */
 
+import com.google.common.reflect.TypeToken;
+
+import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 @ConfigSerializable
 public class TextConfig {
-
+	public static TypeToken<TextConfig> type = TypeToken.of(TextConfig.class);
+	@Setting
+	public Error error;
+	@ConfigSerializable
+	public class Error {
+		@Setting("no-permission")
+		private String noPerm = "&cYou are not allowed to do that!";
+		@Setting
+		private String invalid = "&cThat is not a valid {0}!";
+	}
 }

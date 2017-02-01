@@ -45,7 +45,6 @@ public abstract class Trigger {
 
 	@Setting
 	protected List<String> formats = Utils.al();
-	private Group group;
 	private List<Format> fmts = Utils.al();
 
 	public int trigger(ParsableData data, List<Player> targets) {
@@ -68,7 +67,6 @@ public abstract class Trigger {
 	}
 
 	public void setGroup(Group g) {
-		this.group = g;
 		this.fmts = g.getAllFormats().get().stream().filter(f -> formats.contains(f.getName()))
 				.collect(RayCollectors.rayList());
 	}

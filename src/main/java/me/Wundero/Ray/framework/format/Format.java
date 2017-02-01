@@ -73,6 +73,14 @@ public abstract class Format implements Rootable {
 	@Setting
 	private Map<String, Argument> args = Utils.hm();
 
+	public void addArg(String name, Argument arg) {
+		if (name == null || arg == null) {
+			return;
+		}
+		arg.applyRoot(name, null);
+		args.put(name, arg);
+	}
+
 	/**
 	 * Compare formats.
 	 */

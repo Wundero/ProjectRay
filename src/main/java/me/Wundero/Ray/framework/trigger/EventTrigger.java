@@ -42,6 +42,13 @@ import ninja.leaping.configurate.objectmapping.Setting;
 
 public class EventTrigger extends Trigger {
 
+	public EventTrigger() {
+	}
+
+	public EventTrigger(String event) {
+		this.event = event;
+	}
+
 	@Setting
 	private String event;
 	// TODO event filters + more data

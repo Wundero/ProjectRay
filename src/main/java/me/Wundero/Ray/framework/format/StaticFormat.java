@@ -61,6 +61,13 @@ public class StaticFormat extends Format {
 	@Setting("executables")
 	private Map<String, Executable> sendables;
 
+	public void addExe(String name, Executable exe) {
+		if (name == null || exe == null) {
+			return;
+		}
+		this.sendables.put(name, exe);
+	}
+
 	@Override
 	public boolean send(MessageReceiver f, Map<String, Object> args, Optional<Object> o, Optional<UUID> u,
 			boolean broadcast) {

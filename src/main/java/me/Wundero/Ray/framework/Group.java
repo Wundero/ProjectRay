@@ -71,6 +71,13 @@ public class Group implements Rootable {
 	@Nullable
 	private ConfigurationNode config;
 
+	public void addTrigger(String name, Trigger trigger) {
+		if (name == null || trigger == null) {
+			return;
+		}
+		this.triggers.put(name, trigger);
+	}
+
 	/**
 	 * Add a format to the group.
 	 */

@@ -53,6 +53,14 @@ public class Groups implements Rootable {
 	public void terminate() {
 		groups.clear();
 	}
+	
+	public void addGroup(String name, Group group) {
+		if(name==null || group==null) {
+			return;
+		}
+		groups.put(name, group);
+		group.setName(name);
+	}
 
 	/**
 	 * Return all groups from all worlds.

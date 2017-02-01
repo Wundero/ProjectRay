@@ -40,7 +40,23 @@ public class Argument implements Rootable {
 	private Text value;
 	@Setting
 	private boolean override = false;
-	
+
+	public Argument() {
+	}
+
+	public Argument(String k, Text v) {
+		this.key = k;
+		this.value = v;
+	}
+
+	public void setValue(Text text) {
+		this.value = text;
+	}
+
+	public void setOverride(boolean o) {
+		this.override = o;
+	}
+
 	/**
 	 * @return whether to override the string in the text.
 	 */

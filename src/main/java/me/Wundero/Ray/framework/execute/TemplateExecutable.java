@@ -36,6 +36,13 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 @ConfigSerializable
 public class TemplateExecutable implements Executable {
 
+	public TemplateExecutable() {
+	}
+
+	public TemplateExecutable(TextTemplate template) {
+		this.template = template;
+	}
+
 	@Setting
 	private TextTemplate template;
 
